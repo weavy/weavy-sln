@@ -1,0 +1,17 @@
+﻿@model ActivityAppModel
+@{
+    Title = "Activity";
+}
+
+<div class="container-fluid my-3">
+    @if (Model.Activities.Any()) {
+        <div class="list-group mb-4" id="infinite-scroll-target">
+            @{ Html.RenderPartial("~/Views/Content/_ListItems.cshtml", Model.Activities); }
+        </div>
+        @Html.ScrollMore(Model.Activities)
+    } else {
+        <p class="empty text-center text-muted py-4">
+            Nothing’s happened yet! But as soon as you get the ball rolling, everything will be summarized for you right here.
+        </p>
+    }
+</div>

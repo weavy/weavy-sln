@@ -1,0 +1,8 @@
+﻿~/scripts/vendor/popper.js/popper.min.js
+~/scripts/vendor/bootstrap/util.js
+~/scripts/vendor/bootstrap/alert.js
+~/scripts/vendor/bootstrap/button.js
+~/scripts/vendor/bootstrap/dropdown.js
+~/scripts/src/bootstrap/modal.js
+~/scripts/vendor/bootstrap/tab.js
+~/scripts/vendor/bootstrap/tooltip.js

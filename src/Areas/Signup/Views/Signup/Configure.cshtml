@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Transfer";
+}
+<main>
+    <h1>Configuring...</h1>
+    <div class="text-center" data-mobile-set-url="@WeavyContext.ApplicationUrl" data-mobile-transfer-url="@WeavyContext.ApplicationUrl">
+        @Html.SvgSpinner(160, true)
+    </div>
+</main>
+
+@section scripts {
+    <script>
+        $(function () {
+            weavy.postal.post({ name: "setUrl", url: "@WeavyContext.ApplicationUrl", redirect: "@ONBOARDING_URL" }, null, true);
+        });
+    </script>
+}

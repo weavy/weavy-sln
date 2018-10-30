@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Package">
+
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)'==''">Release</Configuration>
+  </PropertyGroup>
+
+  <!-- custom tasks -->
+  <UsingTask TaskName="CreatePackage" AssemblyFile="$(MSBuildProjectDirectory)\tools\Weavy.Build.dll" />
+  <UsingTask TaskName="GetVersion" AssemblyFile="$(MSBuildProjectDirectory)\tools\Weavy.Build.dll" />
+
+  <!-- create deployment package -->
+  <Target Name="Package" DependsOnTargets="Precompile">
+    <GetVersion Path="$(MSBuildProjectDirectory)\src\obj\$(Configuration)\Wvy.dll">
+      <Output TaskParameter="Version" PropertyName="Version"/>
+    </GetVersion>
+    <CreatePackage Name="wvy-$(Version)" SolutionDir="$(MSBuildProjectDirectory)" />
+  </Target>
+
+    <!-- precompile razor views -->
+  <Target Name="Precompile" DependsOnTargets="Publish">
+    <Message Text="Precompiling views" Importance="High" />
+    <AspNetCompiler VirtualPath="/" PhysicalPath="$(MSBuildProjectDirectory)\dist\published" TargetPath="$(MSBuildProjectDirectory)\dist\compiled" Force="true" />
+    <Message Text="Merging precompiled views" Importance="High" />
+    <CSC OutputAssembly="$(MSBuildProjectDirectory)\src\obj\$(Configuration)\AssemblyInfo.dll" TargetType="library" NoLogo="false" Sources="$(MSBuildProjectDirectory)\src\Properties\AssemblyInfo.cs" />
+    <Exec Command="aspnet_merge.exe $(MSBuildProjectDirectory)\dist\compiled -o Wvy.Views -copyattrs $(MSBuildProjectDirectory)\src\obj\$(Configuration)\AssemblyInfo.dll -a -nologo" WorkingDirectory="$(MSBuildProjectDirectory)\tools" />
+  </Target>
+
+  <!-- publish project -->
+  <Target Name="Publish" DependsOnTargets="Restore">
+    <Message Text="Publishing project" Importance="High" />
+    <MSBuild Projects="$(MSBuildProjectDirectory)\Wvy.sln" Properties="Configuration=$(Configuration);DeployOnBuild=true;DeployDefaultTarget=WebPublish;WebPublishMethod=FileSystem;DeleteExistingFiles=true;publishUrl=$(MSBuildProjectDirectory)\dist\published" />
+  </Target>
+
+  <!-- package restore -->
+  <Target Name="Restore">
+    <Message Text="Restoring Nuget packages" Importance="High" />
+    <Exec Command="tools\nuget.exe restore Wvy.sln" WorkingDirectory="$(MSBuildProjectDirectory)"/>
+  </Target>
+</Project>

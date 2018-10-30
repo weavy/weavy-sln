@@ -1,0 +1,423 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+// Layout
+html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    //overflow: hidden; // NOTE: setting overflow:hidden on html prevents document previews from working properly
+   
+}
+
+html {
+    // show/hide stuff depending on if we are running embedded or standalone
+    &.embedded {
+        .d-standalone {
+            display: none !important;
+        }
+    }
+
+    &:not(.embedded) {
+        .d-embedded {
+            display: none !important;
+        }
+    }
+
+    // show/hide stuff depending on if we are running mobile
+    &.mobile {
+        .d-desktop {
+            display: none !important;
+        }
+    }
+
+    &:not(.mobile) {
+        .d-mobile {
+            display: none !important;
+        }
+    }
+}
+
+body {
+    background: $body-bg;
+    overflow: hidden;
+}
+
+.app {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+}
+
+
+.one {
+    // start with only one column visible
+    .pane-one {
+        width: 100%;
+    }
+
+    .pane-two, .pane-three {
+        display: none;
+    }
+}
+
+.two {
+    .pane-one, .pane-three {
+        display: none;
+    }
+
+    .pane-two {
+        width: 100%;
+    }
+}
+
+.three {
+    .pane-one {
+        display: none;
+    }
+
+    .pane-three {
+        width: 100%;
+    }
+}
+
+.pane-one {
+    .navbar-secondary {
+        .navbar-icons {
+            // hide new message dropdown
+            display: none;
+        }
+    }
+}
+
+.pane-two {
+    .navbar-secondary {
+        .navbar-icons {
+            display: flex !important;
+        }
+    }
+
+    .btn[data-show=drawer-details] {
+        // hide avatar
+        display: none;
+    }
+}
+
+@media (min-width: 649px) {
+    // show two columns now
+    .pane {
+        padding-top: $navbar-height;
+    }
+
+    #main {
+        .navbar-theme {
+            background-color: $body-bg;
+        }
+
+        .navbar-middle {
+            padding-left: $messenger-icon-width;
+        }
+    }
+
+    .one, .two {
+
+        .pane-one, .pane-two {
+            display: flex;
+        }
+
+        .pane-two {
+            .pane-header, .pane-body, .pane-footer {
+                border-left: $border-width solid $messenger-border-color;
+            }
+        }
+    }
+
+    .three {
+
+        .pane-one, .pane-three {
+            display: flex;
+        }
+
+        .pane-two {
+            display: none;
+        }
+
+        .pane-three {
+
+            .pane-header, .drawer-header, .pane-body, .drawer-body {
+                border-left: $border-width solid $messenger-border-color;
+            }
+        }
+    }
+}
+
+
+@media (min-width: 649px) and (max-width: 900px) {
+    .one, .two {
+
+        .pane-one {
+            width: 40%;
+        }
+
+        .pane-two {
+            width: 60%;
+        }
+    }
+
+    .three {
+        .pane-one {
+            width: 40%;
+        }
+
+        .pane-two {
+            width: 60%;
+        }
+
+        .pane-three {
+            position: absolute;
+            left: 40%;
+            width: 60%;
+        }
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1024px) {
+    .one, .two {
+        .pane-one {
+            width: 35%;
+        }
+
+        .pane-two {
+            width: 65%;
+        }
+    }
+
+    .three {
+        .pane-one {
+            width: 35%;
+        }
+
+        .pane-two {
+            width: 65%;
+        }
+
+        .pane-three {
+            position: absolute;
+            left: 35%;
+            width: 65%;
+        }
+    }
+}
+
+@media (min-width: 1025px) {
+    // show three columns now
+    .one, .two, .three {
+
+        .pane {
+            display: flex;
+        }
+    }
+
+    .three {
+        .pane-two {
+            .pane-header, .pane-body, .pane-footer {
+                border-left: $border-width solid $messenger-border-color;
+            }
+        }
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1300px) {
+    .one, .two {
+        .pane-one {
+            width: 35%;
+        }
+
+        .pane-two {
+            width: 65%;
+        }
+    }
+
+    .three {
+        .pane-one {
+            width: 30%;
+        }
+
+        .pane-two {
+            width: 40%;
+        }
+
+        .pane-three {
+            width: 30%;
+        }
+    }
+}
+
+@media (min-width: 1301px) {
+    .one, .two {
+        .pane-one {
+            width: 28.4375rem; // 455px;
+        }
+
+        .pane-two {
+            width: calc(100% - 28.4375rem);
+        }
+    }
+
+    .three {
+        .pane-one {
+            width: 22.5rem; // 360px;
+        }
+
+        .pane-two {
+            width: calc(100% - 22.5rem - 28.4375rem);
+        }
+
+        .pane-three {
+            width: 28.4375rem;
+        }
+    }
+}
+
+.pane {
+    display: flex;
+    overflow: hidden;
+    height: 100%;
+    transform: translateZ(0);
+    flex-direction: column;
+    position: relative;
+    -ms-transform: none;
+}
+
+.pane-body {
+    flex-grow: 1;
+    z-index: 1;
+
+    &.loading {
+        .loading-message {
+            display: block;
+        }
+    }
+}
+
+.pane-footer {
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.scroll-y {
+    background-color: $body-bg;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; // ios momentum scrolling
+}
+
+// conversation header and messages goes here
+.header-messages-partial {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    height: 100%;
+    overflow: hidden;
+}
+
+// message form goes here
+footer {
+    background-color: #fff;
+    border-top: $border-width solid $messenger-border-color;
+}
+
+
+
+
+.drawer {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    flex-direction: column;
+    pointer-events: auto;
+    will-change: transform;
+    transition: transform;
+    @include material-animation-default();
+}
+
+.drawer-header {
+    height: $navbar-height;
+    width: 100%;
+    z-index: 1000;
+    flex: none;
+    box-sizing: border-box;
+    padding: 0;
+    position: relative;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    padding: .5rem;
+    background-color: $theme-700;
+
+    &, .btn-icon {
+        color: color-yiq($theme-700);
+    }
+}
+
+.drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+
+    > .presence {
+        margin: 1rem auto;
+    }
+}
+
+.drawer-body-padded {
+    padding: $spacer;
+}
+
+
+.drawer-manager {
+    @extend .app;
+    pointer-events: none;
+    z-index: 10000;
+    // drawers initially hidden (offscreen)
+    .pane-one .drawer {
+        transform: translateX(-100%);
+
+        &.drawer-visible {
+            transform: translateX(0);
+        }
+    }
+
+    .pane-three .drawer {
+        background: $body-bg;
+        transition: none;
+        transform: translateX(100%);
+        top: $navbar-height;
+
+        &.drawer-visible {
+            transform: translateX(0);
+        }
+
+        .navbar-middle {
+            // padding to center text
+            padding-left: $messenger-icon-width;
+        }
+    }
+}
+
+.visibility-h {
+    visibility: hidden !important;
+}

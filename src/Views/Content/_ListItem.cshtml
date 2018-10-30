@@ -1,0 +1,16 @@
+﻿@model Content
+
+<a class="list-group-item list-group-item-action" href="@Model.Url()">
+    <div class="media">
+        @Html.SvgIcon(Model, size: 48)
+        <div class="media-body">
+          <h6 class="media-title">@Model.Name @Html.ContentBadge(Model)</h6>
+            <small class="text-muted">@(Model.MetaData().ModifyVerb)d @Html.Time(Model.ModifiedAt) by @Model.ModifiedBy().GetTitle()</small>
+        </div>
+        <div class="media-icons">
+          @if (Model is IStarrable starrable) {
+            @Html.StarToggle(starrable)
+          }
+        </div>
+    </div>
+</a>

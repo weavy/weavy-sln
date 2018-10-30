@@ -1,0 +1,59 @@
+﻿@model Privacy?
+
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+    var attrs = new Dictionary<string, object>();
+    attrs["class"] = "form-control";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+
+    // get allowed values
+    var allowed = SpaceService.GetAllowedPrivacyLevels();
+
+    // always allow the current privacy level
+    if (Model != null && !allowed.Contains(Model.Value)) {
+        foreach (Privacy val in Enum.GetValues(typeof(Privacy))) {
+            if (val == Model.Value) {
+                allowed.Add(Model.Value);
+                break;
+            }
+        }
+    }
+
+    var inputName = ViewData.TemplateInfo.GetFullHtmlFieldName("");
+
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+@if (label) {
+    @Html.LabelFor(m => m)
+}
+
+@foreach (Privacy item in allowed) {
+    var name = item.GetDisplayName();
+    var desc = item.GetDisplayDescription();
+    <div class="custom-control custom-radio">
+        <input class="custom-control-input" id="@ViewData.TemplateInfo.GetFullHtmlFieldId(item.ToString())" name="@inputName" type="radio" value="@(Convert.ChangeType(item, item.GetTypeCode()))" @(Model == item ? "checked" : "")>
+        <label class="custom-control-label" for="@ViewData.TemplateInfo.GetFullHtmlFieldId(item.ToString())">@name @if (desc != null) {<span class="form-text d-inline">@desc</span>}</label>
+    </div>
+}
+
+
+@if (feedback != null) {
+    <div class="invalid-feedback">@feedback</div>
+} else if (text) {
+    <div class="form-text">@meta.Description</div>
+}
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}

@@ -1,0 +1,58 @@
+/// <reference path="../_core.scss" />
+
+/*
+.weavy-widget-nav {
+    .weavy-widget {
+        z-index: $zindex-fixed;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transition: background $md-animation-duration $md-animation-curve-default;
+        font-size: rem(1);
+        line-height: rem(1.5);
+
+        @import "../widget/avatars";
+        @import "../widget/buttons";
+        @import "../widget/dot";
+        @import "../widget/bubbles";
+        @import "../widget/personal";
+        @import "../widget/messenger";
+
+        @import "../widget/layout";
+        @import "../widget/collapsed";
+        @import "../widget/drag";
+    }
+
+    .weavy-strips {
+        display: none;
+    }
+
+    .weavy-status-check {
+        display: none;
+    }
+
+    .weavy-cache {
+        display: none !important;
+    }
+
+    .weavy-disable-transition, .weavy-cache {
+        &, & * {
+            transition-duration: 0s !important;
+            transition-delay: 0s !important;
+        }
+    }
+
+    @media print {
+        display: none;
+    }
+}
+*/
+
+[data-remove-bubble*='"bubbleId":0'] {
+    opacity: $opacity-disabled;
+    pointer-events: none;
+}

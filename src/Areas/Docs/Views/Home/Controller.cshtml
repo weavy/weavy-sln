@@ -1,0 +1,25 @@
+@model ControllerDoc
+
+@using Weavy.Web.Areas.Docs.Controllers
+@using Weavy.Web.Areas.Docs.Models
+@using Weavy.Web.Extensions
+
+@{
+    Title = Model.ControllerName;
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container my-3">
+    <header>
+        <h1 class="display-1">@Title</h1>
+        <p>@Html.Raw(Model.Summary)</p>
+    </header>
+
+    <article>
+        <header>
+            <h2 class="display-2">Methods</h2>
+            <p>The API exposes the following methods.</p>
+        </header>
+        @Html.DisplayFor(m => m)
+    </article>
+</div>

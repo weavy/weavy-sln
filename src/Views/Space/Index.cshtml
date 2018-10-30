@@ -1,0 +1,80 @@
+﻿@model SearchResult<Space, SpaceQuery>
+@{
+    Title = "Spaces";
+    var tab = ViewContext.RouteData.Values["tab"] as string;
+}
+
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @if (tab == null || tab == "spaces") {
+            @(Html.ActionLink<SpaceController>(c => c.Index(null, null, null), text: "All", htmlAttributes: new { @class = "nav-link active" }, active: LinkActive.Path))
+        } else {
+            @(Html.ActionLink<SpaceController>(c => c.Index(null, null, null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        }
+        @(Html.ActionLink<SpaceController>(c => c.Index(null, "joined", null), text: "Joined", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    </nav>
+
+    @if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
+        <div class="fab">
+            <a class="btn btn-round btn-primary" href="@(Url.Action<SpaceController>(c => c.New(null)))" title="Add space">@Html.SvgIcon("plus")</a>
+        </div>
+    }
+}
+
+<div class="container-fluid my-3">
+    @(Html.FilterForm<SpaceController>(c => c.Index(null, tab, null), Model.Query))
+
+    @if (Model.HasItems()) {
+        <table class="table table-hover table-spaces">
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th class="text-right">Members</th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            <tbody id="infinite-scroll-target">
+                @{ Html.RenderPartial("_SpaceTable", Model); }
+            </tbody>
+        </table>
+        @Html.ScrollMore(Model)
+
+    } else if (!Model.Query.Text.IsNullOrWhiteSpace()) {
+        <p class="mt-3">@Html.SearchResultText(Model)</p>
+    } else {
+        <p class="text-muted text-center">
+            @if (tab == "joined") {
+                <text>Nothing to see here. Why don't you join <a href="@(Url.Action<SpaceController>(c => c.Index(null, null, null)))">existing space</a>?</text>
+            } else {
+                <text>Nothing to see here.</text>
+                if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
+                    <text>Why don't you <a href="@(Url.Action<SpaceController>(c => c.New(null)))">add a new space</a>?</text>
+                }
+            }
+        </p>
+    }
+
+    @if ((Model.Query.Archived ?? false) || (Model.Query.Trashed ?? false) || Model.Query.Privacy != null) {
+        <p class="text-muted text-center"><small>Back to <a href="@Url.Rebuild("archived", null, "privacy", null, "trashed", null)">active</a> spaces.</small></p>
+    } else if ((ViewBag.Archived ?? false) && (ViewBag.Secret ?? false) && (ViewBag.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", "true", "privacy", null, "trashed", null)">archived</a>, <a href="@Url.Rebuild("archived", null, "privacy", "secret", "trashed", null)">secret</a>, and <a href="@Url.Rebuild("archived", null,  "privacy", null, "trashed", "true")">trashed</a> spaces.</small></p>
+    } else if ((ViewBag.Archived ?? false) && (ViewBag.Secret ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", "true",  "privacy", null, "trashed", null)">archived</a> and <a href="@Url.Rebuild("archived", null, "privacy", "secret", "trashed", null)">secret</a> spaces.</small></p>
+    } else if ((ViewBag.Archived ?? false) && (ViewBag.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", "true", "privacy", null, "trashed", null)">archived</a> and <a href="@Url.Rebuild("archived", null, "privacy", null, "trashed", "true")">trashed</a> spaces.</small></p>
+    } else if ((ViewBag.Secret ?? false) && (ViewBag.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", null, "privacy", "secret", "trashed", null)">secret</a> and <a href="@Url.Rebuild("archived", null,  "privacy", null, "trashed", "true")">trashed</a> spaces.</small></p>
+    } else if (ViewBag.Archived ?? false) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", "true",  "privacy", null, "trashed", null)">archived</a> spaces.</small></p>
+    } else if (ViewBag.Secret ?? false) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", null,  "privacy", "secret", "trashed", null)">secret</a> spaces.</small></p>
+    } else if (ViewBag.Trashed ?? false) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("archived", null,  "privacy", null, "trashed", "true")">trashed</a> spaces.</small></p>
+    }
+</div>

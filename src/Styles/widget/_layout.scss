@@ -1,0 +1,105 @@
+/// <reference path="../widget.scss" />
+
+// Widget side left/right/top/bottom/middle positioning
+
+&.weavy-bottom {
+    .weavy-draggable {
+        top: auto;
+        bottom: 0;
+    }
+}
+
+&.weavy-left {
+
+    .weavy-buttons {
+        right: auto;
+        left: 0;
+    }
+
+    .weavy-strips {
+        right: 0;
+        left: $widget-icon-size + rem(1.75);
+    }
+
+    .weavy-controls {
+        left: auto;
+        right: rem(-.5);
+    }
+
+    .weavy-bubble-item {
+        &:hover, &:active {
+            .weavy-bubble-close {
+                transform: translate(rem(-.25), rem(-.75));
+
+                @media (max-height: 479px) {
+                    transform: translate(rem(-.75), rem(-.5));
+                }
+            }
+
+            .weavy-button.weavy-open {
+                ~ .weavy-bubble-action {
+                    transform: translate(0,0);
+                }
+            }
+        }
+    }
+
+    .weavy-bubble-action {
+        left: 0;
+        right: auto;
+
+        &.weavy-bubble-close {
+            top: 0;
+            transform: translate(50%, 50%);
+        }
+
+        &.weavy-bubble-connect, &.weavy-bubble-disconnect {
+            bottom: 0;
+            transform: translate(50%, -50%);
+        }
+    }
+
+    .weavy-bubble-tooltip {
+        right: auto;
+        left: $widget-icon-size + rem(.625);
+    }
+
+    .weavy-button {
+        &.weavy-open {
+            transform: translateX(rem(1));
+
+            &, &:not(.weavy-personal) img {
+                border-radius: rem(1.5) 0 0 rem(1.5);
+            }
+        }
+    }
+
+    .weavy-notifications {
+        right: rem(1);
+    }
+
+    .weavy-strip {
+        transform: translateX(rem(-1)); // -1rem
+        left: 0;
+        right: auto;
+
+        &.weavy-open {
+            transform: translateX(0);
+        }
+
+        .weavy-controls {
+            left: auto;
+            right: rem(2.5);
+        }
+    }
+}
+
+&.weavy-middle:not(.weavy-drag) {
+    .weavy-draggable {
+        position: relative;
+        margin-top: auto;
+        margin-bottom: auto;
+        top: auto !important;
+        bottom: auto !important;
+    }
+}

@@ -1,0 +1,17 @@
+﻿@model List<Breadcrumb>
+@{
+    var crumbs = Model.Skip(1).ToList();
+    crumbs.Reverse();
+}
+<div class="dropdown">
+    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown">
+        @Html.SvgIcon("menu-down")
+    </button>
+    <div class="dropdown-menu">
+        @foreach (var crumb in crumbs) {
+            <a class="dropdown-item" href="@crumb.Url">@Html.SvgIcon(crumb.Icon)<span>@crumb.Text</span></a>
+        }
+        <a class="dropdown-item" href="@WeavyContext.App.Url()">@Html.SvgIcon(WeavyContext.App)<span>@WeavyContext.App.Name</span></a>
+    </div>
+</div>
+

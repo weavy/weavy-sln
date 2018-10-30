@@ -1,0 +1,131 @@
+﻿@model string
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+    var attrs = new Dictionary<string, object>();
+    attrs["type"] = "text";
+    attrs["class"] = "form-control";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+    if (prop.IsRequired()) {
+        attrs["required"] = null;
+    }
+
+    var minute = new Dictionary<string, string> {
+        { "* * * * *", "Every minute"},
+        { "*/15 * * * *", "Every 15 minutes"},
+        { "*/40 * * * *", "Every 30 minutes"},
+        { "*/45 * * * *", "Every 45 minutes"}
+    };
+
+    var hour = new Dictionary<string, string> {
+        { "0 * * * *", "Every hour"},
+        { "0 */2 * * *", "Every two hours"},
+        { "0 */4 * * *", "Every four hours"},
+        { "0 */8 * * *", "Every eight hours"},
+        { "0 */12 * * *", "Every twelve hours"}
+    };
+
+    var day = new Dictionary<string, string> {
+        { "0 4 * * *", "Daily at 4AM"},
+        { "0 8 * * *", "Daily at 8AM"},
+        { "0 12 * * *", "Daily at noon"},
+        { "0 16 * * *", "Daily at 4PM"},
+        { "0 20 * * *", "Daily at 8PM"},
+        { "0 0 * * *", "Daily at midnight"}
+    };
+
+    var week = new Dictionary<string, string> {
+        {"0 0 * * 1", "At midnight on Mondays"},
+        {"0 0 * * 2", "At midnight on Tuesdays"},
+        {"0 0 * * 3", "At midnight on Wednesdays"},
+        {"0 0 * * 4", "At midnight on Thursdays"},
+        {"0 0 * * 5", "At midnight on Fridays"},
+        {"0 0 * * 6", "At midnight on Saturdays"},
+        {"0 0 * * 0", "At midnight on Sundays"}
+    };
+
+    var month = new Dictionary<string, string> {
+        {"0 0 1 * *", "On the first of every month at midnight"},
+        {"0 0 15 * *", "On the 15:th of every month at midnight"}
+    };
+
+    var year = new Dictionary<string, string> {
+        {"0 0 1 1 *", "At midnight on the first of January"},
+        {"0 0 1 2 *", "At midnight on the first of February"},
+        {"0 0 1 3 *", "At midnight on the first of March"},
+        {"0 0 1 4 *", "At midnight on the first of April"},
+        {"0 0 1 5 *", "At midnight on the first of May"},
+        {"0 0 1 6 *", "At midnight on the first of June"},
+        {"0 0 1 7 *", "At midnight on the first of July"},
+        {"0 0 1 8 *", "At midnight on the first of August"},
+        {"0 0 1 9 *", "At midnight on the first of September"},
+        {"0 0 1 10 *", "At midnight on the first of October"},
+        {"0 0 1 11 *", "At midnight on the first of November"},
+        {"0 0 1 12 *", "At midnight on the first of December"}
+    };
+
+    bool selected = Model == null || minute.ContainsKey(Model) || hour.ContainsKey(Model) || day.ContainsKey(Model) || week.ContainsKey(Model) || month.ContainsKey(Model) || year.ContainsKey(Model);
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+@if (label) {
+    @Html.LabelFor(m => m)
+}
+
+@if (selected) {
+    <select class="form-control" name="@ViewData.TemplateInfo.GetFullHtmlFieldName("")" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+        <option value=""></option>
+        <optgroup label="Minute by minute">
+            @foreach (var c in minute) {
+                <option value="@c.Key" @(Model == c.Key ? "selected" : "")>@c.Value</option>
+            }
+        </optgroup>
+        <optgroup label="Hourly">
+            @foreach (var c in hour) {
+                <option value="@c.Key" @(Model == c.Key ? "selected" : "")>@c.Value</option>
+            }
+        </optgroup>
+        <optgroup label="Daily">
+            @foreach (var c in day) {
+                <option value="@c.Key" @(Model == c.Key ? "selected" : "")>@c.Value</option>
+            }
+        </optgroup>
+        <optgroup label="Weekly">
+            @foreach (var c in week) {
+                <option value="@c.Key" @(Model == c.Key ? "selected" : "")>@c.Value</option>
+            }
+        </optgroup>
+        <optgroup label="Monthly">
+            @foreach (var c in month) {
+                <option value="@c.Key" @(Model == c.Key ? "selected" : "")>@c.Value</option>
+            }
+        </optgroup>
+        <optgroup label="Yearly">
+            @foreach (var c in year) {
+                <option value="@c.Key" @(Model == c.Key ? "selected" : "")>@c.Value</option>
+            }
+        </optgroup>
+    </select>
+} else {
+    @Html.TextBox("", ViewData.TemplateInfo.FormattedModelValue, attrs)
+}
+
+@if (feedback != null) {
+    <div class="invalid-feedback">@feedback</div>
+} else if (text) {
+    <div class="form-text">@meta.Description</div>
+}
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}

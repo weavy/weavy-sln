@@ -1,0 +1,28 @@
+﻿@model AppsModel
+@{
+    var apps = Model.Available.Where(a => a.MetaData().AllowMultiple || !Model.Installed.Any(i => i.AppGuid == a.AppGuid));
+}
+
+@if (apps.Any()) {
+
+    <div class="list-group">
+        @foreach (var app in apps) {
+            var meta = app.MetaData();
+
+            using (Html.BeginForm(nameof(AppController.Insert), typeof(AppController).ControllerName(), new { id = WeavyContext.Space.Id }, FormMethod.Post, new { @class = "list-group-item list-group-item-action p-0 btn-list-group-item", data_turboform = "" })) {
+                @Html.Hidden("guid", app.AppGuid);
+                <button type="submit" class="btn w-100 text-left bg-transparent">
+                    <div class="media flex-scale">
+                        @Html.SvgIcon(app, size: 48)
+                        <div class="media-body d-flex flex-column">
+                            <h6 class="media-title text-truncate">@meta.Name</h6>
+                            <small class="text-muted">@meta.Description</small>
+                        </div>
+                    </div>
+                </button>
+            }
+        }
+    </div>
+} else {
+    <p class="text-muted text-center">Can't find any more apps to add :(</p>
+}

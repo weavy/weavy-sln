@@ -1,0 +1,10 @@
+﻿@{
+    ViewBag.Title = "Invalid";
+}
+<main>
+    <h1>Invalid invite</h1>
+    <h2>Your invite has expired or is invalid. You can try to signup again.</h2>
+    <div class="buttons">
+        <a href="@Url.Action(nameof(SignupController.Index), typeof(SignupController).ControllerName(), new { Area = "Signup" })" class="button">Start over</a>
+    </div>
+</main>

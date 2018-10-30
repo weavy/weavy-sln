@@ -1,0 +1,6 @@
+// codesample styles for tinycmce
+@import 'variables';
+@import "vendor/bootstrap/functions";
+@import "functions"; // override some of the default bootstrap functions
+@import "vendor/bootstrap/variables";
+@import "components/prism";

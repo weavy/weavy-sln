@@ -1,0 +1,65 @@
+﻿@model Notification
+@{
+    Layout = null;
+    Title = Model.GetTitle();
+    var entity = Model.Link.Value() as IEntity;
+    var subject = Model.Link?.Value();
+    IEntity commentable = null;
+    if (subject is ICommentable && subject.HasPermission(Permission.Comment)) {
+        commentable = subject;
+    } else if (subject is Comment comment && comment.Parent != null && comment.Parent.HasPermission(Permission.Comment)) {
+        commentable = comment.Parent;
+    }
+
+    var url = commentable != null ? Url.Content($"~/api/{(commentable.Type == EntityType.Content ? "content" : commentable.Type.ToString().ToLower() + "s")}/{commentable.Id}/comments") : "";
+    int? spaceId = Model.Link is ISpaceEntity se ? se.SpaceId : null;      
+}
+<!DOCTYPE html>
+<html class="@HtmlClasses() notification-preview" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <title>@Title</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @Bundler.Scripts("~/scripts/notification.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+</head>
+<body class="@BodyClasses()" @BodyAttributes>
+    @Html.SvgSprite()
+    <main>
+        <div class="container-fluid">
+            <div class="card card-notification" data-notification-id="@Model.Id">
+                <div class="card-header media">
+                    <button type="button" class="btn btn-icon close" role="button">
+                        @Html.SvgIcon("close")
+                    </button>
+                    <img class="img-32 d-flex mr-3" src="@Model.CreatedBy().AvatarUrl(32, retina: true)" alt="">
+                    <div class="media-body">
+                        <p class="mb-2"><a href="#">@Html.Raw(Model.Html.TruncateQuotes(64))</a></p>
+                        <p class="mb-2 d-none"><a href="@Model.Url(absolute: true)" class="notification" data-entity="notification" data-spaceid="@spaceId">@Html.Raw(Model.Html.TruncateQuotes(128))</a></p>
+                    </div>
+                </div>
+                <div class="feedback d-none">
+                    @if (subject is ILikeable) {
+                        <div class="card-feedback">
+                            <div class="list-group">
+                                <a class="list-group-item list-group-item-action @(((ILikeable)subject).IsLiked() ? "" : "d-none")" href="#" data-type="@subject.Type.ToString().ToLower()" data-entity-unlike="@subject.Id">@Html.SvgIcon("thumb-up", size: 18) Unlike</a>
+                                <a class="list-group-item list-group-item-action @(((ILikeable)subject).IsLiked() ? "d-none" : "")" href="#" data-type="@subject.Type.ToString().ToLower()" data-entity-like="@subject.Id">@Html.SvgIcon("thumb-up-outline", size: 18) Like</a>
+                            </div>
+                        </div>
+                    }
+                    @if (commentable != null) {
+                        <div class="section-comments card-comments">
+                            <form action="@url" method="post">
+                                <input type="hidden" name="id" value="@commentable.Id" />
+                                <input type="hidden" name="type" value="@commentable.Type.ToString().ToLower()" />
+                                <textarea data-editor-location="notification" name="text"></textarea>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

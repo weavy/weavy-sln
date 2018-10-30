@@ -1,0 +1,29 @@
+﻿@model RoleModel
+
+@if (Model.Members.Any()) {
+    foreach (var user in Model.Members) {
+        <tr class="@($"{(user.IsTrashed() ? "table-trashed" : "")} {(user.IsSuspended ? "table-suspended": "")}")">
+            <td class="table-icon">@user.AvatarImg(32, presence: true)</td>
+            <td>
+                @if (user.Username == user.GetTitle()) {
+                    <a href="@user.Url()"><small>@@@user.Username</small></a>
+                } else {
+                    <a href="@user.Url()">@user.GetTitle()</a> <small>@@@user.Username</small>
+                }
+                @Html.Badge(user)
+            </td>
+            <td class="table-icon">
+                @using (Html.BeginForm(nameof(RolesController.RemoveMember), null, new { Model.Role.Id })) {
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    @Html.Hidden("UserId", user.Id)
+                    <button type="submit" class="btn btn-icon" title="Remove member" data-remove-from-role>@Html.SvgIcon("close")</button>
+                }
+            </td>
+        </tr>
+    }
+
+    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model.Members)">
+        <td colspan="3"></td>
+    </tr>
+}
+

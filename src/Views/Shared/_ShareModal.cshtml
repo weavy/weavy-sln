@@ -1,0 +1,20 @@
+﻿<div class="modal fade" id="share-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" action="@Url.Action(nameof(ShareController.Insert), typeof(ShareController).ControllerName())" method="post">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">Share</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                    @Html.SvgIcon("close")
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="EntityType" value="" />
+                <input type="hidden" name="EntityId" value="" />
+                <textarea class="form-control" name="Text" data-editor-location="share" placeholder="@Html.Raw("Use @ to mention the people you want to share this with.")"></textarea>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="submit" class="btn btn-primary btn-load">Share</button>
+            </div>
+        </form>
+    </div>
+</div>

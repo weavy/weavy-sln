@@ -1,0 +1,18 @@
+﻿@model Post
+@{
+    Title = "Post details";
+    Back = Url.Back(WeavyContext.Space.Url<PostsApp>() ?? Url.Action<HomeController>(c => c.Index()));
+}
+
+<div class="container my-3">
+    @Html.Partial("_Post", Model, new ViewDataDictionary { { "details", true } })
+</div>
+
+@section footer {
+    @{
+        Html.RenderPartial("_FeedbackModal");
+        Html.RenderPartial("_EditPostModal");
+        Html.RenderPartial("_MovePostModal");
+        Html.RenderPartial("_EditCommentModal");
+    }
+}

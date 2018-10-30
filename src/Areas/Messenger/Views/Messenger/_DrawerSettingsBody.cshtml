@@ -1,0 +1,35 @@
+﻿@using Weavy.Web.Areas.Messenger.Controllers
+@model MessengerSettings
+<form class="form-settings">
+    <fieldset>
+        <legend>List settings</legend>
+        @Html.EditorsForModel(group: "List", formGroups: false, formText: false)
+    </fieldset>
+
+    <fieldset>
+        <legend>Message settings</legend>
+        @Html.EditorsForModel(group: "Message", formGroups: false, formText: false)
+    </fieldset>
+
+    <fieldset>
+        <legend>Notification settings</legend>
+        <div class="notification-alerts">
+            <div class="alert alert-warning notification-required">We <a href="#" class="alert-link notification-required">need your permission</a> to enable desktop notifications in this browser.</div>
+            <div class="alert alert-danger notification-denied">Desktop notifications have been disabled in this browser.</div>
+            <div class="alert alert-info notification-missing">This browser does not support desktop notifications.</div>
+        </div>
+        @Html.EditorsForModel(group: "Notifications", formGroups: false, formText: false)
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Time zone</legend>
+        @Html.EditorFor(x => Model.Timezone, additionalViewData: new { FormLabel = false, FormText = false })
+    </fieldset>
+
+    <hr />
+    <a class="btn btn-primary d-standalone" href="~/sign-out?path=/messenger" id="signout">@Html.SvgIcon("logout")Sign out</a>
+
+</form>
+
+

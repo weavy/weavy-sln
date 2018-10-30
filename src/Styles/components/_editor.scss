@@ -1,0 +1,434 @@
+/// <reference path="../_core.scss" />
+@import '../vendor/emojionearea/emojionearea';
+
+.card.card-weavy-editor {
+    &::after {
+        //mix-blend-mode: normal;
+        z-index: 4;
+    }
+}
+
+.weavy-editor {
+    display: flex;
+    flex-direction: column;
+    background: $gray-50;
+    border-radius: $border-radius;
+
+    &:not(.minimized) {
+        .btn-more {
+            display: none;
+        }
+    }
+
+    &.active {
+        position: relative;
+        z-index: 3;
+        box-shadow: none;
+    }
+
+    .emojionearea {
+        .emojionearea-picker.emojionearea-picker-position-top {
+            opacity: 1;
+            left: 0;
+            right: 0;
+            width: auto;
+            top: 7px;
+            box-shadow: none;
+            border-radius: 0;
+            border-bottom: $border-width solid $input-border-color;
+            margin-top: 0;
+            position: static;
+        }
+
+        .emojionearea-picker.emojionearea-picker-position-fixed {
+            opacity: 1;
+            left: 0;
+            right: 0;
+            width: auto;
+            bottom: 50px;
+            box-shadow: none;
+            border-radius: 0;
+            border-bottom: $border-width solid $input-border-color;
+            position: fixed;
+            top: auto !important;
+            margin-top: auto;
+        }
+
+        &.form-control {
+            display: flex;
+            flex-direction: column;
+            border: none;
+            box-shadow: none;
+        }
+
+        .emojionearea-editor {
+            max-height: 23em;
+            font-size: $font-size-base;
+            line-height: $input-btn-line-height;
+            border-bottom: $border-width solid $border-color;
+            padding: $card-spacer-y ($card-spacer-x - .0625rem);
+            // To enable HW acceleration and not cause repaint on scroll
+            backface-visibility: hidden;
+        }
+
+        .emojionearea-editor:empty::before {
+            color: $input-placeholder-color;
+            padding: .0625rem 0;
+        }
+
+        .emojionearea-picker .emojionearea-wrapper {
+            width: auto;
+            background-color: #f5f5f5;
+            border-radius: 0;
+        }
+
+        .emojionearea-picker.emojionearea-picker-position-top .emojionearea-filters {
+            display: flex;
+            border-top: $border-width solid $input-border-color;
+            justify-content: space-around;
+            background: #fff;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .emojionearea-picker .emojionearea-scroll-area h1 {
+            background: none;
+            color: $dropdown-link-color;
+        }
+
+        .emojionearea-picker .emojionearea-wrapper:after {
+            display: none;
+        }
+    }
+
+    .emojionearea-button-container {
+        padding: $card-spacer-x/2 $card-spacer-x/2;
+        display: flex;
+        color: $text-muted;
+
+        .emojionearea-button {
+            width: 1.5rem;
+            height: 1.5rem;
+            opacity: 1;
+            cursor: pointer;
+            margin-right: .5rem !important;
+            transition: opacity 200ms ease-in-out;
+            display: inline-block;
+            padding: $input-btn-padding-y-sm;
+        }
+
+        .emojionearea-button:hover {
+            opacity: 1;
+        }
+
+        .emojionearea-button > div {
+            display: block;
+            width: 1.5rem;
+            height: 1.5rem;
+            position: absolute;
+            transition: transform 200ms ease-in-out, opacity 200ms ease-in-out;
+            background-size: 1.5rem 1.5rem;
+            background-repeat: no-repeat;
+        }
+
+        .emojionearea-button > div.emojionearea-button-open {
+            background-image: url('data:image/svg+xml,%3Csvg%20fill%3D%22%23696969%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M11.99%202C6.47%202%202%206.48%202%2012s4.47%2010%209.99%2010C17.52%2022%2022%2017.52%2022%2012S17.52%202%2011.99%202zM12%2020c-4.42%200-8-3.58-8-8s3.58-8%208-8%208%203.58%208%208-3.58%208-8%208zm3.5-9c.83%200%201.5-.67%201.5-1.5S16.33%208%2015.5%208%2014%208.67%2014%209.5s.67%201.5%201.5%201.5zm-7%200c.83%200%201.5-.67%201.5-1.5S9.33%208%208.5%208%207%208.67%207%209.5%207.67%2011%208.5%2011zm3.5%206.5c2.33%200%204.31-1.46%205.11-3.5H6.89c.8%202.04%202.78%203.5%205.11%203.5z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E');
+            opacity: 1;
+        }
+
+        .emojionearea-button > div.emojionearea-button-close {
+            background-image: url('data:image/svg+xml,%3Csvg%20fill%3D%22%23696969%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M19%206.41L17.59%205%2012%2010.59%206.41%205%205%206.41%2010.59%2012%205%2017.59%206.41%2019%2012%2013.41%2017.59%2019%2019%2017.59%2013.41%2012z%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E');
+            transform: rotate(-45deg);
+            opacity: 0;
+        }
+
+        .emojionearea-button.active > div.emojionearea-button-open {
+            transform: rotate(45deg);
+            opacity: 0;
+        }
+
+        .emojionearea-button.active > div.emojionearea-button-close {
+            transform: rotate(0deg);
+            opacity: 1;
+        }
+
+        :last-child {
+            margin-left: auto;
+        }
+        // file upload button
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+
+            > .i:nth-child(2) {
+                margin-left: .5rem;
+            }
+            // TODO: add focus state to .btn-file when input is focused...
+            > input {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 0;
+                opacity: 0;
+                -ms-filter: 'alpha(opacity=0)';
+                font-size: 130px;
+                direction: ltr;
+                cursor: pointer;
+            }
+        }
+
+        &.footer {
+            background: #fff;
+            height: 3rem;
+            box-shadow: -.0625rem -.0625rem 0 0 rgba(173,173,173,1);
+            padding: .75rem .25rem .75rem 1rem;
+            cursor: text;
+            display: flex;
+
+            span:last-child {
+                flex: 1;
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            span.placeholder {
+                flex: 1;
+                color: $gray-400;
+            }
+        }
+
+        &.no-emojis {
+            .emojionearea-button {
+                display: none;
+            }
+        }
+    }
+
+    .uploads {
+
+        .table-attachments {
+            tr:first-child td {
+                border-top: $border-width solid $border-color;
+            }
+
+            margin: 0;
+        }
+
+        .progress {
+            height: .5rem;
+            background-color: $progress-bar-bg;
+        }
+    }
+
+    .embeds {
+        width: 100%;
+        border-top: $border-width solid $border-color;        
+    }
+
+    .poll-options {
+        display: none;
+        padding: 0 $card-spacer-x/2;
+        margin-top: 1rem;
+        width: 100%;
+
+        .form-group {
+            margin-bottom: .5rem;
+        }
+    }
+
+    div.context {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+
+    .context {
+        .context-data {
+            background: $gray-200;
+            padding: 0 .3125rem 0 .625rem;
+            height: 2rem;
+            margin: .5rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+
+            span {
+                @extend .small;
+                text-overflow: ellipsis;
+                max-width: 100%;
+                overflow: hidden;
+                white-space: nowrap;
+                margin: 0 0.5rem;
+                flex: 1;
+            }
+
+            img {
+                align-self: center;
+            }
+        }
+
+        .btn-add-context {
+            img {
+                align-self: center;
+                margin-right: 0.6rem;
+            }
+        }
+
+        &.has-context {
+            &.btn-add-context {
+                opacity: $opacity-disabled;
+                pointer-events: none;
+            }
+        }
+    }
+    // single line editor (for comments etc.)
+    &.collapsed {
+        flex-wrap: wrap;
+        align-items: center;
+        position: relative;
+        background: #fff;
+        border: $border-width solid $border-color;
+        border-radius: $border-radius;
+        flex-direction: row;
+        padding: 0;
+        margin: 0;
+
+        .emojionearea .emojionearea-editor:empty::before {
+            font-size: $font-size-sm;
+        }
+
+        .emojionearea {
+            min-width: 0;
+            flex-grow: 1;
+            word-break: break-word;
+            width: auto;
+            border: 0;
+            outline: 0;
+            box-shadow: none;
+
+            .emojionearea-editor {
+                min-height: 2em;
+                margin-bottom: $border-width * -1;
+
+                > div {
+                    // Makes the scrollbar appear on the very right side where it should
+                    width: 100vw;
+                    max-width: 100%;
+                }
+            }
+
+            .emojionearea-picker.emojionearea-picker-position-top {
+                opacity: 1;
+                top: .5rem;
+                width: 20rem;
+                box-shadow: 0 .0625rem .25rem rgba(0, 0, 0, 0.32);
+                margin-top: -286px;
+                position: absolute;
+            }
+        }
+
+        .emojionearea-button-container {
+            display: flex;
+            align-self: flex-end;
+            flex-grow: 0;
+            margin-left: auto;
+            flex-direction: row;
+            justify-content: flex-end;
+
+            .btn-file {
+                display: flex;
+                margin: 0;
+            }
+        }
+
+        &.collapsed-static {
+            .emojionearea-picker.emojionearea-picker-position-top {
+                opacity: 1;
+                width: 20rem;
+                margin-top: 0;
+                box-shadow: 0 .0625rem .25rem rgba(0, 0, 0, 0.32);
+                position: static;
+            }
+        }
+    }
+
+    &.minimized {
+
+        .emojionearea {
+            .emojionearea-editor {
+                min-height: 3em;
+            }
+        }
+
+        .emojionearea-button-container {
+            .btn-submit, .btn-poll, .btn-file .i:nth-child(2) {
+                display: none;
+            }
+        }
+
+        .context, .add-context {
+            display: none;
+        }
+    }
+
+    &.textonly {
+        .emojionearea {
+            .emojionearea-editor {
+                @extend .form-control;
+            }
+        }
+    }
+}
+
+.editor.container-fluid {
+    padding-right: 0;
+    padding-left: 0;
+    padding-bottom: 3.75rem;
+
+    .weavy-editor {
+        padding: 0;
+        box-shadow: none;
+        border: none;
+        background: none;
+
+        .emojionearea-button-container {
+            padding: .5rem .625rem;
+        }
+
+        .emojionearea {
+            &.form-control {
+                border: 0;
+            }
+
+            .emojionearea-editor {
+                border-bottom: none;
+            }
+        }
+
+        .poll-options {
+            padding: 0 .625rem;
+        }
+
+        @include media-breakpoint-up(sm) {
+            border: none;
+            margin-top: 0;
+        }
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    html:not(.embedded) {
+        .card-weavy-editor {
+            .weavy-editor {
+                .emojionearea {
+                    .emojionearea-editor {
+                        padding: $card-spacer-y $card-spacer-x;
+                    }
+                }
+
+                .emojionearea-button-container {
+                    padding: $card-spacer-x/2 $card-spacer-y;
+                }
+            }
+        }
+    }
+}

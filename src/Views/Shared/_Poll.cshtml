@@ -1,0 +1,41 @@
+﻿@model Post
+@{ 
+    var max = 4; // max number of voters to show
+}
+
+<form class="poll" action="~/posts/@Model.Id/vote" data-votes="@Model.Poll.VoteCount">
+    <table>
+        @foreach (var option in Model.Poll.Options) {
+            var more = option.Voters.Count() - max;
+            var width = (int)Math.Floor((option.VoteCount / (double)Model.Poll.VoteCount) * 100);
+            <tr @if (option.HasVoted) { <text>class="active" </text> }>
+                <td class="input">
+                    <div class="custom-control custom-radio">
+                      <input id="option-@option.Id" name="option" type="radio" class="custom-control-input" value="@option.Id" @if (option.HasVoted) { <text> checked</text>}>
+                      <label class="custom-control-label" for="option-@option.Id"></label>
+                    </div>
+                </td>
+                <td class="option" data-votes="@option.VoteCount">
+                    <div class="progress">
+                        <div class="progress-bar" style="width: @(width)%"></div>
+                    </div>
+                    <label for="option-@option.Id">@Html.Raw(option.Html)</label>
+                </td>
+                <td class="facepile">
+                    @option.Voters.Take(max).Facepile(size: 32, link:true)
+                    @if (more > 0) {
+                        <button class="btn btn-sm btn-round btn-light justify-content-center" type="button" data-modal-title="People who voted on this option" data-path="/posts/@Model.Id/votes/@option.Id" data-target="#feedback-modal" data-toggle="modal" title="@Weavy.Core.Helpers.StringExtensions.SingularizeOrPluralize(more, "other person", "other people")">
+                            <span>+@more</span>
+                        </button>
+                    }
+                </td>
+                <td class="votes">
+                    @if (option.VoteCount > 0) { 
+                        <a href="#votes" class="more" title="@Weavy.Core.Helpers.StringExtensions.SingularizeOrPluralize(option.VoteCount, "vote", "votes")" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="People who voted on this option"><img src="@(WeavyRequestContext.Current.ApplicationPath)img/pixel.png" class="img-32 avatar" alt=""/><span>@option.VoteCount</span></a>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+</form>
+

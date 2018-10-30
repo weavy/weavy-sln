@@ -1,0 +1,52 @@
+﻿@model IndexResult
+@{
+    Title = "Search";
+    Back = WeavyContext.ApplicationPath;
+    string tab = ViewContext.RouteData.Values["tab"] as string;
+    string qs = Request.QueryString.Rebuild("top", null, "skip", null).AsQueryString();
+}
+
+<div class="container text-center my-4">
+    <div class="mb-4 d-flex flex-column align-items-center mx-auto align-self-center">
+        @Html.IconImg(32)
+    </div>
+    <form action="@Url.Rebuild("q", null)" method="get" data-turboform>
+        <div class="form-group" role="search">
+            <input class="form-control" type="search" name="q" value="@Model.Query.Text" placeholder="Search @WeavyContext.System.Name" />
+            @if (Model.Query.Text.IsNullOrEmpty()) {
+                <button type="submit" class="btn btn-icon">@Html.SvgIcon("magnify")</button>
+            } else {
+                <a href="@(Url.Action<HomeController>(c => c.Search(null, null)))" class="btn btn-icon">@Html.SvgIcon("close")</a>
+            }
+        </div>
+    </form>
+</div>
+
+<div class="container my-4">
+    @if (!string.IsNullOrEmpty(Model.Query.Text)) {
+        <nav class="nav nav-tabs mb-4">
+            @if (tab == null) {
+                @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: "Everything", htmlAttributes: new { @class = "nav-link active" }))
+            } else {
+                @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: "Everything", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            }
+            @(Html.ActionLink<HomeController>(c => c.Search("spaces", null), qs: qs, text: "Spaces", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("posts", null), qs: qs, text: "Posts", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("files", null), qs: qs, text: "Files", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("comments", null), qs: qs, text: "Comments", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        </nav>
+    }
+
+    @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.Text)) {
+        <p>Your search - <strong>@Model.Query.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab).</p>
+        <p>Suggestions:</p>
+        <ul>
+            <li>Make sure that all words are spelled correctly.</li>
+            <li>Try different keywords.</li>
+            <li>Try more general keywords.</li>
+            <li>Try fewer keywords.</li>
+        </ul>
+    }
+
+    @{ Html.RenderPartial("_SearchResult"); }
+</div>

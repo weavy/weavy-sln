@@ -1,0 +1,53 @@
+﻿@model ITool
+@{
+    Title = "Tools";
+    Back = Url.Action<ToolsController>(c => c.Index());
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(ToolsController.Run), null, FormMethod.Post, new { data_turboform = "" })) {
+        <div class="form-group">
+            <label class="control-label">Id</label>
+            <p class="form-control-static">@Model.Id</p>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Type</label>
+            <p class="form-control-static">@Model.FullName</p>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Desciption</label>
+            <p class="form-control-static">@Model.Description</p>
+        </div>
+        if (!Model.IsLoaded()) {
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <p class="form-control-static">
+                    <span class="badge badge-danger">missing</span>
+                </p>
+            </div>
+        }
+
+        @Html.EditorsForModel()
+        <div class="form-buttons">
+            <button type="submit" name="button" value="@nameof(ToolsController.Run)" class="btn btn-primary btn-load">Run</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">Cancel</a>
+            @if (!Model.IsLoaded()) {
+                <button type="submit" name="button" value="@nameof(ToolsController.Delete)" class="btn btn-danger btn-load">Delete</button>
+            }
+        </div>
+
+        if (Model.IsEnabled) {
+            <div class="form-group">
+                <label class="control-label">Log</label>
+                <pre class="log">
+@Model.Status()
+@if (!Model.Log.IsNullOrWhiteSpace()) {
+@:--
+@Model.Log
+}
+</pre>
+            </div>
+        }
+
+    }
+</div>

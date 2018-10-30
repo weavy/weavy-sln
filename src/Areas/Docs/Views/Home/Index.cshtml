@@ -1,0 +1,58 @@
+@model IEnumerable<ControllerDoc>
+@using Weavy.Web.Areas.Docs.Controllers
+@using Weavy.Web.Areas.Docs.Models
+@using Weavy.Web.Areas.Docs.Extensions
+
+@{
+    Title = ConfigurationService.ApplicationName + " API";
+    Back = Url.Action<Weavy.Web.Controllers.HomeController>(c => c.Index());
+}
+
+
+<div class="container my-3">
+    <header>
+        <h1 class="display-1">@Title</h1>
+        <p>The @ConfigurationService.ApplicationName API lets you integrate with, and build tools and applications on top of @ConfigurationService.ApplicationName.</p>
+        <p><span class="badge badge-danger">Disclaimer</span> While the API is used extensively by the @ConfigurationService.ApplicationName user interface it should still be considered experimental since the API endpoints, as well as their request and response might change between versions of @ConfigurationService.ApplicationName.</p>
+        <h2 class="display-2">Guiding principles</h2>
+        <p>The API is a JSON API with the following guiding principles:</p>
+        <ul>
+            <li>Only available over HTTPS.</li>
+            <li>Always returns JSON.</li>
+            <li>Utilizes HTTP error codes and methods.</li>
+            <li>In general, required parameters are in URLs; optional parameters are specified in the query string.</li>
+            <li>Complex data should be sent as a JSON string.</li>
+        </ul>
+        <h3 class="display-3"><a href="@Url.Action(nameof(HomeController.GetOAuthDocumentation))">Authentication</a></h3>
+        <p>
+            In order to make authorized calls to the Weavy API, your application must first obtain an OAuth access token on behalf of a user.
+            Once you have an access token, you can issue authorized requests to the API.
+        </p>
+        <table class="table table-api">
+            <thead>
+                <tr>
+                    <th class="verb">Method</th>
+                    <th class="path">Path</th>
+                    <th class="desc">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="verb">POST</td>
+                    <td class="path"><a href="@Url.Action(nameof(HomeController.GetOAuthTokenDocumentation))">/api/oauth/token</a></td>
+                    <td class="desc">Request an access token from the authorization server’s token endpoint.</td>
+                </tr>
+            </tbody>
+        </table>
+    </header>
+
+    @foreach (var doc in Model) {
+        <article>
+            <header>
+                <h3 id="@doc.ControllerName" class="display-3">@Html.ActionLink(doc.ControllerName, nameof(HomeController.GetControllerDocumentation), new { controllerId = @doc.ApiDescription.GetControllerId() })</h3>
+                <p>@Html.Raw(doc.Summary)</p>
+            </header>
+            @Html.DisplayFor(m => doc)
+        </article>
+    }
+</div>

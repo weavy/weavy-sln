@@ -1,0 +1,36 @@
+﻿@model Content
+@{
+    var draftable = Model as IDraftable;
+
+    var htmlAttributes = new Dictionary<string, object>(){
+        { "class", draftable != null ? "autosave" : "" },
+        { "autocomplete", "off" },
+        { "novalidate", "" },
+        { "data-is-draft", draftable?.IsDraft.ToString().ToLower() },
+        { "data-status", "#autosave-status" },
+        { "data-id", Model.Id }
+    };
+    
+    if (ViewData["turboform"] != null) {
+        htmlAttributes.Add("data-turboform", "");
+    }
+}
+
+@using (Html.BeginForm(nameof(ContentController.Update), typeof(ContentController).ControllerName(), new RouteValueDictionary(new { id = Model.Id }), FormMethod.Post, htmlAttributes)) {
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+    @Html.EditorsForModel()
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
+        @if (draftable != null) {
+            <button type="submit" class="btn btn-outline-secondary" name="operation" value="draft">Save draft</button>
+            if (draftable.IsDraft) {
+                <button type="submit" class="btn btn-outline-secondary" name="operation" value="discard">Discard changes</button>
+            }
+        }
+        <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel">Cancel</button>
+        <div class="text-muted ml-auto" id="autosave-status"></div>
+    </div>
+    <div id="blobs">
+        @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
+    </div>
+}

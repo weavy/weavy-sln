@@ -1,0 +1,28 @@
+/// <reference path="../_core.scss" />
+
+.media {
+    white-space: normal; // To behave normally inside .btn
+
+    > img, > .i {
+        margin-left: 0 !important;
+        margin-right: $list-group-item-padding-x !important;
+    }
+}
+
+.media-body {
+    word-break: break-word;
+    line-height: 1.25;
+    // needed for text-truncate to work, see https://css-tricks.com/flexbox-truncated-text/
+    min-width: 0;
+}
+
+
+.media-title {
+    font-weight: normal;
+}
+
+.media-icons {
+    display: flex;
+    flex: 0 0 auto;
+    margin: -.25rem;
+}

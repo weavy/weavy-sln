@@ -1,0 +1,25 @@
+﻿@model Weavy.Web.Models.SignUpModel
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = "Sign up";
+}
+<div class="container mt-5">
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-6">
+            <div class="text-center mb-3">
+                @Html.IconImg(48)
+            </div>
+            <h1 class="display-3">@Title</h1>
+            <p>Welcome to @Theme.Name, enter your email address to sign up for an account.</p>
+
+            @using (Html.BeginForm(nameof(AccountController.SignUp), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
+                @Html.AntiForgeryToken()
+                @Html.EditorsForModel(formLabels: false, formText: false)
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary btn-load">Sign up</button>
+                    <a href="@Url.Action(nameof(AccountController.SignIn), typeof(AccountController).ControllerName())" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

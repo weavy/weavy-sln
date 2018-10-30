@@ -1,0 +1,68 @@
+// Custom variables and colors
+@import 'variables';
+
+// Bootstrap functions, variables and mixins
+@import "vendor/bootstrap/functions";
+@import "functions"; // override some of the default bootstrap functions
+@import "vendor/bootstrap/variables";
+@import "vendor/bootstrap/mixins";
+
+// Additional mixins
+@import 'mixins/animation';
+@import 'mixins/dot';
+
+@import "widget/variables";
+
+// Widget styles (wrap all styles in .weavy-widget)
+.weavy-widget {
+    &.weavy-default {
+        z-index: $widget-zindex;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transition: background $md-animation-duration $md-animation-curve-default;
+        font-size: rem(1);
+        line-height: rem(1.5);
+
+        @import "widget/avatars";
+        @import "widget/buttons";
+        @import "widget/strips";
+        @import "widget/dot";
+        @import "widget/bubbles";
+        @import "widget/notifications";
+        @import "widget/personal";
+        @import "widget/messenger";
+        @import "widget/filebrowser";
+
+        @import "widget/layout";
+        @import "widget/wide";
+        @import "widget/preview";
+        @import "widget/collapsed";
+        @import "widget/drag";
+    }
+
+    .weavy-status-check {
+        display: none;
+    }
+
+    .weavy-cache {
+        display: none !important;
+    }
+
+    .weavy-disable-transition, .weavy-cache {
+        &, & * {
+            transition-duration: 0s !important;
+            transition-delay: 0s !important;
+        }
+    }
+
+    @import "widget/alert";
+
+    @media print {
+        display: none;
+    }
+}

@@ -1,0 +1,62 @@
+/// <reference path="../../../../_core.scss" />
+@import "../lightgray/Skin";
+
+// tinymce inline table editing
+div.mce-tinymce-inline {
+    width: auto !important;
+}
+
+.mce-tinymce-inline-inside {
+    margin-top: -32px !important;
+    width: 300px !important;
+    z-index: 999 !important;
+
+    .mce-container.mce-flow-layout-item.mce-last.mce-btn-group {
+        right: auto;
+    }
+}
+
+.mce-menu {
+    border-radius: 2px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+.mce-toolbar.mce-first {
+    padding-right: 0 !important;
+}
+
+.mce-toolbar.mce-first .mce-btn-group.mce-last {
+    float: right;
+    position: static !important;
+}
+
+.fixed-toolbar .mce-toolbar.mce-first {
+
+    .mce-btn-group.mce-last {
+        float: none;
+        position: absolute !important;
+    }
+}
+
+.mce-tinymce.last-toolbar-hidden {
+    .mce-toolbar.mce-last {
+        display: none;
+    }
+}
+
+// popups
+.mce-floatpanel {
+    width: 100% !important;
+
+    .mce-container-body {
+        width: 100% !important;
+    }
+
+    @media only screen and (min-width : 576px) {
+        width: 75% !important;
+    }
+
+    @media only screen and (min-width : 992px) {
+        width: 50% !important;
+    }
+}

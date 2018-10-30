@@ -1,0 +1,30 @@
+﻿@model App
+
+@if (WeavyContext.Space.HasPermission(Permission.Apps) || Model.HasPermission(Permission.Edit)) {
+    <div class="dropdown">
+        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Html.SvgIcon("dots-vertical")</button>
+        <div class="dropdown-menu dropdown-menu-right">
+
+            @if (Model.HasPermission(Permission.Edit)) {
+                if(Html.HasEditors(except: new List<string> {nameof(Model.Name)})) {
+                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Edit(WeavyContext.App.Id)))" data-title="Edit tab">@Html.SvgIcon("pencil") Edit tab</a>
+                }
+                <a class="dropdown-item" href="@Model.Url()/rename" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.EditName(WeavyContext.App.Id)))" data-title="Rename tab">@Html.SvgIcon("textbox") Rename tab</a>
+
+                if (Model.HasPermission(Permission.Delete)) {
+                    <form action="@(Url.Action(nameof(AppController.Trash), typeof(AppController).ControllerName(), new { id = Model.Id }))" method="post" data-turboform>
+                        <button type="submit" class="dropdown-item">@Html.SvgIcon("delete") Remove tab</button>
+                    </form>
+                }
+            }
+
+            @if (WeavyContext.Space.HasPermission(Permission.Apps)) {
+                if (Model.HasPermission(Permission.Edit)) {
+                    <div class="dropdown-divider"></div>
+                }
+                <a href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" class="dropdown-item" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="Add tab" title="Add tab">@Html.SvgIcon("plus") <span>Add tab</span></a>
+
+            }
+        </div>
+    </div>
+}

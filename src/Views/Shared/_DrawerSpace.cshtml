@@ -1,0 +1,22 @@
+﻿
+<aside id="drawer-space" class="drawer drawer-left">
+    <header class="drawer-header cover cover-bg">
+        <a class="text-center pt-3" href="@WeavyContext.Space.Url()" title="@WeavyContext.Space.Name Home">
+            @WeavyContext.Space.AvatarImg(64)
+            <div class="drawer-title px-1">
+                <span>
+                    @WeavyContext.Space.Name
+                    @if (WeavyContext.Space.Teamname != null) {
+                        <small>@@@WeavyContext.Space.Teamname</small>
+                    }
+                </span>
+
+            </div>
+        </a>
+    </header>
+    <div class="drawer-body scroll-y">
+        <nav class="nav flex-column">
+            @Html.Partial("_SpaceMenuItems", WeavyContext.Space)
+        </nav>
+    </div>
+</aside>

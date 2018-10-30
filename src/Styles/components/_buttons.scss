@@ -1,0 +1,158 @@
+/// <reference path="../_core.scss" />
+
+@mixin nav-link-active {
+    background-color: transparent;
+    color: $link-color;
+    border-color: $link-color;
+}
+
+.btn {
+    cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    flex-grow: 0;
+
+    &:not(.btn-icon, .btn-round, .dropdown-toggle-split) {
+        > .i:first-child {
+            margin-right: .25rem;
+        }
+    }
+
+    &.btn-sm {
+        > .i {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    }
+    &.btn-lg {
+        > .i {
+            width: 2rem;
+            height: 2rem;
+        }
+    }
+}
+
+.btn-icon {
+    background-color: transparent !important;
+    border: none;
+    border-radius: 50%;
+    box-shadow: none !important;
+    color: $icon-color;
+    line-height: 1;
+    padding: .25rem;
+    align-items: center;
+    justify-content: center;
+    text-transform: none;
+    min-width: 2rem;
+    min-height: 2rem;
+
+    @include hover-focus {
+        outline: none;
+        color: darken($icon-color, 10%);
+    }
+    // color variants
+    @each $color, $value in $theme-colors {
+        &.btn-#{$color} {
+            color: $value !important;
+
+            @include hover-focus {
+                color: darken($value, 10%) !important;
+            }
+        }
+    }
+
+    &.close {
+        opacity: 1;
+
+        &:hover {
+            opacity: $opacity-hover;
+        }
+    }
+
+
+    span {
+        margin-left: .25rem;
+    }
+
+
+    &.btn-badge {
+        position: relative;
+
+        .badge {
+            @include badge-notification;
+        }
+    }
+}
+
+/*a.btn-icon {
+    color: inherit;
+}*/
+
+.btn-text {
+    border: none;
+    display: inline;
+    transition: none;
+    outline: none;
+    vertical-align: baseline;
+    padding: 0;
+
+    &:active {
+        box-shadow: none !important;
+    }
+}
+
+.btn-round {
+    @extend .rounded-circle;
+    display: inline-flex;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+
+    > .i {
+        margin: auto;
+        transition: transform .3s;
+        transform: rotate(0deg);
+    }
+
+    &.btn-sm {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    &.btn-lg {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+}
+
+
+.btn-azure {
+    @include button-variant(#2771ed, darken(#2771ed, 5%));
+}
+
+.btn-facebook {
+    @include button-variant(#3c65c4, darken(#3c65c4, 5%));
+}
+
+.btn-google {
+    @include button-variant(#dd4b39, darken(#dd4b39, 5%));
+}
+
+.btn-microsoft {
+    @include button-variant(#000, #000);
+}
+
+.btn-twitter {
+    @include button-variant(#1da1f3, darken(#1da1f3, 5%));
+}
+
+.btn-list-group-item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    &:focus, &:focus-within {
+        outline: none;
+        z-index: 1;
+    }
+}

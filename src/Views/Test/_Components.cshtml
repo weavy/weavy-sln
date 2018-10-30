@@ -1,0 +1,487 @@
+﻿@model TestViewModel
+
+<section id="alerts">
+
+    <h1 id="alerts" class="display-3 mt-4">Alerts</h1>
+    <hr />
+    <div class="alert alert-success fade show" role="alert">
+        This is a success alert with an undo link. <a href="#" class="alert-link">Undo</a>.
+    </div>
+    <div class="alert alert-danger fade show d-flex" role="alert">
+        This is a danger alert with a dropdown for testing errors.
+
+        <div class="dropdown d-inline-block  ml-auto">
+            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                @Html.SvgIcon("dots-vertical")
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Error(null)))">Get => Error</a>
+                <form action="@(Url.Action<TestController>(c => c.Error(null)))" method="post" data-turboform>
+                    <button type="submit" class="dropdown-item">Post => Error</button>
+                </form>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Error(404)))">404</a>
+                <a class="dropdown-item" href="@(Url.Action<ErrorController>(c => c.Index()))">Error without exception</a>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <button type="button" class="btn btn-icon close" data-dismiss="alert" aria-label="Close">
+            @Html.SvgIcon("close")
+        </button>
+        This is a warning alert with an undo form. <form class="d-inline" action="" method="get"><button type="submit" class="btn btn-link alert-link">Undo</button>.</form>
+    </div>
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <button type="button" class="btn btn-icon close" data-dismiss="alert" aria-label="Close">
+            @Html.SvgIcon("close")
+        </button>
+        This is a dismissible info alert.
+    </div>
+    <a class="alert alert-info fade show d-flex" role="alert" href="#">
+        @Html.SvgIcon("information-outline", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-sm-block" })
+        <span>Alls of this alert is <span class="alert-link">a link</span>.</span>
+        <span class="btn btn-outline-info ml-auto d-none d-sm-inline-flex">Button</span>
+    </a>
+</section>
+
+<h1 id="buttons" class="display-3 mt-4">Buttons</h1>
+<hr />
+<div class="form-group">
+    <button type="button" class="btn btn-primary">Primary</button>
+    <button type="button" class="btn btn-secondary">Secondary</button>
+    <button type="button" class="btn btn-success" data-alert="success">Success</button>
+    <button type="button" class="btn btn-info" data-alert="info">Info</button>
+    <button type="button" class="btn btn-warning" data-alert="warning">Warning</button>
+    <button type="button" class="btn btn-danger" data-alert="danger">Danger</button>
+    <button type="button" class="btn btn-light" data-body-bg="light">Light</button>
+    <button type="button" class="btn btn-dark" data-body-bg="dark">Dark</button>
+    <button type="button" class="btn btn-link">Link</button>
+</div>
+<div class="form-group">
+    <a href="javascript:;" class="btn btn-primary">Primary</a>
+    <a href="javascript:;" class="btn btn-secondary">Secondary</a>
+    <a href="javascript:;" class="btn btn-success" data-alert="success">Success</a>
+    <a href="javascript:;" class="btn btn-info" data-alert="info">Info</a>
+    <a href="javascript:;" class="btn btn-warning" data-alert="warning">Warning</a>
+    <a href="javascript:;" class="btn btn-danger" data-alert="danger">Danger</a>
+    <a href="javascript:;" class="btn btn-light" data-body-bg="light">Light</a>
+    <a href="javascript:;" class="btn btn-dark" data-body-bg="dark">Dark</a>
+    <a href="@User.Url()" class="btn btn-link">Link</a>
+</div>
+<div class="form-group">
+    <button type="button" class="btn btn-outline-primary">Primary</button>
+    <button type="button" class="btn btn-outline-secondary">Secondary</button>
+    <button type="button" class="btn btn-outline-success" data-alert="success">Success</button>
+    <button type="button" class="btn btn-outline-info" data-alert="info">Info</button>
+    <button type="button" class="btn btn-outline-warning" data-alert="warning">Warning</button>
+    <button type="button" class="btn btn-outline-danger" data-alert="danger">Danger</button>
+    <button type="button" class="btn btn-outline-light" data-body-bg="light">Light</button>
+    <button type="button" class="btn btn-outline-dark" data-body-bg="dark">Dark</button>
+</div>
+<div class="form-group">
+    <a href="javascript:;" class="btn btn-outline-primary">Primary</a>
+    <a href="javascript:;" class="btn btn-outline-secondary">Secondary</a>
+    <a href="javascript:;" class="btn btn-outline-success" data-alert="success">Success</a>
+    <a href="javascript:;" class="btn btn-outline-info" data-alert="info">Info</a>
+    <a href="javascript:;" class="btn btn-outline-warning" data-alert="warning">Warning</a>
+    <a href="javascript:;" class="btn btn-outline-danger" data-alert="danger">Danger</a>
+    <a href="javascript:;" class="btn btn-outline-light" data-body-bg="light">Light</a>
+    <a href="javascript:;" class="btn btn-outline-dark" data-body-bg="dark">Dark</a>
+</div>
+<div class="form-group">
+    <button class="btn btn-primary" type="button">Normal</button>
+    <button class="btn btn-secondary btn-load" data-style="zoom-in" type="button">Disable</button>
+    <button type="button" class="btn btn-info">@Html.SvgIcon("thumb-up") Icon</button>
+    <button class="btn btn-outline-warning" type="button">Outline</button>
+    <div class="btn-group dropdown">
+        <button type="button" class="btn btn-primary">Split button</button>
+        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+            @Html.SvgIcon("menu-down")
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <form>
+                <button type="submit" class="dropdown-item">Form action</button>
+            </form>
+            <a class="dropdown-item" href="#">Link action</a>
+            <a class="dropdown-item" href="#">Something else here</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Separated link</a>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <button type="button" class="btn btn-icon btn-link">@Html.SvgIcon("arrow-left")<span>Back</span></button>
+    <button type="button" class="btn btn-icon btn-badge">@Html.SvgIcon("bell") <span class="badge badge-danger">3</span></button>
+    <button type="button" class="btn btn-icon btn-badge">@User.AvatarImg(24) <span class="badge badge-danger">3</span></button>
+    <button type="button" class="btn btn-icon">@Html.SvgIcon("comment")</button>
+    <div class="dropdown d-inline-block">
+        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+            @Html.SvgIcon("dots-vertical")
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#">@Html.SvgIcon("pencil") Link action</a>
+            <form action="#" method="get" data-turboform>
+                <input type="hidden" name="q" value="form" />
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("upload") Form action</button>
+            </form>
+
+            <a class="dropdown-item" href="#">@Html.SvgIcon("pin") Button action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" target="_blank">@Html.SvgIcon("check") Separated action</a>
+        </div>
+        <button type="button" class="btn btn-sm btn-round btn-success">@Html.SvgIcon("plus")</button>
+        <button type="button" class="btn btn-round btn-success">@Html.SvgIcon("plus")</button>
+        <button type="button" class="btn btn-lg btn-round btn-success">@Html.SvgIcon("plus")</button>
+    </div>
+</div>
+
+
+<h1 id="colors" class="display-3 mt-4">Colors</h1>
+<hr />
+@{
+    // Note: The color swatches are only generated specifically for the test page, use the scss color functions for classes where you need colors
+    var colors = new string[] { "theme", "light-blue", "blue", "indigo", "deep-purple", "purple", "pink", "red", "deep-orange", "orange", "amber", "lime", "yellow", "light-green", "green", "teal", "cyan", "gray" };
+    var shades = new int[] { 50, 100, 200, 300, 400, 500, 600, 700, 800, 900 };
+    var theme = new Dictionary<string, string> { { "theme-500", "primary" }, { "teal-500", "success" }, { "light-blue-500", "info" }, { "amber-500", "warning" }, { "red-500", "danger" }, { "gray-400", "secondary" } };
+}
+
+<div class="row ">
+    @foreach (var color in colors) {
+        <div class="col-6 col-sm-4 col-lg-2 mb-4">
+            <div class="p-2 swatch-@color">@color.Replace("-", " ").ToTitleCase()</div>
+            <div class="p-2 text-@color">Abc @Html.SvgIcon("palette", htmlAttributes: new { @class = "i-inline" })</div>
+            @foreach (var shade in shades) {
+                var name = theme.ContainsKey(color + "-" + shade) ? " = " + theme[color + "-" + shade].ToTitleCase() : null;
+                <div class="p-2 swatch-@color-@shade">@shade @name</div>
+            }
+        </div>
+    }
+</div>
+
+
+<h1 id="forms" class="display-3 mt-4">Forms</h1>
+<hr />
+<form action="@Url.Action(nameof(TestController.Post))" method="post" novalidate data-turboform>
+    <div class="row">
+        <div class="col">
+            @Html.EditorFor(x => Model.Name)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Email)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @Html.EditorFor(x => Model.Username, additionalViewData: new { FormGroup = false })
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Password)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @Html.EditorFor(x => Model.Date)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.DateTime)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Time)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Schedule)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @Html.EditorFor(x => Model.Decimal)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Double)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Integer)
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Long)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            @Html.EditorFor(x => Model.CheckStatus)
+        </div>
+        <div class="col-sm-3">
+
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Privacy)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="form-group">
+                @Html.EditorFor(x => Model.Bool, additionalViewData: new { FormGroup = false })
+                @Html.EditorFor(x => Model.RequiredBool, additionalViewData: new { FormGroup = false })
+            </div>
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.Status, additionalViewData: new { FormLabel = false })
+        </div>
+    </div>
+    @Html.EditorFor(x => Model.Text)
+    @Html.EditorFor(x => Model.Webpage)
+    @Html.EditorFor(x => Model.Tags)
+    <div class="row">
+        <div class="col">
+            @Html.EditorFor(x => Model.Image)
+        </div>
+        <div class="col">
+            <label>&nbsp;<!-- this is just used for alignment--></label>
+            @Html.EditorFor(x => Model.Avatar, additionalViewData: new { FormLabel = false, FormText = false })
+        </div>
+        <div class="col">
+            @Html.EditorFor(x => Model.File)
+        </div>
+    </div>
+    <div class="form-buttons">
+        @Html.EditorFor(x => Model.Hidden)
+        <button class="btn btn-primary btn-load" type="submit">Submit</button>
+        <button class="btn btn-outline-secondary" type="button">Cancel</button>
+    </div>
+</form>
+
+<h1 id="icons" class="display-3 mt-4">Icons</h1>
+<hr />
+@Html.SvgIcons()
+<h1 id="navs" class="display-3 mt-4">Navs</h1>
+<hr />
+
+
+<nav class="nav nav-tabs">
+    <a class="nav-link active" href="#">Active</a>
+    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link disabled" href="#">Disabled</a>
+</nav>
+
+
+<nav class="navbar navbar-content p-0 mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Space Name</a></li>
+        <li class="breadcrumb-item"><a href="#">Name of Folder</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Title of Item That Could Be Long</li>
+    </ol>
+    <div class="navbar-icons ml-auto">
+        @Html.StarToggle(new Note(), true)
+        @{ Html.RenderPartial("_ContentMenu", new Note()); }
+    </div>
+</nav>
+
+<nav class="navbar navbar-content p-0">
+    <ol class="breadcrumb hide-last">
+        <li class="breadcrumb-item"><a href="#">Space Name</a></li>
+        <li class="breadcrumb-item"><a href="#">Last item is hidden</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Title of Item That Could Be Long</li>
+    </ol>
+    <div class="navbar-icons ml-auto">
+        @Html.StarToggle(new Note(), true)
+        @{ Html.RenderPartial("_ContentMenu", new Note()); }
+    </div>
+</nav>
+
+
+
+
+
+<h1 id="spinners" class="display-3 mt-4">Spinners</h1>
+<hr />
+<div class="d-flex align-items-center">
+    @Html.SvgSpinner(spin: true)
+    @Html.SvgSpinner(size: 32, spin: true)
+    @Html.SvgSpinner(size: 48, spin: true)
+    <img src="@Url.Content("~/img/spinner.svg")" class="ml-auto" width="24" height="24" alt="spinner" />
+
+</div>
+
+<h1 id="tables" class="display-3 mt-4">Tables</h1>
+<hr />
+
+<table class="table table-hover">
+    <thead class="thead-light">
+        <tr>
+            <th class="table-icon"></th>
+            <th style="width:250px;">Username</th>
+            <th>Name</th>
+            <th class="table-icon" style="width:80px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#tables">@@linus</a></td>
+            <td class="hidden-sm-down">Linus Birgerstam</td>
+            <td class="table-icon text-right">
+                <div class="dropdown">
+                    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                        @Html.SvgIcon("dots-vertical")
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#">@Html.SvgIcon("plus") An action</a>
+                        <a class="dropdown-item" href="#">@Html.SvgIcon("check") Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">@Html.SvgIcon("check") Separated action</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#">@@johan</a></td>
+            <td class="hidden-sm-down">Johan Jeppson</td>
+            <td class="table-icon text-right"><button type="button" class="btn btn-icon btn-success">@Html.SvgIcon("check")</button></td>
+        </tr>
+        <tr class="table-warning" data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#">@@magnus</a> <span class="badge badge-warning">warning</span></td>
+            <td class="hidden-sm-down">Magnus Krona</td>
+            <td class="table-icon text-right"><button type="button" class="btn btn-icon">@Html.SvgIcon("close")</button></td>
+        </tr>
+        <tr class="table-suspended" data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#">@@jimmy</a></td>
+            <td class="hidden-sm-down">Jimmy Wilhelmsson</td>
+            <td class="table-icon text-right"><a href="#" class="btn btn-icon btn-danger">@Html.SvgIcon("open-in-new")</a></td>
+        </tr>
+        <tr class="table-danger" data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#">@@rickard</a> <span class="badge badge-danger">danger</span></td>
+            <td class="hidden-sm-down">Rickard Hansson</td>
+            <td class="table-icon text-right"><form method="get" action="" data-turboform><button type="submit" class="btn btn-icon btn-danger">@Html.SvgIcon("delete")</button></form></td>
+        </tr>
+        <tr class="table-trashed" data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#">@@robert</a></td>
+            <td class="hidden-sm-down">Robert Hess</td>
+            <td class="table-icon text-right"><a href="#" class="btn btn-icon btn-danger">@Html.SvgIcon("backup-restore")</a></td>
+        </tr>
+        <tr data-href="#tables">
+            <td class="table-icon hidden-xs-down">@User.AvatarImg(24, retina: true)</td>
+            <td><a href="#">@@klas</a></td>
+            <td class="hidden-sm-down">Klas Lundberg</td>
+            <td class="table-icon text-right">
+                <form method="get" action="" data-turboform>
+                    <button type="submit" name="button" class="btn btn-icon btn-success" value="approve">@Html.SvgIcon("check")</button>
+                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete">@Html.SvgIcon("close")</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<h1 id="text" class="display-3 mt-4">Text</h1>
+<hr />
+<div class="row">
+    <div class="col">
+        <h1 class="display-1">Display 1</h1>
+        <h1 class="display-2">Display 2</h1>
+        <h1 class="display-3">Display 3</h1>
+        <h1 class="display-4">Display 4</h1>
+        <br /><br />
+        <h1>Heading <small class="text-muted">.h1</small></h1>
+        <h2>Heading <small class="text-muted">.h2</small></h2>
+        <h3>Heading <small class="text-muted">.h3</small></h3>
+        <h4>Heading <small class="text-muted">.h4</small></h4>
+        <h5>Heading <small class="text-muted">.h5</small></h5>
+        <h6>Heading <small class="text-muted">.h6</small></h6>
+    </div>
+
+    <div class="col">
+        <p style="font-weight: 900;">font-weight: 900</p>
+        <p style="font-weight: 800;">font-weight: 800</p>
+        <p style="font-weight: 700;">font-weight: 700</p>
+        <p style="font-weight: 600;">font-weight: 600</p>
+        <p style="font-weight: 500;">font-weight: 500</p>
+        <p style="font-weight: 400;">font-weight: 400</p>
+        <p style="font-weight: 300;">font-weight: 300</p>
+        <p style="font-weight: 200;">font-weight: 200</p>
+        <p style="font-weight: 100;">font-weight: 100</p>
+        <p class="font-weight-bold">.font-weight-bold</p>
+        <p class="font-weight-strong">.font-weight-strong</p>
+        <p class="font-weight-normal">.font-weight-normal</p>
+    </div>
+
+    <div class="col">
+        <p><a href="#" class="text-primary">Primary link</a></p>
+        <p><a href="#" class="text-secondary">Secondary link</a></p>
+        <p><a href="#" class="text-success">Success link</a></p>
+        <p><a href="#" class="text-danger">Danger link</a></p>
+        <p><a href="#" class="text-warning">Warning link</a></p>
+        <p><a href="#" class="text-info">Info link</a></p>
+        <p><a href="#" class="text-light bg-gray">Light link</a></p>
+        <p><a href="#" class="text-dark">Dark link</a></p>
+    </div>
+
+    <div class="col">
+        <p class="text-primary">.text-primary</p>
+        <p class="text-secondary">.text-secondary</p>
+        <p class="text-success">.text-success</p>
+        <p class="text-danger">.text-danger</p>
+        <p class="text-warning">.text-warning</p>
+        <p class="text-info">.text-info</p>
+        <p class="text-light">.text-light</p>
+        <p class="text-dark">.text-dark</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col">
+        <p>You can use the <code>&lt;mark&gt;</code> tag to <mark>highlight</mark> text.</p>
+        <p><s>This line of text is meant to be treated as no longer accurate.</s></p>
+        <p><u>This line of text will render as underlined.</u></p>
+        <p class="text-muted">This line of text text is muted.</p>
+    </div>
+    <div class="col">
+        <p><strong>This line rendered as bold text.</strong></p>
+        <p class="font-weight-strong">This line rendered as strong text.</p>
+        <p><em>This line rendered as italicized text.</em></p>
+        <p><small>This line of text is meant to be treated as fine print.</small></p>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col">
+        <p>A normal paragraph of text <a href="#">with a link</a>. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.</p>
+        <p class="lead">
+            Make a paragraph stand out by adding .lead. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus.
+        </p>
+        <blockquote class="blockquote">
+            <p class="mb-0">For quoting blocks of content from another source within your document use blockquote.</p>
+            <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+        </blockquote>
+        <pre><code class="language-csharp">public static void Main(string[] args) {
+    Console.WriteLine("Hello world");
+}</code></pre>
+    </div>
+</div>
+
+<h1 id="pagination" class="display-3 mt-4">Pagination</h1>
+<hr />
+
+<div class="pager">
+    <ul class="pagination">
+        <li class="page-item active"><a class="page-link" href="">1</a></li>
+        <li class="page-item"><a class="page-link" href="?skip=50">2</a></li>
+        <li class="page-item"><a class="page-link" href="?skip=100">3</a></li>
+        <li class="page-item"><a class="page-link" href="?skip=150">4</a></li>
+        <li class="page-item"><a class="page-link" href="?skip=200">5</a></li>
+        <li class="page-item disabled"><a class="page-link">…</a></li>
+        <li class="page-item"><a class="page-link" href="?skip=550">12</a></li>
+    </ul>
+    <ul class="pagination ml-auto hidden-xs-down">
+        <li class="page-item active"><a class="page-link" href="?top=50">50</a></li>
+        <li class="page-item"><a class="page-link" href="?top=100">100</a></li>
+        <li class="page-item next"><a class="page-link" href="?top=500">500</a></li>
+    </ul>
+</div>

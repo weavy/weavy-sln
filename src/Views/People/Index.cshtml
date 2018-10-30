@@ -1,0 +1,72 @@
+﻿@model SearchResult<User, UserQuery>
+@{
+    Title = "People";
+    
+    var tab = ViewContext.RouteData.Values["tab"] as string;
+}
+
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
+}
+
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @if (tab == null) {
+            @(Html.ActionLink<PeopleController>(c => c.Index(null, null, null), text: "All", htmlAttributes: new { @class = "nav-link active" }))
+        } else {
+            @(Html.ActionLink<PeopleController>(c => c.Index(null, null, null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        }
+        @(Html.ActionLink<PeopleController>(c => c.Index(null, "internal", null), text: "Internal", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<PeopleController>(c => c.Index(null, "external", null), text: "External", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    </nav>
+
+    @if (PermissionService.HasSystemPermission(Permission.ManageUsers)) {
+        <div class="fab dropdown">
+            <button class="btn btn-round btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#" title="Add or invite user">@Html.SvgIcon("plus")</button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.New()))">@Html.SvgIcon("account", "primary") Add user</a>
+                <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Html.SvgIcon("email", "deep-orange") Invite people</a>
+            </div>
+        </div>
+
+    } else if (PermissionService.HasSystemPermission(Permission.Invite)) {
+        <div class="fab">
+            <a class="btn btn-round btn-primary" href="@(Url.Action<PeopleController>(c => c.Invite()))" title="Invite people">@Html.SvgIcon("plus")</a>
+        </div>
+    }
+}
+
+<div class="container-fluid my-3">
+    @(Html.FilterForm<PeopleController>(c => c.Index(null, tab, null), Model.Query))
+
+    @if (Model.HasItems()) {
+        <table class="table table-hover table-people" prevent-modal>
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th><a href="@Url.OrderBy("name")">Name</a></th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            <tbody id="infinite-scroll-target">
+                @{ Html.RenderPartial("_PeopleTable", Model, new ViewDataDictionary() { { "modal", false } }); }
+            </tbody>
+        </table>
+        @Html.ScrollMore(Model)
+
+    } else if (!Model.Query.Text.IsNullOrWhiteSpace()) {
+        <p class="mt-3">@Html.SearchResultText(Model)</p>
+    }
+
+    @if ((Model.Query.Suspended ?? false) || (Model.Query.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>Back to <a href="@Url.Rebuild("suspended", null, "trashed", null)">active</a> user accounts.</small></p>
+    } else if ((ViewBag.Suspended ?? false) && (ViewBag.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("suspended", "true", "trashed", null)">suspended</a> and <a href="@Url.Rebuild("suspended", null, "trashed", "true")">trashed</a> user accounts.</small></p>
+    } else if ((ViewBag.Suspended ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("suspended", "true", "trashed", null)">suspended</a> user accounts.</small></p>
+    } else if ((ViewBag.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@Url.Rebuild("suspended", null, "trashed", "true")">trashed</a> user accounts.</small></p>
+    }
+
+</div>

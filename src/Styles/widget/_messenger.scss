@@ -1,0 +1,59 @@
+/// <reference path="../widget.scss" />
+
+// Messenger
+
+.weavy-conversations {
+    margin: rem(-.5) 0 rem(.5) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:empty {
+        display: none;
+    }
+
+    .weavy-avatar {
+        display: block;
+        width: rem(1.5);
+        height: rem(1.5);
+        margin: rem(.25);
+    }
+}
+
+.weavy-conversation {
+    transition: height $md-animation-duration $md-animation-curve-default;
+    opacity: 1;
+    height: rem(1.5 + .25);
+}
+
+
+.weavy-bubble-item {
+    &.weavy-bubble-messenger {
+        height: auto;
+    }
+}
+
+
+.weavy-button {
+    &.weavy-messenger {
+        height: auto;
+
+        &.weavy-dot {
+            background-color: $white;
+        }
+    }
+}
+
+.weavy-messenger {
+    .weavy-icon {
+        margin: $widget-icon-size / 2 - rem(1);
+
+        &:first-child {
+            color: $theme;
+        }
+
+        /*&:last-child {
+            margin: rem(-.25) 0 rem(-.5) 0;
+        }*/
+    }
+}

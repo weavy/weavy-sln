@@ -1,0 +1,88 @@
+﻿@model FileBase
+@{
+    Title = Model.Name ?? "Untitled";
+    Back = Url.Back(WeavyContext.Content.Parent().Url() ?? WeavyContext.App.Url());
+    var creator = Model.CreatedBy();
+    var versionable = Model as IVersionable;
+    var fmt = FileHelper.GetPreviewFormat(Model.Blob.Name);
+    Back = versionable == null || versionable.IsCurrent() ? Url.Back(WeavyContext.Content.Parent().Url() ?? WeavyContext.App.Url()) : Url.Back(versionable.Url() + "/versions");
+}
+
+<div class="container my-3">
+
+  <article class="file" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+    <header class="file-header">
+      <a class="btn btn-icon mr-1" href="@creator.Url()">@creator.AvatarImg(24)</a>
+      @if (Model.CreatedById != Model.ModifiedById) {
+        var editor = Model.ModifiedBy();
+        <a class="btn btn-icon mr-1" href="@editor.Url()">@editor.AvatarImg(24)</a>
+      }
+      <a href="@(Url.Action<ContentController>(c => c.Versions(Model.Id)))" class="mr-1">@Html.Time(Model.ModifiedAt)</a>
+      @Html.ContentBadge(Model)
+
+      @if (Model is ITaggable taggable) {
+        Html.RenderPartial("_Tags", taggable);
+      }
+
+      <div class="navbar-icons ml-auto">
+        @if (versionable == null || versionable.IsCurrent()) {
+          if (Model.HasPermission(Permission.Edit)) {
+            if (FileHelper.IsOfficeDocument(Model.Name)) {
+              <a class="btn btn-icon" href="@Model.OfficeUrl()" title="Open in @OfficeHelper.GetProductName(Model.Name)">@Html.SvgIcon(Model, "icon")</a>
+            } else {
+              <a class="btn btn-icon" href="@Model.Url()/edit">@Html.SvgIcon("pencil", "icon")</a>
+            }
+          }
+          Html.RenderPartial("_ContentMenu", Model);
+        } else {
+          <form action="@Url.Action(nameof(ContentController.Revert), null, new { id = Model.Id })" method="post">
+            @Html.HttpMethodOverride(HttpVerbs.Put)
+            @Html.Hidden(nameof(versionable.Version), versionable.Version)
+            <button type="submit" class="btn btn-icon" title="Revert">@Html.SvgIcon("undo", "icon")</button>
+          </form>
+        }
+      </div>
+    </header>
+
+    @if (fmt == PreviewFormat.Text) {
+      var lang = FileHelper.SyntaxHighlight(Model.Name);
+      if (lang != null) {
+        <pre class="language-@lang"><code class="language-@lang">@System.IO.File.ReadAllText(BlobService.GetData(Model.Blob).FullName)</code></pre>
+      } else {
+        <pre class="document">@System.IO.File.ReadAllText(BlobService.GetData(Model.Blob).FullName)</pre>
+      }
+
+    } else if (fmt == PreviewFormat.Image || fmt == PreviewFormat.Document) {
+      var attrs = Html.PreviewAttributes(Model);
+
+      <div class="text-center">
+        <figure class="figure">
+          <a href="@Model.FileUrl()" @Html.Raw(attrs.AsHtmlAttributes())><img src="@Model.ThumbUrl(480, 480)" class="figure-img img-fluid d-block mx-auto" alt="@Model.Name" /></a>
+          <figcaption class="figure-caption"><a href="@Model.FileUrl(download:true)">@(Model.GetExcerpt() ?? Model.GetTitle())</a></figcaption>
+        </figure>
+      </div>
+
+    } else {
+      <h1 class="text-center mb-3"><a href="@Model.FileUrl(download:true)">@Model.Name</a></h1>
+    }
+
+    @if (versionable == null || versionable.IsCurrent()) {
+
+      if (Model is ICommentable commentable) {
+        <section class="content-comments my-3">
+          <h4 class="display-4"><span>Comments</span></h4>
+          <div class="list-group comments" data-container="comments">
+            @Html.Partial("_Comments", commentable.Comments())
+          </div>
+          @Html.Partial("_CommentForm", commentable, new ViewDataDictionary() { { "container", ".comments" } })
+        </section>
+      }
+
+      if (Model is IFollowable followable) {
+        Html.RenderPartial("_Subscribers");
+      }
+    }
+
+  </article>
+</div>
+

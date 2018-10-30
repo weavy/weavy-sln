@@ -1,0 +1,159 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+
+
+.list-group {
+
+    .dropdown {
+        position: absolute;
+        bottom: -.375rem;
+        right: -.625rem;
+        display: none;
+
+        &.show {
+            display: block;
+        }
+    }
+
+    time {
+        float: right;
+        font-size: $font-size-xs;
+        margin-top: .25rem;
+    }
+
+    .list-group-item {
+
+        &.unread {
+
+            &.unread {
+                time::before {
+                    @include dot;
+                    margin: 0 .25rem;
+                }
+            }
+
+            .media-title, .media-text {
+                font-weight: $font-weight-bold;
+            }
+        }
+    }
+
+    .list-group-item:hover {
+
+        .media-text {
+            padding-right: 1.25rem;
+        }
+
+        .dropdown {
+            display: block;
+        }
+    }
+
+    .list-group-item.selected {
+        .checked {
+            display: inline-flex;
+        }
+
+        .unchecked {
+            display: none;
+        }
+    }
+
+    .list-group-item.active {
+        z-index: 1;
+
+        @media (max-width: 648px) {
+            background-color: $list-group-bg;
+            border-color: $list-group-border-color;
+            color: $list-group-action-color;
+
+            &:hover {
+                background-color: $list-group-hover-bg;
+            }
+        }
+
+        @media (min-width: 649px) {
+
+            .btn-icon {
+                color: $white;
+            }
+
+            &.unread {
+                time::before {
+                    @include dot($white);
+                }
+            }
+        }
+    }
+
+
+    .list-group-item:not(.active) {
+        time {
+            color: $text-muted;
+        }
+    }
+}
+
+.list-group-item:not(.active):active {
+    background-color: $list-group-hover-bg;
+}
+
+.list-group-item {
+    border-color: $messenger-border-color;
+}
+
+.list-group-item-action {
+    cursor: pointer;
+}
+
+.list-group-separator {
+    margin: 1rem;
+    color: $text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+
+    &.expand {
+        margin: .5rem 1rem;
+    }
+
+    &.reset {
+        color: $body-color;
+        font-size: $font-size-base;
+        font-weight: $font-weight-base;
+        text-transform: none;
+        letter-spacing: initial;
+    }
+}
+
+
+.list-group-conversations, .list-group.list-group-users {
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+}
+
+.list-group-users {
+    flex: 100%;
+}
+// toggle more rooms
+.rooms {
+    .conversation:nth-child(1n+4) {
+        display: none;
+    }
+
+    &.expanded .conversation:nth-child(1n+4) {
+        display: inherit;
+    }
+}
+// hide dropdown when adding user to conversation
+.drawer-add-people {
+    .list-group-users {
+        .media {
+            .btn-icon {
+                display: none;
+            }
+        }
+    }
+}

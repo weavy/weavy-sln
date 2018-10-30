@@ -1,0 +1,34 @@
+﻿@model IEnumerable<ConnectOption>
+<form class="modal-content" id="connect-url">
+    <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">Connect bubble</h5>
+        <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Html.SvgIcon("close")</button>
+    </div>
+    <div class="modal-body scroll-y">
+        <p>Select url where this bubble should be active.</p>
+
+        <ul class="list-group mb-3">
+            @foreach (var option in Model.AsSmartEnumerable()) {
+                <li class="list-group-item list-group-item-action @if (!option.Value.Wildcard) { <text>active</text> }" onclick="$(this).find('input[type=radio]').prop('checked', 'checked'); $(this).closest('.list-group').find('li').removeClass('active'); $(this).addClass('active');">
+                    <div class="custom-control custom-radio mb-0">
+                        <input class="custom-control-input" type="radio" name="connect-url" id="connect-radio-@option.Index" value="@option.Value.ToString()" @if (!option.Value.Wildcard) { <text> checked</text> }>
+                        <label class="custom-control-label d-flex flex-column" for="connect-radio-@option.Index" title="@(option.Value.ToString())">
+                            <div class="h6">@(option.Value.Label)</div>
+                            <small class="scroll-x text-nowrap">@(option.Value.Description)</small>
+                        </label>
+                    </div>
+                </li>
+            }
+        </ul>
+
+        @*<div class="media text-info">
+            @Html.SvgIcon("information-outline", size: 36)
+            <div class="media-body small font-italic">After connecting the bubble it will show up for everyone that has access to it.</div>
+        </div>*@
+
+    </div>
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-load">Connect</button>
+    </div>
+</form>

@@ -1,0 +1,16 @@
+﻿@model NotificationsModel
+
+@if (Model.UnreadNotifications.Count + Model.ReadNotifications.Count == 0) {
+    <div class="container-fluid mt-3 empty">
+        <p class="text-center text-muted">All caught up :)</p>
+    </div>
+}
+
+<div class="list-group list-group-flush">
+    @foreach (var notification in Model.UnreadNotifications) {
+        Html.RenderPartial("~/Views/Notification/_Notification.cshtml", notification);
+    }
+    @foreach (var notification in Model.ReadNotifications) {
+        Html.RenderPartial("~/Views/Notification/_Notification.cshtml", notification);
+    }
+</div>

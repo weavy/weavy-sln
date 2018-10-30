@@ -1,0 +1,87 @@
+﻿@model SearchResult<TrashedEntity, TrashQuery>
+@{
+    Title = "Recycle bin";
+    string tab = ViewContext.RouteData.Values["tab"] as string;
+    Back = Url.Action<Weavy.Web.Areas.Manage.Controllers.HomeController>(c => c.Index());
+}
+
+@section navbar_secondary {
+<nav class="nav nav-tabs">
+    @if (tab == null) {
+        @(Html.ActionLink<TrashController>(c => c.Index(null, null), text: "Everything", htmlAttributes: new { @class = "nav-link active" }))
+    } else {
+        @(Html.ActionLink<TrashController>(c => c.Index(null, null), text: "Everything", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    }
+    @(Html.ActionLink<TrashController>(c => c.Index("spaces", null), text: "Spaces", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<TrashController>(c => c.Index("tabs", null), text: "Tabs", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<TrashController>(c => c.Index("posts", null), text: "Posts", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<TrashController>(c => c.Index("files", null), text: "Files", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<TrashController>(c => c.Index("comments", null), text: "Comments", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<TrashController>(c => c.Index("users", null), text: "Users", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+
+    @*<a class="nav-link @(Model.Query.EntityTypes.Count > 1 ? "active" : null)" href="@(Request.Path + Request.QueryString.Rebuild("et", null, "skip", null).AsQueryString())">Everything</a>
+    @foreach (EntityType et in ViewBag.EntityTypes) {
+        <a class="nav-link @((Model.Query.EntityTypes.Count == 1 && Model.Query.EntityTypes.SingleOrDefault() == et) ? "active" : null)" href="@(Request.Path + Request.QueryString.Rebuild("et", et.ToString().ToLower(), "skip", null).AsQueryString())">@(et.Pluralize())</a>
+    }*@
+</nav>
+}
+
+
+<div class="container-fluid mt-3">
+@if (Model.HasItems()) {
+
+    <table class="table table-hover table-trash">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Trashed</th>
+                <th class="table-icon">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td class="table-icon">@Html.SvgIcon(item)</td>
+                    <td>@item.Title.Ellipsis(128)</td>
+                    <td>@(item.Space(filter:false)?.Name)</td>
+                    <td>@Html.Time(item.TrashedAt, format: "g")</td>
+                    <td class="table-icon text-right">
+                        <div>
+                            <form method="post" action="@Url.Action(nameof(TrashController.Restore))" data-turboform>
+                                @Html.HttpMethodOverride(HttpVerbs.Put)
+                                @Html.Hidden("id", item.Id)
+                                @Html.Hidden("type", item.Type.ToString().ToLower())
+                                @if (Model.Query.EntityTypes.Count == 1) {
+                                    @Html.Hidden("tab", Model.Query.EntityTypes.Single().ToString())
+                                }
+                                <button type="submit" class="btn btn-icon btn-success btn-load" title="Restore">@Html.SvgIcon("undo")</button>
+                            </form>
+                            @if (item.Type != EntityType.User) {
+                                <form method="post" action="@Url.Action(nameof(TrashController.Delete))" data-turboform>
+                                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                    @Html.Hidden("id", item.Id)
+                                    @Html.Hidden("type", item.Type.ToString().ToLower())
+                                    @if (Model.Query.EntityTypes.Count == 1) {
+                                        @Html.Hidden("tab", Model.Query.EntityTypes.Single().ToString())
+                                    }
+                                    <button type="submit" class="btn btn-icon btn-danger btn-load" title="Permanently delete">@Html.SvgIcon("close")</button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.Pagination(Model)
+} else {
+    if (tab == null) {
+        <p class="text-muted text-center">Nothing in trash. Items in trash are deleted after 30 days.</p>
+    } else {
+        <p class="text-muted text-center">No trashed @tab. Items in trash are deleted after 30 days.</p>
+    }
+    
+}
+</div>

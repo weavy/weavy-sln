@@ -1,0 +1,25 @@
+@model ActionDoc
+@using Weavy.Web.Areas.Docs.Controllers
+@using Weavy.Web.Areas.Docs.Models
+@using Weavy.Web.Extensions
+
+@{
+  Title = Model.Method + " " + Model.ApiDescription.RelativePath;
+    Back = Url.Action<HomeController>(c => c.GetControllerDocumentation(Model.ApiDescription.ActionDescriptor.ControllerDescriptor.ControllerName));
+}
+
+
+
+<div class="container my-3">
+<article>
+  <header>
+    <h1 class="display-1">@Model.Method /@Model.ApiDescription.Route.RouteTemplate</h1>
+    @if (Model.ApiDescription.Documentation != null) {
+      <p>@Html.Raw(Model.ApiDescription.Documentation)</p>
+    } else {
+      <p>No documentation available.</p>
+    }
+  </header>
+  @Html.DisplayFor(m => Model)
+</article>
+</div>  

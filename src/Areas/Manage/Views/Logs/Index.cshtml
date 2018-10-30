@@ -1,0 +1,41 @@
+﻿@model IEnumerable<System.IO.FileInfo>
+@{
+    Title = "Log files";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container-fluid mt-3">
+@if (Model.HasItems()) {
+    <table class="table table-hover table-logs" id="table-logfiles">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Modified</th>
+                <th>Size</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.AsSmartEnumerable()) {
+                <tr data-href="@(Url.Action<LogsController>(c => c.Get(item.Value.Name.ToLower(), false)))">
+                    <td class="table-icon"><a class="btn btn-icon" href="@Url.Action(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() })" target="_blank">@Html.SvgIcon("file-document")</a></td>
+                    <td>@Html.ActionLink(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() }, new { target = "_blank" })</td>
+                    <td>@Html.Time(item.Value.LastWriteTimeUtc, format: "g")</td>
+                    <td>@FileHelper.FileSizeAsString(item.Value.Length)</td>
+                    <td class="table-icon text-right">
+                        <div>
+                            <a href="@(Url.Action<LogsController>(c => c.Get(item.Value.Name.ToLower(), null)))?download=true" class="btn btn-icon btn-primary" title="Download">@Html.SvgIcon("download")</a>
+                            <form action="@(Url.Action<LogsController>(c => c.Delete(item.Index)))" method="post" class="d-inline-block" data-turboform>
+                                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                <button type="submit" name="name" value="@item.Value.Name.ToLower()" class="btn btn-icon btn-danger" title="Remove">@Html.SvgIcon("close")</button>
+                            </form>
+                        </div>
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+</div>

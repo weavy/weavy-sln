@@ -1,0 +1,21 @@
+/// <reference path="../widget.scss" />
+
+// Widget variables
+
+// Set --weavy-rem: 16px; in :root or on the shadow-root-element to change widget rem
+
+$widget-default-rem: 16px;
+
+@function rem($value) {
+    @return $widget-default-rem * $value;
+    // NOTE: IE/Edge dose not handle --weavy-rem very good (on high dpi display?)
+    // Edge does unfortunately not fully support calc() in box-shadow and transform, otherwise --variables work
+    //@return calc(var(--weavy-rem, #{$widget-default-rem}) * #{$value}); // Defaults to 16px
+
+}
+
+// Widget variables
+$widget-strip-width: rem(24); // 384px, previously 375px;
+$widget-zindex: 2147483647; // max possible z-index
+$widget-border-radius: rem(.25);
+$widget-icon-size: rem(2.5);

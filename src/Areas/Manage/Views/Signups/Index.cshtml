@@ -1,0 +1,80 @@
+﻿@using Weavy.Web.Areas.Manage.Controllers
+@model SearchResult<Invite, InviteQuery>
+@{
+    Title = "Sign-ups";
+    Back = Url.Action<HomeController>(c => c.Index());
+    var u = new User();
+}
+
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @(Html.ActionLink<SignupsController>(c => c.Index(null, null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<SignupsController>(c => c.Index(null, "pending"), text: "Pending", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<SignupsController>(c => c.Index(null, "verified"), text: "Verified", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<SignupsController>(c => c.Index(null, "approved"), text: "Approved", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    </nav>
+}
+
+<div class="container-fluid mt-3">
+    @if (Model.HasItems()) {
+
+        <table class="table table-hover table-signups">
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var invite in Model) {
+                    <tr @if (invite.ExpiresAt < DateTime.UtcNow) { <text> class="table-warning" title="Sign-up request has expired" </text> }>
+                        <td class=" table-icon">@u.AvatarImg(32)</td>
+                        <td>
+                            @invite.Email
+                            @if (invite.IsExternal) {
+                                <span class="badge badge-warning" title="Invited to @(invite.Space?.Name) by @invite.CreatedBy.GetTitle()">external</span>
+                            } else if (invite.IsInvite) {
+                                <span class="badge badge-info" title="Invited by @invite.CreatedBy.GetTitle()">invite</span>
+                            } else {
+                                <span class="badge badge-success">signup</span>
+                            }
+                        </td>
+                        @if (invite.Status == InviteStatus.Approved) {
+                            <td title="Sign-up request is approved">@invite.Status</td>
+                            <td class="table-icon">
+                                <form method="post" action="@(Url.Action<SignupsController>(c => c.Update(invite.Id, null)))" data-turboform>
+                                    <button type="submit" name="button" class="btn btn-icon btn-info" value="email" title="Resend @(invite.IsSignup ? "approval": "invite") email">@Html.SvgIcon("email")</button>
+                                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete" title="Remove @(invite.IsSignup ? "sign-up request": "invite")">@Html.SvgIcon("close")</button>
+                                </form>
+                            </td>
+                        } else if (invite.Status == InviteStatus.Verified) {
+                            <td title="Email is verified">@invite.Status</td>
+                            <td class="table-icon">
+                                <form method="post" action="@(Url.Action<SignupsController>(c => c.Update(invite.Id, null)))" data-turboform>
+                                    <button type="submit" name="button" class="btn btn-icon btn-success" value="approve" title="Approve @(invite.IsSignup ? "sign-up request": "invite")">@Html.SvgIcon("check")</button>
+                                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete" title="Remove @(invite.IsSignup ? "sign-up request": "invite")">@Html.SvgIcon("close")</button>
+                                </form>
+                            </td>
+                        } else {
+                            <td title="Pending email verification">@invite.Status</td>
+                            <td class="table-icon">
+                                <form method="post" action="@(Url.Action<SignupsController>(c => c.Update(invite.Id, null)))" data-turboform>
+                                    @if (!invite.IsSignup) {
+                                        <button type="submit" name="button" class="btn btn-icon btn-info" value="email" title="Resend @(invite.IsSignup ? "email confirmation" : "invite")">@Html.SvgIcon("email")</button>
+                                    }
+
+                                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete" title="Remove @(invite.IsSignup ? "sign-up request": "invite")">@Html.SvgIcon("close")</button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    } else {
+        <p>There are no sign-up requests or invites at this time.</p>
+    }
+</div>

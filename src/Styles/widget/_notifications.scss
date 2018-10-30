@@ -1,0 +1,17 @@
+/// <reference path="../widget.scss" />
+
+// Notifications
+
+.weavy-notifications {
+    opacity: 1;
+    position: absolute;
+    bottom: rem(.5);
+    right: $widget-icon-size + rem(.5);
+}
+
+.weavy-notification-frame {
+    pointer-events: all;
+    width: rem(20 + 1); //320px;
+    height: 0;
+    border: 0;
+}

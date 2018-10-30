@@ -1,0 +1,30 @@
+﻿@using Weavy.Web.Areas.Manage.Controllers;
+<!DOCTYPE html>
+<html lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <meta name="turbolinks-cache-control" content="no-preview">
+    <title>@(string.IsNullOrWhiteSpace(Title) ? Theme.Name : Title + " | " + Theme.Name)</title>
+    @Html.ThemeHead()
+    @Bundler.Styles("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @Bundler.Scripts("~/areas/setup/scripts/setup.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+</head>
+<body class="@BodyClasses("body-dark")" @BodyAttributes>
+    @Html.SvgSprite()
+    <main>
+        <div class="container my-4">
+            <div class="row justify-content-md-center">
+                <div class="col-lg-6 col-md-8">
+                    <div class="text-center mt-3 mb-3">
+                        @Html.IconImg(128, retina: true)
+                    </div>
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </main>
+    @RenderSection("footer", required: false)
+    
+</body>
+</html>

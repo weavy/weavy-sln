@@ -1,0 +1,44 @@
+﻿@model string
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+    var attrs = new Dictionary<string, object>();
+    attrs["type"] = "text";
+    attrs["class"] = "form-control";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+    if (prop.IsRequired()) {
+        attrs["required"] = null;
+    }
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+@if (label) {
+    @Html.LabelFor(m => m)
+}
+
+<select class="form-control" name="@ViewData.TemplateInfo.GetFullHtmlFieldName("")" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+    <option value="@TimeZoneInfo.Local.Id"></option>
+    @foreach (var timeZoneInfo in TimeZoneInfo.GetSystemTimeZones()) {
+        <option value="@timeZoneInfo.Id" @(Model == timeZoneInfo.Id ? @"selected=""selected""" : "")>@timeZoneInfo.DisplayName</option>
+    }
+</select>
+
+@if (feedback != null) {
+    <div class="invalid-feedback">@feedback</div>
+} else if (text) {
+    <div class="form-text">@meta.Description</div>
+}
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}

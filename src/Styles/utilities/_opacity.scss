@@ -1,0 +1,25 @@
+/// <reference path="../_core.scss" />
+
+.opacity-faded {
+    opacity: $opacity-faded;
+}
+
+.opacity-backdrop {
+    opacity: $opacity-backdrop;
+}
+
+.opacity-muted {
+    opacity: $opacity-muted;
+}
+
+.opacity-disabled {
+    opacity: $opacity-disabled;
+}
+
+.opacity-hover {
+    opacity: $opacity-hover;
+}
+
+.opacity-panel {
+    opacity: $opacity-panel;
+}

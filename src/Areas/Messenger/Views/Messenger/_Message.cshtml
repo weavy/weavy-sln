@@ -1,0 +1,125 @@
+﻿@using System.Text.RegularExpressions
+@model Message
+@{
+    MessengerModel parent = ViewBag.ParentModel;
+
+    // strip HTML and whitespace and check zero-length
+    string emoji = !Model.Html.IsNullOrEmpty() && Regex.Replace(Model.Html, "<[^>]*>|\\s+", "").Length == 0 ? " emoji" : "";
+    bool attachments = Model.AttachmentIds.Any();
+    var images = attachments ? Model.Attachments().Where(x => FileHelper.IsWebImage(x.Blob.Name)) : new List<Weavy.Core.Models.Attachment>();
+    var files = attachments ? Model.Attachments().Where(x => !FileHelper.IsWebImage(x.Blob.Name)) : new List<Weavy.Core.Models.Attachment>();
+    var width = images.FirstOrDefault()?.Blob?.Width;
+
+    var embeds = Model.Embeds();
+    //var embed = embeds.FirstOrDefault(x => !x.IsLink);
+    var link = embeds.FirstOrDefault(x => x.IsLink);
+}
+
+@if (Model.CreatedById == UserService.SystemId && parent.Other?.Id != UserService.SystemId) {
+    <div class="message system" data-message="@Model.Id">
+        <a id="message-@Model.Id"></a>
+        <div class="bubble">
+            @Html.Raw(Model.Html)
+        </div>
+    </div>
+} else if (Model.CreatedById == User.Id) {
+    <div class="message me@(emoji)" data-message="@Model.Id">
+        <a id="message-@Model.Id"></a>
+        
+        <div class="bubble">
+            @if (images.Any()) {
+                <div class="card-images" @(width != null ? Html.Raw(@"style=""width:" + @width + @"px""") : null )>
+                    @{ Html.RenderPartial("_ImageGrid", images); }
+                </div>
+            }
+
+            @if (files.Any()) {
+                <div class="card-files">
+                    @{ Html.RenderPartial("_Attachments", files); }
+                </div>
+            }
+
+            <div class="text">@Html.Raw(Model.Html)</div>
+            <div class="meta">
+                @Html.Time(Model.CreatedAt, "t")
+            </div>
+
+            @if (link != null) {
+                <div class="card-context">
+                    @{Html.RenderPartial("_ContextLink", link); }
+                </div>
+            }
+        </div>
+        
+
+        @if (parent.Messages.Skip == 0) {
+            // we only want the status indicator on the first "page" of messages
+            var next = Model.CreatedById == User.Id ? parent.Messages.FirstOrDefault(x => x.CreatedById == User.Id && x.CreatedAt > Model.CreatedAt) : null;
+            var members = parent.Conversation.Members.Where(x => x.Id != User.Id).ToList();
+            if (next != null) {
+                if (members.Any(x => x.ReadAt >= Model.CreatedAt && x.ReadAt < next.CreatedAt)) {
+                    <div class="status status-read">
+                        @foreach (var member in members.Where(x => x.ReadAt >= Model.CreatedAt && x.ReadAt < next.CreatedAt)) {
+                            @member.AvatarImg(18, retina: true, htmlAttributes: new { title = $"Seen by {member.GetTitle()}", data_user = member.Id })
+                        }
+                    </div>
+                }
+            } else if (members.Any(x => x.ReadAt >= Model.CreatedAt)) {
+                <div class="status status-read">
+                    @foreach (var member in members.Where(x => x.ReadAt >= Model.CreatedAt)) {
+                        @member.AvatarImg(18, retina: true, htmlAttributes: new { title = $"Seen by {member.GetTitle()}", data_user = member.Id })
+                    }
+                </div>
+            } else if (members.Any(x => x.DeliveredAt >= Model.CreatedAt)) {
+                <div class="status status-delivered" title="Delivered">
+                    @Html.SvgIcon("check-circle", size: 18)
+                </div>
+            } else {
+                <div class="status status-sent" title="Sent">
+                    @Html.SvgIcon("check-circle-outline", size: 18)
+                </div>
+            }
+        }
+
+    </div>
+
+} else {
+    <div class="message@(emoji)" data-message="@Model.Id">
+        <a id="message-@Model.Id"></a>
+        <a class="mr-2" href="#" data-profile="@Model.CreatedById">@Model.CreatedBy().AvatarImg(32, retina: true)</a>
+          
+        <div class="bubble">
+            @if (parent.Conversation.IsRoom) {
+                <div class="from">
+                    <a href="#" data-profile="@Model.CreatedById">@Model.CreatedBy().GetTitle()</a>
+                </div>
+            }
+
+            @if (images.Any()) {
+                <div class="card-images" @(width != null ? Html.Raw(@"style=""width:" + @width + @"px""") : null )>
+                    @{ Html.RenderPartial("_ImageGrid", images); }
+                </div>
+            }
+
+
+
+            @if (files.Any()) {
+                <div class="card-files">
+                    @{ Html.RenderPartial("_Attachments", files); }
+                </div>
+            }
+
+            <div class="text">@Html.Raw(Model.Html)</div>
+            <div class="meta">
+                @Html.Time(Model.CreatedAt, "t")
+            </div>
+
+            @if (link != null) {
+                <div class="card-context">
+                    @{Html.RenderPartial("_ContextLink", link); }
+                </div>
+            }
+
+        </div>
+    </div>
+}

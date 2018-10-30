@@ -1,0 +1,70 @@
+/// <reference path="../_core.scss" />
+
+.alert {
+    &.connection-state {
+        margin-top: $alert-padding-y/2;
+        position: fixed;
+        top: 0;
+        left: 45%;
+        font: $font-size-sm;
+        padding: $alert-padding-y/2 $alert-padding-x;
+        display: none;
+        z-index: $zindex-fixed;
+    }
+
+    &.d-flex {
+        display: flex;
+        align-items: center;
+
+        .close, .dropdown {
+            order: 1;
+            margin-right: -.5rem;
+            align-self: flex-start;
+        }
+    }
+}
+
+.alert-dismissible {
+    padding-right: 3rem;
+
+    .close {
+        margin: .5rem;
+        padding: .25rem;
+    }
+}
+
+.alert-link {
+    &.btn.btn-link {
+        padding: 0;
+        vertical-align: initial;
+
+        &:active, &.active {
+            box-shadow: none;
+        }
+    }
+}
+
+.alerts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1rem;
+    width: 100%;
+    position: fixed;
+    top: $navbar-height/2;
+    z-index: $zindex-modal + 1;
+    pointer-events: none;
+
+    .has-navbar-secondary & {
+        top: $navbar-height*1.5;
+    }
+
+    .alert {
+        pointer-events: all;
+        box-shadow: $md-shadow-4dp;
+
+        @include media-breakpoint-up(sm) {
+            max-width: map-get($container-max-widths, sm);
+        }
+    }
+}

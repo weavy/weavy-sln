@@ -1,0 +1,66 @@
+@using Weavy.Web.Areas.Docs.Controllers
+
+@{
+    Title = "POST /api/oauth/token";
+    Back = Url.Action<HomeController>(c => c.GetOAuthDocumentation());
+}
+
+<div class="container my-3">
+    <article>
+        <header>
+            <h1 class="display-1">@Title</h1>
+            <p>
+                Allows an application to obtain an OAuth 2 Bearer Token, which can be used to make API requests on an user’s behalf.
+                Tokens received by this method should be cached and reused until they expire. All parameters should be sent in the request <b>body</b> using the “application/x-www-form-urlencoded” format.
+            </p>
+        </header>
+
+        <h2 class="display-2">Request</h2>
+        <table class="table table-api">
+            <thead>
+                <tr>
+                    <th class="name">Parameter</th>
+                    <th class="desc">Description</th>
+                    <th class="info">Additional information</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name">grant_type</td>
+                    <td class="desc">Value <strong>must</strong> be set to “password”.</td>
+                    <td class="info">Define this parameter in the <b>body</b></td>
+                </tr>
+                <tr>
+                    <td class="name">username</td>
+                    <td class="desc">The username.</td>
+                    <td class="info">Define this parameter in the <b>body</b></td>
+                </tr>
+                <tr>
+                    <td class="name">password</td>
+                    <td class="desc">The password.</td>
+                    <td class="info">Define this parameter in the <b>body</b></td>
+                </tr>
+            </tbody>
+        </table>
+        <h4 class="display-4">Example</h4>
+<pre>grant_type=password&username=username&password=password</pre>
+        <h2 class="display-2">Response</h2>
+        <p>
+            If the access token request is valid and authorized, the
+            authorization server issues an access token and optional refresh
+            token as described in <a class="reference external" href="http://tools.ietf.org/html/rfc6749#section-5.1">Section 5.1</a>.  If the request failed client
+            authentication or is invalid, the authorization server returns an
+            error response as described in <a class="reference external" href="http://tools.ietf.org/html/rfc6749#section-5.2">Section 5.2</a>.
+        </p>
+        <h4 class="display-4">Example</h4>
+        <pre>{
+  "access_token":"nSC8mSjBuqiJ5QzZ2UnOPf7L4KP5171YghoKinBMZTVeJR3H0fMNuLDqd4FHahTou7ShzO8Bur3S9Wv36hJ6NYTY9TLzSeNbOooQdWtuNpvETFibCzRWO2SwNqzPYldzdS2yPTINrZVxhQzRxaqMKGY5S3EyVMnqwjua1h6Q6hG51pXeJT0MYBRRNiUKU-HNH-MtBwEtLV0FPAItOzelHuJ0DNKBg9XkpIfLhCjogZkK6NfW8Y7bwxsBO5bNbYshGOWVrba9GBgG98EGTyrymvBp7YxsDIxWVQ6ylatHc2A",
+  "token_type":"bearer",
+  "expires_in":3600
+}</pre>
+
+
+    </article>
+</div>
+
+

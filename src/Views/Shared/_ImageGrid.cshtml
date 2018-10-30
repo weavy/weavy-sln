@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Attachment>
+@{
+    var count = Model?.Count() ?? 0;
+    var index = 0;
+    var limit = 3;
+}
+
+<div class="image-grid">
+    @foreach (var img in Model.Take(limit)) {
+        var attrs = Html.PreviewAttributes(img);
+
+        var padding = (100 / img.Blob.Ratio()).ToString("0.00000", System.Globalization.CultureInfo.InvariantCulture) + "%";
+        var ratio = img.Blob.Ratio().ToString("0.00000", System.Globalization.CultureInfo.InvariantCulture);
+
+        var flexBasis = ratio + "px";
+        if (index == 0 && count != 2) {
+            // first images should span entire row (unless only 2 images)
+            flexBasis = "100%";
+        }
+
+        var flex = $"{ratio} {ratio} {flexBasis}";
+
+        var ext = FileHelper.GetExtension(img.Blob.Name);
+        var gif = ext.Equals(".gif");
+        var svg = ext.Equals(".svg");
+        var ani = gif || svg;
+        var src = ani ? img.FileUrl() : img.ThumbUrl(1920, 1920);
+        var thumbSrc = img.ThumbUrl(512, 512, rasterize: svg);
+
+        <div class="image" style="flex: @flex;">
+            <a href="@img.FileUrl()" style="padding-bottom: @padding;" @Html.Raw(attrs.AsHtmlAttributes())>
+                <img src="@thumbSrc" alt="" />
+                @if (ani) {
+                    <img class="img-play" src="@img.FileUrl()" alt="" />
+                }
+                @if (count > limit && index == limit - 1) {
+                    <span class="more">+@Model.Skip(limit).Count()</span>
+                }
+            </a>
+        </div>
+
+        index++;
+    }
+
+    @foreach (var file in Model.Skip(limit)) {
+
+        var ext = FileHelper.GetExtension(file.Blob.Name);
+        var gif = ext.Equals(".gif");
+        var svg = ext.Equals(".svg");
+        var ani = gif || svg;
+        var src = ani ? file.FileUrl() : file.ThumbUrl(1920, 1920);
+        var thumbSrc = file.ThumbUrl(512, 512, rasterize: svg);
+
+        <a href="@file.FileUrl()" data-photoswipe="@(file.Parent.Type.ToString().ToLower() + "-" + file.Parent.Id)" data-src="@src" data-thumb-src="@(ani ? src : thumbSrc)" data-size="@(file.Blob.Width + "x" + file.Blob.Height)"></a>
+    }
+</div>
+

@@ -1,0 +1,23 @@
+﻿@model Space
+
+@if (Model.IsTrashed() && Model.HasPermission(Permission.Delete)) {
+    <form action="@(Url.Action<SpaceController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
+        <button type="submit" class="btn btn-icon" title="Restore space">@Html.SvgIcon("backup-restore", "success")</button>
+    </form>
+} else if (Model.Privacy == Privacy.Secret && User.IsAdmin && !Model.IsMember) {
+    // admins can take admin control of any space
+    <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
+        @Html.AntiForgeryToken()
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        <button type="submit" class="btn btn-icon" title="Join as admin">@Html.SvgIcon("account-key", "warning")</button>
+    </form>
+} else if (Model.HasPermission(Permission.Edit) || Model.HasPermission(Permission.Join)) {
+    <div class="dropdown">
+        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+            @Html.SvgIcon("dots-vertical")
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            @Html.Partial("_SpaceMenuItems")
+        </div>
+    </div>
+}

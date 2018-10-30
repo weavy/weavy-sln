@@ -1,0 +1,31 @@
+﻿@model Content
+@{
+  var crumbs = Model.Breadcrumbs(space:true).ToList();
+  bool hasBreadcrumbOverflow = crumbs.Count > 1;
+  bool forceBreadcrumbOverflow = crumbs.Count > 4;
+  string breadcrumbClasses = "hide-last";
+  breadcrumbClasses += hasBreadcrumbOverflow ? " pl-sm-2 pr-2" : " px-2";
+  breadcrumbClasses += forceBreadcrumbOverflow ? " hide-trail" : "";
+}
+
+<nav class="navbar navbar-light navbar-files sticky-top flex-nowrap align-items-start">
+  <div class="d-flex flex-wrap align-items-start flex-shrink-1">
+    <div class="d-flex align-items-start flex-shrink-1">
+      @if (hasBreadcrumbOverflow) {
+        Html.RenderPartial("_BreadcrumbMenu", crumbs);
+      }
+      @Model.Breadcrumb(htmlAttributes: new { @class = breadcrumbClasses })
+    </div>
+    <h6 class="nav-title mx-2 align-center text-truncate" title="@Model.Name">@Model.Name</h6>
+  </div>
+  <div class="navbar-icons ml-auto">
+    @if (Model is IStarrable starrable) {
+      @Html.StarToggle(starrable, true)
+    }
+    @{ Html.RenderPartial("_ContentMenu", Model);}
+  </div>
+</nav>
+
+
+
+

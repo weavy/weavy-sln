@@ -1,0 +1,261 @@
+/// <reference path="../_core.scss" />
+body.controller-home.action-index,
+body.controller-post.action-index,
+body.controller-post.action-get,
+body.app-5ebfa152-de85-48da-82dd-30a1b560c313 {
+    background: $gray-100;
+}
+
+body.app-5ebfa152-de85-48da-82dd-30a1b560c313,
+body.controller-post.action-get {
+    main, .cover {
+        > .container {
+            max-width: map-get($grid-breakpoints, sm);
+        }
+    }
+}
+
+.post-form {
+    margin-bottom: 1rem;
+
+    &.focused {
+        border-color: transparent;
+        box-shadow: $md-shadow-4dp;
+    }
+
+    .emojionearea.form-control {
+        background: $white;
+    }
+}
+
+.post {
+    margin-bottom: 1rem;
+
+    .card-header {
+        background: none;
+        border: none;
+        padding: $card-spacer-x;
+    }
+
+    .card-title {
+        margin: 0;
+        font-weight: $font-weight-normal;
+    }
+
+    .card-body {
+        padding-top: $card-spacer-y;
+        padding-bottom: $card-spacer-y;
+    }
+
+    .card-files {
+        padding: $card-spacer-y $card-spacer-x;
+    }
+
+    .card-context {
+        margin: 0 $card-spacer-x;
+    }
+
+    .card-embeds, .card-images {
+        + .card-context {
+            margin-top: $card-spacer-y !important;
+        }
+    }
+
+    .card-feedback {
+        padding: $card-spacer-y;
+        display: flex;
+        font-size: $font-size-sm;
+        align-items: center;
+
+        a:not(.btn) {
+            @extend .text-muted;
+            line-height: 1.5rem;
+            margin: 0 $spacer/2;
+
+            &:empty {
+                display: none;
+            }
+        }
+    }
+
+    .post-comments {
+        background: $card-cap-bg;
+        border-top: $card-border-width solid $card-border-color;
+        padding: $card-spacer-x;
+
+        &:last-child {
+            @include border-radius(0 0 $card-inner-border-radius $card-inner-border-radius);
+        }
+
+        .comment {
+            padding: 0;
+            margin-bottom: $card-spacer-y;
+        }
+
+        svg.spinner {
+            display: block;
+            margin: 0 auto 1rem auto;
+        }
+
+        .media-body {
+            font-size: $font-size-sm;
+        }
+    }
+}
+
+.fake-post {
+    .media-title {
+        flex: 1;
+    }
+
+    .fake-user {
+        width: 48px;
+        height: 48px;
+        background: $theme-300;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .fake-text {
+        height: 10px;
+        margin-bottom: 10px;
+        background: linear-gradient(91deg, $theme-300, $theme-200, $theme-300);
+        background-size: 300% 300%;
+        -webkit-animation: faketext-animation 4s ease infinite;
+        -moz-animation: faketext-animation 4s ease infinite;
+        animation: faketext-animation 4s ease infinite;
+
+        &.fake-text-25 {
+            width: 25%;
+        }
+
+        &.fake-text-50 {
+            width: 50%;
+        }
+
+        &.fake-text-75 {
+            width: 75%;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-image: url("/img/spinner.svg");
+            background-repeat: no-repeat;
+            background-position: 50%;
+            background-size: 48px;
+            background-color: #fff;
+            opacity: $opacity-faded;
+        }
+
+        @-webkit-keyframes faketext-animation {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 51%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        @-moz-keyframes faketext-animation {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 51%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        @keyframes faketext-animation {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 51%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+    }
+}
+
+.post-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    visibility: hidden;
+    background-color: transparent;
+    transition-property: background-color;
+    @include material-animation-default();
+
+    .post-form.focused & {
+        visibility: visible;
+        background-color: $backdrop-bg;
+    }
+
+    @supports (pointer-events: auto) {
+        background-color: $backdrop-bg;
+        opacity: 0;
+        transition-property: opacity;
+        visibility: visible;
+        pointer-events: none;
+
+        .post-form.focused & {
+            pointer-events: auto;
+            opacity: 1;
+        }
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    html:not(.embedded) {
+        .post, .post-form {
+            margin-left: calc(-#{$grid-gutter-width/2});
+            margin-right: calc(-#{$grid-gutter-width/2});
+
+            &, > *, &::after {
+                border-radius: 0;
+            }
+
+            &::after {
+                border-left-width: 0;
+                border-right-width: 0;
+            }
+        }
+    }
+
+    html.embedded {
+        .post {
+            .card-header,
+            .card-body,
+            .card-files,
+            .post-comments {
+                padding: $card-spacer-y;
+            }
+
+            .card-context {
+                margin: 0 $card-spacer-y;
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+﻿@model CreateAccountModel
+@{
+    Title = "Add user";
+    Back = Url.Action<PeopleController>(c => c.Index(null, null, null));
+}
+
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        <a class="nav-link disabled">Profile</a>
+        <a class="nav-link disabled">Settings</a>
+        <a class="nav-link active">Account</a>
+    </nav>
+}
+
+<div class="container-fluid mt-3">
+    @using (Html.BeginForm(nameof(PeopleController.Insert), typeof(PeopleController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsExternal), nameof(Model.IsSuspended) })
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsExternal, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { FormGroup = false })
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    }
+</div>

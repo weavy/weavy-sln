@@ -1,0 +1,7 @@
+{{#each data}}
+<tr>
+    <td class="table-icon"><svg class="i text-{{icon.color}}"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#{{icon.name}}"></use></svg></td>
+    <td>{{name}} ({{file_size size}})<input type="hidden" name="blobs" value="{{id}}" /></td>
+    <td class="table-icon"><button type="button" class="btn btn-icon" data-remove="{{id}}"><svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg></button></td>
+</tr>
+{{/each}}

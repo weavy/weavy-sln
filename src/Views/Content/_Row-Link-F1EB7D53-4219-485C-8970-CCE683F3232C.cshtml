@@ -1,0 +1,16 @@
+﻿@model Link
+@{
+  var meta = Model.MetaData();
+  var href = Model.Embedded ? Model.Url() : Model.Uri;
+  var target = Model.Embedded ? "" : "_blank";
+}
+<tr data-id="@Model.Id" data-item-guid="@Model.ContentGuid" data-allowed-children="@meta.AllowedChildren()" data-allowed-parents="@meta.AllowedParents()" data-href="@href" data-target="@target">
+  <td class="table-icon">@Html.SvgIcon(Model)</td>
+  <td title="@Model.Name">
+    <a href="@href" target="@target">@Model.Name @if (!Model.Embedded) {@Html.SvgIcon("open-in-new", color: "icon",size: 18, htmlAttributes: new { @class = "i-inline" })}</a>
+  </td>
+  <td>@Html.Time(Model.ModifiedAt, format: "g")</td>
+  <td>@Model.Kind()</td>
+  <td>--</td>
+  <td class="table-icon">@{ Html.RenderPartial("_ContentMenu", Model);}</td>
+</tr>

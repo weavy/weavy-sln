@@ -1,0 +1,29 @@
+/// <reference path="../_core.scss" />
+.context-link {
+    display: flex;
+    padding: .5rem .75rem;
+    align-items: center;
+    background: $theme-100;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+
+    .icon {
+        flex: 0 0 auto;
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .text {
+        @extend small;
+        flex: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 0 .375rem;
+    }
+
+    .link-open {
+        display: flex;
+        flex: 0 0 auto;
+    }
+}

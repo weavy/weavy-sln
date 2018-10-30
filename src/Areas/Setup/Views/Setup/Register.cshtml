@@ -1,0 +1,16 @@
+﻿@model LicenseRequest
+@{
+    Title = "Register for a license";
+}
+
+<h1 class="display-3">@Title</h1>
+<p>First you need a license. Just fill in the details below and we'll fetch one for you. If you already have a license, @(Html.ActionLink<SetupController>(c => c.License(), text: "click here", htmlAttributes: new { @style = "text-decoration:underline;" })).</p>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+    @Html.EditorsForModel(formLabels: false)
+    <div class="form-buttons">
+        @(Html.ActionLink<SetupController>(c => c.Index(), text: "Back", htmlAttributes: new { @class = "btn btn-outline-secondary" }))
+        <button type="submit" class="btn btn-primary btn-load">Next</button>
+    </div>
+}
+

@@ -1,0 +1,26 @@
+/// <reference path="../_core.scss" />
+@mixin font-weight-strong {
+    font-weight: $font-weight-strong;
+}
+
+@mixin font-emphasis {
+    font-style: italic;
+}
+
+@mixin text-hyphens {
+    word-break: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+.font-weight-strong {
+    @include font-weight-strong;
+}
+
+.font-emphasis {
+    @include font-emphasis;
+}
+
+.text-hyphens {
+    @include text-hyphens;
+}

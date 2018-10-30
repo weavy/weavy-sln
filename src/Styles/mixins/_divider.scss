@@ -1,0 +1,32 @@
+/// <reference path="../_core.scss" />
+@mixin divider($color: $hr-border-color) {
+    display: block;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+
+    > * {
+        position: relative;
+        display: inline-block;
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 100vh;
+            height: $border-width;
+            background: $color;
+        }
+
+        &:before {
+            right: 100%;
+            margin-right: 1rem;
+        }
+
+        &:after {
+            left: 100%;
+            margin-left: 1rem;
+        }
+    }
+}

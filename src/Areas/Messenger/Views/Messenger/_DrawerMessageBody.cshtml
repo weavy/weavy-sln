@@ -1,0 +1,11 @@
+﻿@using Weavy.Web.Areas.Messenger.Controllers
+@model SearchResult<User, UserQuery>
+
+<div class="form-group search search-user">
+    <input type="text" class="form-control" name="q" value="@Model.Query.Text" placeholder="Find people..." />
+    <button type="button" class="btn btn-icon btn-search">@Html.SvgIcon("magnify")</button>
+    <button type="button" class="btn btn-icon btn-reset d-none">@Html.SvgIcon("close")</button>
+</div>
+<div class="list-group list-group-users">
+    @{ Html.RenderPartial("_UserList"); }
+</div>

@@ -1,0 +1,10 @@
+﻿@model App
+@{
+    Title = Model.Name;
+}
+
+<div class="container my-3">
+    <section class="properties">
+        @Html.DisplayGroups(exclude: new string[] { nameof(Model.Name) })
+    </section>
+</div>

@@ -1,0 +1,6 @@
+﻿@model User
+<nav class="nav nav-tabs">
+    @(Html.ActionLink<PeopleController>(c => c.EditProfile(Model.Id), text: "Profile", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
+    @(Html.ActionLink<PeopleController>(c => c.EditSettings(Model.Id), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<PeopleController>(c => c.EditAccount(Model.Id), text: "Account", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+</nav>

@@ -1,0 +1,98 @@
+﻿@model IndexResult
+@{
+    ViewBag.Title = "Insert link";
+    Layout = "_Layout.cshtml";
+    var propsActive = string.IsNullOrEmpty(Model.Query.Text);
+    var searchActive = !propsActive;
+    var attachments = ViewBag.Attachments as List<Weavy.Core.Models.File>;
+    var isMarkdown = Request.QueryString["editortype"] == "markdown";
+
+}
+
+@section scripts {
+<script>
+    var editorType = "@ViewBag.EditorType";
+</script>
+}
+
+<div class="container-fluid">
+    <header class="page-header">
+        @if (isMarkdown) {
+            <button type="button" class="btn btn-transparent pull-right" data-close title="Close">✕</button>
+            <div class="page-title">Insert link</div>
+        }
+
+
+        <nav class="nav nav-tabs" role="tablist">
+            <a class="nav-item nav-link @(propsActive ? "active" : "")" href="@(Request.Path + Request.QueryString.Rebuild("q", null).AsQueryString())#props" id="nav-properties-tab" aria-controls="nav-properties" aria-selected="false">Properties</a>
+            <a class="nav-item nav-link" id="nav-attachments-tab" data-toggle="tab" href="#nav-attachments" aria-controls="nav-attachments" aria-selected="true">Attachments (@attachments.Count)</a>
+
+
+            <a class="nav-item nav-link @(searchActive ? "active" : "")" href="#nav-search" data-toggle="tab" aria-controls="nav-search" aria-selected="false">Search</a>
+
+        </nav>
+
+    </header>
+
+    <div class="tab-content mt-3">
+        <div class="tab-pane @(propsActive ? "active" : "")" id="nav-properties" role="tabpanel" aria-labelledby="nav-properties-tab">
+            <form method="get" class="properties">
+                <div class="form-group">
+                    <label class="control-label" for="url">Url</label>
+                    @Html.TextBox("url", Request.QueryString["url"], new { @class = "form-control", placeholder = "Paste or type a link..." })
+                </div>
+                <div class="buttons">
+                    <button type="submit" class="btn btn-primary">Insert</button>
+                    <button type="button" class="btn btn-secondary" data-shortcut="Esc">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+        <div class="tab-pane" id="nav-attachments" role="tabpanel" aria-labelledby="nav-attachments-tab">
+
+            @if (!attachments.IsNullOrEmpty()) {
+                <section class="attachments d-flex flex-wrap">
+
+                    @foreach (var file in attachments) {
+                        <div class="card mr-1 mb-1" style="width: 96px;" data-url="@file.FileUrl()" data-text="@file.Name">
+                            <a href="javascript:;"><img alt="" src="@file.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" /></a>
+                            <div class="card-block p-1">
+                                <a href="javascript:;" title="@file.Name"><small>@file.Name.Ellipsis(10)</small></a>
+                                <div class="meta">
+                                    @file.Description
+                                </div>
+                                <div class="meta"><small>@FileHelper.FileSizeAsString(file.Blob.Size)</small></div>
+                            </div>
+                        </div>
+                    }
+
+                </section>
+            } else {
+                <p>No attachments here.</p>
+            }
+
+        </div>
+
+        <div class="tab-pane @(searchActive ? "active" : "")" id="nav-search" role="tabpanel" aria-labelledby="nav-search-tab">
+            <form method="get" class="ml-auto d-flex" role="search">
+
+                @Html.TextBox("q", Model.Query.Text, new { @class = "form-control submit", placeholder = "Search..." })
+                @Html.Hidden("id", Request.QueryString["id"])
+                @Html.Hidden("url", Request.QueryString["url"])
+                @Html.Hidden("editortype", Request.QueryString["editortype"])
+
+                @if (Model.Query.Text.IsNullOrWhiteSpace()) {
+                    <button type="submit" class="btn btn-icon" title="Search">@Html.SvgIcon("magnify")</button>
+                } else {
+                    <a class="btn btn-icon" href="@Url.Action(ActionName, new { id = Request.QueryString["id"], url = Request.QueryString["url"], editortype = Request.QueryString["editortype"] })" title="Clear search">@Html.SvgIcon("close")</a>
+                }
+            </form>
+            <div class="result">
+                @if (!Model.Query.Text.IsNullOrEmpty()) {
+                    <p>@Model.Description()</p>
+                }
+                @Html.Partial("_SearchResult", Model)
+            </div>
+        </div>
+    </div>
+</div>

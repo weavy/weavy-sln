@@ -1,0 +1,31 @@
+/// <reference path="../_core.scss" />
+
+article.file {
+    margin: 0 auto;
+    max-width: map-get($container-max-widths, lg);
+    // look like a document
+    .document {
+        background: #fff;
+        padding: 2rem;
+        box-shadow: $md-shadow-2dp;
+        min-height: 48rem; // 768px;
+        white-space: pre-wrap;
+        overflow: hidden;
+    }
+
+
+    .figure-img {
+        box-shadow: $md-shadow-2dp;
+    }
+
+    .file-comments {
+        margin-top: 1rem;
+    }
+}
+
+
+.file-header {
+    display:flex;
+    margin-bottom: 1rem;
+    align-items:center;
+}

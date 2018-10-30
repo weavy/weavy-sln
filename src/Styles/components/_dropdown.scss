@@ -1,0 +1,170 @@
+/// <reference path="../_core.scss" />
+
+$md-menu-expand-duration: 0.3s;
+$md-menu-fade-duration: 0.2s;
+
+.dropdown-z {
+    z-index: $zindex-dropdown;
+}
+
+.dropdown-divider + .dropdown-divider {
+    display: none;
+}
+
+.dropdown-menu {
+    opacity: 0;
+    transition: opacity $md-menu-fade-duration $md-animation-curve-default;
+    max-width: 20rem;
+
+    &.show {
+        opacity: 1;
+        animation-name: md-dropdown-animation;
+        animation-duration: $md-menu-expand-duration;
+        animation-fill-mode: forwards;
+        animation-timing-function: $md-animation-curve-default;
+    }
+    // Make dropdown appear over navbar when opening upwards
+    &[x-placement*="top"] {
+        z-index: $zindex-fixed + 1;
+    }
+}
+
+@keyframes md-dropdown-animation {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.dropdown-toggle.btn-icon + .dropdown-menu {
+    margin-top: .5rem;
+}
+
+.dropup .dropdown-toggle.btn-icon + .dropdown-menu {
+    margin-top: 0;
+    margin-bottom: .5rem;
+}
+
+.dropdown-divider {
+    margin: .25rem 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding-right: 1.25rem;
+
+    &:hover {
+        transition: background-color $md-animation-duration $md-animation-curve-fast-out-slow-in;
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    .i {
+        color: $icon-color;
+    }
+
+    > .i, > .img-24 {
+        vertical-align: middle;
+        margin-right: .5rem;
+    }
+
+    span {
+        @include text-truncate();
+        flex: 1 1 0%;
+        line-height: $line-height-base;
+    }
+    // data-toggle=star
+    .btn-icon {
+        margin: -.25rem -.75rem -.25rem -.25rem;
+    }
+}
+
+.dropdown-header {
+    //text-transform: uppercase;
+    padding-top: $dropdown-item-padding-y / 12 * 14;
+    padding-bottom: $dropdown-item-padding-y / 12 * 11;
+    line-height: $line-height-sm;
+
+    &:first-child {
+        padding-top: $dropdown-item-padding-y;
+    }
+}
+
+
+.dropdown-menu.textcomplete-dropdown {
+    opacity: 1;
+    max-width: 16rem;
+    z-index: $zindex-modal !important;
+
+    .textcomplete-item {
+        @extend .dropdown-item;
+        display: block;
+
+        a {
+            display: flex;
+            align-items: center;
+
+            > .i, > img {
+                vertical-align: middle;
+                margin-right: .5rem;
+            }
+
+            span {
+                @include text-truncate();
+                flex: 1 1 0%;
+            }
+        }
+    }
+}
+
+// backdrop (when dropdown is open)
+// add it to .dropdown
+.dropdown-backdrop {
+
+    &::before {
+        content: "";
+        @include overscroll-behavior-contain;
+        position: fixed;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        //z-index: $zindex-drawer-backdrop;
+        visibility: hidden;
+        background-color: transparent;
+        transition-property: background-color;
+        @include material-animation-default();
+    }
+
+    &.show {
+        &::before {
+            visibility: visible;
+            background-color: $backdrop-bg;
+        }
+    }
+
+    @supports (pointer-events: auto) {
+        &::before {
+            background-color: $backdrop-bg;
+            opacity: 0;
+            transition-property: opacity;
+            visibility: visible;
+            pointer-events: none;
+        }
+
+        &.show {
+            &::before {
+                pointer-events: auto;
+                opacity: 1;
+            }
+        }
+    }
+}

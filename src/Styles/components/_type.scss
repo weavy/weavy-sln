@@ -1,0 +1,11 @@
+/// <reference path="../_core.scss" />
+
+// headings with icons
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    .i-inline, .dropdown, .btn-icon {
+        position: relative;
+        top: -.125rem;
+    }
+}

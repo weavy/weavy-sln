@@ -1,0 +1,271 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+fieldset {
+    margin-bottom: 1rem;
+}
+
+legend {
+    color: $text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .75rem;
+}
+
+.search {
+    margin-bottom: 0;
+    padding: .5rem;
+    flex: 1 1 auto;
+    position: relative;
+
+    .form-control {
+        padding-right: 2.5rem;
+        box-shadow: none;
+        border-color: $messenger-border-color;
+
+        &::-ms-clear {
+            display: none;
+        }
+    }
+
+    .btn-icon {
+        color: $text-muted;
+        position: absolute;
+        top: .6875rem;
+        right: .625rem;
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    .btn-reset-search {
+        display: none;
+        z-index: 2;
+    }
+
+    &.search-user {
+        flex: none;
+    }
+}
+
+.drawer-add-people {
+    .search {
+        button[type=submit] {
+            display: none;
+        }
+    }
+}
+
+// fix for ie
+html.ie .message-form .form-control {
+    width: 100% !important;
+}
+
+.message-form {
+    position: relative;
+
+    fieldset {
+        margin: 0;
+    }
+
+    .form-group {
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .form-buttons {
+        flex-direction: row-reverse;
+        margin: 0;
+        align-self: flex-end;
+        flex: 1;
+        padding: .5rem .25rem;
+
+        .btn-icon {
+            margin: 0 .25rem;
+        }
+    }
+
+    .form-control {
+        padding: $input-btn-padding-x;
+        min-width: 0;
+        width: auto !important;
+        flex-grow: 1;
+    }
+
+    textarea[disabled] {
+        background: none;
+        resize: none;
+        border: none;
+        opacity: 0.6;
+    }
+
+    .emojionearea-button-container {
+        display: inline-flex;
+
+
+        .emojionearea-button {
+            width: 1.5rem;
+            height: 1.5rem;
+            opacity: .6;
+            cursor: pointer;
+            transition: opacity 200ms ease-in-out;
+        }
+
+        .emojionearea-button:hover {
+            opacity: 1;
+        }
+
+        .emojionearea-button > div {
+            display: block;
+            width: 1.5rem;
+            height: 1.5rem;
+            position: absolute;
+            transition: transform 200ms ease-in-out, opacity 200ms ease-in-out;
+            background-size: 1.5rem 1.5rem;
+            background-repeat: no-repeat;
+        }
+
+        .emojionearea-button > div.emojionearea-button-open {
+            background-image: url('data:image/svg+xml,%3Csvg%20fill%3D%22#{$body-color-base64}%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M11.99%202C6.47%202%202%206.48%202%2012s4.47%2010%209.99%2010C17.52%2022%2022%2017.52%2022%2012S17.52%202%2011.99%202zM12%2020c-4.42%200-8-3.58-8-8s3.58-8%208-8%208%203.58%208%208-3.58%208-8%208zm3.5-9c.83%200%201.5-.67%201.5-1.5S16.33%208%2015.5%208%2014%208.67%2014%209.5s.67%201.5%201.5%201.5zm-7%200c.83%200%201.5-.67%201.5-1.5S9.33%208%208.5%208%207%208.67%207%209.5%207.67%2011%208.5%2011zm3.5%206.5c2.33%200%204.31-1.46%205.11-3.5H6.89c.8%202.04%202.78%203.5%205.11%203.5z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E');
+        }
+
+        .emojionearea-button > div.emojionearea-button-close {
+            background-image: url('data:image/svg+xml,%3Csvg%20fill%3D%22#{$body-color-base64}%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M19%206.41L17.59%205%2012%2010.59%206.41%205%205%206.41%2010.59%2012%205%2017.59%206.41%2019%2012%2013.41%2017.59%2019%2019%2017.59%2013.41%2012z%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E');
+            transform: rotate(-45deg);
+            opacity: 0;
+        }
+
+        .emojionearea-button.active > div.emojionearea-button-open {
+            transform: rotate(45deg);
+            opacity: 0;
+        }
+
+        .emojionearea-button.active > div.emojionearea-button-close {
+            transform: rotate(0deg);
+            opacity: 1;
+        }
+    }
+
+    .btn-file {
+        // file upload button
+        overflow: hidden;
+        position: relative;
+        display: inline-flex;
+        opacity: .6;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        > input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            opacity: 0;
+            -ms-filter: 'alpha(opacity=0)';
+            font-size: 8.125rem; // 130px;
+            direction: ltr;
+            cursor: pointer;
+        }
+    }
+
+
+    .btn-icon.btn-primary {
+        &:hover, &:active, &:focus {
+            color: $link-hover-color !important;
+        }
+    }
+}
+// file upload progessbar?
+.progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: .25rem;
+    background-color: $primary;
+    width: 0%;
+}
+
+.messenger-textcomplete {
+    @media (max-width: 648px) {
+        left: .625rem !important; // 10px !important;
+    }
+
+    .textcomplete-item {
+        @extend .dropdown-item;
+    }
+}
+
+.messenger-textcomplete.dropdown-menu {
+    opacity: 1 !important;
+    max-width: 16rem;
+
+    li a {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+
+        > .i {
+            vertical-align: middle;
+            margin-right: .5rem;
+        }
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1 1 0%;
+        }
+    }
+}
+
+div.context {
+    flex: 1 1 100%;
+    display: none;
+    max-width: 100%;
+}
+
+.context {
+    .context-data {
+        background: $gray-200;
+        padding: 0 .3125rem 0 .625rem;
+        height: 2rem;
+        margin: .5rem;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+
+        span {
+            @extend .small;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 0.5rem;
+            flex: 1;
+        }
+
+        img {
+            align-self: center;
+        }
+    }
+
+    .btn-add-context {
+        img {
+            align-self: center;
+            margin-right: 0.6rem;
+        }
+    }
+
+    &.has-context {
+        &.btn-add-context {
+            opacity: .65;
+            pointer-events: none;
+        }
+    }
+}

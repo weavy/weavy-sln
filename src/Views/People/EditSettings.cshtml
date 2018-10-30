@@ -1,0 +1,34 @@
+﻿@model UserSettings
+@{    
+    User user = ViewBag.User as User;
+    Title = "Edit user";
+    Back = Url.Back(user.Url());
+}
+
+@section navbar_secondary {
+    @Html.Partial("_Navbar", user)
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(PeopleController.UpdateSettings), typeof(PeopleController).ControllerName(), new { id = user.Id }, FormMethod.Post, new { id = "update-settings-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.AntiForgeryToken()
+        
+        <h5 class="mb-3">Date and time</h5>
+        @Html.EditorsForModel(Model, group: "settings")
+        <h5 class="mb-3">Notification settings</h5>
+        @Html.EditorsForModel(Model, group: "notifications")
+        <h5 class="mb-3">Notification delivery</h5>
+        <div class="notification-alerts">
+            <div class="alert alert-warning notification-required">We <a href="#" class="alert-link notification-required">need your permission</a> to enable desktop notifications in this browser.</div>
+            <div class="alert alert-danger notification-denied">Desktop notifications have been disabled in this browser.</div>
+            <div class="alert alert-info notification-missing">This browser does not support desktop notifications.</div>
+        </div>
+        @Html.EditorFor(model => model.DesktopNotifications)
+        @Html.EditorsForModel(Model, group: "channel", exclude: new[] { "DesktopNotifications" })
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+        </div>
+    }
+</div>

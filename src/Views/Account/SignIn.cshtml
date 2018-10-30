@@ -1,0 +1,59 @@
+﻿@using Microsoft.Owin.Security
+@using Weavy.Web.Controllers
+@model Weavy.Web.Models.SignInModel
+@{
+  Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+  Title = "Sign in";
+}
+<div class="container mt-5">
+  <div class="row justify-content-sm-center">
+    <div class="col-sm-8 col-md-6 col-lg-5">
+      <div class="text-center mb-3">
+        @Html.IconImg(96)
+      </div>
+
+      @using (Html.BeginForm(nameof(AccountController.SignIn), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
+        <div class="form-group">
+          @if (Bootstrapper.Status == SystemStatus.Ok && Model.AllowSignUps) {
+            @Html.ActionLink("Sign up", nameof(AccountController.SignUp), typeof(AccountController).ControllerName(), null, new { tabindex = "-1", @class = "float-right" })
+          }
+          @Html.EditorFor(x => x.Username, new { HideSurroundingHtml = true })
+        </div>
+        <div class="form-group">
+          @Html.ActionLink("Recover password", nameof(AccountController.RecoverPassword), typeof(AccountController).ControllerName(), null, new { tabindex = "-1", @class = "float-right" })
+          @Html.EditorFor(x => x.Password, new { HideSurroundingHtml = true })
+        </div>
+        <div class="form-buttons align-items-baseline">
+          @Html.EditorFor(x => x.RememberMe)
+          <button type="submit" class="btn btn-primary btn-load ml-auto">Sign in</button>
+        </div>
+      }
+
+      @if (Bootstrapper.Status == SystemStatus.Ok && Model.Settings.HasExternalAuthentication) {
+        <div class="mb-3 text-center">or</div>
+        var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().OrderBy(x => x.AuthenticationType);
+        using (Html.BeginForm(nameof(AccountController.SignInExternal), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post, new { target = "_blank" })) {
+          <div class="form-buttons justify-content-center">
+            @foreach (AuthenticationDescription p in loginProviders) {
+              <button type="submit" class="btn btn-@p.AuthenticationType.Slugify()" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType">@Html.SvgIcon(p.AuthenticationType.Slugify()) Sign in with @p.Caption</button>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+@if (ViewData.ModelState.Values.SelectMany(x => x.Errors).Any()) {
+  @section scripts{
+    <script>
+      $(function () {
+        var win = null;
+        if (window.opener) {
+          win = window.opener.parent;
+        }
+        weavy.postal.post({ name: "authenticationError" }, win, true);
+      })
+    </script>
+  }
+}

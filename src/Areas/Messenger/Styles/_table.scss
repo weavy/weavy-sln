@@ -1,0 +1,67 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+
+.table-users {
+    table-layout: fixed;
+
+    td {
+        border: none;
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // dropdown
+    td:nth-child(3) {
+        padding: $spacer/2 0;
+        width: 2rem;
+    }
+}
+
+.table-uploads {
+    table-layout: fixed;
+    margin: 0;
+
+    td {
+        border: none;
+        background-color: $gray-100;
+    }
+
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // close icon
+    td:nth-child(3) {
+        padding: .25rem .75rem .25rem .25rem;
+        width: 3rem;
+    }
+
+    tr:last-child td {
+        border-bottom: $border-width solid $messenger-border-color;
+    }
+}
+
+
+.table-files {
+    table-layout: fixed;
+
+
+    td {
+        border: none;
+
+    }
+
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+
+}

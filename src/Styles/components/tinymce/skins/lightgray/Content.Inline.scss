@@ -1,0 +1,9 @@
+/* Content.Inline.scss */
+
+@import "Variables.scss";
+@import "Mixins.scss";
+@import "Content.Objects.scss";
+
+.mce-content-body {
+  line-height: $content-line-height;
+}

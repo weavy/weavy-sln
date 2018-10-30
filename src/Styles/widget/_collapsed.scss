@@ -1,0 +1,100 @@
+/// <reference path="../widget.scss" />
+
+// Collapsed and minimized widget mode
+
+&.weavy-collapsed:not(.weavy-open):not(.weavy-no-collapse) {
+    .weavy-draggable {
+        transform: scale(0.8);
+        transform-origin: center right;
+        min-height: $widget-icon-size + rem(.5);
+        pointer-events: auto;
+        cursor: pointer;
+
+        &:hover, &:active {
+            &::after {
+                display: block;
+                border-width: rem(.125/.8);
+            }
+        }
+    }
+
+    &.weavy-left .weavy-draggable {
+        transform-origin: center left;
+    }
+
+    &:not(.weavy-drag) {
+        &:not(.weavy-before-drag) .weavy-draggable {
+            transition: transform 0.2s ease-out;
+        }
+
+        .weavy-bubble-item, .weavy-button, .weavy-bubble-action {
+            pointer-events: none !important;
+        }
+    }
+
+    .weavy-button.weavy-messenger.weavy-dot {
+        background-color: transparent;
+    }
+
+    .weavy-bubble-personal, .weavy-bubble-messenger {
+        height: $widget-icon-size;
+    }
+
+    .weavy-conversation {
+        height: 0;
+        opacity: 0;
+    }
+
+    .weavy-bubbles {
+        &::before {
+            height: 0;
+            margin: 0 rem(.25);
+        }
+
+        .weavy-bubble-item {
+            height: rem(1.5);
+
+            .weavy-button {
+                transform: scale(.75);
+                flex-shrink: 0;
+                transition: transform $md-animation-duration $md-animation-curve-default, background-color $md-animation-duration $md-animation-curve-default;
+            }
+        }
+    }
+
+    .weavy-bubble-add {
+        svg {
+            opacity: 0;
+        }
+        height: $widget-icon-size - rem(1);
+    }
+
+
+    &.weavy-minimized {
+        .weavy-bubble-item {
+            height: rem(0);
+
+            .weavy-button {
+                background: transparent !important;
+                box-shadow: none;
+            }
+        }
+
+        .weavy-icon, .weavy-avatar, .weavy-personal svg {
+            opacity: 0;
+        }
+
+        .weavy-bubble-weavy {
+            opacity: 1;
+            height: $widget-icon-size + rem(.75);
+
+            .weavy-logo {
+                margin: rem(.375)
+            }
+
+            .weavy-avatar {
+                opacity: 1;
+            }
+        }
+    }
+}

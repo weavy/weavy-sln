@@ -1,0 +1,26 @@
+/// <reference path="../widget.scss" />
+
+// Avatars and icons
+
+.weavy-avatar {
+    width: auto; //$widget-icon-size;
+    height: 100%; // $widget-icon-size;
+    border-radius: 50%;
+    user-select: none;
+}
+
+.weavy-icon {
+    color: $icon-color;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: rem(.25);
+    flex: 0 0 auto;
+
+    svg {
+        fill: currentColor;
+        width: rem(1.5);
+        height: rem(1.5);
+    }
+}

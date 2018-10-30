@@ -1,0 +1,24 @@
+﻿@model EmailAddressModel
+@{
+    ViewBag.Title = "Signup";
+}
+<main>
+    <h1>Sign up</h1>
+    <h2>Please use your work email address.</h2>
+    
+    @using (Html.BeginForm(nameof(SignupController.Index), null, FormMethod.Post, new { data_turboform = true })) {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <div class="input-group flex-nowrap">
+                @Html.TextBoxFor(x => x.Email, new { @class = "form-control form-control-lg", placeholder = "name@company.com" })
+                <span class="input-group-append d-none d-sm-block flex-nowrap">
+                    <button type="submit" class="button">Sign up</button>
+                </span>
+            </div>
+            <div class="form-text">@Html.ValidationMessageFor(x => x.Email)</div>
+            <div class="buttons d-block d-sm-none">
+                <button type="submit" class="button">Sign up</button>
+            </div>
+        </div>
+    }
+</main>

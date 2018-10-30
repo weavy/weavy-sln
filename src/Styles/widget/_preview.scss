@@ -1,0 +1,46 @@
+/// <reference path="../widget.scss" />
+
+// Full window preview mode
+
+&.weavy-preview, &.weavy-left.weavy-preview {
+    .weavy-strips {
+        width: auto;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        max-width: none;
+
+
+        .weavy-strip:not(.weavy-open) {
+            visibility: hidden;
+            max-width: $widget-strip-width;
+        }
+
+        .weavy-strip.weavy-open {
+            border-radius: initial;
+            top: 0;
+            bottom: 0;
+            box-shadow: none;
+            max-width: none;
+            width: 100%;
+            
+            .weavy-controls {
+                display: none;
+            }
+
+            .weavy-strip-frame {
+                background-color: transparent;
+            }
+        }
+
+    }
+
+    .weavy-buttons {
+        display: none;
+    }
+}
+
+.weavy-strip-frame {
+    transition: background-color $md-animation-duration $md-animation-curve-default;
+}

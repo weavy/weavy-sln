@@ -1,0 +1,21 @@
+﻿@model TestViewModel
+@{
+    Title = "Test";
+    Back = WeavyContext.ApplicationPath;
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        <a class="nav-link" href="@Url.Action(nameof(TestController.Index))">Components</a>
+        <a class="nav-link active" href="@Url.Action(nameof(TestController.Get), new { view = "redirect"})">Redirect</a>
+    </nav>
+
+}
+
+<div class="container my-4">
+    <p><a class="btn btn-primary" href="@Url.Action(nameof(TestController.GetRedirect))">GET => REDIRECT</a></p>
+    <form action="@Url.Action(nameof(TestController.PostRedirect))" method="post" data-turboform>
+        <button class="btn btn-primary" type="submit">POST => REDIRECT</button>
+    </form>
+</div>
+

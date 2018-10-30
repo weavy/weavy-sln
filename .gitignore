@@ -1,0 +1,44 @@
+# Weavy 
+/src/App_Data/
+/src/css/
+/src/js/
+/src/settings.config
+
+# Dist folder
+/dist/
+
+# Node modules
+node_modules/
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+[Dd]esktop.ini
+
+# Visual Studio temp and user files
+*.suo
+*.user
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+# NuGet Packages
+*.nupkg
+
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+
+# Include our libs
+!/lib/Debug/
+!/lib/Release/

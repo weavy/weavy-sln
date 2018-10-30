@@ -1,0 +1,83 @@
+﻿@model Post
+
+@{
+    bool details = ViewData["details"] as bool? ?? false;
+    var creator = Model.CreatedBy();
+    var attachments = Model.Attachments();
+
+    var images = attachments.Where(x => FileHelper.IsWebImage(x.Blob.Name));
+    var files = attachments.Where(x => !FileHelper.IsWebImage(x.Blob.Name));
+
+    var embeds = Model.Embeds();
+    var embed = embeds.FirstOrDefault(x => !x.IsLink);
+    var link = embeds.FirstOrDefault(x => x.IsLink);
+}
+<div class="card post" data-type="post" data-id="@Model.Id" data-post-id="@Model.Id">
+
+    <div class="card-header media">
+        @creator.AvatarLink(48, htmlAttributes: new { @class = "mr-2" })
+        <div class="media-body">
+            <h6 class="media-title">@creator.Link() <small>@@@creator.Username</small></h6>
+            <small class="text-muted">
+                @Html.Time(Model.CreatedAt) @if (details) {<text>in</text> @Model.Space().Link()}
+                @if (Model.ModifiedAt != Model.CreatedAt) {<text>&middot;</text> @Html.Time(Model.ModifiedAt, @"e\di\te\d")}
+            </small>
+        </div>
+        <div class="media-icons">
+            @Html.StarToggle(Model)
+            @{ Html.RenderPartial("_PostMenu", Model, new ViewDataDictionary() { { "details", details } }); }
+        </div>
+    </div>
+
+    @if (images.Any()) {
+        <div class="card-images">
+            @{ Html.RenderPartial("_ImageGrid", images); }
+        </div>
+    }
+
+    @if (embed != null) {
+        <div class="card-embeds">
+            @{ Html.RenderPartial("_Embed", embed); }
+        </div>
+    }
+
+    @if (!Model.Html.IsNullOrEmpty() || Model.Poll != null) {
+        <div class="card-body">
+            <p class="card-text">@Html.Raw(Model.Html)</p>
+            @if (Model.Poll != null) {
+                Html.RenderPartial("_Poll", Model);
+            }
+        </div>
+    }
+
+
+    @if (files.Any()) {
+        <div class="card-files">
+            @{ Html.RenderPartial("_Attachments", files); }
+        </div>
+    }
+
+    @if (link != null) {
+        <div class="card-context">
+            @{Html.RenderPartial("_ContextLink", link); }
+        </div>
+    }
+
+    <div class="card-feedback">
+        @{ Html.RenderPartial("_PostFeedback", Model); }
+    </div>
+
+    <div class="section-comments post-comments@(details ? "":" d-none")">
+        @if (details) {
+            <div class="list-group comments">
+                @{Html.RenderPartial("_Comments", Model.Comments()); }
+            </div>
+        } else {
+            @Html.SvgSpinner()
+            <div class="list-group comments"></div>
+        }
+        @Html.Partial("_CommentForm", Model, new ViewDataDictionary() { { "container", ".comments" } })
+    </div>
+
+</div>
+

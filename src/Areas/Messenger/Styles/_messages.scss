@@ -1,0 +1,275 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+
+.messages {
+    padding-top: $spacer;
+    padding-bottom: $spacer*2;
+    padding-left: 9%;
+    padding-right: 9%;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 1216px) {
+        padding-left: 8.5%;
+        padding-right: 8.5%;
+    }
+
+    @media (max-width: 1152px) {
+        padding-left: 8%;
+        padding-right: 8%;
+    }
+
+    @media (max-width: 1088px) {
+        padding-left: 7.5%;
+        padding-right: 7.5%;
+    }
+
+    @media (max-width: 1024px) {
+        padding-left: 7%;
+        padding-right: 7%;
+    }
+
+    @media (max-width: 968px) {
+        padding-left: 6.5%;
+        padding-right: 6.5%;
+    }
+
+    @media (max-width: 912px) {
+        padding-left: 6%;
+        padding-right: 6%;
+    }
+
+    @media (max-width: 856px) {
+        padding-left: 5.5%;
+        padding-right: 5.5%;
+    }
+
+    @media (max-width: 800px) {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+}
+
+.message {
+    display: flex;
+
+    .bubble {
+        background-color: $gray-100;
+        border-radius: $border-radius;
+        padding: .375rem .5rem;
+        position: relative;
+
+        @media (max-width: 900px) {
+            max-width: 95%;
+        }
+
+        @media (min-width: 901px) and (max-width: 1024px) {
+            max-width: 85%;
+        }
+
+        @media (min-width: 1025px) and (max-width: 1300px) {
+            max-width: 75%;
+        }
+
+        @media (min-width: 1301px) {
+            max-width: 65%;
+        }
+
+        .card-images {
+            margin: 0 auto .5rem auto;
+            max-width: 100%;
+            min-width: 8rem;
+            background-color: inherit;
+
+            .image-grid {
+                background-color: inherit;
+            }
+        }
+
+        .card-files {
+            .list-group-item {
+                margin-bottom: .5rem;
+            }
+        }
+
+        .context-link {
+            padding: .25rem .5rem;
+            background: rgba($theme-900, .05);
+            margin: .25rem -.25rem -.125rem;
+            border-radius: inherit;
+            display: flex;
+            align-items: center;
+
+            .icon {
+                flex: 0 0 auto;
+                width: 1rem;
+                height: 1rem;
+            }
+
+            .text {
+                @extend small;
+                flex: 1;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                padding: 0 .375rem;
+            }
+
+            .link-open {
+                display: flex;
+                flex: 0 0 auto;
+            }
+        }
+
+        .text {
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+
+            &::after {
+                content: " \00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0";
+                display: inline;
+            }
+        }
+
+        .meta {
+            color: $text-muted;
+            font-size: $font-size-xs;
+            position: absolute;
+            //bottom: .25rem;
+            right: .5rem;
+            margin-top: -1.5em;
+
+            time {
+                font-size: inherit;
+                color: inherit;
+            }
+        }
+    }
+
+    &.system {
+        justify-content: center;
+
+        .bubble {
+            background-color: inherit;
+            color: $text-muted;
+            display: inline-block;
+            max-width: 100%;
+            margin: initial;
+        }
+    }
+
+    &.me {
+        flex-direction: column;
+        align-items: flex-end;
+
+        .bubble {
+            background-color: $theme-200;
+        }
+    }
+
+    &.emoji {
+        .bubble {
+            background: none;
+            padding: 0 .5rem 0 0;
+        }
+
+        img.eo, img.emojione {
+            font-size: 2rem;
+            margin: 0 .25rem 0 0;
+        }
+
+        object.emojione {
+            width: 2.625rem; // 42px;
+            height: 2.625rem; // 42px;
+            margin: 0 .25rem 0 0;
+        }
+
+        &.me {
+            img.eo, img.emojione, object.emojione {
+                margin: 0 0 0 .25rem;
+            }
+        }
+    }
+
+    &.sending {
+        .bubble {
+            opacity: .5;
+        }
+    }
+
+    .from {
+        font-size: $font-size-xs;
+        margin-bottom: .25rem;
+
+        a {
+            color: $text-muted;
+        }
+    }
+
+
+    .img-play {
+        display: none;
+        animation-play-state: paused;
+        position: absolute;
+        top: 0;
+        background-color: #fff;
+    }
+
+    &:hover, &:focus {
+        .img-play {
+            display: block;
+            animation-play-state: running;
+        }
+    }
+}
+
+.message, .message + .message {
+    margin-top: $spacer;
+}
+
+.date-separator {
+    font-size: $font-size-sm;
+    line-height: 1;
+    text-align: center;
+    margin: 1rem 0;
+    position: sticky;
+    top: .5rem;
+    z-index: 2;
+    pointer-events: none;
+
+    time {
+        background: $primary;
+        color: color-yiq($primary);
+        padding: .5rem .625rem;
+        border-radius: $border-radius;
+        display: inline-block;
+    }
+}
+
+.new-separator {
+    font-size: $font-size-sm;
+    line-height: 1;
+    text-align: center;
+    background: $primary;
+    padding: .5rem 0;
+    border-radius: $border-radius;
+    color: color-yiq($primary);
+    width: 50%;
+    margin: 1rem auto;
+    position: sticky;
+    top: .5rem;
+    z-index: 3;
+}
+
+
+
+.status {
+    color: $theme-200;
+    font-size: $font-size-xs;
+    float: right;
+    margin-top: .25rem;
+
+    img {
+        margin-left: .25rem;
+    }
+}

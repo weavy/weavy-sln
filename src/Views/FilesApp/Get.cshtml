@@ -1,0 +1,64 @@
+﻿@model FilesModel
+@{
+    Title = WeavyContext.App.Name;
+}
+
+<nav class="navbar navbar-light navbar-files sticky-top">
+    <ol class="breadcrumb px-2">
+        <li class="breadcrumb-item" title="@WeavyContext.App.Name"><a href="@WeavyContext.App.Url()">@WeavyContext.App.Name</a></li>
+    </ol>
+</nav>
+
+<div class="my-3">
+    @if (Model.Layout == Weavy.Core.Models.Layout.Card) {
+        <div class="cards" id="infinite-scroll-target">
+            @{ Html.RenderPartial("~/Views/Content/_Cards.cshtml", Model.Items); }
+        </div>
+    } else if (Model.Layout == Weavy.Core.Models.Layout.List) {
+        <div class="list-group" id="infinite-scroll-target">
+            @{ Html.RenderPartial("~/Views/Content/_ListItems.cshtml", Model.Items); }
+        </div>
+    } else {
+        <table class="table table-hover table-content">
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th>Name</th>
+                    <th>Modified</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            @if (Model.Items.IsNullOrEmpty()) {
+                <tfoot>
+                    <tr>
+                        <td class="empty text-center text-muted py-4" colspan="6">
+                            Nothing in this folder yet.
+                            @if (Model.App.HasPermission(Permission.Content)) {
+                                <text>Go ahead and add some files!</text>
+                            }
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+            <tbody id="infinite-scroll-target">
+                @{ Html.RenderPartial("~/Views/Content/_Rows.cshtml", Model.Items); }
+            </tbody>
+        </table>
+    }
+    @Html.ScrollMore(Model.Items)
+</div>
+
+@section fab {
+    @Model.App.FAB()
+}
+
+@section footer {
+    @{ 
+        Html.RenderPartial("_AttachModal");
+        Html.RenderPartial("_MoveModal");
+        Html.RenderPartial("_OfficeModal");
+        Html.RenderPartial("_ShareModal");
+    }
+}

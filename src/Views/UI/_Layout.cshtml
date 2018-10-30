@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <meta name="turbolinks-cache-control" content="no-preview">
+    <title>@Title</title>
+    @Html.ThemeStyle("~/styles/weavy.scss")
+    @Bundler.Scripts("~/scripts/pickers.bundle")
+    @RenderSection("scripts", required: false)
+</head>
+<body class="@ControllerName.ToLower()-@ActionName.ToLower() no-navbar dialog">
+    @Html.SvgSprite()
+  <div class="alerts">
+    @Html.AlertMessages()
+  </div>
+  <main>
+    @RenderBody()
+  </main>
+</body>
+</html>

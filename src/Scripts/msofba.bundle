@@ -1,0 +1,4 @@
+﻿# script bundle used on MS-OFBA sign-in page
+~/scripts/vendor/jquery/jquery.min.js
+~/scripts/_bootstrap.bundle
+

@@ -1,0 +1,153 @@
+/// <reference path="../_core.scss" />
+
+$drawer-left-width: 16rem !default; // 256px;
+$drawer-right-width: 20rem !default; // 320px;
+$zindex-drawer: $zindex-modal-backdrop - 1;
+$zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
+
+
+#drawer-user {
+    // hide "Mark all as read" unless the notifications tab is active
+    [data-toggle="tab"][href="#notifications"]:not(.active) ~ [data-read="notifications"] {
+        display: none;
+    }
+}
+
+
+.drawer {
+    @include overscroll-behavior-contain;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: $zindex-drawer;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    background-color: $body-bg;
+    box-shadow: $md-shadow-8dp;
+    // transform offscreen
+    transition: transform, opacity;
+    will-change: transform, opacity;
+    transform-style: preserve-3d;
+    @include material-animation-default();
+}
+
+// drawers initially closed (off screen)
+.drawer-left {
+    left: 0;
+    width: $drawer-left-width;
+    max-width: 80%;
+    transform: translateX(-$drawer-left-width - .75rem);
+    // show drawer by moving it on screen
+    &.drawer-in {
+        transform: translateX(0);
+    }
+}
+
+.drawer-right {
+    left: 100%; // Instead of right: 0 to be able to ignore scrollbars
+    width: $drawer-right-width;
+    max-width: none; // maybe we should allow this drawer to open full width and have a close button?
+    transform: translateX(.75rem);
+    background-color: transparent;
+    box-shadow: none;
+    align-items: flex-end;
+
+    > .drawer-header, > .drawer-body {
+        width: 100%;
+        max-width: calc(100vw - 4.5rem);
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        max-width: calc(100vw - 4.5rem);
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-color: $body-bg;
+        box-shadow: $md-shadow-8dp;
+        z-index: -1;
+    }
+    // show drawer by moving it on screen
+    &.drawer-in {
+        transform: translateX(-$drawer-right-width);
+    }
+}
+
+
+
+.drawer-header {
+    background-color: rgba($theme-800, .95);
+    padding: .5rem;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    min-height: $navbar-height * 2;
+
+    &, a, .btn-icon {
+        color: color-yiq($theme-800) !important;
+    }
+
+    > .dropdown, > .btn-icon {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+
+        .drawer-right & {
+            left: auto;
+            right: .5rem;
+        }
+    }
+
+    .dropdown-menu a {
+        color: $dropdown-link-color !important;
+    }
+}
+
+.drawer-title {
+    margin: .5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > span {
+        @include text-truncate();
+    }
+}
+
+
+// backdrop (when drawer is open)
+.drawer-backdrop {
+    @include overscroll-behavior-contain;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: $zindex-drawer-backdrop;
+    visibility: hidden;
+    background-color: transparent;
+    transition-property: background-color;
+    @include material-animation-default();
+
+    .drawer-open & {
+        visibility: visible;
+        background-color: $backdrop-bg;
+    }
+
+    @supports (pointer-events: auto) {
+        background-color: $backdrop-bg;
+        opacity: 0;
+        transition-property: opacity;
+        visibility: visible;
+        pointer-events: none;
+
+        .drawer-open & {
+            pointer-events: auto;
+            opacity: 1;
+        }
+    }
+}

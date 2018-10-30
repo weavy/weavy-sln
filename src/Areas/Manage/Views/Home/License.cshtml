@@ -1,0 +1,107 @@
+﻿@model LicenseModel
+@{
+    if (Model.IsExpired || !Model.IsAllowed) {
+        Layout = "~/Areas/Setup/Views/Setup/_Layout.cshtml";
+    }
+    Title = "License";
+    Back = Url.Action<HomeController>(c => c.Index());
+    var feedback = string.Join(" ", ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
+    var subscriptionModel = ViewBag.Subscription as SubscriptionModel;
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        <div class="form-group">
+            <label for="LicenseKey">
+                License key <button type="button" title="License details" class="btn btn-icon" data-toggle="modal" data-target="#license-details">@Html.SvgIcon("information")</button>
+            </label>
+            <div class="input-group">
+                @Html.TextBoxFor(x => x.LicenseKey, new { @class = "form-control" + (feedback.IsNullOrEmpty() ? "" : " is-invalid") })
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" title="Update">@Html.SvgIcon("refresh")</button>
+                </div>
+            </div>
+            @if (!feedback.IsNullOrEmpty()) {
+                <div class="invalid-feedback d-block">@feedback</div>
+            }
+        </div>
+    }
+
+    @if (subscriptionModel != null) {
+        if (subscriptionModel?.Email == null) {
+            <div class="alert alert-warning d-flex" role="alert">
+                <span>You need to update your account and add your email address to view or edit your subscription.</span>
+                <a class="btn btn-outline-warning ml-auto" href="@(Url.Action<Weavy.Web.Controllers.AccountController>(x => x.EditAccount()))">Edit account</a>
+            </div>
+        } else {
+            <div class="subscription">
+                <form id="post-login" class="d-none" action="@subscriptionModel.Url" method="post" target="subscription">
+                    @Html.Hidden("key", subscriptionModel.LicenseKey)
+                    @Html.Hidden("Name", subscriptionModel.Name)
+                    @Html.Hidden("Email", subscriptionModel.Email)
+                    @Html.Hidden("UserCount", subscriptionModel.UserCount)
+                </form>
+                <div class="loading py-5">
+                    @Html.SvgSpinner(spin: true)
+                </div>
+                <iframe id="subscription" name="subscription" class="invisible"></iframe>
+            </div>
+        }
+    }
+</div>
+
+@section footer {
+    <div class="modal fade" id="license-details" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">License details</h5>
+                    <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Html.SvgIcon("close")</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-control-label">Issued to</label>
+                        <p class="form-control-static text-muted">@Model.License.IssuedTo</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-control-label">Max users</label>
+                        <p class="form-control-static text-muted">@(Model.License.MaxUsers.HasValue ? Model.License.MaxUsers.ToString() : "Unlimited")</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-control-label">Max spaces</label>
+                        <p class="form-control-static text-muted">@(Model.License.MaxSpaces.HasValue ? Model.License.MaxSpaces.ToString() : "Unlimited")</p>
+                    </div>
+
+                    @if (Model.License.MaintenanceExpiresAt != null) {
+                        <div class="form-group">
+                            <label class="form-control-label">Support and maintenance until</label>
+                            <p class="form-control-static @(Model.License.MaintenanceExpiresAt < DateTime.UtcNow ? "text-warning" : "text-muted")">@(Model.License.MaintenanceExpiresAt.ToLocal().ToShortDateString())</p>
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label class="form-control-label">License expires</label>
+                        <p class="form-control-static @(Model.IsGracePeriod ? "text-warning" : Model.IsExpired ? "text-danger": "text-muted")">@(Model.License.ExpiresAt.HasValue ? Model.License.ExpiresAt.ToLocal().ToShortDateString() : "Never")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (subscriptionModel != null) {
+        <script>
+            document.getElementById("post-login").submit();
+
+            window.addEventListener("message", function (e) {
+                if (e.origin !== "https://my.weavy.com") {
+                    return;
+                }
+                if (e.data.name == "resize") {
+                    $("#subscription").height(e.data.height).removeClass("invisible");
+                    $(".subscription > .loading").addClass("d-none");
+                }
+            });
+        </script>
+    }
+}

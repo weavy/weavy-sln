@@ -1,0 +1,32 @@
+/// <reference path="_bootstrap.scss" />
+
+// Overrides for vendor/bootstrap/_functions.scss
+
+// Added option to specify shade (100..900) when retreiving color from $colors map
+@function color($key: "blue", $shade: null) {
+    $color: map-get($colors, $key);
+    @if ($shade != null) {
+        $lightness: map-get($shades, $shade);
+        $color: hsl(hue($color), saturation($color), $lightness);
+    }
+    @return $color;
+}
+
+// Added option to specify shade (100..900) when retreiving color from $theme-colors map
+@function theme-color($key: "primary", $shade: null) {
+    $color: map-get($theme-colors, $key);
+    @if ($shade != null) {
+        $lightness: map-get($shades, $shade);
+        $color: hsl(hue($color), saturation($color), $lightness);
+    }
+    @return $color;
+}
+
+// Changed function to internally use our color shades instead of the bootstrap color levels
+@function theme-color-level($color-name: "primary", $level: 0) {
+    $shade: map-get($levelshades, max(-12, min(12, $level)));
+    @return theme-color($color-name, $shade);
+}
+
+// Mapping from bootstrap color level to weavy shade
+$levelshades: ( -12: 100, -11: 100, -10: 200, -9: 200, -8: 200, -7: 300, -6: 300, -5: 300, -4: 400, -3: 400, -2: 400, -1: 500, 0: 500, 1: 500, 2: 600, 3: 600, 4: 600, 5: 700, 6: 700, 7: 700, 8: 800, 9: 800, 10: 800, 11: 900, 12: 900 );

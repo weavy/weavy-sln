@@ -1,0 +1,106 @@
+/// <reference path="../_core.scss" />
+$card-size: 10rem;
+
+.card {
+    border: none;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        border: $card-border-width solid $card-border-color;
+        border-radius: $card-border-radius;
+        pointer-events: none;
+        //mix-blend-mode: darken;
+    }
+
+    .table {
+        margin: 0;
+    }
+}
+
+.cards {
+    display: flex;
+    margin: -.5rem;
+    flex-wrap: wrap;
+
+    .card {
+        flex: 1 1 $card-size;
+        margin: .5rem;
+
+        @include media-breakpoint-up(md) {
+            max-width: (2 * $card-size + 1rem);
+        }
+    }
+}
+
+.card-action {
+    position: relative;
+
+    &:hover::after {
+        border-color: $link-color;
+        //mix-blend-mode: normal;
+    }
+}
+
+.card-cover {
+    background-image: linear-gradient(45deg, $cover-gradient-start, $cover-gradient-end);
+    background-position: center center;
+    background-size: 200%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    padding: $card-spacer-x;
+    padding-bottom: $card-spacer-x;
+    position: relative;
+    @include border-top-radius($card-border-radius);
+
+    .top-right {
+        position: absolute;
+        top: .25rem;
+        right: .25rem;
+    }
+
+    .top-left {
+        position: absolute;
+        top: .25rem;
+        left: .25rem;
+    }
+
+    .facepile {
+        width: 100%;
+        bottom: -.75rem;
+        left: 0;
+        justify-content: center;
+        position: absolute;
+
+        ~ .avatar {
+            position: relative;
+            top: -.375rem;
+        }
+    }
+}
+
+.card-images {
+
+    .image-grid {
+        border-radius: 0;
+        background-color: $card-bg;
+
+        &::after {
+            border-left-color: transparent;
+            border-right-color: transparent;
+        }
+
+    }
+}
+
+.card-footer.bg-transparent {
+    background-color: transparent;
+    border-top: none;
+}

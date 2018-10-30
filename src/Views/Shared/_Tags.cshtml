@@ -1,0 +1,8 @@
+﻿@model ITaggable
+@{
+  var color = ViewData["color"] as string ?? "primary";
+
+}
+@if (Model != null && !Model.Tags.IsNullOrEmpty()) {
+  <span class="tags ml-1">· @Html.Raw(Model.Tags.Join(" ", tag => $@"<span class=""badge badge-{color}"">{tag}</span>"))</span>
+}

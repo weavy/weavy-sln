@@ -1,0 +1,41 @@
+﻿@model MessengerModel
+@using Weavy.Web.Areas.Messenger.Controllers
+@{ 
+    var rooms = Model.Conversations.Where(x => x.IsRoom);
+    var direct = Model.Conversations.Where(x => !x.IsRoom);
+}
+
+
+@if (Model.Conversations.IsNullOrEmpty()) {
+    if (Model.Conversations.Query.Text != null) {
+        <div class="list-group-separator reset text-muted">No match for <strong>@Model.Conversations.Query.Text</strong>.</div>
+    } else if (Model.Archive) {
+        <div class="list-group-separator reset text-muted">Archive old conversations to clear up some clutter.</div>
+    } else {
+        <div class="list-group-separator reset text-muted text-center">Inbox zero :)</div>
+    }
+}
+
+@if (Model.Settings.GroupConversations && !Model.Conversations.IsNullOrEmpty()) {
+    <h3 class="list-group-separator">Rooms</h3>
+    <div class="rooms" id="rooms">
+        @foreach (var conversation in rooms) {
+            Html.RenderPartial("_Conversation", conversation, new ViewDataDictionary { { "Active", Model.Conversation?.Id == conversation.Id } });
+        }
+        @if (rooms.Count() > 3) {
+            <div class="list-group-separator expand"><button type="button" class="btn btn-icon" title="Expand rooms" data-expand="rooms">@Html.SvgIcon("dots-horizontal")</button></div>
+        }
+    </div>
+
+    <h3 class="list-group-separator">Direct messages</h3>
+    <div class="direct-messages" id="direct">
+        @foreach (var conversation in direct) {
+            Html.RenderPartial("_Conversation", conversation, new ViewDataDictionary { { "Active", Model.Conversation?.Id == conversation.Id } });
+        }
+    </div>
+
+} else {
+    foreach (var conversation in Model.Conversations) {
+        Html.RenderPartial("_Conversation", conversation, new ViewDataDictionary { { "Active", Model.Conversation?.Id == conversation.Id } });
+    }
+}

@@ -1,0 +1,97 @@
+/// <reference path="../_core.scss" />
+
+// poll in post
+.poll {
+
+    table {
+        width: 100%;
+        border-collapse: initial;
+        border-spacing: 0 .5rem;
+    }
+
+    td {
+        border: 0;
+        padding: 0;
+    }
+
+    td.input {
+        text-align: left;
+        display: none;
+
+        .custom-control {
+            margin: $table-cell-padding-sm 0;
+        }
+
+        .custom-control-label {
+            position: absolute;
+        }
+
+        @include media-breakpoint-up(sm) {
+            display: table-cell;
+        }
+    }
+
+    td.option {
+        border: $table-border-width solid $table-border-color;
+        border-radius: $border-radius-sm;
+        position: relative;
+        width: 100%;
+        word-break: break-all;
+
+        label {
+            padding: .25rem $table-cell-padding;
+            position: relative;
+            width: 100%;
+            cursor: pointer;
+            margin: 0;
+        }
+    }
+
+    td.facepile {
+        padding: 0 0 0 .25rem;
+        display: none;
+        white-space: nowrap;
+
+        @include media-breakpoint-up(sm) {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        a {
+            margin: 0 0 0 .125rem;
+            display: flex;
+        }
+    }
+
+    td.votes {
+        white-space: nowrap;
+        padding: 0 0 0 .5rem;
+
+
+        @include media-breakpoint-up(sm) {
+            display: none;
+        }
+    }
+
+    .progress {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: transparent;
+        box-shadow: none;
+        height: 100%;
+    }
+
+    .progress-bar {
+        height: 100%;
+        box-shadow: none;
+        background-color: $theme-100;
+        transition: none;
+    }
+
+    tr.active .progress-bar {
+        background-color: $theme-200;
+    }
+}

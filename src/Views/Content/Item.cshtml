@@ -1,0 +1,86 @@
+﻿@model ItemBase
+@{
+    Title = Model.Name ?? "Untitled";
+    Back = Url.Back(WeavyContext.Content.Parent().Url() ?? WeavyContext.App.Url());
+    var creator = Model.CreatedBy();
+    var versionable = Model as IVersionable;
+}
+
+<div class="container my-3">
+  <article class="item" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+      <header class="item-header">
+          <a class="btn btn-icon mr-1" href="@creator.Url()">@creator.AvatarImg(24)</a>
+          @if (Model.CreatedById != Model.ModifiedById) {
+              var editor = Model.ModifiedBy();
+              <a class="btn btn-icon mr-1" href="@editor.Url()">@editor.AvatarImg(24)</a>
+          }
+
+          @if (versionable != null) {
+              <a href="@(Url.Action<ContentController>(c => c.Versions(Model.Id)))">@Html.Time(Model.ModifiedAt)</a>
+          } else {
+              @Html.Time(Model.ModifiedAt)
+          }
+
+          @Html.ContentBadge(Model)
+
+          @if (Model is ITaggable taggable) {
+              Html.RenderPartial("_Tags", taggable);
+          }
+
+          <div class="navbar-icons ml-auto">
+              @if (versionable == null || versionable.IsCurrent()) {
+                  if (Model.HasPermission(Permission.Edit)) {
+                      <a class="btn btn-icon" href="@Model.Url()/edit">@Html.SvgIcon("pencil", "icon")</a>
+                  }
+                  Html.RenderPartial("_ContentMenu", Model);
+              } else {
+                  <form action="@Url.Action(nameof(ContentController.Revert), null, new { id = Model.Id })" method="post">
+                      @Html.HttpMethodOverride(HttpVerbs.Put)
+                      @Html.Hidden(nameof(versionable.Version), versionable.Version)
+                      <button type="submit" class="btn btn-icon" title="Revert">@Html.SvgIcon("undo", "icon")</button>
+                  </form>
+              }
+          </div>
+      </header>
+
+    <section class="properties">
+      @Html.DisplayGroups(exclude:new string[] { nameof(Model.Name)})
+    </section>
+
+    @if (versionable == null || versionable.IsCurrent()) {
+
+      if (Model is IHasAttachments attachable) {
+        <section class="content-attachments my-3">
+          <h4 class="display-4"><span>Attachments</span></h4>
+          @if (Model.HasPermission(Permission.Attach)) {
+            <p class="content-upload">
+              <span class="text-muted">Drag and drop files here or</span>
+              <button type="button" class="btn btn-link btn-text">click to upload</button>.
+              <input type="file" data-single-file-uploads="false" data-url="/api/content/@Model.Id/attachments" multiple="">
+            </p>
+          }
+
+          @if (attachable.AttachmentIds.Any()) {
+            Html.RenderPartial("_Attachments", attachable.Attachments(), viewData: new ViewDataDictionary { { "byline", true } });
+          }
+
+        </section>
+      }
+
+      if (Model is ICommentable commentable) {
+        <section class="content-comments my-3">
+          <h4 class="display-4"><span>Comments</span></h4>
+          <div class="list-group comments" data-container="comments">
+            @Html.Partial("_Comments", commentable.Comments())
+          </div>
+          @Html.Partial("_CommentForm", commentable, new ViewDataDictionary() { { "container", ".comments" } })
+        </section>
+      }
+
+      if (Model is IFollowable followable) {
+        Html.RenderPartial("_Subscribers");
+      }
+    }
+  </article>
+
+</div>

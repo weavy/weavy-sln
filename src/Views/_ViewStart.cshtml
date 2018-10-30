@@ -1,0 +1,11 @@
+﻿@{
+    if (WeavyRequestContext.Current.Content != null) {
+        Layout = "~/Views/Shared/_ContentLayout.cshtml";
+    } else if (WeavyRequestContext.Current.App != null) {
+        Layout = "~/Views/Shared/_AppLayout.cshtml";
+    } else if (WeavyRequestContext.Current.Space != null) {
+        Layout = "~/Views/Shared/_SpaceLayout.cshtml";
+    } else {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}

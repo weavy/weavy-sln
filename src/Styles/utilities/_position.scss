@@ -1,0 +1,92 @@
+/// <reference path="../_core.scss" />
+
+// Shorthand
+
+.sticky-top-secondary {
+    @extend .sticky-top;
+
+    @supports (position: sticky) {
+        top: $navbar-height;
+    }
+}
+
+@supports (position: sticky) {
+    html:not(.scrollbar):not(.windows) {
+        > body.has-navbar {
+            .sticky-top {
+                top: $navbar-height;
+            }
+
+            .sticky-top-secondary {
+                top: $navbar-height * 2;
+            }
+        }
+
+        > body.has-navbar-secondary {
+            .sticky-top {
+                top: $navbar-height * 2;
+            }
+
+            .sticky-top-secondary {
+                top: $navbar-height * 3;
+            }
+        }
+    }
+}
+
+// Positions top, right, bottom, left (t, r, b, l)
+// Examples: .t-1 .t-sm--3 t-lg-auto
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-up($breakpoint) {
+        $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+        @each $prop, $abbrev in (top: t, right: r, bottom: b, left: l) {
+            @each $size, $length in $spacers {
+
+                .#{$abbrev}#{$infix}-#{$size} {
+                    #{$prop}: $length !important;
+                }
+
+            }
+            
+            // Some special distance utils
+            .#{$abbrev}#{$infix}-auto {
+                #{$prop}: auto !important;
+            }
+        }
+    }
+}
+
+// Icon positioning etc
+.top-right {
+    position: absolute;
+    top: $card-spacer-y;
+    right: $card-spacer-y;
+    bottom: auto;
+    left: auto;
+}
+
+.top-left {
+    position: absolute;
+    top: $card-spacer-y;
+    right: 0;
+    bottom: auto;
+    left: $card-spacer-y;
+}
+
+.z-fixed {
+    z-index: $zindex-fixed;
+}
+
+.z-sticky {
+    z-index: $zindex-sticky;
+}
+
+.z-behind {
+    z-index: -1;
+}
+
+.z-over {
+    z-index: 100;
+}

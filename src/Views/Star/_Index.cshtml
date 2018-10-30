@@ -1,0 +1,16 @@
+﻿@model SearchResult<Entity, EntityQuery>
+
+@if (Model.IsNullOrEmpty()) {
+    <div class="container-fluid mt-3 empty">
+        <p class="text-muted">You don't have any starred items yet. By starring your favorite content, things you need to remember etc, it will be listed here for quick access.</p>
+    </div>
+}
+
+<table class="table table-hover table-stars">
+    <tbody>
+        @foreach (var entity in Model) {
+            Html.RenderPartial("~/Views/Star/_Star.cshtml", entity);
+        }
+    </tbody>
+</table>
+

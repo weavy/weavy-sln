@@ -1,0 +1,15 @@
+﻿@model App
+@{
+    Title = "Add tab";
+    Back = ViewData.ModelState.IsValid ? Url.Back(Model.Url()) : WeavyContext.Space.Url();
+    ViewData["turboform"] = true;
+}
+<div class="container mt-3">
+    @{ Html.RenderPartial("_New", Model); }    
+</div>
+
+@if (Html.HasHtmlEditor()) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}

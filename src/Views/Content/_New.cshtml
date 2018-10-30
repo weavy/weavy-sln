@@ -1,0 +1,37 @@
+﻿@model Content
+@{
+    var draftable = Model as IDraftable;
+
+    var htmlAttributes = new Dictionary<string, object>(){
+        { "class", draftable != null ? "autosave" : "" },
+        { "autocomplete", "off" },
+        { "novalidate", "" },
+        { "data-is-draft", draftable?.IsDraft.ToString().ToLower() },
+        { "data-status", "#autosave-status" }
+    };
+
+    if (ViewData["turboform"] != null) {
+        htmlAttributes.Add("data-turboform", "");
+    }
+
+    var routeValues = new RouteValueDictionary();
+    routeValues.Add("id", WeavyContext.Content?.Id ?? WeavyContext.App.Id);
+}
+
+
+@using (Html.BeginForm(WeavyContext.Content != null ? nameof(ContentController.Insert) : nameof(ContentController.InsertRoot), typeof(ContentController).ControllerName(), routeValues, FormMethod.Post, htmlAttributes)) {
+    @Html.EditorsForModel()
+    @Html.Hidden(nameof(Guid), Model.ContentGuid)
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary" name="operation" value="insert">@Model.MetaData().CreateVerb</button>
+        @if (draftable != null) {
+            <button type="submit" class="btn btn-outline-secondary" name="operation" value="draft">Save draft</button>
+        }
+        <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel">Cancel</button>
+        <div class="text-muted ml-auto" id="autosave-status"></div>
+    </div>
+    <div id="blobs">
+        @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
+    </div>
+}
+

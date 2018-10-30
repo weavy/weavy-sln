@@ -1,0 +1,22 @@
+// core weavy styles
+@import 'core';
+
+// additional components not in _core.scss
+@import 'components/context';
+@import 'components/embed';
+@import 'components/file';
+@import 'components/item';
+@import 'components/notification';
+@import 'components/personal';
+@import 'components/poll';
+@import 'components/post';
+@import 'components/comment';
+@import 'components/widget';
+@import 'components/office';
+
+
+// Widget styles for widget-nav
+
+@import "widget/variables";
+
+@import "components/widgetnav";

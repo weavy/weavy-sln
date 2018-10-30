@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Attachment>
+<div class="list-group">
+    @foreach (var attachment in Model) {
+        var attrs = Html.PreviewAttributes(attachment);
+        <a class="list-group-item list-group-item-action" href="@attachment.FileUrl()" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
+            <div class="media">
+                @Html.SvgIcon(attachment, size:48)
+                <div class="media-body">
+                    <h6 class="media-title">@attachment.Blob.Name</h6>
+                    <small class="text-muted">
+                        @if (attachment.Parent.Type == EntityType.Content) {
+                            <text>Uploaded @Html.Time(attachment.ModifiedAt) by @attachment.ModifiedBy().GetTitle() –</text>
+                        }
+                        @if (FileHelper.IsImage(attachment.Blob.Name)) {
+                            <text>@(attachment.Blob.Width)x@(attachment.Blob.Height) ·</text>
+                        }
+                        @FileHelper.FileSizeAsString(attachment.Blob.Size)
+                    </small>
+                </div>
+                @if (attachment.Parent.Type == EntityType.Content && attachment.HasPermission(Permission.Delete)) {
+                    <div class="media-icons">
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                                @Html.SvgIcon("dots-vertical")
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <button type="button" data-trash="attachment" data-id="@attachment.Id" class="dropdown-item">@Html.SvgIcon("delete","danger") Trash</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </a>
+    }
+</div>

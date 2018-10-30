@@ -1,0 +1,25 @@
+﻿@model IndexResult
+<div class="list-group">
+    
+    @foreach (var item in Model) {
+        <a href="@item.Url()" class="list-group-item list-group-item-action flex-column align-items-start" data-text="@item.Title">
+            <div class="d-flex w-100 justify-content-between">
+                @if (item.Title != null) {
+                <h5 class="mb-1">@if (item.TitleHighlight != null) { @Html.Raw(item.TitleHighlight) } else { @item.Title }</h5>
+                }
+                <small>@Html.SvgIcon(item)</small>
+            </div>
+            @if (item.Description != null) {
+                <p class="mb-1">@if (item.DescriptionHighlight != null) { @Html.Raw(item.DescriptionHighlight) } else { @item.Description.Ellipsis(256) }</p>
+            }
+
+            @if (item.Type != EntityType.User) {
+                <small>@Html.Time(item.ModifiedAt) by @(item.ModifiedBy()?.GetTitle())</small>
+            }
+
+            @if (!item.Tags.IsNullOrEmpty()) {
+                <span class="tags">&middot; @Html.Raw(item.Tags.Join(", ", x => @"#" + x))</span>
+            }
+        </a>
+    }
+</div>

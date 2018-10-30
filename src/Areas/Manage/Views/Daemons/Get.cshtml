@@ -1,0 +1,74 @@
+﻿@model IDaemon
+@{
+    Title = "Scheduled tasks";
+    Back = Url.Action<DaemonsController>(c => c.Index());
+}
+
+
+<div class="container my-3">
+
+    <form action="@Url.Action(nameof(DaemonsController.Update))" method="post" enctype="application/x-www-form-urlencoded" data-turboform>
+
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        <div class="form-group">
+            <label>Id</label>
+            <p class="form-control-static">@Model.Id</p>
+        </div>
+        <div class="form-group">
+            <label>Type</label>
+            <p class="form-control-static">@Model.FullName</p>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Desciption</label>
+            <p class="form-control-static">@Model.Description</p>
+        </div>
+        @if (!Model.IsLoaded()) {
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <p class="form-control-static">
+                    <span class="badge badge-danger">missing</span>
+                </p>
+            </div>
+        }
+
+        @Html.EditorsForModel()
+
+        <div class="form-buttons">
+
+            @if (Model.IsRunnable()) {
+                <div class="btn-group">
+                    <button type="submit" name="button" value="@nameof(DaemonsController.Update)" class="btn btn-primary btn-load">Save</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">@Html.SvgIcon("menu-down")</button>
+                    <div class="dropdown-menu">
+                        <button type="submit" name="button" value="@nameof(DaemonsController.Run)" class="dropdown-item">Save and Run</button>
+                    </div>
+                </div>
+            } else {
+                <button type="submit" name="button" value="@nameof(DaemonsController.Update)" class="btn btn-primary btn-load" data-shortcut="Ctrl+Shift+S">Save</button>
+            }
+
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">Cancel</a>
+
+            @if (!Model.IsLoaded()) {
+                <button type="submit" name="button" value="@nameof(DaemonsController.Delete)" class="btn btn-danger btn-load">Delete</button>
+            }
+        </div>
+
+        @if (Model.IsEnabled) {
+            <div class="form-group">
+                <label class="control-label">Log</label>
+                <pre class="log">
+@Model.Status() @if (Model.FinishedAt != null) {<text> </text>@Html.Time(Model.FinishedAt)}<text>.</text>
+@if (Model.FinishedAt != null && Model.StartedAt != null) {
+@((int)(Model.FinishedAt.Value - Model.StartedAt.Value).TotalMilliseconds) @:ms running time.
+}
+@if (!Model.Log.IsNullOrWhiteSpace()) {
+@:--
+@Model.Log
+}
+</pre>
+            </div>
+        }
+    </form>
+
+</div>

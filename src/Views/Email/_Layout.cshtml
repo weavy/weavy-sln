@@ -1,0 +1,151 @@
+﻿@model Weavy.Core.Models.EmailModel
+@* 
+  Email template based on and inspired by the following:
+
+  * https://github.com/mailchimp/email-blueprints/blob/master/modular-template-patterns/modular-template-patterns.html
+  * https://github.com/leemunroe/responsive-html-email-template
+  * https://htmlemail.io/
+*@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@Model.Subject</title>
+    <style type="text/css">
+        @* RESET *@
+        body, #bodyTable, #bodyCell{height:100%!important;margin:0;padding:0;width:100%!important;}
+        table{border-collapse:collapse;}
+        img,a img{border:0;outline:none;text-decoration:none;}
+        h1,h2,h3,h4,h5,h6{margin:0;padding:0;}
+        p{margin:1em 0;}
+        @* CLIENT-SPECIFIC STYLES *@
+        .ReadMsgBody{width:100%;} .ExternalClass{width:100%;} @* Force Hotmail/Outlook.com to display emails at full width. *@
+        .ExternalClass,.ExternalClass p,.ExternalClass span,.ExternalClass font,.ExternalClass td,.ExternalClass div{line-height:100%;} @* Force Hotmail/Outlook.com to display line heights normally. *@
+        table,td{mso-table-lspace:0pt;mso-table-rspace:0pt;} @* Remove spacing between tables in Outlook 2007 and up. *@
+        #outlook a{padding:0;} @* Force Outlook 2007 and up to provide a "view in browser" message. *@
+        img{-ms-interpolation-mode:bicubic;} @* Force IE to smoothly render resized images. *@
+        body,table,td,p,a,li,blockquote{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;} @* Prevent Windows- and Webkit-based mobile platforms from changing declared text sizes. *@
+        @* FRAMEWORK STYLES *@
+        .flexibleContainerCell{padding-top:20px;padding-right:20px;padding-left:20px;}
+        .flexibleImage{height:auto;}
+        .bottomShim{padding-bottom:20px;}
+        .imageContent,.imageContentLast{padding-bottom:20px;}
+        .nestedContainerCell{padding-top:20px; padding-right:20px; padding-left:20px;}
+        @* EMAIL STYLES *@
+        body,#bodyTable{background-color:@Model.Theme.NeutralColor(Shade.Fifty).ToHex();}
+        #bodyCell{padding-top:40px;padding-bottom:40px;}
+        #emailBody{background-color:#FFFFFF;border:1px solid @Model.Theme.NeutralColor(Shade.TwoHundred).ToHex();border-collapse:separate;border-radius:4px;}
+        #headerImage{height:auto;max-width:600px!important;}
+        h1,h2,h3,h4,h5,h6{color:@Model.Theme.NeutralColor(Shade.EightHundred).ToHex();font-family:Arial,sans-serif;font-size:20px;line-height:125%;text-align:left;}
+        small {color:@Model.Theme.NeutralColor().ToHex();font-family:Arial,sans-serif;font-size:14px;line-height:150%;}
+        .headerContent{text-align:center;vertical-align:middle;}
+        .textContent,.textContentLast{color:@Model.Theme.NeutralColor(Shade.EightHundred).ToHex();font-family:Arial,sans-serif;font-size:16px;line-height:150%;text-align:left;padding-bottom:20px;}
+        .textContent a,.textContentLast a{color:@Model.Theme.PrimaryColor(Shade.SixHundred).ToHex();text-decoration:underline;}
+        .nestedContainer{background-color:@Model.Theme.NeutralColor(Shade.OneHundred).ToHex();border:1px solid @Model.Theme.NeutralColor(Shade.TwoHundred).ToHex();border-collapse:separate;border-radius:4px;}
+        .emailButton{background-color:@Model.Theme.PrimaryColor().ToHex();border-collapse:separate;border-radius:4px;}
+        .buttonContent{color:@(Model.Theme.PrimaryColor().UseDarkText()? Model.Theme.NeutralColor(Shade.EightHundred).ToHex() : "#FFFFFF");font-family:Arial,sans-serif;font-size:18px;font-weight:bold;line-height:100%;text-align:center;padding:15px;}
+        .buttonContent a{color:@(Model.Theme.PrimaryColor().UseDarkText()? Model.Theme.NeutralColor(Shade.EightHundred).ToHex() : "#FFFFFF");display:block;text-decoration:none;}
+        #emailFooter{background-color:@Model.Theme.NeutralColor(Shade.Fifty).ToHex();border:0;}
+        .footerContent{color:@Model.Theme.NeutralColor().ToHex();font-family:Arial,sans-serif;font-size:14px;line-height:150%;text-align:center;}
+        .footerContent a{color:@Model.Theme.PrimaryColor(Shade.SixHundred).ToHex();text-decoration:underline;}
+        @* MOBILE STYLES *@
+        @@media only screen and (max-width: 480px){
+            @* CLIENT-SPECIFIC STYLES *@
+            body{width:100%!important;min-width:100%!important;} @* Force iOS Mail to render the email at full width. *@
+            @* FRAMEWORK STYLES *@
+            table[id="emailBody"],table[id="emailFooter"],table[class="flexibleContainer"]{width:100%!important;} @* CSS selectors are written in attribute selector format to prevent Yahoo Mail from rendering media query styles on desktop. *@
+            img[class="flexibleImage"]{height:auto!important;width:100%!important;} @* Makes any image classed with 'flexibleImage' fluid when the query activates. Make sure you add an inline max-width to those images to prevent them from blowing out. *@
+            @* EMAIL STYLES *@
+            body,#bodyTable,#emailFooter{background-color:#FFFFFF;}
+            #emailBody{border:0;}
+            td[id="bodyCell"]{padding-top:10px!important;padding-right:10px!important;padding-left:10px!important;}
+            table[class="emailButton"]{width:100% !important;} @* Make buttons in the email span the full width of their container, allowing for left- or right-handed ease of use. *@
+            td[class="buttonContent"]{padding:0!important;}
+            td[class="buttonContent"] a{padding:15px!important;}
+            td[class="textContentLast"],td[class="imageContentLast"]{padding-top:20px!important;}
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
+            <tr>
+                <td align="center" valign="top" id="bodyCell">
+                    @* EMAIL CONTAINER // *@
+                    @* The table "emailBody" is the email's container. Its width can be set to 100% for a color band  that spans the width of the page. *@
+                    @* To move or duplicate any of the design patterns in this email, simply move or copy the entire MODULE row for each content block. *@
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="emailBody">
+                        @* HEADER MODULE // *@
+                        <tr>
+                            <td align="center" valign="top">
+                                @* CENTERING TABLE // *@
+                                @* The centering table keeps the content tables centered in the emailBody table, in case its width is set to 100%. *@
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td align="center" valign="top">
+                                            @* FLEXIBLE CONTAINER // *@
+                                            @* The flexible container has a set width that gets overridden by the media query. Most content tables within can then be given 100% widths. *@
+                                            <table border="0" cellpadding="0" cellspacing="0" width="600" class="flexibleContainer">
+                                                <tr>
+                                                    <td align="center" valign="top" width="600" class="flexibleContainerCell">
+                                                        @* CONTENT TABLE // *@
+                                                        @* The content table is the first element that's entirely separate from the structural framework of the email. *@
+                                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                            <tr>
+                                                                <td valign="top" class="headerContent">
+                                                                    <a href="/" target="_blank">
+                                                                        <img src="@Weavy.Core.Helpers.UrlHelper.IconUrl(48*2)" width="48" height="48" alt="" id="headerImage" style="max-width:600px;" />
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        @* // CONTENT TABLE *@
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            @* // FLEXIBLE CONTAINER *@
+                                        </td>
+                                    </tr>
+                                </table>
+                                @* // CENTERING TABLE *@
+                            </td>
+                        </tr>
+                        @* // HEADER MODULE *@
+                        @RenderBody()
+                    </table>
+                    @* // EMAIL CONTAINER *@
+
+                    @if (IsSectionDefined("footer")) {
+                    @* EMAIL FOOTER // *@
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="emailFooter">
+                        <tr>
+                            <td align="center" valign="top">
+                                @* CENTERING TABLE // *@
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td align="center" valign="top">
+                                            @* FLEXIBLE CONTAINER // *@
+                                            <table border="0" cellpadding="0" cellspacing="0" width="600" class="flexibleContainer">
+                                                <tr>
+                                                    <td align="center" valign="top" width="600" class="flexibleContainerCell">
+                                                        @RenderSection("footer")
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            @* // FLEXIBLE CONTAINER *@
+                                        </td>
+                                    </tr>
+                                </table>
+                                @* // CENTERING TABLE *@
+                            </td>
+                        </tr>
+                    </table>
+                    @* // EMAIL FOOTER *@
+                    }
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

@@ -1,0 +1,15 @@
+/// <reference path="../_core.scss" />
+
+// subscription iframe
+.subscription {
+    > iframe {
+        width: 100%;
+        border: none;
+        padding: $spacer 0;
+        height: 25rem;
+    }
+
+    .loading {
+        text-align: center;
+    }
+}

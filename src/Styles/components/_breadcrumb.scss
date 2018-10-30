@@ -1,0 +1,133 @@
+/// <reference path="../_core.scss" />
+@mixin breadcrumb-hide-trail {
+    &:not(.hide-last) {
+        .breadcrumb-item {
+            display: none;
+
+            &:last-child {
+                display: inline-flex;
+
+                &:not(:first-of-type) {
+                    margin-left: .625em;
+                }
+            }
+        }
+    }
+
+    &.hide-last {
+        // :not(:nth-last-child(2)) does not work in sass due to some bug
+        .breadcrumb-item {
+            display: none;
+
+            &:nth-last-child(2) {
+                display: inline-flex;
+
+                &:not(:first-of-type) {
+                    margin-left: .625em;
+                }
+            }
+        }
+    }
+}
+
+.breadcrumb {
+    font-size: $font-size-xs;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    flex: 0 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+
+    .breadcrumb-item {
+        display: inline-flex;
+        background-color: $breadcrumb-bg;
+        background-clip: padding-box;
+        padding: 0 .8333333em;
+        line-height: 2.1666667em;
+        margin: .1875rem 0;
+        min-width: calc(1em/.83333333/2 + 1em);
+        align-items: center;
+
+        &, a {
+            color: $gray-700; //color-yiq($breadcrumb-bg);
+            flex: 0 999999999 auto;
+        }
+
+        a {
+            @include text-truncate();
+        }
+
+        &:first-child {
+            border-bottom-left-radius: $border-radius-sm;
+            border-top-left-radius: $border-radius-sm;
+            min-width: calc(1em/.83333333 + 1em);
+        }
+        // move separator from ::before to ::after for better linebreaks
+        + .breadcrumb-item {
+            margin-left: 1.3333333em;
+
+            &::before {
+                display: inline-block;
+                content: $breadcrumb-divider;
+                border-bottom: 2.1666667em solid $breadcrumb-bg;
+                border-left: .6666667em solid transparent;
+                margin-left: -1.6666667em;
+                padding-right: .33333333em;
+            }
+        }
+
+        &:last-child {
+            &, a {
+                flex: 0 1 auto;
+            }
+        }
+
+        &::after {
+            display: inline-block;
+            content: $breadcrumb-divider;
+            border-top: 2.1666667em solid $breadcrumb-bg;
+            border-right: .6666667em solid transparent;
+            margin-right: -1.6666667em;
+            padding-left: .33333333em;
+        }
+
+        &.active, &:hover, &:focus {
+            background-color: $breadcrumb-active-color;
+
+            &, a {
+                color: color-yiq($breadcrumb-active-color);
+            }
+
+            &::before {
+                border-bottom-color: $breadcrumb-active-color;
+            }
+
+            &::after {
+                border-top-color: $breadcrumb-active-color;
+            }
+        }
+    }
+
+    &.hide-last {
+        .breadcrumb-item {
+            &:nth-last-child(2) {
+                &, a {
+                    flex: 0 1 auto;
+                }
+            }
+
+            &:last-child {
+                display: none;
+            }
+        }
+    }
+
+    &.hide-trail {
+        @include breadcrumb-hide-trail;
+    }
+
+    @include media-breakpoint-down(xs) {
+        @include breadcrumb-hide-trail;
+    }
+}

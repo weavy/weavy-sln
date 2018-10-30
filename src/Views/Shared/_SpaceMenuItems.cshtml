@@ -1,0 +1,91 @@
+﻿@model Space
+
+@if (!Model.IsTrashed() && (Model.HasPermission(Permission.Edit) || Model.HasPermission(Permission.Delete) || (User.IsAdmin && !Model.HasPermission(Permission.Admin)) || Model.HasPermission(Permission.Join))) {
+
+    if (Model.HasPermission(Permission.Edit)) {
+        <a class="dropdown-item" href="@(Url.Action<SpaceController>(c => c.Edit(Model.Id)))">@Html.SvgIcon("pencil", "primary") Edit</a>
+        if (Model.IsArchived()) {
+            <form action="@(Url.Action<SpaceController>(c => c.Unarchive(Model.Id)))" method="post" data-turboform>
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("archive", "orange") Unarchive</button>
+            </form>
+        } else {
+            <form action="@(Url.Action<SpaceController>(c => c.Archive(Model.Id)))" method="post" data-turboform>
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("archive", "orange") Archive</button>
+            </form>
+        }
+    }
+
+    if (Model.HasPermission(Permission.Delete) && !Model.IsTrashed()) {
+        <form action="@(Url.Action<SpaceController>(c => c.Trash(Model.Id)))" method="post">
+            @Html.AntiForgeryToken()
+            @Html.HttpMethodOverride(HttpVerbs.Delete)
+            <button type="submit" class="dropdown-item">@Html.SvgIcon("delete", "danger") Trash</button>
+        </form>
+    }
+
+    if (Model.HasPermission(Permission.Admin)) {
+        <button class="dropdown-item d-not-connected" data-connect-space="@Model.Id">@Html.SvgIcon("link-variant", "primary") Connect to url</button>
+        <button class="dropdown-item d-connected" data-disconnect-space="@Model.Id">@Html.SvgIcon("link-variant-off", "orange") Disconnect from url</button>
+    }
+
+    if (Model.HasPermission(Permission.Edit)) {
+        <div class="dropdown-divider"></div>
+    }
+
+    if (Model.IsMember || Model.Privacy != Privacy.Secret) {
+        <a class="dropdown-item" href="@(Url.Action<SpaceController>(c => c.Members(Model.Id, null, null)))">@Html.SvgIcon("account-multiple", "success") Members</a>
+    }
+
+    if (Model.IsMember) {
+        if (User.IsAdmin && !Model.HasPermission(Permission.Admin)) {
+            // admins can take admin control of any space
+            <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
+                @Html.AntiForgeryToken()
+                @Html.HttpMethodOverride(HttpVerbs.Put)
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("account-key", "warning") Make me admin</button>
+            </form>
+        }
+
+        if (Model.HasPermission(Permission.Join)) {
+            <form action="@(Url.Action<SpaceController>(c => c.Leave(Model.Id)))" method="post" data-turboform>
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("account-minus") Leave space</button>
+            </form>
+        }
+    } else {
+        if (Model.HasPermission(Permission.Join)) {
+            if (!Model.IsMember) {
+                var pending = SpaceService.HasPendingMembershipRequest(Model.Id);
+                if (pending) {
+                    <form action="@(Url.Action<SpaceController>(c => c.Leave(Model.Id)))" method="post" data-turboform>
+                        @Html.HttpMethodOverride(HttpVerbs.Delete)
+                        <button type="submit" class="dropdown-item">@Html.SvgIcon("account-minus") Undo membership request</button>
+                    </form>
+                } else {
+                    <form action="@(Url.Action<SpaceController>(c => c.Join(Model.Id)))" method="post" data-turboform>
+                        <button type="submit" class="dropdown-item">@Html.SvgIcon("account-plus", "success") Join space</button>
+                    </form>
+                }
+            }
+        }
+        if (User.IsAdmin) {
+            // admins can take admin control of any space
+            <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
+                @Html.AntiForgeryToken()
+                @Html.HttpMethodOverride(HttpVerbs.Put)
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("account-key", "warning") Join as admin</button>
+            </form>
+        }
+    }
+
+    if (Model.IsMember || Model.Privacy != Privacy.Secret) {
+        <div class="dropdown-divider"></div>
+    }
+
+    @Html.StarToggle(Model, false, htmlAttributes: new { @class = "dropdown-item" })
+
+    @Html.SubscribeToggle(Model, new { @class = "dropdown-item" })
+
+    <div class="dropdown-divider d-mobile d-not-connected"></div>
+    <button class="dropdown-item d-mobile d-not-connected" data-close-space="@Model.Id">@Html.SvgIcon("close-circle") Close</button>
+}

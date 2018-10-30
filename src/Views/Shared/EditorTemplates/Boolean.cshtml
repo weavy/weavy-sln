@@ -1,0 +1,36 @@
+﻿@model bool?
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+    var attrs = new Dictionary<string, object>();
+    attrs["type"] = "checkbox";
+    attrs["class"] = "custom-control-input";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+<div class="custom-control custom-checkbox">
+    @Html.CheckBox("", Model.HasValue && Model.Value, attrs)
+    @if (label) {
+        @Html.LabelFor(m => m, new { @class = "custom-control-label" })
+    }
+    @if (feedback != null) {
+        <div class="invalid-feedback">@feedback</div>
+    } else if (text) {
+        <div class="form-text d-inline">@meta.Description</div>
+    }
+</div>
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}

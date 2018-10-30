@@ -1,0 +1,53 @@
+﻿@model SearchResult<User, UserQuery>
+
+@{
+    var selected = ViewData["selected"] as IEnumerable<User> ?? new List<User>();
+    var users = Model.ToList();
+    foreach (var s in selected) {
+        if (!users.Any(u => u.Id == s.Id)) {
+            users.Add(s);
+        }
+    }
+    users = users.OrderBy(x => x.GetTitle()).ToList();
+}
+
+@if (users.HasItems()) {
+    foreach (var group in users.GroupBy(x => x.GetTitle().ToUpper().Trim().FirstOrDefault())) {
+        <div class="list-group-separator">@group.Key</div>
+        foreach (var user in group) {
+            bool active = selected.Any(s => s.Id == user.Id);
+            <div class="list-group-item list-group-item-action @(active ? "selected" : "")" data-user="@user.Id" data-user-title="@user.GetTitle()">
+                <div class="media">
+                    <div class="mr-3">
+                        @user.AvatarImg(48, presence: true)
+                    </div>
+                    <div class="media-body">
+                        @if (user.Presence == PresenceStatus.Active) {
+                            <time>active now</time>
+                        } else if (user.LastSeenAt != null) {
+                            @Html.Time(user.LastSeenAt.Value, abbrev: true)
+                        }
+                        <div class="media-title text-capitalize">@user.GetTitle()</div>
+                        <div class="media-text">
+                            @@@user.Username
+                            @if (user.IsSuspended) {
+                                <span class="badge badge-secondary">suspended</span>
+                            } else if (user.IsAdmin) {
+                                <span class="badge badge-primary">admin</span>
+                            } else if (user.IsExternal) {
+                                <span class="badge badge-warning">external</span>
+                            }
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-icon checked">@Html.SvgIcon("checkbox-marked-outline")</button>
+                    <button type="button" class="btn btn-icon unchecked">@Html.SvgIcon("checkbox-blank-outline")</button>
+                </div>
+            </div>
+        }
+    }
+}
+
+@if (!Model.HasItems()) {
+    <div class="list-group-separator reset">No match for <strong>@Model.Query.Text</strong>.</div>
+}
+

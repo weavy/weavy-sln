@@ -1,0 +1,22 @@
+﻿
+# prism
+~/scripts/vendor/prismjs/prism-core.min.js
+~/scripts/vendor/prismjs/prism-clike.min.js
+~/scripts/vendor/prismjs/prism-c.min.js
+~/scripts/vendor/prismjs/prism-cpp.min.js
+~/scripts/vendor/prismjs/prism-csharp.min.js
+~/scripts/vendor/prismjs/prism-css.min.js
+~/scripts/vendor/prismjs/prism-java.min.js
+~/scripts/vendor/prismjs/prism-javascript.min.js
+~/scripts/vendor/prismjs/prism-php.min.js
+~/scripts/vendor/prismjs/prism-python.min.js
+~/scripts/vendor/prismjs/prism-ruby.min.js
+~/scripts/vendor/prismjs/prism-markup.min.js
+~/scripts/vendor/prismjs/prism-markup-templating.min.js
+
+
+# prism plugins
+~/scripts/vendor/prismjs/prism-line-numbers.min.js
+
+# component
+~/scripts/src/codesample.js

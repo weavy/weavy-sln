@@ -1,0 +1,67 @@
+﻿@{
+    var bubbles = BubbleService.GetForUser(WeavyContext.User.Id).ToList();
+    if (WeavyContext.Space != null && !bubbles.Any(s => s.SpaceId == WeavyContext.Space.Id)) {
+        bubbles.Add(new Bubble { Space = WeavyContext.Space });
+    }
+
+    var navtitle = WeavyContext.Space?.Name ?? Title;
+}
+
+<div class="navbar-middle d-embedded">
+    @Html.StarToggle(WeavyContext.Space)
+    <a href="@(WeavyContext.Space?.Url() ?? Url.Action<HomeController>(c => c.Index()))" class="navbar-text">
+        @navtitle
+        @if (WeavyContext.Space?.Teamname != null) {
+            <small class="d-none d-sm-inline">@@@WeavyContext.Space.Teamname</small>
+        }
+    </a>
+</div>
+
+<div class="navbar-middle d-standalone">
+    <div class="dropdown navbar-menu dropdown-backdrop">
+        @Html.StarToggle(WeavyContext.Space)
+        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+            <span class="navbar-text">@navtitle</span>
+            @Html.SvgIcon("menu-down")
+        </button>
+        <div class="dropdown-menu">
+            <div class="dropdown-header">
+                @Html.StarToggle(WeavyContext.Space)
+                <div class="dropdown">
+                    <span class="navbar-text">@navtitle</span>
+                    @Html.SvgIcon("menu-up")
+                </div>
+            </div>
+            <a class="dropdown-item@(ActionName == nameof(HomeController.Index) && ControllerName == typeof(HomeController).ControllerName() && AreaName.IsNullOrEmpty() ? " active" : "")" href="@(Url.Action<HomeController>(c => c.Index()))">
+                @Html.IconImg(24)<span>Start</span>
+            </a>
+
+            @if (bubbles.Any()) {
+            <div class="active-spaces weavy-bubble-add">
+                @foreach (var bubble in bubbles) {
+                    <a href="@bubble.Space.Url()" class="dropdown-item@(bubble.Space.Id == WeavyContext.Space?.Id ? " active" : "") weavy-bubble-item weavy-bubble-@bubble.Space.Id" data-bubble-id="@bubble.Id">
+                        @bubble.Space.AvatarImg(24)<span>@bubble.Space.Name @if (bubble.Space.Teamname != null) {<small class="text-muted">@@@bubble.Space.Teamname</small>}</span>
+                        <div class="btn btn-icon i weavy-bubble-close ml-3" data-remove-bubble="@($@"{{""spaceId"":{bubble.Space.Id}, ""bubbleId"":{bubble.Id}}}")" title="Close">@Html.SvgIcon("close")</div>
+                    </a>
+                }
+            </div>
+            } else {
+                <div class="active-spaces weavy-bubble-add"></div>
+            }
+
+            @(Html.ActionLink<SpaceController>(c => c.Index(null, null, null), icon: "view-grid", color: "primary", text: "Spaces", htmlAttributes: new { @class = "dropdown-item spaces" }, active: LinkActive.Action))
+
+            @(Html.ActionLink<PeopleController>(c => c.Index(null, null, null), icon: "account-multiple", color: "primary", text: "People", htmlAttributes: new { @class = "dropdown-item" }, active: LinkActive.Controller))
+            <a class="dropdown-item d-desktop" href="@(Url.Action<Weavy.Web.Areas.Messenger.Controllers.MessengerController>(c => c.Index()))" target="_blank" title="Open Messenger">
+                @Html.SvgIcon("message-text", color: "primary")
+                <span>Messenger</span>
+                @Html.SvgIcon("open-in-new", size: 18, htmlAttributes: new { @class = "mr--1" })
+            </a>
+
+            @if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
+                @(Html.ActionLink<Weavy.Web.Areas.Manage.Controllers.HomeController>(c => c.Index(), icon: "settings", color: "primary", text: "Manage", htmlAttributes: new { @class = "dropdown-item" }, active: LinkActive.Area))
+            }
+
+        </div>
+    </div>
+</div>

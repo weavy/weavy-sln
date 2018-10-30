@@ -1,0 +1,8 @@
+﻿@model SearchResult<Content, ContentQuery>
+
+@if (Model.Any()) {
+    foreach (var item in Model) {
+        Html.RenderPartialContent(Weavy.Core.Models.Layout.List, item);
+    }
+    @Html.ScrollNext(Model)
+}

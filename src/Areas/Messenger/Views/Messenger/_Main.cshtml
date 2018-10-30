@@ -1,0 +1,54 @@
+﻿@using Weavy.Web.Areas.Messenger.Controllers
+@model MessengerModel
+
+@if (Model.Conversation == null) {
+    <div class="header-messages-partial">
+        <header class="pane-header navbar-theme">
+            <div class="navbar navbar-primary"></div>
+            <div class="navbar navbar-secondary"></div>
+        </header>
+        <div id="messages" class="pane-body scroll-y"></div>
+    </div>
+} else {
+    <div class="header-messages-partial">
+        @Html.Partial("_HeaderAndMessages", Model)
+    </div>
+
+    <footer class="pane-footer">
+        <form class="message-form" action="" method="post">
+            <input type="hidden" name="hasContext" id="hasContext" value="false" />
+            <input type="hidden" name="contextUrl" id="contextUrl" />
+            <input type="hidden" name="contextTitle" id="contextTitle" />
+
+            <fieldset class="form-container">
+                <table class="table table-uploads"></table>
+                <div class="form-group">
+                    
+                    <div class="context">
+                        <div class="context-data"><img class="context-icon" src="" /><span class="context-url"></span><a href="#" title="Remove url as context" class="remove-context btn btn-icon">@Html.SvgIcon("close", size: 18)</a></div>
+                     </div>
+                    
+                    @Html.TextArea("Text", string.Empty, new { placeholder = "Type a message...", rows = "1", @class = "form-control", disabled = "disabled", data_quicklinks = true, data_mentions = true })
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-icon btn-primary" title="Send message">@Html.SvgIcon("send")</button>
+                        <div class="btn btn-icon emojionearea-button-container" id="emojionearea-button-container">
+                            <div class="emojionearea-button"><div class="emojionearea-button-open"></div></div>
+                        </div>
+                        <div class="btn btn-icon btn-file" title="Add files">@Html.SvgIcon("attachment")<input type="file" name="files" multiple /></div>
+                        <button type="button" class="btn btn-icon btn-add-context d-embedded context" title="Attach current url as context">@Html.SvgIcon("link-context")</button>
+                    </div>
+                </div>
+
+                <div class="progress"></div>
+            </fieldset>
+        </form>
+    </footer>
+
+    <script>
+        // scroll down message area ASAP
+        var messageArea = document.getElementById("messages");
+        if (messageArea && messageArea.scrollHeight) {
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+    </script>
+}

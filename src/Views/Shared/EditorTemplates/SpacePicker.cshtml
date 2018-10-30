@@ -1,0 +1,44 @@
+﻿@model int?
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+
+    var attrs = new Dictionary<string, object>();
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+    if (prop.IsRequired()) {
+        attrs["required"] = null;
+    }
+
+    Permission? permission = ViewData["Permission"] as Permission?;
+    var spaces = SpaceService.GetByPermission(permission ?? Permission.View);
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+@if (label) {
+    @Html.LabelFor(m => m)
+}
+
+<select class="form-control custom-select space-picker" name="@ViewData.TemplateInfo.GetFullHtmlFieldName("")" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+    @Html.SelectOptions(spaces, Model)
+</select>
+
+@if (feedback != null) {
+    <div class="invalid-feedback">@feedback</div>
+} else if (text) {
+    <div class="form-text">@meta.Description</div>
+}
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}
+

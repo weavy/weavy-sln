@@ -1,0 +1,39 @@
+﻿@model MessengerModel
+
+<header class="pane-header navbar-theme">
+
+    <div class="navbar navbar-primary">
+        <div class="navbar-icons">
+            <button type="button" class="btn btn-icon" data-toggle="pane-one" title="Back">@Html.SvgIcon("arrow-left")<span class="badge badge-danger">@Model.UnreadConversations</span></button>
+        </div>
+        <div class="navbar-middle conversation-title">@(Model.Conversation?.GetTitle())</div>
+        <div class="navbar-icons">            
+            <button type="button" class="btn btn-icon d-embedded visibility-h">@Html.SvgIcon("expand-window")</button>
+            <button type="button" class="btn btn-icon d-embedded visibility-h">@Html.SvgIcon("close")</button>
+        </div>
+    </div>
+    <div class="navbar navbar-secondary">
+        <div class="navbar-middle">
+            <div class="d-flex typing-hide">
+                @if (Model.Conversation.IsRoom) {
+                    foreach (var user in Model.Conversation.Members) {
+                        <button type="button" class="btn btn-icon" data-profile="@user.Id">@user.AvatarImg(24, presence: true)</button>
+                    }
+                } else {
+                    <button type="button" class="btn btn-icon" data-profile="@(Model.Other?.Id)">@(Model.Other?.AvatarImg(24, presence: true))</button>
+                }
+            </div>
+            <div class="typing-show"></div>
+        </div>
+        <div class="navbar-icons">
+            @{ Html.RenderPartial("_ConversationMenu", Model.Conversation); }
+        </div>
+    </div>
+</header>
+
+<div class="pane-body scroll-y" id="messages">
+    <div class="text-center loading-message">Loading messages...</div>
+    <div class="messages">
+        @{Html.RenderPartial("_Messages", Model); }
+    </div>
+</div>

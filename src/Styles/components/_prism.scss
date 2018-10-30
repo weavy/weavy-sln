@@ -1,0 +1,147 @@
+﻿// Downloaded from http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript.
+// Then manually converted to scss.
+
+code[class*="language-"],
+pre[class*="language-"] {
+    color: $body-color;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    tab-size: 4;
+    hyphens: none;
+
+    &::selection, ::selection {
+        background: color("light-blue", 200);
+    }
+}
+
+// code blocks
+pre[class*="language-"] {
+    padding: 1em;
+    margin: .5em 0;
+    overflow: auto;
+}
+
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+    background: $gray-100;
+}
+
+// inline code
+:not(pre) > code[class*="language-"] {
+    padding: .1em;
+    border-radius: $border-radius;
+}
+
+
+.token {
+
+    &.comment, &.prolog, &.doctype, &.cdata {
+        color: $gray-600;
+    }
+
+    &.punctuation {
+        color: $gray-500;
+    }
+
+    &.property, &.tag, &.boolean, &.number, &.constant, &.symbol, &.deleted {
+        color: #905;
+    }
+
+    &.selector, &.attr-name, &.string, &.char, &.builtin, &.inserted {
+        color: #690;
+    }
+
+    &.operator, &.entity, &.url {
+        color: #a67f59;
+        background: hsla(0, 0%, 100%, .5);
+    }
+
+    &.atrule, &.attr-value, &.keyword {
+        color: #07a;
+    }
+
+    &.function {
+        color: #DD4A68;
+    }
+
+    &.regex, &.important, &.variable {
+        color: #e90;
+    }
+
+    &.important, &.bold {
+        font-weight: bold;
+    }
+
+    &.italic {
+        font-style: italic;
+    }
+
+    &.entity {
+        cursor: help;
+    }
+}
+
+.namespace {
+    opacity: .7;
+}
+
+
+.language-css .token.string,
+.style .token.string {
+    color: #a67f59;
+    background: hsla(0, 0%, 100%, .5);
+}
+
+
+
+// line numbers
+pre.line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+
+    > code {
+        position: relative;
+        white-space: inherit;
+    }
+}
+
+
+
+.line-numbers {
+    .line-numbers-rows {
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        font-size: 100%;
+        left: -3.8em;
+        width: 3em; /* works for line-numbers below 1000 lines */
+        letter-spacing: -.0625rem;
+        border-right: $border-width solid #999;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+.line-numbers-rows {
+    > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+
+        &:before {
+            content: counter(linenumber);
+            color: $gray-500;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+    }
+}

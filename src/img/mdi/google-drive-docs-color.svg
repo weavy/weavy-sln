@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg4"
+   viewBox="0 0 24 24"
+   height="24"
+   width="24"
+   version="1.1">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8">
+    <radialGradient
+       id="SVGID_1_"
+       cx="-254.81979"
+       cy="705.83588"
+       r="82.978401"
+       gradientTransform="matrix(2.827,1.6322,-1.6322,2.827,2092.1199,-1494.5786)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         style="stop-color:#4387FD"
+         id="stop3737" />
+      <stop
+         offset="0.65"
+         style="stop-color:#3078F0"
+         id="stop3739" />
+      <stop
+         offset="0.9099"
+         style="stop-color:#2B72EA"
+         id="stop3741" />
+      <stop
+         offset="1"
+         style="stop-color:#286EE6"
+         id="stop3743" />
+    </radialGradient>
+    <radialGradient
+       id="SVGID_2_"
+       cx="-254.8174"
+       cy="705.83691"
+       r="82.973"
+       gradientTransform="matrix(2.827,1.6322,-1.6322,2.827,2092.1199,-1494.5786)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         style="stop-color:#FFD24D"
+         id="stop3748" />
+      <stop
+         offset="1"
+         style="stop-color:#F6C338"
+         id="stop3750" />
+    </radialGradient>
+  </defs>
+  <g
+     style="display:none"
+     id="layer1">
+    <g
+       transform="matrix(0.47644273,0,0,0.47644273,0.52179143,0.53359496)"
+       id="surface1">
+      <path
+         style="fill:#43a047"
+         d="M 37,45 H 11 C 9.34375,45 8,43.65625 8,42 V 6 C 8,4.34375 9.34375,3 11,3 h 19 l 10,10 v 29 c 0,1.65625 -1.34375,3 -3,3 z"
+         id="path13" />
+      <path
+         style="fill:#c8e6c9"
+         d="M 40,13 H 30 V 3 Z"
+         id="path15" />
+      <path
+         style="fill:#2e7d32"
+         d="M 30,13 40,23 V 13 Z"
+         id="path17" />
+      <path
+         style="fill:#e8f5e9"
+         d="M 31,23 H 15 V 37 H 33 V 23 Z m -14,2 h 4 v 2 h -4 z m 0,4 h 4 v 2 h -4 z m 0,4 h 4 v 2 h -4 z m 14,2 h -8 v -2 h 8 z m 0,-4 h -8 v -2 h 8 z m 0,-4 h -8 v -2 h 8 z"
+         id="path19" />
+    </g>
+  </g>
+  <g
+     style="display:inline"
+     id="layer2">
+    <g
+       transform="matrix(0.47621573,0,0,0.47621573,0.52837435,0.4825709)"
+       id="surface1-5">
+      <path
+         style="fill:#2196f3"
+         d="M 37,45 H 11 C 9.34375,45 8,43.65625 8,42 V 6 C 8,4.34375 9.34375,3 11,3 h 19 l 10,10 v 29 c 0,1.65625 -1.34375,3 -3,3 z"
+         id="path36" />
+      <path
+         style="fill:#bbdefb"
+         d="M 40,13 H 30 V 3 Z"
+         id="path38" />
+      <path
+         style="fill:#1565c0"
+         d="M 30,13 40,23 V 13 Z"
+         id="path40" />
+      <path
+         style="fill:#e3f2fd"
+         d="m 15,23 h 18 v 2 H 15 Z"
+         id="path42" />
+      <path
+         style="fill:#e3f2fd"
+         d="m 15,27 h 18 v 2 H 15 Z"
+         id="path44" />
+      <path
+         style="fill:#e3f2fd"
+         d="m 15,31 h 18 v 2 H 15 Z"
+         id="path46" />
+      <path
+         style="fill:#e3f2fd"
+         d="m 15,35 h 10 v 2 H 15 Z"
+         id="path48" />
+    </g>
+  </g>
+  <g
+     style="display:none"
+     id="layer3">
+    <g
+       transform="matrix(0.47669492,0,0,0.47669492,0.51170398,0.54050654)"
+       id="surface1-1">
+      <path
+         style="fill:#ffc107"
+         d="M 37,45 H 11 C 9.34375,45 8,43.65625 8,42 V 6 C 8,4.34375 9.34375,3 11,3 h 19 l 10,10 v 29 c 0,1.65625 -1.34375,3 -3,3 z"
+         id="path68" />
+      <path
+         style="fill:#ffecb3"
+         d="M 40,13 H 30 V 3 Z"
+         id="path70" />
+      <path
+         style="fill:#ffa000"
+         d="M 30,13 40,23 V 13 Z"
+         id="path72" />
+      <path
+         style="fill:#ffffff"
+         d="M 30,22 H 18 c -1.101562,0 -2,0.898438 -2,2 v 12 c 0,1.101563 0.898438,2 2,2 h 12 c 1.101563,0 2,-0.898437 2,-2 V 24 c 0,-1.101562 -0.898437,-2 -2,-2 z m 0,4 v 8 H 18 v -8 z"
+         id="path74" />
+    </g>
+  </g>
+  <g
+     style="display:none"
+     id="layer4">
+    <g
+       transform="matrix(0.48107348,0,0,0.48107348,0.4288126,0.4389824)"
+       id="g107">
+      <g
+         style="display:none"
+         id="g91">
+</g>
+      <path
+         style="fill:#dd2c00"
+         d="m 40.429,35.999 c 0,0 2.89,-0.393 3.47,-3.185 C 43.964,32.502 44,32.161 44,31.787 c 0,-0.233 -0.015,-0.454 -0.044,-0.665 -0.428,-3.158 -3.852,-3.868 -3.852,-3.868 0,0 0.595,-3.401 -2.543,-5.183 -3.138,-1.78 -6.005,0 -6.005,0 0,0 -1.678,-3.401 -6.222,-3.401 -5.843,0 -6.817,6.64 -6.817,6.64 0,0 -5.517,0.326 -5.517,5.183 0,4.859 5.031,5.507 5.031,5.507 z"
+         id="path93" />
+      <path
+         style="fill:#dd2c00"
+         d="m 11,30.493 c 0,-4.395 3.286,-6.319 5.875,-6.945 0.898,-2.954 3.384,-6.878 8.46,-6.878 0.006,0 0.011,10e-4 0.017,10e-4 0.007,0 0.013,-10e-4 0.02,-10e-4 3.522,0 5.71,1.646 6.892,2.953 0.65,-0.191 1.448,-0.343 2.347,-0.343 0.004,0 0.007,10e-4 0.011,10e-4 0.003,0 0.006,0 0.01,0 0.02,0 0.039,0.004 0.059,0.004 C 34.729,19 34.063,12 26.013,12 c -5.503,0 -7.446,4.691 -7.446,4.691 0,0 -3.992,-2.965 -8.092,1.133 C 8.37,19.928 8.856,23.162 8.856,23.162 8.856,23.162 4,23.648 4,28.825 4.001,33.515 9.018,34 9.018,34 h 2.807 C 11.32,33.041 11,31.886 11,30.493 Z"
+         id="path95" />
+    </g>
+  </g>
+  <g
+     style="display:none"
+     id="layer5">
+    <path
+       style="fill:#007ee5;stroke-width:0.45290712"
+       d="M 7.9966535,3.0112704 2.3353145,6.6798179 6.2756065,9.8501725 11.936943,6.3174919 Z M 2.3353145,12.929942 7.9966535,16.64378 11.936943,13.337558 6.2756065,9.8501725 Z m 9.6016285,0.407616 3.985583,3.306222 5.616048,-3.668547 -3.895001,-3.1250605 z m 9.601631,-6.6577401 -5.616048,-3.6685475 -3.985583,3.3062215 5.70663,3.5326806 z m -9.55634,7.3823921 -3.9855805,3.306222 -1.675757,-1.132268 v 1.26814 l 5.6613375,3.396803 5.661339,-3.396803 v -1.26814 l -1.721047,1.132268 z"
+       id="path112" />
+  </g>
+  <g
+     style="display:none"
+     id="layer6">
+    <g
+       transform="matrix(0.06438099,0,0,0.06438099,-13.090532,-14.87738)"
+       id="layer1-0">
+      <g
+         transform="matrix(2.1002378,0,0,-2.1002378,392.06674,469.67845)"
+         id="g4166">
+        <path
+           id="path4168"
+           style="fill:#22a7f0;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 0,0 c -8.688,-0.052 -15.781,6.945 -15.826,15.634 -0.066,8.688 6.932,15.77 15.627,15.823 C 8.489,31.522 15.578,24.524 15.637,15.836 15.696,7.141 8.698,0.052 0,0 m -46.337,-0.294 c -8.694,-0.059 -15.783,6.939 -15.835,15.621 -0.059,8.695 6.938,15.783 15.637,15.836 8.678,0.059 15.773,-6.939 15.832,-15.621 0.049,-8.695 -6.952,-15.79 -15.634,-15.836 m 46.066,42.258 c -10.049,-0.072 -18.728,-5.775 -23.082,-14.085 -4.464,8.264 -13.211,13.854 -23.251,13.785 -5.911,-0.036 -11.345,-2.02 -15.706,-5.338 l -0.143,22.085 c -0.082,2.852 -2.422,5.127 -5.281,5.108 -2.862,-0.017 -5.176,-2.321 -5.202,-5.173 l 0.267,-43.515 h 0.013 c 0.32,-14.289 12.04,-25.719 26.382,-25.628 10.039,0.065 18.718,5.77 23.085,14.087 4.452,-8.258 13.218,-13.852 23.258,-13.787 14.484,0.092 26.149,11.913 26.061,26.398 -0.095,14.485 -11.909,26.155 -26.401,26.063" />
+      </g>
+      <g
+         transform="matrix(2.1002378,0,0,-2.1002378,534.58467,473.48829)"
+         id="g4170">
+        <path
+           id="path4172"
+           style="fill:#22a7f0;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 0,0 -14.726,17.866 14.498,18.055 h -0.007 c 1.795,2.317 1.247,5.547 -1.24,7.251 -2.513,1.697 -6.025,1.24 -7.918,-1.013 v 0.01 L -21.92,26.58 -34.629,42.004 v -0.013 c -1.926,2.234 -5.457,2.652 -7.925,0.917 -2.486,-1.737 -2.983,-4.964 -1.155,-7.275 l 14.717,-17.858 -14.492,-18.05 c -1.798,-2.33 -1.25,-5.549 1.26,-7.251 2.49,-1.704 6.012,-1.247 7.905,1.01 L -21.809,9.06 -9.086,-6.358 c 1.922,-2.233 5.444,-2.645 7.934,-0.914 C 1.325,-5.523 1.821,-2.305 0,0" />
+      </g>
+    </g>
+  </g>
+  <g
+     id="layer7">
+    <g
+       transform="matrix(0.5613887,0,0,0.5613887,9.4895534,10.469182)"
+       style="display:inline"
+       id="layer1-1">
+      <g
+         transform="matrix(0.15896049,0,0,0.15896049,-29.074732,-22.614517)"
+         id="g4127">
+        <g
+           class="svg-logo"
+           id="g3761">
+          <polygon
+             style="fill:#0da960"
+             class="logo-st2"
+             points="234.3,154.8 258.5,196.7 213.2,275.2 189,233.3 "
+             id="polygon3735" />
+          <radialGradient
+             id="radialGradient4313"
+             cx="-254.81979"
+             cy="705.83588"
+             r="82.978401"
+             gradientTransform="matrix(2.827,1.6322,-1.6322,2.827,2092.1199,-1494.5786)"
+             gradientUnits="userSpaceOnUse">
+            <stop
+               offset="0"
+               style="stop-color:#4387FD"
+               id="stop4305" />
+            <stop
+               offset="0.65"
+               style="stop-color:#3078F0"
+               id="stop4307" />
+            <stop
+               offset="0.9099"
+               style="stop-color:#2B72EA"
+               id="stop4309" />
+            <stop
+               offset="1"
+               style="stop-color:#286EE6"
+               id="stop4311" />
+          </radialGradient>
+          <polygon
+             style="fill:url(#SVGID_1_)"
+             class="logo-st0"
+             points="328,233.3 303.8,275.2 213.2,275.2 237.4,233.3 "
+             id="polygon3746" />
+          <radialGradient
+             id="radialGradient4320"
+             cx="-254.8174"
+             cy="705.83691"
+             r="82.973"
+             gradientTransform="matrix(2.827,1.6322,-1.6322,2.827,2092.1199,-1494.5786)"
+             gradientUnits="userSpaceOnUse">
+            <stop
+               offset="0"
+               style="stop-color:#FFD24D"
+               id="stop4316" />
+            <stop
+               offset="1"
+               style="stop-color:#F6C338"
+               id="stop4318" />
+          </radialGradient>
+          <polygon
+             style="fill:url(#SVGID_2_)"
+             class="logo-st1"
+             points="234.3,154.8 282.7,154.8 328,233.3 279.6,233.3 "
+             id="polygon3753" />
+          <polygon
+             style="fill:#2d6fdd"
+             class="logo-st3"
+             points="247.9,215 213.2,275.2 258.5,233.3 237.4,233.3 "
+             id="polygon3755" />
+          <polygon
+             style="fill:#e5b93c"
+             class="logo-st4"
+             points="269.1,215 279.6,233.3 328,233.3 "
+             id="polygon3757" />
+          <polygon
+             style="fill:#0c9b57"
+             class="logo-st5"
+             points="234.3,154.8 247.9,215 258.5,196.7 "
+             id="polygon3759" />
+        </g>
+        <g
+           style="display:none"
+           id="id"
+           class="file-icon"
+           data-curve="file_6">
+          <g
+             id="g3765">
+            <polygon
+               style="fill:#cc338e"
+               class="st14"
+               points="110,25 110,140 0,140 0,0 85,0 "
+               id="polygon3763" />
+          </g>
+          <polygon
+             style="opacity:0.4;fill:#231f20"
+             class="st9"
+             points="110,25 85,25 110,50 "
+             id="polygon3767" />
+          <polyline
+             style="opacity:0.4;fill:#ffffff"
+             class="st17"
+             points="85,0 85,25 110,25 85,0"
+             id="polyline3769" />
+          <g
+             id="g3779">
+            <rect
+               style="fill:none"
+               x="10"
+               y="25"
+               class="st13"
+               width="90"
+               height="90"
+               id="rect3771" />
+            <g
+               id="g3777">
+              <rect
+                 style="fill:#ffffff"
+                 x="35.200001"
+                 y="50.599998"
+                 class="st12"
+                 width="7.4000001"
+                 height="40.299999"
+                 id="rect3773" />
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="m 59.7,91.6 c 3.9,0 7.1,-2 8.7,-5.3 h 0.1 l 0.3,4.6 h 6 c -0.1,-2 -0.2,-5.2 -0.2,-8.2 V 48.4 h -6.7 v 16.5 h -0.1 c -1.2,-2.2 -3.8,-3.8 -7.5,-3.8 -6.4,0 -12,5.8 -11.9,15.6 -0.1,8.9 4.9,14.9 11.3,14.9 z m 2.2,-24.8 c 3.1,0 5.2,2.3 5.8,5.2 0.1,0.6 0.2,1.3 0.2,1.9 v 4.4 c 0,0.8 -0.1,1.5 -0.2,2.2 -0.7,3.2 -3.1,5.2 -5.8,5.2 -4.3,0 -6.7,-3.9 -6.7,-9.2 -0.1,-5.5 2.4,-9.7 6.7,-9.7 z"
+                 id="path3775" />
+            </g>
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="ps"
+           class="file-icon"
+           data-curve="file_7">
+          <g
+             id="g3784">
+            <polygon
+               style="fill:#3980fc"
+               class="st16"
+               points="110,25 110,140 0,140 0,0 85,0 "
+               id="polygon3782" />
+          </g>
+          <polygon
+             style="fill:#2054b2"
+             class="st3"
+             points="110,25 85,25 110,50 "
+             id="polygon3786" />
+          <polyline
+             style="fill:#9ec2ff"
+             class="st15"
+             points="85,0 85,25 110,25 85,0"
+             id="polyline3788" />
+          <g
+             id="g3798">
+            <g
+               id="g3794">
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="m 38,74.8 c 1,0.2 2.2,0.2 3.6,0.2 5.2,0 9.8,-1.4 12.7,-4.3 2.3,-2.2 3.5,-5.3 3.5,-9.2 0,-3.8 -1.6,-6.9 -3.9,-8.9 -2.6,-2.2 -6.5,-3.3 -11.9,-3.3 -5,0 -8.6,0.4 -11.2,0.8 V 90 H 38 Z m 0,-19.5 c 0.8,-0.2 2.2,-0.4 4.2,-0.4 5.1,0 8.2,2.4 8.2,6.9 0,4.7 -3.3,7.4 -8.9,7.4 -1.5,0 -2.7,-0.1 -3.6,-0.3 V 55.3 Z"
+                 id="path3790" />
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="m 67.5,85.3 c -2.6,0 -5.8,-1.1 -7.5,-2.1 l -1.4,5.3 c 2.2,1.2 5.3,2.1 8.9,2.1 7.7,0 11.8,-3.9 11.8,-9.2 -0.1,-4.3 -2.5,-7 -7.8,-8.9 -3.7,-1.3 -5.1,-2.2 -5.1,-4.1 0,-1.8 1.4,-3.1 4.1,-3.1 2.6,0 4.9,1 6.2,1.7 l 1.4,-5.2 c -1.7,-0.9 -4.5,-1.7 -7.7,-1.7 -6.8,0 -11,4 -11,9.2 -0.1,3.4 2.3,6.5 8,8.5 3.6,1.3 4.8,2.3 4.8,4.2 0,2 -1.4,3.3 -4.7,3.3 z"
+                 id="path3792" />
+            </g>
+            <rect
+               style="fill:none"
+               x="10"
+               y="25"
+               class="st13"
+               width="90"
+               height="90"
+               id="rect3796" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="ai"
+           class="file-icon"
+           data-curve="file_5">
+          <g
+             id="g3803">
+            <polygon
+               style="fill:#f6b502"
+               class="st5"
+               points="110,25 110,140 0,140 0,0 85,0 "
+               id="polygon3801" />
+          </g>
+          <polygon
+             style="fill:#d89f01"
+             class="st19"
+             points="110,25 85,25 110,50 "
+             id="polygon3805" />
+          <polyline
+             style="fill:#ffe25e"
+             class="st11"
+             points="85,0 85,25 110,25 85,0"
+             id="polyline3807" />
+          <g
+             id="g3819">
+            <g
+               id="g3815">
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="m 73.9,57.3 c 2.6,0 4.2,-1.7 4.2,-3.9 -0.1,-2.3 -1.6,-4 -4.1,-4 -2.5,0 -4.1,1.7 -4.1,4 -0.1,2.2 1.5,3.9 4,3.9 z"
+                 id="path3809" />
+              <rect
+                 style="fill:#ffffff"
+                 x="70.199997"
+                 y="61.5"
+                 class="st12"
+                 width="7.4000001"
+                 height="29.1"
+                 id="rect3811" />
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="m 43,79.2 h 12.8 l 3.6,11.4 h 7.9 L 54.2,50.3 H 44.8 L 31.9,90.6 h 7.6 z m 4.3,-15.5 c 0.7,-2.4 1.3,-5.2 1.9,-7.5 h 0.1 c 0.6,2.3 1.3,5.1 2,7.5 l 3.2,9.9 H 44.2 Z"
+                 id="path3813" />
+            </g>
+            <rect
+               style="fill:none"
+               x="10"
+               y="25"
+               class="st13"
+               width="90"
+               height="90"
+               id="rect3817" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="video"
+           class="file-icon"
+           data-curve="file_8">
+          <polyline
+             style="fill:#df4431"
+             class="st22"
+             points="64.8,0 0,0 0,140 110,140 110,25 85,0 64.8,0"
+             id="polyline3822" />
+          <polygon
+             style="fill:#c31209"
+             class="st22b"
+             points="110,25 85,25 110,50 "
+             id="polygon3824" />
+          <polyline
+             style="fill:#fb7659"
+             class="st7"
+             points="85,0 85,0 85,25 110,25 85,0"
+             id="polyline3826" />
+          <g
+             id="g3846">
+            <g
+               id="g3842">
+              <polygon
+                 style="fill:#ffffff"
+                 class="st12"
+                 points="22,46 29.1,46 31.4,52 22,52 "
+                 id="polygon3828" />
+              <polygon
+                 style="fill:#ffffff"
+                 class="st12"
+                 points="89,52 86.8,52 84.5,46 89,46 "
+                 id="polygon3830" />
+              <polygon
+                 style="fill:#ffffff"
+                 class="st12"
+                 points="32.6,46 42,46 44.4,52 34.9,52 "
+                 id="polygon3832" />
+              <polygon
+                 style="fill:#ffffff"
+                 class="st12"
+                 points="45.5,46 55,46 57.3,52 47.9,52 "
+                 id="polygon3834" />
+              <polygon
+                 style="fill:#ffffff"
+                 class="st12"
+                 points="58.5,46 68,46 70.3,52 60.9,52 "
+                 id="polygon3836" />
+              <polygon
+                 style="fill:#ffffff"
+                 class="st12"
+                 points="71.5,46 81,46 83.3,52 73.9,52 "
+                 id="polygon3838" />
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="M 22,55 V 95.8 H 82.4 L 89,90.2 V 55 Z"
+                 id="path3840" />
+            </g>
+            <rect
+               style="fill:#df4431"
+               x="27"
+               y="61"
+               class="st22"
+               width="56"
+               height="4"
+               id="rect3844" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="pdf"
+           class="file-icon"
+           data-curve="file_4">
+          <g
+             id="g3857">
+            <polygon
+               style="fill:#e6e7e8"
+               class="st1"
+               points="64.8,0 0,0 0,140 110,140 110,25 85,0 "
+               id="polygon3849" />
+            <g
+               id="g3855">
+              <polygon
+                 style="fill:#cfd1d3"
+                 class="st1b"
+                 points="110,50 110,25 85,25 "
+                 id="polygon3851" />
+              <polygon
+                 style="fill:#f1f2f2"
+                 class="st4"
+                 points="110,25 85,0 85,25 "
+                 id="polygon3853" />
+            </g>
+          </g>
+          <g
+             id="g3866">
+            <g
+               id="g3861">
+              <path
+                 style="fill:none"
+                 class="st13"
+                 d="m 93,103.3 c 0,2.6 -2.1,4.7 -4.7,4.7 H 22.7 C 20.1,108 18,105.9 18,103.3 V 37.7 C 18,35.1 20.1,33 22.7,33 h 65.6 c 2.6,0 4.7,2.1 4.7,4.7 z"
+                 id="path3859" />
+            </g>
+            <g
+               id="g3864">
+              <path
+                 style="fill:#df4431;stroke:#df4431;stroke-width:1.875;stroke-miterlimit:1"
+                 id="path4463_1_"
+                 class="st21"
+                 d="m 45.6,74.6 c 1.7,-3.4 3.7,-7.1 5.2,-10.9 v 0 l 0.6,-1.5 c -2,-7.7 -3.3,-14 -2.2,-18 v 0 c 0.3,-1 1.5,-1.7 2.8,-1.7 v 0 h 0.8 0.2 c 1.8,0 2.6,2.2 2.7,3.1 v 0 c 0.2,1.5 -0.5,3.9 -0.5,3.9 v 0 c 0,-1 0,-2.6 -0.6,-4 v 0 c -0.7,-1.6 -1.4,-2.6 -2.1,-2.7 v 0 c -0.3,0.2 -0.6,0.7 -0.7,1.5 v 0 c -0.2,1.2 -0.3,2.7 -0.3,3.4 v 0 c 0,2.7 0.5,6.3 1.6,10 v 0 c 0.2,-0.6 0.4,-1.1 0.5,-1.6 v 0 c 0.2,-0.8 1.6,-6.2 1.6,-6.2 v 0 c 0,0 -0.3,7.2 -0.8,9.3 v 0 c -0.1,0.5 -0.2,0.9 -0.3,1.4 v 0 c 1.7,4.9 4.5,9.2 7.9,12.3 v 0 c 1.3,1.2 3,2.2 4.6,3.1 v 0 c 3.4,-0.5 6.6,-0.7 9.2,-0.7 v 0 c 3.5,0.1 6.1,0.6 7.1,1.6 v 0 c 0.5,0.5 0.7,1.1 0.8,1.8 v 0 c 0,0.3 -0.1,0.9 -0.2,1 v 0 c 0,-0.2 0,-1.1 -2.8,-2 v 0 C 78.5,77 74.3,77 69.4,77.6 v 0 c 5.7,2.8 11.4,4.2 13.1,3.4 v 0 c 0.4,-0.2 1,-0.9 1,-0.9 v 0 c 0,0 -0.3,1.4 -0.5,1.8 v 0 c -0.3,0.4 -0.8,0.8 -1.4,1 v 0 c -2.8,0.7 -10.1,-1 -16.5,-4.6 v 0 c -7.1,1 -14.9,3 -21.2,5 v 0 C 37.7,94 33,99 29.3,97.1 v 0 l -1.4,-0.7 c -0.6,-0.3 -0.6,-1.1 -0.5,-1.7 v 0 c 0.4,-2.1 3.1,-5.4 8.5,-8.6 v 0 c 0.6,-0.3 3.2,-1.7 3.2,-1.7 v 0 c 0,0 -1.9,1.9 -2.4,2.2 v 0 c -4.3,3.5 -7.5,8 -7.4,9.7 v 0 0.2 C 33,95.9 38.5,88.4 45.6,74.6 m 2.2,1.1 c -1.2,2.2 -2.3,4.3 -3.4,6.2 v 0 c 5.9,-2.5 12.2,-4.1 18.3,-5.2 v 0 c -0.8,-0.6 -1.6,-1.2 -2.3,-1.8 v 0 c -3.3,-2.8 -5.9,-6.3 -7.7,-10 v 0 c -1.2,3.2 -2.6,6.5 -4.9,10.8" />
+            </g>
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="docs"
+           class="file-icon"
+           data-curve="file_1">
+          <polygon
+             style="fill:#3980fc"
+             class="st16"
+             points="0,140 110,140 110,45.2 85,0 64.8,0 0,0 "
+             id="polygon3869" />
+          <g
+             id="g3875">
+            <polygon
+               style="fill:#2054b2"
+               class="st3"
+               points="85,25 110,50 110,25 "
+               id="polygon3871" />
+            <polygon
+               style="fill:#9ec2ff"
+               class="st15"
+               points="85,25 110,25 85,0 "
+               id="polygon3873" />
+          </g>
+          <g
+             id="g3885">
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="21"
+               y1="48.5"
+               x2="88"
+               y2="48.5"
+               id="line3877" />
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="21"
+               y1="62.5"
+               x2="88"
+               y2="62.5"
+               id="line3879" />
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="21"
+               y1="77.5"
+               x2="88"
+               y2="77.5"
+               id="line3881" />
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="21"
+               y1="91.5"
+               x2="61"
+               y2="91.5"
+               id="line3883" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="sheets"
+           class="file-icon"
+           data-curve="file_2">
+          <g
+             id="g3896">
+            <g
+               id="g3890">
+              <polygon
+                 style="fill:#029d55"
+                 class="st18"
+                 points="110,140 0,140 0,0 85,0 110,25 "
+                 id="polygon3888" />
+            </g>
+            <polygon
+               style="opacity:0.2"
+               class="st8"
+               points="84.5,25 109.5,50 109.5,25 "
+               id="polygon3892" />
+            <polyline
+               style="opacity:0.4;fill:#ffffff"
+               class="st17"
+               points="84.5,0 84.5,25 109.5,25 84.5,0"
+               id="polyline3894" />
+          </g>
+          <g
+             id="g3906">
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="40.5"
+               y1="48"
+               x2="40.5"
+               y2="91"
+               id="line3898" />
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="26"
+               y1="62.5"
+               x2="82"
+               y2="62.5"
+               id="line3900" />
+            <rect
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               x="25.5"
+               y="48.5"
+               class="st6"
+               width="57"
+               height="43"
+               id="rect3902" />
+            <line
+               style="fill:none;stroke:#ffffff;stroke-width:5;stroke-miterlimit:10"
+               class="st6"
+               x1="26"
+               y1="77.5"
+               x2="82"
+               y2="77.5"
+               id="line3904" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="slides"
+           class="file-icon"
+           data-curve="file_3">
+          <polygon
+             style="fill:#f6b502"
+             class="st5"
+             points="0,140 110,140 110,45.2 85,0 64.8,0 0,0 "
+             id="polygon3909" />
+          <g
+             id="g3915">
+            <polygon
+               style="fill:#d89f01"
+               class="st19"
+               points="85,25 110,50 110,25 "
+               id="polygon3911" />
+            <polygon
+               style="fill:#ffe25e"
+               class="st11"
+               points="85,25 110,25 85,0 "
+               id="polygon3913" />
+          </g>
+          <g
+             id="g3925">
+            <path
+               style="fill:#ffffff"
+               class="st12"
+               d="M 89,97 H 44 V 60 H 89 Z M 49,89 H 84 V 68 H 49 Z"
+               id="path3917" />
+            <g
+               id="g3923">
+              <rect
+                 style="fill:#f6b502"
+                 x="26"
+                 y="49"
+                 class="st5"
+                 width="39"
+                 height="25"
+                 id="rect3919" />
+              <path
+                 style="fill:#ffffff"
+                 class="st12"
+                 d="M 68,80 H 23 V 43 H 68 Z M 28,72 H 63 V 51 H 28 Z"
+                 id="path3921" />
+            </g>
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="audio"
+           class="file-icon"
+           data-curve="file_9">
+          <polyline
+             style="fill:#e6e7e8"
+             class="st1"
+             points="64.8,0 0,0 0,140 110,140 110,25 85,0 64.8,0"
+             id="polyline3928" />
+          <polygon
+             style="fill:#cfd1d3"
+             class="st1b"
+             points="110,25 85,25 110,50 "
+             id="polygon3930" />
+          <g
+             id="g3938">
+            <polygon
+               style="fill:#df4431;stroke:#e6e7e8;stroke-width:2;stroke-miterlimit:10"
+               class="st2"
+               points="33.4,61.7 26.7,61.7 26.7,78.3 33.4,78.3 52.2,95.6 52.2,44.4 "
+               id="polygon3932" />
+            <path
+               style="fill:#df4431;stroke:#e6e7e8;stroke-width:2;stroke-miterlimit:10"
+               class="st2"
+               d="m 58.8,80.6 c 5.9,0 10.3,-4.8 10.3,-10.6 0,-5.9 -4.4,-10.6 -10.3,-10.6 z"
+               id="path3934" />
+            <path
+               style="fill:#df4431;stroke:#e6e7e8;stroke-width:2;stroke-miterlimit:10"
+               class="st2"
+               d="m 58.8,43.1 v 7.1 c 9.9,1.1 17.4,9.6 17.4,19.8 0,10.2 -7.4,18.7 -17.4,19.8 v 7.1 C 72.6,95.8 83.3,84.1 83.3,70 83.3,55.8 72.6,44.2 58.8,43.1 Z"
+               id="path3936" />
+          </g>
+          <polyline
+             style="fill:#f1f2f2"
+             class="st4"
+             points="85,0 85,25 110,25 85,0"
+             id="polyline3940" />
+        </g>
+        <g
+           style="display:none"
+           id="w"
+           class="file-icon"
+           data-curve="file_10">
+          <g
+             id="g3949">
+            <polyline
+               style="fill:#3980fc"
+               class="st16"
+               points="64.8,0 0,0 0,140 110,140 110,25 85,0 64.8,0"
+               id="polyline3943" />
+            <polygon
+               style="fill:#2054b2"
+               class="st3"
+               points="85,25 110,50 110,25 "
+               id="polygon3945" />
+            <polyline
+               style="fill:#9ec2ff"
+               class="st15"
+               points="85,0 85,25 110,25 85,0"
+               id="polyline3947" />
+          </g>
+          <g
+             id="g3955">
+            <rect
+               style="fill:none"
+               x="15"
+               y="30"
+               class="st13"
+               width="80"
+               height="80"
+               id="rect3951" />
+            <polygon
+               style="fill:#ffffff"
+               class="st12"
+               points="68.5,51.5 66.1,51.5 61.2,51.5 61.2,56.5 65.1,56.5 61.4,75 57.5,51.5 52.5,51.5 48.6,75 43.9,51.5 36.5,51.5 45.2,88.5 50.1,88.5 55,66.3 59.9,88.5 64.8,88.5 73.5,51.5 "
+               id="polygon3953" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="x"
+           class="file-icon"
+           data-curve="file_11">
+          <polyline
+             style="fill:#029d55"
+             class="st18"
+             points="64.8,0 0,0 0,140 110,140 110,25 85,0 64.8,0"
+             id="polyline3958" />
+          <polygon
+             style="opacity:0.2"
+             class="st8"
+             points="110,25 85,25 110,50 "
+             id="polygon3960" />
+          <polyline
+             style="opacity:0.4;fill:#ffffff"
+             class="st17"
+             points="85,0 85,25 110,25 85,0"
+             id="polyline3962" />
+          <g
+             id="g3968">
+            <rect
+               style="fill:none"
+               x="15"
+               y="30"
+               class="st13"
+               width="80"
+               height="80"
+               id="rect3964" />
+            <polygon
+               style="fill:#ffffff"
+               class="st12"
+               points="58.7,68.2 69.8,51.5 62.4,51.5 55,62.6 47.6,51.5 40.2,51.5 51.3,68.2 37.8,88.5 42.7,88.5 45.1,88.5 55,88.5 55,83.5 48.4,83.5 55,73.7 64.8,88.5 72.2,88.5 "
+               id="polygon3966" />
+          </g>
+        </g>
+        <g
+           style="display:none"
+           id="p"
+           class="file-icon"
+           data-curve="file_12">
+          <g
+             id="g3977">
+            <polyline
+               style="fill:#ff7300"
+               class="st10"
+               points="64.8,0 0,0 0,140 110,140 110,25 85,0 64.8,0"
+               id="polyline3971" />
+            <polygon
+               style="fill:#fc4e1e"
+               class="st23"
+               points="85,25 110,50 110,25 "
+               id="polygon3973" />
+            <polyline
+               style="fill:#fd9827"
+               class="st24"
+               points="85,0 85,25 110,25 85,0"
+               id="polyline3975" />
+          </g>
+          <g
+             id="g3983">
+            <rect
+               style="fill:none"
+               x="15"
+               y="30"
+               class="st13"
+               width="80"
+               height="80"
+               id="rect3979" />
+            <path
+               style="fill:#ffffff"
+               class="st12"
+               d="M 57.5,51.5 H 40.2 v 4.9 h 4.9 v 32 h 7.4 V 76.2 h 4.9 c 7.4,0 12.3,-4.9 12.3,-12.3 0.1,-7.4 -4.9,-12.4 -12.2,-12.4 z m 0,19.7 H 52.6 V 56.5 h 4.9 c 2.5,0 6.2,2.5 6.2,7.4 -0.1,4.9 -3.8,7.3 -6.2,7.3 z"
+               id="path3981" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <style
+     type="text/css"
+     id="style3733"><![CDATA[
+	.svg-logo, .file-icon {
+	  -ms-transform-origin: center center;
+	  -webkit-transform-origin: center center;
+	  transform-origin: center center;}
+	.file-icon {display: none;}
+	.st1{fill:#E6E7E8;}
+	.st1b{fill:#cfd1d3;}
+	.st2{fill:#DF4431;stroke:#E6E7E8;stroke-width:2;stroke-miterlimit:10;}
+	.st3{fill:#2054B2;}
+	.st4{fill:#F1F2F2;}
+	.st5{fill:#F6B502;}
+	.st6{fill:none;stroke:#FFFFFF;stroke-width:5;stroke-miterlimit:10;}
+	.st7{fill:#FB7659;}
+	.st8{opacity:0.2;}
+	.st9{opacity:0.4;fill:#231F20;}
+	.st10{fill:#FF7300;}
+	.st11{fill:#FFE25E;}
+	.st12{fill:#FFFFFF;}
+	.st13{fill:none;}
+	.st14{fill:#CC338E;}
+	.st15{fill:#9EC2FF;}
+	.st16{fill:#3980FC;}
+	.st17{opacity:0.4;fill:#FFFFFF;}
+	.st18{fill:#029D55;}
+	.st19{fill:#D89F01;}
+	.st20{display:none;}
+	.st21{fill:#DF4431;stroke:#DF4431;stroke-width:1.875;stroke-miterlimit:1;}
+	.st22{fill:#DF4431;}
+	.st22b{fill:#c31209;}
+	.st23{fill:#fc4e1e;}
+	.st24{fill:#fd9827;}
+
+	.logo-st0{fill:url(#SVGID_1_);}
+	.logo-st1{fill:url(#SVGID_2_);}
+	.logo-st2{fill:#0DA960;}
+	.logo-st3{fill:#2d6fdd;}
+	.logo-st4{fill:#e5b93c;}
+	.logo-st5{fill:#0c9b57;}
+]]></style>
+</svg>

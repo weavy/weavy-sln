@@ -1,0 +1,52 @@
+// Custom bootstrap loader
+@import 'bootstrap';
+
+// Vendor components
+@import 'vendor/select2/core';
+
+// Bootstrap overrides and custom components
+@import 'components/layout';
+@import 'components/badge';
+@import 'components/alert';
+@import 'components/breadcrumb';
+@import 'components/button-group';
+@import 'components/buttons';
+@import 'components/card';
+@import 'components/codemirror';
+@import 'components/cover';
+@import 'components/custom_form';
+@import 'components/drawer';
+@import 'components/dropdown';
+@import 'components/editor';
+@import 'components/emojione';
+@import 'components/fab';
+@import 'components/facepile';
+@import 'components/file-list';
+@import 'components/forms';
+@import 'components/frame';
+@import 'components/display';
+@import 'components/icons';
+@import 'components/image-grid';
+@import 'components/images';
+@import 'components/media';
+@import 'components/menu';
+@import 'components/modal';
+@import 'components/nav';
+@import 'components/navbar';
+@import 'components/note';
+@import 'components/notifications';
+@import 'components/pagination';
+@import 'components/photoswipe';
+@import 'components/pincode';
+@import 'components/presence';
+@import 'components/preview';
+@import 'components/prism';
+@import 'components/progress';
+@import 'components/search';
+@import 'components/spinner';
+@import "components/swatches";
+@import 'components/tables';
+@import 'components/tags';
+@import 'components/togglers';
+@import 'components/turbolinks';
+@import 'components/type';

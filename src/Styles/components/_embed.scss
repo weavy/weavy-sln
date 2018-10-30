@@ -1,0 +1,129 @@
+/// <reference path="../_core.scss" />
+
+// embed in post
+.embed {
+    position: relative;
+
+    img.giphy {
+        width: 100%;
+        height: auto;
+
+        &.giphy-sm {
+            display: block;
+            margin: 1rem auto;
+            width: auto;
+            max-width: 100%;
+            padding: .25rem;
+            border: $border-width solid $border-color;
+            border-radius: $border-radius;
+        }
+    }
+
+    .close-embed {
+        position: absolute;
+        top: .5rem;
+        right: 1.5rem;
+        border-radius: 0;
+        background: rgba(0,0,0,.5) !important;
+        color: $white;
+        z-index: 1;
+    }
+
+    .embed-image ~ .close-embed {
+        right: .5rem;
+    }
+
+    .embed-image {
+        position: relative;
+        display: block;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        height: 0;
+
+        img {
+            position: absolute;
+            width: 100%;
+        }
+
+        > a {
+            display: block;
+            position: relative;
+        }
+    }
+
+    .embed-provider {
+        background: $backdrop-bg;
+        padding: $spacer/2 $spacer;
+        margin: $spacer;
+        font-size: $font-size-sm;
+        color: $white;
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        .embeds & {
+            display: none;
+        }
+    }
+
+    .embed-caption {
+        background-color: $list-group-hover-bg;
+        border: $list-group-border-width solid $list-group-border-color;
+        border-radius: $list-group-border-radius;
+        color: $body-color;
+        display: block;
+        line-height: 1.25rem;
+        margin: $card-spacer-y $card-spacer-x;
+        padding: $list-group-item-padding-y $list-group-item-padding-x;
+
+        *:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .embed-title {
+        font-weight: normal;
+    }
+
+    .embed-description {
+        font-size: $font-size-sm;
+        margin-bottom: $spacer;
+    }
+
+    .embed-host {
+        display: block;
+        font-size: $font-size-sm;
+        text-transform: uppercase;
+    }
+
+    .embed-image + .embed-caption {
+        // image captions
+        background-color: $backdrop-bg;
+        border: none;
+        border-radius: 0;
+        color: $white;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100%;
+        margin: 0;
+        overflow: hidden;
+
+        .embed-title {
+            font-size: $h5-font-size;
+            font-weight: $font-weight-light;
+            margin-bottom: $spacer;
+        }
+    }
+
+    &.embed-video {
+
+        .play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+    }
+}

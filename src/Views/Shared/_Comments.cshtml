@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Comment>
+
+@foreach (var comment in Model) {
+    var creator = comment.CreatedBy();
+    var attachments = comment.Attachments();
+    var images = attachments.Where(x => FileHelper.IsWebImage(x.Blob.Name));
+    var files = attachments.Where(x => !FileHelper.IsWebImage(x.Blob.Name));
+    var context = comment.Embeds().FirstOrDefault(x => x.IsLink);
+
+    <div id="comment-@comment.Id" class="list-group-item comment" data-comment-id="@comment.Id" data-parent-id="@comment.Parent.Id" data-parent-entity="@comment.Parent.Type.ToString().ToLower()">
+        <div class="media">
+            @creator.AvatarLink(32, htmlAttributes: new { @class = "mr-2" })
+            <div class="media-body">
+                <p class="mb-1">@creator.Link() @Html.Raw(comment.Html)</p>
+
+
+                @if (images.Any()) {
+                    Html.RenderPartial("_ImageGrid", images);
+                }
+
+                @if (files.Any()) {
+                    Html.RenderPartial("_Attachments", files);
+                }
+
+   
+                <div class="text-muted">
+                    @Html.Time(comment.CreatedAt)
+                    @if (comment.ModifiedAt != comment.CreatedAt) {<text>&middot;</text> @Html.Time(comment.ModifiedAt, @"e\di\te\d")}
+                    <span class="comment-feedback">
+                        @{ Html.RenderPartial("_CommentFeedback", comment); }
+                    </span>
+                </div>
+
+            </div>
+            <div class="media-icons">
+
+                @if (context != null) {
+                    <a class="btn btn-icon" href="@context.OriginalUrl" target="_blank" title="Open in context - @context.OriginalUrl" data-context-url="@context.OriginalUrl" data-weavy-context-url="@comment.Url(absolute: true)" data-weavy-context-space="@comment.SpaceId">
+                        @Html.SvgIcon("open-in-new", size: 18)
+                    </a>
+                }
+                @Html.StarToggle(comment)
+                @{ Html.RenderPartial("_CommentMenu", comment); }
+            </div>
+        </div>
+
+    </div>
+}

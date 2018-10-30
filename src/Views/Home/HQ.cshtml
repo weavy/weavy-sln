@@ -1,0 +1,23 @@
+﻿@model Space
+@{
+    Title = "Create Main Space";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(HomeController.InsertHQ), typeof(HomeController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.AntiForgeryToken()
+
+        <div class="text-center">
+            @Html.EditorsForModel(include: new string[] { nameof(Model.Avatar) }, formLabels: false)
+        </div>
+
+        @Html.EditorFor(x => Model.Name)
+        @Html.EditorFor(x => Model.Description)
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+        </div>
+    }
+</div>

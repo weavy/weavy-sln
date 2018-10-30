@@ -1,0 +1,65 @@
+// image sizes for avatars etc.
+@mixin img-size($size) {
+    width: $size;
+    height: $size;
+    flex: 0 0 auto;
+}
+
+@mixin img-padded {
+    position: absolute;
+    width: 100%;
+}
+
+.avatar {
+    @extend .rounded-circle;
+}
+
+.avatar[src^="/favicon"] {
+    border-radius:0 !important;
+}
+
+.img-16 {
+    @include img-size(1rem); // 16px
+}
+
+.img-18 {
+    @include img-size(1.125rem); // 18px
+}
+
+.img-24 {
+    @include img-size(1.5rem); // 24px
+}
+
+.img-32 {
+    @include img-size(2rem); // 32px
+}
+
+.img-48 {
+    @include img-size(3rem); // 48px
+}
+
+.img-64 {
+    @include img-size(4rem); // 64px
+}
+
+.img-96 {
+    @include img-size(6rem); // 96px
+}
+
+.img-128 {
+    @include img-size(8rem); // 128px
+}
+
+.img-256 {
+    @include img-size(16rem); // 256px
+}
+
+.img-512 {
+    @include img-size(32rem); // 512px
+}
+
+.img-padded {
+    @include img-padded;
+}
+
+

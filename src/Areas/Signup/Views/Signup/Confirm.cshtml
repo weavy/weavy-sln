@@ -1,0 +1,23 @@
+﻿@model ConfirmationModel
+@{
+    ViewBag.Title = "Confirm";
+}
+<main>
+    <h1>Check your email</h1>
+    <h2>We’ve sent a @Model.Invite.Code.Length-digit confirmation code to <strong>@Model.Invite.Email</strong>.<br/>It will expire shortly, so enter your code soon.</h2>
+    @using (Html.BeginForm(nameof(SignupController.Confirm), null, FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
+        @Html.AntiForgeryToken()
+        <div class="form-group mt-4 d-flex flex-column align-items-center">
+            @Html.EditorsForModel(formGroups: false, formLabels: false)
+        </div>
+        <div class="text-center">
+            <button type="submit" id="btn-confirm" class="button">Confirm</button>
+        </div>
+    }
+    <div class="text-center mt-4">
+        <small>
+            Keep this window open while checking for your code.<br />
+            Haven't received our email? Try your spam folder!
+        </small>
+    </div>
+</main>

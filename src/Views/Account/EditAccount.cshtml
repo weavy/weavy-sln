@@ -1,0 +1,72 @@
+﻿@model AccountModel
+@using Microsoft.Owin.Security
+@{
+    Title = "Edit profile";
+    Back = Url.Back(User.Url()) ?? WeavyContext.ApplicationPath;
+    var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+    string embeddedBack = Url.Back<NotificationController>(c => c.Index());
+}
+
+@section navbar_left {
+    <div class="navbar-icons">
+        <a class="btn btn-icon d-embedded" href="@embeddedBack" data-link>@Html.SvgIcon("arrow-left")</a>
+        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Html.SvgIcon("arrow-left")</a>
+    </div>
+}
+
+
+@section navbar_secondary {
+    @Html.Partial("_Navbar", User)
+}
+
+<div class="container my-3">
+
+    @using (Html.BeginForm(nameof(AccountController.UpdateAccount), typeof(AccountController).ControllerName(), FormMethod.Post, new { id = "update-account-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.AntiForgeryToken()
+        @Html.EditorsForModel(Model)
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@embeddedBack" class="d-embedded btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+            <a href="@Back" class="d-standalone btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+        </div>
+    }
+
+    @if (User.Logins.Any()) {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Provider</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Login login in User.Logins) {
+                    <tr>
+                        <td>@(login.Email ?? login.ProviderId)</td>
+                        <td>@login.Provider</td>
+
+                        <td class="table-icon text-right">
+                            @using (Html.BeginForm(nameof(AccountController.RemoveLogin), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
+                                @Html.Hidden("Provider", login.Provider)
+                                @Html.Hidden("ProviderId", login.ProviderId)
+                                <button type="submit" class="btn btn-icon" title="Remove">@Html.SvgIcon("close")</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (loginProviders.Any()) {
+        using (Html.BeginForm(nameof(AccountController.AddLogin), typeof(AccountController).ControllerName(), FormMethod.Post)) {
+            <div class="form-buttons">
+                @foreach (AuthenticationDescription p in loginProviders) {
+                    <button type="submit" class="btn btn-load btn-@p.AuthenticationType.Slugify()" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType">@Html.SvgIcon(p.AuthenticationType.Slugify()) Sign in with @p.Caption</button>
+                }
+            </div>
+        }
+    }
+</div>

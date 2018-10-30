@@ -1,0 +1,9 @@
+﻿@model User
+<nav class="nav nav-tabs">
+    @(Html.ActionLink<AccountController>(c => c.EditProfile(), text: "Profile", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
+    @(Html.ActionLink<AccountController>(c => c.EditSettings(), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<AccountController>(c => c.EditAccount(), text: "Account", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @if (!ConfigurationService.IsWindowsAuthentication && SettingService.Get<Weavy.Core.Plugins.AuthenticationSettings>()?.ActiveDirectoryDomain == null) {
+        @(Html.ActionLink<AccountController>(c => c.EditPassword(), text: "Password", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    }
+</nav>

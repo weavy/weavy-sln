@@ -1,0 +1,17 @@
+﻿@model Entity
+<tr data-href="@Model.Url()">
+  <td class="table-icon">
+    @if ((Model.Type == EntityType.Space || Model.Type == EntityType.User) && Model.Value is IHasAvatar entity) {
+      @entity.AvatarImg(size: 32)
+    } else {
+      @Html.SvgIcon(Model)
+    }
+  </td>
+  <td><a href="@Model.Url()">@Model.GetTitle()</a></td>
+  <td class="table-icon">
+    <button type="button" class="btn btn-icon on" data-entity="@Model.Type.ToString().ToLower()" data-id="@Model.Id" data-toggle="star">
+      @Html.SvgIcon("star-outline", "yellow", htmlAttributes: new { @class = "d-block" })
+      @Html.SvgIcon("star", "yellow", htmlAttributes: new { @class = "d-none" })
+    </button>
+  </td>
+</tr>

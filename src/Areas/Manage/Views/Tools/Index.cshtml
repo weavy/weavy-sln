@@ -1,0 +1,42 @@
+﻿@model IEnumerable<ITool>
+@{
+    Title = "Tools";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+
+<div class="container-fluid mt-3">
+@if (Model.HasItems()) {
+    <table class="table table-hover table-extensions">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tool in Model) {
+                <tr @(Html.Raw(!tool.IsLoaded() ? @"class=""table-warning""" : "")) data-href="@(Url.Action<ToolsController>(c => c.Get(tool.Id)))">
+                   <td class="table-icon"><a class="btn btn-icon" href="@(Url.Action<ToolsController>(c => c.Get(tool.Id)))">@Html.SvgIcon(tool.Icon, tool.Color)</a></td>
+                    <td><a href="@(Url.Action<ToolsController>(c => c.Get(tool.Id)))">@tool.Name</a></td>
+                    <td>@tool.Description</td>
+                    <td class="table-icon text-right">
+                        @if (!tool.IsLoaded()) {
+                            using (Html.BeginForm(nameof(ToolsController.Delete), null, new { id = tool.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
+                                @Html.HttpMethodOverride(HttpVerbs.Delete);
+                                <button type="submit" class="btn btn-icon btn-danger" title="Remove">@Html.SvgIcon("close")</button>
+                            }
+                        } else if (tool.IsRunnable()) {
+                            <form action="@Url.Action(nameof(ToolsController.Run), null, new { id = tool.Id })" method="post" data-turboform>
+                                <button type="submit" class="btn btn-icon btn-primary" title="Run">@Html.SvgIcon("play")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+</div>

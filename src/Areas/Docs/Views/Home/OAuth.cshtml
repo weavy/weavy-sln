@@ -1,0 +1,87 @@
+@using Weavy.Web.Areas.Docs.Controllers
+
+@{
+    Title = "Authentication";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container my-3">
+    <header>
+        <h1 class="display-1">@Title</h1>
+        <p>
+            In order to make authorized calls to the API, your application must first obtain an OAuth access token on behalf of a user.
+            Once you have an access token, you can issue authorized requests to the API.
+        </p>
+    </header>
+
+    <article>
+        <h2 class="display-2">Resource Owner Password Credentials Grant</h2>
+        <p>
+            The resource owner password credentials grant type is suitable in cases where the resource
+            owner has a trust relationship with the client, such as the device operating system or a
+            highly privileged application. This grant type is suitable for clients capable of obtaining
+            the resource owner’s credentials (username and password, typically using an interactive form).
+        </p>
+
+        <pre>+----------+
+| Resource |
+|  Owner   |
+|          |
++----------+
+     v
+     |    Resource Owner
+    (1) Password Credentials
+     |
+     v
++---------+                                  +---------------+
+|         |&gt;--(2)-- Access Token Request ---&gt;|               |
+|         |         Password Credentials     | Authorization |
+| Client  |                                  |     Server    |
+|         |&lt;--(3)-- Access Token Response --&lt;|               |
+|         |    (w/ Optional Refresh Token)   |               |
++---------+                                  +---------------+
+    </pre>
+        <p>The flow illustrated in the figure above includes the following steps:</p>
+        <ol>
+            <li>
+                <p>The resource owner provides the client with its username and password.</p>
+            </li>
+            <li>
+                <p>
+                    The client requests an access token from the authorization
+                    server’s token endpoint by including the credentials received
+                    from the resource owner.  When making the request, the client
+                    authenticates with the authorization server.
+                </p>
+            </li>
+            <li>
+                <p class="first last">
+                    The authorization server authenticates the client and validates
+                    the resource owner credentials, and if valid, issues an access
+                    token.
+                </p>
+            </li>
+        </ol>
+
+        <h2 class="display-2">Methods</h2>
+        <p>The API exposes the following methods.</p>
+        <table class="table table-api">
+            <thead>
+                <tr>
+                    <th class="verb">Method</th>
+                    <th class="path">Path</th>
+                    <th class="desc">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="verb">POST</td>
+                    <td class="path"><a href="@Url.Action(nameof(HomeController.GetOAuthTokenDocumentation))">/api/oauth/token</a></td>
+                    <td class="desc">Request an access token from the authorization server’s token endpoint.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </article>
+</div>
+

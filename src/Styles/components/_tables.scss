@@ -1,0 +1,688 @@
+/// <reference path="../_core.scss" />
+
+.table {
+    &:not(.table-bordered) {
+        th, td {
+            &:not(:first-child) {
+                padding-left: 0;
+            }
+        }
+
+        thead th {
+            border-top-color: transparent;
+            border-bottom-width: $table-border-width;
+            border-bottom-color: $gray-300;
+        }
+    }
+
+    thead th {
+        font-size: $font-size-xs;
+        text-transform: uppercase;
+    }
+
+    th.table-icon, td.table-icon {
+        // cell with .img-32 or .btn-icon
+        line-height: 0;
+        padding: .25rem 0;
+        width: 3rem; // 48px;
+        height: 3rem;
+        min-width: 3rem;
+        min-height: 3rem;
+        color: $icon-color;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+
+        > button {
+            position: relative;
+        }
+
+        > * {
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        &.text-right {
+            > * {
+                left: auto;
+                justify-content: flex-end;
+                margin-right: 0;
+            }
+        }
+
+        &.text-left {
+            > * {
+                right: auto;
+                justify-content: flex-start;
+                margin-left: 0;
+            }
+        }
+    }
+
+    .th, .td {
+        &.text-truncate {
+            max-width: 1px;
+        }
+    }
+}
+
+.table-sm {
+    th.table-icon, td.table-icon {
+        // cell with .img-32 or .btn-icon
+        padding: 0;
+        width: 2.125rem; //34px;
+        min-width: 2.125rem;
+
+        > .i {
+            margin: .3125rem;
+        }
+    }
+}
+
+.table-fixed {
+    table-layout: fixed;
+}
+
+.table-archived, .table-disabled, .table-suspended {
+    > th, > td:not(.table-icon) {
+        color: $text-muted;
+
+        a:not(.badge) {
+            color: $text-muted;
+        }
+
+        img, .i {
+            opacity: $opacity-muted;
+        }
+    }
+}
+
+.table-trashed {
+    @extend .table-suspended;
+
+    &, > th, > td {
+        text-decoration: line-through;
+
+        a {
+            text-decoration: line-through;
+        }
+    }
+}
+
+.table {
+    .thead-light {
+        th {
+            border-color: $gray-300;
+        }
+    }
+
+    .thead-panel {
+        th {
+            color: $panel-color;
+            background-color: $panel-bg;
+            border-color: $gray-300;
+        }
+    }
+}
+
+
+tr[data-href] {
+    cursor: pointer;
+}
+
+.table-hover tbody tr:hover {
+    transition: background-color linear 400ms;
+}
+
+
+// rules for specific tables
+
+// table with content in folder
+.table-content {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+        padding-right: 0;
+    }
+    // modified
+    td:nth-child(3), th:nth-child(3) {
+        width: 11.25rem; // 180px; // needs to be this wide to fit MM/DD/YYYY HH:mm AM/PM
+        display: none;
+    }
+    // type
+    td:nth-child(4), th:nth-child(4) {
+        display: none;
+        width: 7.5rem; // 120px;
+    }
+    // size
+    td:nth-child(5), th:nth-child(5) {
+        display: none;
+        text-align: right;
+        width: 6.25rem; // 100px;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(2), th:nth-child(2) {
+            padding-right: $table-cell-padding;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        td:nth-child(5), th:nth-child(5) {
+            display: table-cell;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    html:not(.embedded) {
+        .table-content {
+            td:first-child {
+                width: 3.25rem;
+
+                > * {
+                    left: .25rem;
+                }
+            }
+
+            td:last-child {
+                width: 3.25rem;
+
+                > * {
+                    right: .25rem;
+                }
+            }
+        }
+    }
+}
+
+
+.table-attachments {
+    @extend .table-fixed;
+
+    tr td {
+        border-top-color: transparent;
+    }
+
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+}
+
+.table-people, .table-members {
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        max-width: 1px; // Needed for text-truncate
+        @include text-truncate;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+    }
+}
+
+
+.table-roles {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%; // 160px
+        @include text-truncate;
+    }
+    // description
+    td:nth-child(3), th:nth-child(3) {
+        width: 10rem;
+        @include text-truncate;
+        display: none;
+    }
+    // members
+    td:nth-child(4), th:nth-child(4) {
+        width: 5.5rem; // 85px;
+        @include text-truncate;
+        display: none;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        td:nth-child(2), th:nth-child(2) {
+            width: 10rem; // 160px
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+            width: 100%;
+        }
+
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+}
+
+.table-spaces {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    .table-archived .badge-info {
+        color: $white;
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // description
+    td:nth-child(3), th:nth-child(3) {
+        width: 100%;
+        @include text-truncate;
+        display: none;
+    }
+    // members
+    td:nth-child(4), th:nth-child(4) {
+        width: 5.5rem; // 85px;
+        @include text-truncate;
+        display: none;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(lg) {
+        td:nth-child(2), th:nth-child(2) {
+            width: 20rem;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+    }
+}
+
+// table with url + icon
+.table-urls {
+    // url
+    td:nth-child(1), th:nth-child(1) {
+        width: 100%;
+        white-space: nowrap;
+        @include text-truncate;
+    }
+
+    td:nth-child(2), th:nth-child(2) {
+        width: 3rem;
+    }
+}
+
+// tables with icon + name
+.table-extensions {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // description
+    td:nth-child(3), th:nth-child(3) {
+        display: none;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(md) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(2), th:nth-child(2) {
+            width: 12.5rem; // 200px;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            width: 100%;
+            display: table-cell;
+            @include text-truncate;
+        }
+    }
+}
+
+.table-daemons {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // last
+    td:nth-child(3), th:nth-child(3) {
+        width: 10rem; // 160px;
+        display: none;
+    }
+    // next
+    td:nth-child(4), th:nth-child(4) {
+        width: 10rem; // 160px;
+        display: none;
+    }
+    // schedule
+    td:nth-child(5), th:nth-child(5) {
+        width: 10rem; // 160px;
+        display: none;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(5), th:nth-child(5) {
+            display: table-cell;
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+}
+
+
+.table-logs {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // modified
+    td:nth-child(3), th:nth-child(3) {
+        width: 11.25rem; // 180px; // needs to be this wide to fit MM/DD/YYYY HH:mm AM/PM
+        display: none;
+    }
+    // size
+    td:nth-child(4), th:nth-child(4) {
+        display: none;
+        text-align: right;
+        width: 6.25rem; // 100px;
+    }
+    // icons
+    td:nth-child(5), th:nth-child(5) {
+        width: 5rem; // 80px;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+}
+
+
+.table-signups {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // status
+    td:nth-child(3), th:nth-child(3) {
+        width: 6.75rem; // 105px;
+        display: none;
+    }
+    // icons
+    td:nth-child(4), th:nth-child(4) {
+        width: 5rem; // 80px;
+        text-align: right;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+    }
+}
+
+// tables with icon + name
+.table-stars, .table-drafts, .table-userlist {
+    @extend .table-fixed;
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+}
+
+.table-userlist {
+    margin-bottom: 0;
+
+    tr td {
+        border: none;
+    }
+
+    td:nth-child(1), th:nth-child(1) {
+        padding-left: 0;
+        width: 2.5rem;
+        text-align: left;
+
+        > * {
+            right: auto;
+            justify-content: flex-start;
+            margin-left: 0;
+        }
+    }
+}
+
+.table-trash {
+    @extend .table-fixed;
+
+    thead {
+        display: none;
+
+        th {
+            color: $panel-color;
+            border-color: $gray-300;
+        }
+    }
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // location
+    td:nth-child(3), th:nth-child(3) {
+        width: 11.25rem;
+        @include text-truncate;
+        display: none;
+    }
+    // trashed
+    td:nth-child(4), th:nth-child(4) {
+        width: 11.25rem; // 180px; // needs to be this wide to fit MM/DD/YYYY HH:mm AM/PM
+        display: none;
+    }
+    // actions
+    td:nth-child(5), th:nth-child(5) {
+        width: 5rem; // 80px;
+    }
+    // show columns on larger devices
+    @include media-breakpoint-up(sm) {
+        thead {
+            display: table-header-group;
+        }
+
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+
+        // show columns on larger devices
+    @include media-breakpoint-up(md) {
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+    }
+}

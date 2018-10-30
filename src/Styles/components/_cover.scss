@@ -1,0 +1,68 @@
+/// <reference path="../_core.scss" />
+.cover {
+    position: relative;
+    word-wrap: break-word;
+
+    .top-right {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+    }
+
+    .top-left {
+        position: absolute;
+        top: .5rem;
+        left: .5rem;
+    }
+
+    &.cover-bg {
+        // Blending the gradient with theme-color
+        background-image: linear-gradient(45deg, $cover-gradient-start, $cover-gradient-end);
+
+        &, .btn-icon {
+            color: color-yiq(mix($cover-gradient-start, $cover-gradient-end));
+        }
+    }
+
+    &.cover-under-navbar {
+        .has-navbar & {
+            margin-top: -$navbar-height;
+            padding-top: $navbar-height;
+
+            .top-right, .top-left {
+                top: $navbar-height + .5rem;
+            }
+        }
+
+        .has-navbar-secondary & {
+            margin-top: -2 * $navbar-height;
+            padding-top: 2 * $navbar-height;
+
+            .top-right, .top-left {
+                top: 2 * $navbar-height + .5rem;
+            }
+        }
+    }
+
+    .form-group[role=search] {
+        @include media-breakpoint-up(md) {
+            max-width: 24rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+
+
+    .facepile {
+        position: absolute;
+        bottom: -1rem;
+        left: 0;
+        right: 0;
+        justify-content: center;
+
+        a {
+            margin-bottom: 0;
+        }
+    }
+}

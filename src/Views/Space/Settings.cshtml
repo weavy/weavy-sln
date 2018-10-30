@@ -1,0 +1,28 @@
+﻿@model Space
+@{
+    Title = "Edit space";
+    Back = Model.Url();
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @(Html.ActionLink<SpaceController>(c => c.Edit(Model.Id), text: "Details", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<SpaceController>(c => c.Settings(Model.Id), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    </nav>
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(SpaceController.UpdateSettings), typeof(SpaceController).ControllerName(), new { id = Model.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.EditorsForModel(group: "settings")
+
+        if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
+            @Html.EditorFor(x => Model.IsHQ)
+        }
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+        </div>
+    }
+</div>

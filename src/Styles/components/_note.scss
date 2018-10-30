@@ -1,0 +1,86 @@
+/// <reference path="../_core.scss" />
+
+
+.note {
+    position: relative;
+    border: 0;
+    @include box-shadow($md-shadow-2dp);
+    margin-bottom: 1.5rem;
+    transform: rotate(-.25deg);
+
+    &:nth-child(even) {
+        transform: rotate(.5deg);
+    }
+
+    &:nth-child(3n) {
+        transform: rotate(0);
+    }
+
+    &:nth-child(5n) {
+        transform: rotate(-.5deg);
+    }
+
+    .card-header {
+        border-bottom: none;
+        background: inherit;
+        padding-bottom: 0;
+    }
+
+    .card-title {
+        margin: .25rem 1.5rem 0 0;
+        font-size: 0.75rem;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        font-weight: $font-weight-medium;
+    }
+
+    .card-footer {
+        border-top: none;
+        background: inherit;
+        padding-top: 0;
+    }
+
+    .dropdown {
+        position: absolute;
+        top: .5rem;
+        right: .25rem;
+
+        > svg, .btn-icon > svg {
+            color: $icon-color;
+            transform: rotate(45deg);
+        }
+    }
+}
+
+$note-colors: ( "red", "green", "blue", "yellow", "gray");
+
+@each $color in $note-colors {
+    .note-#{$color} {
+        @include alert-variant(color($color, 100), color($color, 200), $gray-700);
+
+        a {
+            color: color($color, 700);
+        }
+    }
+}
+
+.note-gray {
+    background-color: darken($gray-100, 3%);
+}
+
+
+#note-modal {
+    .modal-body {
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .modal-footer {
+        justify-content: space-between;
+    }
+
+    .custom-radio {
+        margin-right: .25rem;
+    }
+}

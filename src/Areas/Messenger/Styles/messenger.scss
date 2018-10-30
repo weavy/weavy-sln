@@ -1,0 +1,149 @@
+﻿// Custom variables and colors
+@import '../../../styles/variables';
+
+// Bootstrap
+@import "../../../styles/vendor/bootstrap/functions";
+@import "../../../styles/functions"; // override some of the default bootstrap functions
+@import "../../../styles/vendor/bootstrap/variables";
+@import "../../../styles/vendor/bootstrap/mixins";
+@import "../../../styles/vendor/bootstrap/root";
+//@import "../../../styles/vendor/bootstrap/print";
+@import "../../../styles/vendor/bootstrap/reboot";
+@import "../../../styles/vendor/bootstrap/type";
+//@import "../../../styles/vendor/bootstrap/images";
+//@import "../../../styles/vendor/bootstrap/code";
+//@import "../../../styles/vendor/bootstrap/grid";
+@import "../../../styles/vendor/bootstrap/tables";
+@import "../../../styles/vendor/bootstrap/forms";
+@import "../../../styles/vendor/bootstrap/buttons";
+@import "../../../styles/vendor/bootstrap/transitions";
+@import "../../../styles/vendor/bootstrap/dropdown";
+//@import "../../../styles/vendor/bootstrap/button-group";
+@import "../../../styles/vendor/bootstrap/input-group";
+@import "../../../styles/vendor/bootstrap/custom-forms";
+@import "../../../styles/vendor/bootstrap/nav";
+@import "../../../styles/vendor/bootstrap/navbar";
+//@import "../../../styles/vendor/bootstrap/card";
+//@import "../../../styles/vendor/bootstrap/breadcrumb";
+//@import "../../../styles/vendor/bootstrap/pagination";
+@import "../../../styles/vendor/bootstrap/badge";
+//@import "../../../styles/vendor/bootstrap/jumbotron";
+@import "../../../styles/vendor/bootstrap/alert";
+@import "../../../styles/vendor/bootstrap/progress";
+@import "../../../styles/vendor/bootstrap/media";
+@import "../../../styles/vendor/bootstrap/list-group";
+@import "../../../styles/vendor/bootstrap/close";
+//@import "../../../styles/vendor/bootstrap/modal";
+//@import "../../../styles/vendor/bootstrap/tooltip";
+//@import "../../../styles/vendor/bootstrap/popover";
+//@import "vendor/bootstrap/carousel";
+@import "../../../styles/vendor/bootstrap/utilities";
+
+// Additional mixins
+@import '../../../styles/mixins/animation';
+@import '../../../styles/mixins/dot';
+
+// Additional utilities
+@import '../../../styles/utilities/color';
+@import '../../../styles/utilities/flex';
+@import '../../../styles/utilities/fonts';
+@import '../../../styles/utilities/scroll';
+@import '../../../styles/utilities/text';
+@import '../../../styles/utilities/opacity';
+
+// Custom components
+@import '../../../styles/components/layout';
+@import '../../../styles/components/badge';
+@import '../../../styles/components/alert';
+@import '../../../styles/components/buttons';
+@import '../../../styles/components/custom_form';
+@import '../../../styles/components/dropdown';
+@import '../../../styles/components/emojione';
+@import '../../../styles/components/forms';
+@import '../../../styles/components/icons';
+@import '../../../styles/components/image-grid';
+@import '../../../styles/components/images';
+@import '../../../styles/components/media';
+@import '../../../styles/components/navbar';
+@import '../../../styles/components/nav';
+@import '../../../styles/components/photoswipe';
+@import '../../../styles/components/presence';
+@import '../../../styles/components/preview';
+@import '../../../styles/components/spinner';
+@import '../../../styles/components/togglers';
+@import '../../../styles/components/tables';
+
+// Messenger components
+$messenger-border-color: rgba(0, 0, 0, .08);
+$messenger-icon-width: 2rem;
+$body-color-base64: str-replace(inspect($body-color), "#", "%23");
+
+@import 'app';
+@import 'forms';
+@import 'list-group';
+@import 'media';
+@import 'messages';
+@import 'navbar';
+@import 'table';
+@import 'emojionearea';
+
+img.emojione, object.emojione {
+    @extend .eo;
+}
+
+.emojionearea {
+    .emojionearea-picker.emojionearea-picker-position-top {
+        margin-top: 0;
+    }
+}
+
+// typing indicators
+.typing-hide {
+    display: initial;
+}
+
+.typing-show {
+    display: none;
+}
+
+.typing {
+
+    .typing-hide {
+        display: none !important;
+    }
+
+    .typing-show {
+        display: initial !important;
+    }
+}
+
+
+.loader {
+    display: block;
+    padding: $spacer 0;
+    text-align: center;
+}
+
+.loading-message {
+    display: none;
+    padding: $spacer 0;
+    text-align: center;
+}
+
+
+// notifications
+.notification-alerts .alert {
+    display: none;
+}
+
+.notification-required {
+    cursor: pointer;
+
+    &.alert-link {
+        font-weight: $font-weight-bold;
+    }
+}
+
+
+
+

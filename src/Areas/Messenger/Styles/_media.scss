@@ -1,0 +1,37 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+
+.media {
+    position: relative;
+
+    > .btn-icon {
+        position: absolute;
+        bottom: -.25rem;
+        right: -.5rem;
+
+        &.checked {
+            display: none;
+        }
+
+        &.unchecked {
+            display: inline-flex;
+        }
+    }
+}
+
+.media-body {
+    line-height: 1.5;
+    // needed for text-truncate to work, see https://css-tricks.com/flexbox-truncated-text/
+    min-width: 0;
+}
+
+.media-title {
+    @include text-truncate;
+}
+
+.media-text {
+    @include text-truncate;
+}
+
+.media-separator {
+    margin: .25rem 0;
+}

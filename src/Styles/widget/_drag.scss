@@ -1,0 +1,89 @@
+/// <reference path="../widget.scss" />
+
+// Drag positioning for the widget
+
+.weavy-dragimage {
+    pointer-events: none;
+    position: absolute;
+    opacity: 0;
+    width: rem(2);
+    height: rem(2);
+}
+
+.weavy-draggable {
+    pointer-events: none;
+    position: absolute;
+    top: rem(2.5);
+    user-select: none;
+    background: hsla(0, 0%, 92%, 0.9);
+    border-radius: ($widget-icon-size + rem(.75))/2;
+    box-shadow: $md-shadow-4dp;
+    margin: rem(.5);
+    padding: rem(.125) 0;
+    max-height: calc(100% - #{rem(1.5)});
+    display: flex;
+    flex-direction: column;
+
+    //transition: transform 0.2s ease-out;
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: inherit;
+        border: rem(.125) solid rgba($link-color, 0.2);
+        display: none;
+    }
+}
+
+&.weavy-drag {
+    pointer-events: all;
+    cursor: move;
+
+    &.weavy-open {
+        &.weavy-wide {
+            background-color: transparent;
+        }
+
+        .weavy-strip {
+            &.weavy-open {
+                pointer-events: none;
+                opacity: 0;
+            }
+        }
+    }
+
+    .weavy-bubble-action {
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    &, &.weavy-left {
+        .weavy-button {
+            pointer-events: none;
+            box-shadow: none;
+            cursor: move;
+            transform: none;
+
+            &, &:not(.weavy-button-transparent) img {
+                border-radius: rem(1.5);
+            }
+        }
+    }
+
+    .weavy-bubble-tooltip {
+        display: none !important;
+    }
+
+    .weavy-draggable {
+        pointer-events: none !important;
+        box-shadow: $md-shadow-8dp;
+        transition: transform 25ms ease-out;
+
+        &.weavy-snap {
+            transition: transform 150ms cubic-bezier(0.3, 1.5, 0.5, 0.96); //out-back ease-out;
+        }
+    }
+}

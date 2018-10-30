@@ -1,0 +1,11 @@
+/// <reference path="../_core.scss" />
+
+.pager {
+    @extend .d-flex, .justify-content-start;
+    padding-top: .5rem;
+    margin-top: 1.5rem;
+}
+
+.pagination {
+    margin-bottom: .5rem;
+}

@@ -1,0 +1,20 @@
+﻿@model IFollowable
+@{
+    var limit = 16;
+    var followers = Model.FollowedByIds.Count();
+}
+
+<section class="subscribers">
+    <h4 class="display-4"><span>Subscribers</span></h4>
+    <p class="text-muted">@Html.SubscribersText(Model) @Html.SubscribeToggle(Model, new { @class = "btn btn-link btn-text" }).</p>
+    @if (followers > 0) {
+    <div class="facepile facepile-lg">
+        @Model.FollowedBy().Take(limit).Facepile(size:48, link:true)
+        @if (Model.FollowedByIds.Count() > limit) {
+            <a class="btn btn-round btn-light" href="@Model.Url()/followers" data-toggle="modal" data-target="#feedback-modal" data-path="@Model.Url().RemoveLeading("/")/followers" data-modal-title="Subscribers" title="Show all subscribers">
+                @Html.SvgIcon("dots-horizontal", htmlAttributes: new { @class = "text-gray" })
+            </a>
+        }
+    </div>
+    }
+</section>

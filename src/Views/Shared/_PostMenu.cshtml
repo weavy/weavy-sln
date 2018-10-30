@@ -1,0 +1,43 @@
+﻿@model Post
+@{
+    bool details = ViewData["details"] as bool? ?? false;
+}
+<div class="dropdown">
+    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+        @if (Model.IsPinned() && !details) {
+            @Html.SvgIcon("pin")
+        } else {
+            @Html.SvgIcon("dots-vertical")
+        }
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="@Model.Url()">@Html.SvgIcon("information", "info") Details</a>
+        <div class="dropdown-divider"></div>
+        @if (!details && Model.HasPermission(Permission.Pin)) {
+            if (Model.IsPinned()) {
+                <form action="@(Url.Action<PostController>(c => c.Unpin(Model.Id)))" method="post" data-turboform>
+                    @Html.AntiForgeryToken()
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("pin-off") Unpin</button>
+                </form>
+            } else {
+                <form action="@(Url.Action<PostController>(c => c.Pin(Model.Id)))" method="post" data-turboform>
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("pin") Pin</button>
+                </form>
+            }
+        }
+
+        @Html.StarToggle(Model, compact: false, htmlAttributes: new { @class = "dropdown-item toggle-dropdown" })
+
+        @Html.SubscribeToggle(Model, new { @class = "dropdown-item toggle-dropdown" })
+
+        @if (Model.HasPermission(Permission.Edit)) {
+            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#edit-post-modal" data-path="@(Url.Action<PostController>(c => c.EditModal(Model.Id)))" title="Edit post">@Html.SvgIcon("pencil", "primary") Edit</button>
+            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-post-modal" data-path="@(Url.Action<PostController>(c => c.MoveModal(Model.Id)))" title="Move post">@Html.SvgIcon("undo", "warning") Move</button>
+        }
+        @if (Model.HasPermission(Permission.Delete)) {
+            <button type="button" class="dropdown-item" data-trash="post" data-id="@Model.Id">@Html.SvgIcon("delete", "danger") Trash</button>
+        }
+    </div>
+</div>

@@ -1,0 +1,11 @@
+﻿/// <reference path="../_core.scss" />
+
+.progress {
+    &.progress-fixed {
+        position: fixed;
+        z-index: 9999;
+        bottom: 0;
+        height: 0.2rem;
+        background-color: $progress-bar-bg;
+    }
+}

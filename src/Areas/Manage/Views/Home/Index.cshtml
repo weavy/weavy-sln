@@ -1,0 +1,218 @@
+﻿@using Weavy.Web.Areas.Manage.Controllers
+@using Weavy.Web.Owin;
+@model IEnumerable<ISettings>
+@{
+    Title = "Manage";
+    ISettings smtp = Model.Single(x => x.Id == typeof(Weavy.Core.Plugins.SmtpSettings).GUID);
+}
+
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
+}
+
+<div class="container my-3">
+    @if (!Request.GetOwinContext().IsWebSocketsEnabled()) {
+        <div class="alert alert-warning d-flex" role="alert">
+            @Html.SvgIcon("alert", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-sm-block" })
+            <span>WebSockets are not enabled on the server. We recommend enabling it for the best experience.</span>
+        </div>
+    }
+    @if (!MailService.IsConfigured()) {
+        <a class="alert alert-warning d-flex" role="alert" href="@(Url.Action<SettingsController>(c => c.Get(smtp.Id)))">
+            @Html.SvgIcon(smtp.Icon, size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-sm-block" })
+            <span>For email notifications and password recovery to work, you need to <span class="alert-link">configure smtp settings</span> for outgoing email.</span>
+            <span class="btn btn-outline-warning ml-auto d-none d-md-block">Resolve</span>
+        </a>
+    }
+    @if (WeavyContext.Theme.Color == null && WeavyContext.Theme.Logo == null) {
+        <a class="alert alert-info d-flex" role="alert" href="@(Url.Action<HomeController>(c => c.Theme()))">
+            @Html.SvgIcon("palette", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-sm-block" })
+            <span>Did you know you that you can <span class="alert-link">set a logo and theme color</span> to match your branding?</span>
+            <span class="btn btn-outline-info ml-auto d-none d-md-block">Theme settings</span>
+        </a>
+    }
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h6 class="col-title">Settings</h6>
+
+            <div class="list-group mb-3">
+                @foreach (ISettings setting in Model.Reverse()) {
+                    <a class="list-group-item list-group-item-action" href="@(Url.Action<SettingsController>(x => x.Get(setting.Id)))">
+                        <div class="media">
+                            @Html.SvgIcon(setting.Icon, setting.Color, size: 48)
+                            <div class="media-body">
+                                <h6 class="media-title">@setting.Name</h6>
+                                <small class="text-muted">@setting.Description.Ellipsis(128)</small>
+                            </div>
+                        </div>
+                    </a>
+                }
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<HomeController>(x => x.Theme()))">
+                    <div class="media">
+                        @Html.SvgIcon("palette", "orange", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Theme </h6>
+                            <small class="text-muted">Configuration settings for the user interface.</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            <h6 class="col-title">Users &amp; roles</h6>
+
+            <div class="list-group mb-3">
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<SignupsController>(x => x.Index(null, null)))">
+                    <div class="media">
+                        @Html.SvgIcon("human-greeting", "light-blue", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Sign-ups &amp; invites</h6>
+                            <small class="text-muted">Approve (or deny) sign-up requests and handle invites.</small>
+                        </div>
+                    </div>
+                </a>
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<RolesController>(x => x.Index(null)))">
+                    <div class="media">
+                        @Html.SvgIcon("account-multiple", "blue", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Roles</h6>
+                            <small class="text-muted">Manage security roles for authorization.</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+            <h6 class="col-title">Usage statistics</h6>
+
+            <div class="list-group mb-3">
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<HomeController>(x => x.Statistics()))">
+                    <div class="media">
+                        @Html.SvgIcon("chart-line", "green", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Usage statistics</h6>
+                            <small class="text-muted">Check the usage of your installation.</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <h6 class="col-title">Recycle bin</h6>
+
+            <div class="list-group mb-3">
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<Weavy.Web.Controllers.TrashController>(x => x.Index(null, null)))">
+                    <div class="media">
+                        @Html.SvgIcon("delete", "danger", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Recycle bin</h6>
+                            <small class="text-muted">Manage trashed items.</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+        <div class="col-sm-6">
+            <h6 class="col-title">Extensions</h6>
+
+            <div class="list-group mb-3">
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<AppsController>(x => x.Index()))">
+                    <div class="media">
+                        @Html.SvgIcon("layers", "light-blue-600", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Apps</h6>
+                            <small class="text-muted">Configure available apps.</small>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<ContentTypesController>(x => x.Index()))">
+                    <div class="media">
+                        @Html.SvgIcon("file", "light-blue", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Content types</h6>
+                            <small class="text-muted">Configure available content types.</small>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<HooksController>(x => x.Index()))">
+                    <div class="media">
+                        @Html.SvgIcon("webhook", "lime", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Hooks</h6>
+                            <small class="text-muted">Event handlers for various events.</small>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<DaemonsController>(x => x.Index()))">
+                    <div class="media">
+                        @Html.SvgIcon("clock", "amber", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Scheduled tasks</h6>
+                            <small class="text-muted">Manage background tasks.</small>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<ToolsController>(x => x.Index()))">
+                    <div class="media">
+                        @Html.SvgIcon("wrench", "pink", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Tools</h6>
+                            <small class="text-muted">Run misc. tools on demand.</small>
+                        </div>
+                    </div>
+                </a>
+
+
+            </div>
+
+            <h6 class="col-title">Help</h6>
+
+            <div class="list-group mb-3">
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<HomeController>(x => x.License()))">
+                    <div class="media">
+                        @Html.SvgIcon("certificate", "yellow", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">License &amp; subscription</h6>
+                            <small class="text-muted">Manage your license and subscription.</small>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="list-group-item list-group-item-action" href="@(Url.Action<LogsController>(x => x.Index()))">
+                    <div class="media">
+                        @Html.SvgIcon("file-document", "cyan", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Log files</h6>
+                            <small class="text-muted">View and download log files.</small>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="list-group-item list-group-item-action" href="@ConfigurationService.SupportUrl" target="_blank">
+                    <div class="media">
+                        @Html.SvgIcon("comment-question-outline", "green", size: 48)
+                        <div class="media-body">
+                            <h6 class="media-title">Support @Html.SvgIcon("open-in-new", size: 18, htmlAttributes: new { @class = "i-inline" })</h6>
+                            <small class="text-muted">Developer documentation and support.</small>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer class="text-muted text-center my-3">
+    <small>© Incentive, Inc. 2017–@DateTime.Now.Year. All rights reserved. <a href="@(Url.Action<HomeController>(c => c.About()))">About @ConfigurationService.ApplicationName.</a></small>
+</footer>
+

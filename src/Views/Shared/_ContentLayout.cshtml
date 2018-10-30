@@ -1,0 +1,49 @@
+﻿@{
+    Layout = "_SpaceLayout.cshtml";
+}
+
+@if (IsSectionDefined("scripts")) {
+    @section scripts {
+        @RenderSection("scripts")
+    }
+}
+
+@section navbar_middle {
+    @if (IsSectionDefined("navbar_middle")) {
+        @RenderSection("navbar_middle")
+    } else {
+        <div class="navbar-middle">
+            <span class="navbar-text">@WeavyContext.Content.Name</span>
+            @if (WeavyContext.Content is IStarrable starrable) {
+                @Html.StarToggle(starrable)
+            }
+        </div>
+    }
+}
+
+@if (IsSectionDefined("navbar_secondary")) {
+    @section navbar_secondary {
+        @RenderSection("navbar_secondary")
+    }
+}
+
+@RenderBody()
+
+@if (IsSectionDefined("fab")) {
+    @section fab {
+        @RenderSection("fab")
+    }
+}
+
+@section footer {
+    @{
+        Html.RenderPartial("_EditCommentModal");
+        Html.RenderPartial("_FeedbackModal");
+        Html.RenderPartial("_MoveModal");
+        Html.RenderPartial("_OfficeModal"); 
+        Html.RenderPartial("_ShareModal");
+        @RenderSection("footer", required: false)
+    }
+}
+
+

@@ -1,0 +1,33 @@
+﻿@model CloudLink
+@{
+  Title = Model.Name ?? "Untitled";
+  Back = Url.Back(WeavyContext.Content.Parent().Url() ?? WeavyContext.App.Url());
+  var creator = Model.CreatedBy();
+}
+
+<div class="container my-3">
+  <article class="item" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+    <header class="item-header">
+      <a class="btn btn-icon mr-1" href="@creator.Url()">@creator.AvatarImg(24)</a>
+      @if (Model.CreatedById != Model.ModifiedById) {
+        var editor = Model.ModifiedBy();
+        <a class="btn btn-icon mr-1" href="@editor.Url()">@editor.AvatarImg(24)</a>
+      }
+      <a href="@(Url.Action<ContentController>(c => c.Versions(Model.Id)))">@Html.Time(Model.ModifiedAt)</a>
+      @Html.ContentBadge(Model)
+
+      @if (Model is ITaggable taggable) {
+        Html.RenderPartial("_Tags", taggable);
+      }
+
+      <div class="navbar-icons ml-auto">
+          <a class="btn btn-icon" href="@Model.Uri" target="_blank" title="Open in Google Drive">@Html.SvgIcon(Model.GetIcon())</a>
+        @{ Html.RenderPartial("_ContentMenu", Model); }
+      </div>
+    </header>
+
+    <section class="properties">
+        <iframe src="@Model.Uri" class="google-drive-iframe"></iframe>      
+    </section>
+  </article>
+</div>

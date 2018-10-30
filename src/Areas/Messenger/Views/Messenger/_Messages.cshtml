@@ -1,0 +1,27 @@
+﻿@using Weavy.Web.Areas.Messenger.Controllers
+@model MessengerModel
+
+@{
+    // create viewdata dictionary so that partials have access to the same data as the parent view
+    var partialViewData = new ViewDataDictionary(ViewData) { { "ParentModel", Model } };
+}
+
+
+@if (Model.Messages.HasNextPage) {
+    <a class="loader" href="@Url.Action(nameof(MessengerController.Messages), new { id = Model.Conversation.Id})?top=25&skip=@(Model.Messages.Skip + Model.Messages.Top)">Load more</a>
+}
+
+@foreach (var messagesGroupedByDate in Model.Messages.GroupBy(x => x.CreatedAt.ToLocal().Date)) {
+    
+        <div class="date-separator"><time>@messagesGroupedByDate.Key.ToShortDateString()</time></div>
+        foreach (var message in messagesGroupedByDate) {
+            if (ViewBag?.ReadAt < message.CreatedAt) {
+                <div class="new-separator">New messages</div>
+                ViewBag.ReadAt = null;
+            }
+            Html.RenderPartial("_Message", message, partialViewData);
+        }
+    
+}
+
+

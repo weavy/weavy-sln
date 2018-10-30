@@ -1,0 +1,24 @@
+@model ControllerDoc
+
+@using Weavy.Web.Areas.Docs.Controllers
+@using Weavy.Web.Areas.Docs.Models
+@using Weavy.Web.Areas.Docs.Extensions
+
+<table class="table table-api">
+  <thead>
+    <tr>
+      <th class="verb">Method</th>
+      <th class="path">Path</th>
+      <th class="desc">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var action in Model.Actions) {
+      <tr>
+        <td class="verb">@action.Method</td>
+        <td class="path"><a href="@Url.Action(nameof(HomeController.GetActionDocumentation), null, new { actionId = action.ApiDescription.GetActionId() })">/@action.ApiDescription.Route.RouteTemplate</a></td>
+        <td class="desc">@Html.Raw(action.ApiDescription.Documentation)</td>
+      </tr>
+    }
+  </tbody>
+</table>

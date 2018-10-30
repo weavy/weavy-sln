@@ -1,0 +1,18 @@
+﻿<aside id="drawer-profile" class="drawer drawer-left">
+    <header class="drawer-header">
+        <a class="text-center pt-3 pb-2" href="@(Url.Action<NotificationController>(c => c.Index()))" title="@User.GetTitle() Home">
+            @User.AvatarImg(64)
+            <div class="drawer-title px-1"><span>@User.GetTitle() <small>@@@User.Username</small></span></div>
+        </a>
+    </header>
+    <div class="drawer-body scroll-y">
+        <nav class="nav flex-column">
+            <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))">@Html.SvgIcon("pencil") Edit profile</a>
+            <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditSettings()))">@Html.SvgIcon("format-list-checks") Settings</a>
+            <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditAccount()))">@Html.SvgIcon("account-network") Account details</a>
+            <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Html.SvgIcon("account-key") Change password</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="@Url.Action(nameof(AccountController.SignOut), typeof(AccountController).ControllerName(), new { area = "" , path = "/notify" })" title="Sign out" data-widget-event data-widget-name="signingOut">@Html.SvgIcon("logout") Sign out</a>
+        </nav>
+    </div>
+</aside>

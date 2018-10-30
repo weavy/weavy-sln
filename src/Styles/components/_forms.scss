@@ -1,0 +1,29 @@
+/// <reference path="../_core.scss" />
+.form-control {
+    &::placeholder {
+        font-size: $font-size-sm;
+        line-height: $font-size-base * $line-height-base;
+        font-weight: $font-weight-light;
+    }
+}
+
+.form-text {
+    font-size: .875rem;
+    color: $text-muted;
+}
+
+.field-validation-error {
+    color: $danger;
+}
+
+// form buttons
+.form-buttons {
+    @extend .d-flex;
+    align-items: center;
+    margin: 1.5rem 0;
+
+    > .btn:not(:last-child),
+    > .btn-group:not(:last-child) {
+        margin-right: .5rem;
+    }
+}

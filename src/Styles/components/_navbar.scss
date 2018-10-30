@@ -1,0 +1,256 @@
+/// <reference path="../_core.scss" />
+
+.navbar-theme {
+    background-color: rgba($theme-700, $opacity-panel);
+    color: color-yiq($theme-700);
+    //box-shadow: $md-shadow-2dp;
+    backface-visibility: hidden;
+
+    .btn-icon {
+        color: color-yiq($theme-700);
+    }
+
+    .navbar-secondary {
+        .fab {
+            position: absolute;
+            right: 1rem;
+            top: 1.25rem;
+
+            .btn-round {
+                box-shadow: $md-shadow-2dp !important;
+            }
+        }
+    }
+}
+
+.navbar-light {
+    background-color: rgba($body-bg, $opacity-panel);
+    color: $panel-color;
+
+    .btn-icon {
+        color: $panel-color;
+    }
+}
+
+
+.navbar-panel {
+    background-color: rgba($panel-bg, $opacity-panel);
+    color: $panel-color;
+
+    .btn-icon {
+        color: $panel-color;
+    }
+}
+
+
+.navbar-primary {
+    z-index: 3;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    min-height: $navbar-height;
+}
+
+.navbar-secondary {
+    z-index: 2;
+    flex-wrap: nowrap;
+    min-height: $navbar-height;
+    // fix for .dropdown-menu-right in navbar, see https://github.com/twbs/bootstrap/issues/23308
+    .dropdown-menu-right {
+        left: auto;
+        right: 0;
+    }
+}
+
+
+.navbar-content {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+.navbar-icons {
+    display: flex;
+    flex: 1 0 2rem;
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    // fix for .dropdown-menu-right in navbar, see https://github.com/twbs/bootstrap/issues/23308
+    .dropdown-menu-right {
+        left: auto;
+        right: 0;
+    }
+
+    &:not(:first-child):last-child {
+        justify-content: flex-end;
+    }
+}
+
+.navbar-middle {
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    justify-content: center;
+    margin: 0 .5rem;
+    min-width: 0;
+
+    .navbar-text {
+        padding: 0;
+        display: inline-block;
+        @include text-truncate();
+        color: inherit !important;
+    }
+
+    .dropdown {
+        position: static;
+        line-height: 1;
+        display: flex;
+        min-width: 0;
+
+        .dropdown-toggle {
+            background: transparent;
+            border: 0;
+            color: color-yiq($theme-700);
+            padding: 0;
+            flex: 0 1 auto;
+            min-width: 0;
+
+            &:active, &:focus {
+                box-shadow: none;
+                outline: none;
+            }
+
+            .badge {
+                top: .25rem;
+                margin-left: .25rem;
+            }
+
+            .i {
+                margin: 0 !important;
+            }
+        }
+
+        .dropdown-menu {
+            @extend .scroll-y;
+            top: 0;
+            left: .25rem;
+            right: .25rem;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: none;
+            max-height: calc(100vh - .5rem);
+            padding-top: 0;
+
+            @include media-breakpoint-up(sm) {
+                max-width: 20rem;
+            }
+        }
+
+        &.show {
+            .dropdown-toggle {
+                opacity: $opacity-hover;
+            }
+
+            .dropdown-header {
+                font-size: $font-size-base;
+                padding: $dropdown-padding-y $dropdown-item-padding-x $dropdown-item-padding-y $dropdown-item-padding-x;
+                display: flex;
+                justify-content: center;
+                align-content: center;
+                position: sticky;
+                background: rgba($dropdown-bg, $opacity-panel);
+                top: 0;
+
+                .dropdown {
+                    padding-top: .5rem;
+                    cursor: pointer;
+
+                    .i {
+                        margin-top: -.25rem;
+                    }
+                }
+            }
+        }
+
+        .active-spaces {
+            &:not(:empty) {
+                &::before {
+                    content: '';
+                    display: block;
+                    height: 0;
+                    margin: 0.25rem 0;
+                    overflow: hidden;
+                    border-top: 1px solid #E0E0E0;
+                }
+            }
+        }
+
+        .active-spaces + .dropdown-item {
+            margin-bottom: calc(.5rem + 1px);
+            position: relative;
+
+            &::after {
+                content: '';
+                display: block;
+                height: 1px;
+                margin: 0;
+                overflow: hidden;
+                border-top: .25rem solid $dropdown-bg;
+                background: $dropdown-divider-bg;
+                border-bottom: .25rem solid $dropdown-bg;
+                box-sizing: content-box;
+                position: absolute;
+                top: 100%;
+                left: -.75rem;
+                right: -.75rem;
+            }
+        }
+
+        .active-spaces:not(:empty) + .dropdown-item {
+            span {
+                text-transform: lowercase;
+
+                &::first-letter {
+                    text-transform: uppercase;
+                }
+
+                &::before {
+                    content: "All ";
+                }
+            }
+        }
+
+        .active-spaces:empty + .dropdown-item {
+            margin-top: calc(.5rem + 1px);
+            margin-bottom: 0;
+
+            &::after {
+                top: auto;
+                bottom: 100%;
+            }
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        .dropdown-backdrop::before {
+            display: none !important;
+        }
+    }
+
+    .dropdown-backdrop::before {
+        z-index: 3;
+    }
+}
+
+.navbar-title {
+    @extend .nav-title;
+}
+
+@include media-breakpoint-down(xs) {
+    html:not(.embedded) {
+        .navbar {
+            padding: $navbar-padding-y .75rem !important;
+        }
+    }
+}

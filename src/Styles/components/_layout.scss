@@ -1,0 +1,265 @@
+/// <reference path="../_core.scss" />
+html {
+    // show/hide stuff depending on if we are running embedded or standalone
+    &.embedded {
+        .d-standalone {
+            display: none !important;
+        }
+
+        &:not(.connected) {
+            .d-connected {
+                display: none !important;
+            }
+        }
+
+        &.connected {
+            .d-not-connected {
+                display: none !important;
+            }
+        }
+    }
+
+    &:not(.embedded) {
+        .d-embedded, .d-connected, .d-not-connected {
+            display: none !important;
+        }
+    }
+    // show/hide stuff depending on if we are running mobile
+    &.mobile {
+        .d-desktop {
+            display: none !important;
+        }
+    }
+
+    &:not(.mobile) {
+        .d-mobile {
+            display: none !important;
+        }
+    }
+
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: none;
+
+    // Scrollbar handling
+    &:not(.overlay-scrollbar) {
+        // custom scrollbar (for chrome), not present when native overlay scrollbar is enabled
+        // Opt-out on windows, opt-in on mac/android
+        &.windows.chrome main, &.chrome.scrollbar main {
+            @include scrollbar;
+        }
+        // Move scrollbar to body/main (under the navbar)
+        &:not(.notification-preview) {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+
+            body {
+                height: 100%;
+                width: 100%;
+
+                &.has-navbar {
+                    padding-top: 0;
+                    max-height: calc(100vh - #{$navbar-height});
+                    margin-top: $navbar-height;
+                }
+
+                &.has-navbar-secondary {
+                    max-height: calc(100vh - #{$navbar-height * 2});
+                    margin-top: $navbar-height * 2;
+                }
+            }
+
+            main {
+                height: 100%;
+                width: 100%;
+                @include scroll-y;
+                scroll-behavior: smooth;
+                overscroll-behavior-x: none;
+            }
+
+            .preview-container {
+                .preview-document {
+                    top: $navbar-height;
+                    padding: 0;
+                }
+            }
+        }
+    }
+}
+
+body {
+    &.no-navbar {
+        padding-top: 0;
+    }
+
+    &.has-navbar {
+        padding-top: $navbar-height;
+    }
+
+    &.has-navbar-secondary {
+        padding-top: $navbar-height * 2;
+    }
+
+    &.manage-sidebar-left-open, .manage-sidebar-left-open & {
+        @include media-breakpoint-up(xl) {
+            .navbar-secondary {
+                margin-left: $sidebar-left-width;
+            }
+
+            > .alerts {
+                margin-left: $sidebar-left-width/2;
+            }
+
+            > header {
+                margin-left: $sidebar-left-width;
+            }
+
+            > main {
+                margin-left: $sidebar-left-width;
+            }
+        }
+    }
+}
+
+.body-dark {
+    $color: color-yiq($theme-800);
+
+    background: $theme-800;
+    color: $color;
+
+    .navbar-theme, .navbar-primary {
+        background: rgba($theme-900, .8);
+    }
+
+    .drawer-header {
+        background-color: $theme-900;
+    }
+
+    a:not(.btn, .alert-link) {
+        color: $theme-400;
+
+        &:hover {
+            color: darken($theme-400, 15%);
+        }
+    }
+
+    a.alert {
+        color: $link-color;
+    }
+
+    .alert .btn-icon {
+        color: $icon-color;
+    }
+
+    a.dropdown-item {
+        color: $dropdown-link-color;
+    }
+
+    a.nav-link {
+        color: $theme-400;
+    }
+
+    .btn-icon, .icon-sprite {
+        color: $white;
+    }
+
+    .btn-link:not(.alert-link), .text-primary {
+        color: $theme-300;
+    }
+
+    code {
+        color: $color;
+        background: $theme-700;
+    }
+
+
+    pre {
+        color: $color;
+
+        code {
+            background: transparent;
+        }
+    }
+
+    hr {
+        border-color: rgba($white,.1);
+    }
+
+    .blockquote-footer {
+        color: rgba(255,255,255, .5);
+    }
+
+    .modal-content {
+
+        .text-muted {
+            color: $text-muted !important;
+        }
+
+        color: $body-color;
+    }
+
+    .breadcrumb-item {
+        &.active {
+            color: rgba(255,255,255, .3);
+        }
+    }
+
+    .nav-tabs {
+        border-color: rgba($white,.1);
+
+        .nav-link {
+            @include hover-focus {
+                border-color: rgba($theme-400, .3);
+            }
+
+            &.active {
+                color: $theme-400;
+                border-color: $theme-400;
+            }
+
+            &.disabled {
+                color: rgba(255,255,255, .3);
+                border-color: transparent;
+            }
+        }
+    }
+
+    .text-muted, .form-text {
+        color: rgba(255,255,255, .5) !important;
+    }
+
+    .invalid-feedback {
+        color: theme-color("danger", 400);
+    }
+    // TODO: .table-success, .table-info, .table-warning, .table-danger etc.
+}
+
+
+body.controller-error {
+    pre {
+        overflow: visible;
+        white-space: pre-wrap;
+    }
+}
+
+.col-title {
+    color: $gray-700;
+    margin-bottom: $card-spacer-y;
+    padding-left: $card-border-width;
+
+    &.d-flex {
+        align-items: center;
+        justify-content: space-between;
+
+        .btn {
+            margin-top: -$card-spacer-y;
+            margin-bottom: -$card-spacer-y;
+            margin-right: .25rem;
+        }
+    }
+}
+
+.visibility-h{
+    visibility: hidden !important;
+}

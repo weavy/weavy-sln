@@ -1,0 +1,19 @@
+﻿@model SearchResult<Content, ContentQuery>
+
+<div id="drafts">
+    @if (Model.IsNullOrEmpty()) {
+        <div class="container-fluid mt-3 empty">
+            <p class="text-muted">You don't have any drafts or locked items. When you start editing content it will be listed here for quick and easy access.</p>
+        </div>
+    }
+
+    <table class="table table-hover table-drafts">
+        <tbody>
+            @if (Model.Any()) {
+                foreach (var item in Model) {
+                    Html.RenderPartial("~/Views/Content/_Draft.cshtml", item);
+                }
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,39 @@
+﻿
+# codemirror
+~/scripts/vendor/codemirror/codemirror.js                       
+~/scripts/vendor/codemirror/xml.js                              
+~/scripts/vendor/codemirror/javascript.js                       
+~/scripts/vendor/codemirror/css.js                              
+~/scripts/vendor/codemirror/htmlmixed.js     
+
+# tinymce
+~/scripts/vendor/tinymce/tinymce.min.js                    
+
+# theme
+~/scripts/vendor/tinymce/themes/modern/theme.min.js        
+
+# standard plugins
+~/scripts/vendor/tinymce/plugins/anchor/plugin.min.js      
+~/scripts/vendor/tinymce/plugins/autolink/plugin.min.js    
+~/scripts/vendor/tinymce/plugins/autoresize/plugin.min.js  
+~/scripts/vendor/tinymce/plugins/codesample/plugin.min.js  
+~/scripts/vendor/tinymce/plugins/hr/plugin.min.js          
+~/scripts/vendor/tinymce/plugins/link/plugin.min.js        
+~/scripts/vendor/tinymce/plugins/lists/plugin.min.js       
+~/scripts/vendor/tinymce/plugins/media/plugin.min.js     
+~/scripts/vendor/tinymce/plugins/preview/plugin.min.js     
+~/scripts/vendor/tinymce/plugins/table/plugin.min.js       
+~/scripts/vendor/tinymce/plugins/textcolor/plugin.min.js   
+~/scripts/vendor/tinymce/plugins/wordcount/plugin.min.js   
+
+# custom plugins
+~/scripts/src/tinymce/plugins/paste/plugin.js                                 
+~/scripts/src/tinymce/plugins/sourcecode/plugin.js                            
+~/scripts/src/tinymce/plugins/autocomplete/plugin.js                          
+~/scripts/src/tinymce/plugins/image/plugin.js                                 
+~/scripts/src/tinymce/plugins/link/plugin.js                                  
+~/scripts/src/tinymce/plugins/toolbar/plugin.js                               
+~/scripts/src/tinymce/plugins/shortcuts/plugin.js                             
+
+# init script
+~/scripts/src/tinymce/tiny.js

@@ -1,0 +1,94 @@
+/// <reference path="../_core.scss" />
+
+article.item {
+    overflow-wrap: break-word;
+    // user supplied content
+    .display-group[data-type=html] {
+        blockquote {
+            @extend .blockquote;
+            padding: .5rem 1rem;
+            border-left: .25rem solid $table-border-color;
+
+            footer {
+                @extend .blockquote-footer;
+            }
+        }
+
+        img:not(.eo) {
+            @include img-fluid;
+        }
+
+        pre:not([class*="language-"]) {
+            white-space: pre-wrap;
+        }
+
+        table {
+            @extend .table;
+        }
+    }
+}
+
+.item-header {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.content-attachments {
+    h4 {
+        @include divider();
+    }
+}
+
+.content-upload {
+    position: relative;
+
+    button {
+        cursor: pointer;
+    }
+
+    input[type=file] {
+        cursor: pointer;
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+
+//
+.subscribers {
+    h4 {
+        @include divider();
+    }
+
+    [data-toggle=subscribe] .i {
+        display: none !important;
+    }
+}
+
+
+// insert/edit note
+.html-editor {
+    min-height: 500px;
+}
+
+
+/*form.edit-note {
+    .html-editor {
+        height: calc(100vh - 17.25rem); // calc(100vh - 276px)
+        @include media-breakpoint-down(sm) {
+            height: calc(100vh - 19.5rem); // calc(100vh - 312px) // toolbar spans two rows
+        }
+    }
+}*/
+
+.google-drive-iframe {
+    width: 100%;
+    height: 700px;
+    box-shadow: $popover-box-shadow;
+    border: 0;
+}

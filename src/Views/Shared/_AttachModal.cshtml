@@ -1,0 +1,88 @@
+﻿@{
+    var path = (WeavyContext.Content != null) ? $"/api/content/{WeavyContext.Content.Id}/content" : $"/api/apps/{WeavyContext.App.Id}/content";
+}
+
+<iframe id="filebrowser" src="about:blank" style="display:none;width:100%;height:100%;z-index:99999999;position:absolute;top:0;left:0;border:0;"></iframe>
+
+<div class="modal" id="o365-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-header border-bottom-0">
+            <h5 class="modal-title">New Office 365 document</h5>
+            <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                @Html.SvgIcon("close")
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="list-group list-group-flush">
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".docx" data-type="Word">@Html.SvgIcon(FileHelper.GetIcon(".docx")) <span class="mx-1">Word</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".xlsx" data-type="Excel">@Html.SvgIcon(FileHelper.GetIcon(".xlsx")) <span class="mx-1">Excel</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".pptx" data-type="Powerpoint">@Html.SvgIcon(FileHelper.GetIcon(".pptx")) <span class="mx-1">Powerpoint</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="google-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-header border-bottom-0">
+            <h5 class="modal-title">New Google Drive file</h5>
+            <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                @Html.SvgIcon("close")
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="list-group list-group-flush">
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="document" data-type="Docs" data-icon="docs">@Html.SvgIcon("google-docs-color") <span class="mx-1">Google Docs</span> </a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="spreadsheet" data-type="Sheets" data-icon="sheets">@Html.SvgIcon("google-sheets-color") <span class="mx-1">Google Sheets</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="presentation" data-type="Slides" data-icon="slides">@Html.SvgIcon("google-slides-color") <span class="mx-1">Google Slides</span></a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal" id="google-create-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="google-drive-form" action="#">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">New Google <span id="doctype"></span> document</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                    @Html.SvgIcon("close")
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input type="text" class="form-control doctitle" placeholder="Name" name="name" id="name" autofocus>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-gray" title="Add document"><svg class="i m-0"><use class="docicon" xlink:href="#google-docs"></use></svg></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="attach-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="attach-form" action="@path">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">Add file</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                    @Html.SvgIcon("close")
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="dropbox">@Html.SvgIcon("dropbox-color") <span class="mx-1">Dropbox</span> </a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="box">@Html.SvgIcon("box-color") <span class="mx-1">Box</span></a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="onedrive">@Html.SvgIcon("onedrive-color") <span class="mx-1">Onedrive</span></a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="google-drive">@Html.SvgIcon("google-drive-color") <span class="mx-1">Google Drive</span></a>
+                </div>
+                @Html.SvgOverlaySpinner(spin: false, size: 48, id: "attach-modal-spinner")
+            </div>
+            <div class="modal-footer border-top-0 d-none">
+                <button type="submit" disabled="disabled" class="btn btn-primary btn-load">Attach</button>
+            </div>
+        </form>
+    </div>
+</div>

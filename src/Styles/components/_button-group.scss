@@ -1,0 +1,16 @@
+/// <reference path="../_core.scss" />
+
+.btn + .dropdown-toggle-split {
+    padding-right: $input-btn-padding-x/3;
+    padding-left: $input-btn-padding-x/3;
+}
+
+.btn-sm + .dropdown-toggle-split {
+    padding-right: $input-btn-padding-x-sm/2;
+    padding-left: $input-btn-padding-y-sm/2;
+}
+
+.btn-lg + .dropdown-toggle-split {
+    padding-right: $input-btn-padding-x-lg/2;
+    padding-left: $input-btn-padding-x-lg/2;
+}

@@ -1,0 +1,23 @@
+/// <reference path="../_core.scss" />
+
+// icon and text colors
+@each $color, $value in $colors {
+    @include text-emphasis-variant(".text-#{$color}", $value);
+    @each $shade, $percent in $shades {
+        @include text-emphasis-variant(".text-#{$color}-#{$shade}", color($color, $shade));
+    }
+}
+
+// default icon color
+@include text-emphasis-variant(".text-icon", $icon-color);
+
+// todo: loop over $shades instead?
+@include text-emphasis-variant(".text-theme-100", $theme-100);
+@include text-emphasis-variant(".text-theme-200", $theme-200);
+@include text-emphasis-variant(".text-theme-300", $theme-300);
+@include text-emphasis-variant(".text-theme-400", $theme-400);
+@include text-emphasis-variant(".text-theme-500", $theme-500);
+@include text-emphasis-variant(".text-theme-600", $theme-600);
+@include text-emphasis-variant(".text-theme-700", $theme-700);
+@include text-emphasis-variant(".text-theme-800", $theme-800);
+@include text-emphasis-variant(".text-theme-900", $theme-900);

@@ -1,0 +1,104 @@
+/// <reference path="../_core.scss" />
+
+// validation feedback for custom radios and checks
+.custom-control-input {
+    &.is-invalid {
+        ~ .invalid-feedback {
+            display: initial;
+        }
+    }
+}
+
+// file uploads
+.file-upload {
+    .progress {
+        box-shadow: none;
+        height: .25rem;
+    }
+}
+
+.custom-file {
+    display: block;
+}
+
+.custom-file-input:focus ~ .custom-file-control {
+    @if $enable-shadows {
+        box-shadow: $input-box-shadow, $input-btn-focus-box-shadow;
+    }
+    @else {
+        box-shadow: $input-btn-focus-box-shadow;
+    }
+}
+
+.custom-image {
+    display: inline-block;
+    width: 8rem; // 128px;
+    height: 8rem; // 128px;
+    position: relative;
+    // checkered bg
+    background-position: 0 0, .5rem .5rem;
+    background-size: 1rem 1rem;
+    background-image: linear-gradient(45deg, $gray-100 25%, transparent 25%, transparent 75%, $gray-100 75%, $gray-100 100%), linear-gradient(45deg, $gray-100 25%, $white 25%, $white 75%, $gray-100 75%, $gray-100 100%);
+
+    .custom-file-input {
+        min-width: unset;
+        max-width: unset;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    img, .custom-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        border: .0625rem solid $input-border-color;
+    }
+
+    .btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: none;
+    }
+
+    .custom-file-label {
+        display: none;
+        background-color: rgba(0,0,0,0.5);
+        color: $white;
+        position: absolute;
+        bottom: .5rem;
+        right: .5rem;
+        top: auto;
+        left: auto;
+        margin: 0;
+        border: none;
+        height: auto;
+
+        @include button-size($input-btn-padding-y-sm, $input-btn-padding-x-sm, $font-size-sm, $input-btn-line-height-sm, $btn-border-radius-sm);
+
+        &::after {
+            display: none;
+        }
+    }
+
+    .mobile & .custom-file-label {
+        display: block;
+    }
+
+    &:hover {
+        img {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .custom-file-label {
+            display: block;
+        }
+    }
+}
+
+.custom-file-input:focus ~ img {
+    border-color: $input-focus-border-color;
+}

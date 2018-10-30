@@ -1,0 +1,29 @@
+﻿@model Weavy.Web.Models.RegisterModel
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = "Sign up";
+}
+<div class="container mt-5">
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-6">
+            <div class="text-center mb-3">
+                @Html.IconImg(48)
+            </div>
+            <h1 class="display-3">@Title</h1>
+            @if (Model.Space != null) {
+                <p>Welcome to @Theme.Name, you have been invited to join <strong>@Model.Space.Name</strong>. Select a username and password below!</p>
+            } else {
+                <p>Welcome to @Theme.Name, select a username and password below!</p>
+            }
+
+            @using (Html.BeginForm(nameof(AccountController.Register), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
+                @Html.AntiForgeryToken()
+                @Html.EditorsForModel()
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary btn-load">Sign up</button>
+                    <a href="@Url.Action(nameof(AccountController.SignIn), typeof(AccountController).ControllerName())" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

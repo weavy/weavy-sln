@@ -1,0 +1,6 @@
+﻿@model Embed
+<a class="context-link" href="@Model.OriginalUrl" target="_blank" title="Open in context - @Model.OriginalUrl" data-context-url="@Model.OriginalUrl" data-weavy-context-url="@Model.Parent.Url(absolute: true)" data-weavy-context-space="@Model.Parent.SpaceId">
+    <img class="icon" src="https://www.google.com/s2/favicons?domain=@Weavy.Core.Helpers.UrlHelper.GetAuthority(Model.OriginalUrl)">
+    <span class="text">@Model.Title</span>
+    <span class="link-open" >@Html.SvgIcon("open-in-new", size: 18)</span>
+</a>

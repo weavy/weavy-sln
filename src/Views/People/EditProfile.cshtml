@@ -1,0 +1,29 @@
+﻿@model User
+@{
+    Title = "Edit user";
+    Back = Url.Back(Model.Url());
+}
+
+@section navbar_secondary {
+    @Html.Partial("_Navbar", Model)
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(PeopleController.UpdateProfile), typeof(PeopleController).ControllerName(), new { id = Model.Id }, FormMethod.Post, new { id = "update-profile-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.AntiForgeryToken()
+
+
+        <div class="text-center">
+            @Html.EditorFor(x => Model.Avatar, additionalViewData: new { AvatarFor = Model })
+        </div>
+
+        @Html.EditorsForModel(Model.Profile)
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+        </div>
+
+
+    }
+</div>

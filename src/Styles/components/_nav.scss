@@ -1,0 +1,109 @@
+/// <reference path="../_core.scss" />
+.nav-tabs {
+    padding-left: .25rem;
+    padding-right: .25rem;
+    min-height: $navbar-height;
+    flex-wrap: nowrap;
+
+    .drawer-header > &, .navbar > & {
+        border: none;
+        margin: -1 * $navbar-padding-y -1 * $navbar-padding-x;
+        align-items: flex-end;
+        width: calc(100% + #{2 * $navbar-padding-x});
+    }
+
+    .nav-item {
+        margin: 0;
+    }
+
+    .nav-link {
+        border: none;
+        border-bottom: .25rem solid $nav-tabs-link-active-bg;
+        border-top-right-radius: 0;
+        border-top-left-radius: 0;
+        text-transform: uppercase;
+        font-size: $font-size-xs;
+        letter-spacing: .05em;
+        padding: .5rem 0;
+        margin: 0 .5rem 0 .5rem;
+        color: $link-color;
+        font-weight: $font-weight-medium;
+        text-align: center;
+        line-height: 1.75rem;
+
+        &:not(.nav-icon) {
+            display: flex;
+            flex: 0 1 auto;
+            min-width: 0;
+            justify-content: center;
+        }
+
+        &.active {
+            color: $link-color;
+            border-color: $nav-tabs-link-active-border-color;
+        }
+    }
+
+    .nav-icon {
+        padding: .5rem .25rem;
+
+        &.nav-search {
+            // navbar search icon
+            margin-left: auto;
+            margin-right: .25rem;
+        }
+
+
+        &.nav-badge {
+            position: relative;
+
+            .badge {
+                @include badge-notification;
+            }
+        }
+    }
+
+    .btn-icon {
+        align-self: center;
+    }
+
+    .btn-sm {
+        min-width:unset;
+        min-height:unset;
+        margin-bottom: .25rem;
+    }
+
+    > .dropdown .btn-sm {
+        padding-left:0;
+        padding-right:0;
+    }
+
+ }
+
+.nav-title {
+    line-height: 2rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+.tab-loading {
+    text-align: center;
+    margin: 5rem auto;
+}
+
+.cover, .drawer-header, .navbar-theme {
+
+    .nav-link {
+        color: color-yiq($theme-700) !important;
+
+        &.active {
+            color: color-yiq($theme-700) !important;
+            border-color: color-yiq($theme-700) !important;
+        }
+
+        &.disabled {
+            color: rgba(color-yiq($theme-700), .5) !important;
+        }
+    }
+}

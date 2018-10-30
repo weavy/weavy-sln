@@ -1,0 +1,18 @@
+﻿@model MoveContentModel
+@{
+  string url = Url.Action<ContentController>(x => x.Move(Model.Source.Id, null));
+}
+<form class="modal-content" action="@url" method="post" data-turboform>
+  @Html.HttpMethodOverride(HttpVerbs.Put)
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title">Move @Model.Source.GetKind()</h5>
+    <button type="button" class="btn btn-icon" data-dismiss="modal">@Html.SvgIcon("close")</button>
+  </div>
+  <div class="modal-body">
+    @Html.EditorFor(x => x.ParentId, new { Model.Source })
+  </div>
+  <div class="modal-footer border-0">
+    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+    <button type="submit" class="btn btn-primary btn-load">Move</button>
+  </div>
+</form>

@@ -1,0 +1,8 @@
+﻿~/scripts/vendor/jquery/jquery.min.js
+~/scripts/vendor/underscore/underscore-min.js
+~/scripts/src/signalr/jquery.signalR.js
+~/scripts/src/connection.js
+~/scripts/src/realtime.js
+~/scripts/src/urlChecker.js
+~/scripts/src/widget/widget.js
+~/scripts/src/widget/position.js

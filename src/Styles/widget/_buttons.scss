@@ -1,0 +1,76 @@
+/// <reference path="../widget.scss" />
+
+// Buttons
+
+.weavy-buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: $widget-icon-size + rem(1.75);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.weavy-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 0 0 0 rem(.125) rgba($link-color, 0);
+    border-radius: rem(1.5);
+    background-color: $white;
+    cursor: pointer;
+    width: $widget-icon-size;
+    height: $widget-icon-size;
+    min-height: $widget-icon-size;
+    margin: rem(0.25) rem(.375);
+    pointer-events: all;
+    justify-content: center;
+    transition: transform $md-animation-duration $md-animation-curve-default, background-color $md-animation-duration $md-animation-curve-default, flex-shrink $md-animation-duration step-end;
+    z-index: 3;
+
+    // Needed to prevent scroll blocking in context page
+    backface-visibility: hidden;
+
+    &.weavy-button-transparent {
+        background-color: transparent;
+        box-shadow: none;
+
+        svg {
+            fill: $theme;
+        }
+    }
+
+    &:hover, &:active {
+        box-shadow: 0 0 0 rem(.125) rgba($link-color, 0.2);
+        color: $link-color;
+
+        svg {
+            fill: $link-color;
+        }
+    }
+
+    &.weavy-open {
+        background-color: $white;
+        transform: translateX(rem(-1));
+        box-shadow: $md-shadow-4dp;
+        align-self: flex-end;
+
+        ~ .weavy-bubble-tooltip {
+            display: none !important;
+        }
+
+        &, &:not(.weavy-personal) > img {
+            border-radius: 0 rem(1.5) rem(1.5) 0;
+        }
+    }
+
+    &:active {
+        ~ .weavy-bubble-tooltip {
+            display: none !important;
+        }
+    }
+}
+

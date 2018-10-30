@@ -1,0 +1,42 @@
+/// <reference path="../_core.scss" />
+
+.list-group-divider {
+    padding: $list-group-item-padding-y $list-group-item-padding-x;
+    margin: 0;
+}
+
+.list-group-item.notification {
+    border-left: none;
+    border-right: none;
+    color: $body-color;
+
+    .tab-pane & {
+        &:first-child {
+            border-top: 0;
+        }
+    }
+
+    .actor, .subject, .context {
+        font-weight: $font-weight-medium;
+    }
+
+    .btn {
+        position: absolute;
+        bottom: .3125rem;
+        right: 2*$spacer/3;
+    }
+
+    q {
+        color: $text-muted;
+    }
+
+    &.read {
+        background-color: $gray-100;
+        color: $text-muted;
+        opacity: $opacity-muted;
+
+        .btn-primary[data-toggle=notification] {
+            color: inherit !important;
+        }
+    }
+}

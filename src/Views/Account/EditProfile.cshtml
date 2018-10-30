@@ -1,0 +1,36 @@
+﻿@model User
+@{
+    Title = "Edit profile";
+    Back = Url.Back(User.Url()) ?? WeavyContext.ApplicationPath;
+    string embeddedBack = Url.Back<NotificationController>(c => c.Index());
+}
+
+@section navbar_left {
+    <div class="navbar-icons">
+        <a class="btn btn-icon d-embedded" href="@embeddedBack" data-link>@Html.SvgIcon("arrow-left")</a>
+        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Html.SvgIcon("arrow-left")</a>
+    </div>
+}
+
+@section navbar_secondary {
+    @Html.Partial("_Navbar", User)
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(AccountController.UpdateProfile), typeof(AccountController).ControllerName(), FormMethod.Post, new { id = "update-profile-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.AntiForgeryToken()
+
+        <div class="text-center">
+            @Html.EditorFor(x => Model.Avatar, additionalViewData: new { AvatarFor = Model })
+        </div>
+
+        @Html.EditorsForModel(Model.Profile)
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@embeddedBack" class="d-embedded btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+            <a href="@Back" class="d-standalone btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+        </div>
+
+    }
+</div>

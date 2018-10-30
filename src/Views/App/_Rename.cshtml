@@ -1,0 +1,17 @@
+﻿@model App
+@{
+    var htmlAttributes = new Dictionary<string, object>() { { "autocomplete", "off" }, { "novalidate", "" } };
+    if (ViewData["turboform"] != null) {
+        htmlAttributes.Add("data-turboform", "");
+    }
+}
+
+@using (Html.BeginForm(nameof(AppController.Rename), typeof(AppController).ControllerName(), new RouteValueDictionary(new { id = Model.Id }), FormMethod.Post, htmlAttributes)) {
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+    @Html.EditorsForModel(include: new List<string> { "Name" })
+
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary" name="operation" value="update">Update</button>
+        <a class="btn btn-outline-secondary" href="@Back" data-dismiss="modal">Cancel</a>
+    </div>
+}

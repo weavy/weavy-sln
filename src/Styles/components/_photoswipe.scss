@@ -1,0 +1,39 @@
+﻿/// <reference path="../_core.scss" />
+
+// override default settings from ../vendor/photoswipe/_main-settings.scss
+$pswp__background-color: $black;
+$pswp__placeholder-color: $body-bg;
+$pswp__assets-path: '../styles/vendor/photoswipe/default-skin/'; // path to skin assets folder (preloader, PNG and SVG sprite)
+$pswp__error-text-color: $danger; // "Image not loaded" text color
+
+@import "../vendor/photoswipe/main";
+@import "../vendor/photoswipe/default-skin/default-skin";
+
+.pswp {
+    overscroll-behavior: contain;
+    -ms-scroll-chaining: none;
+}
+
+html.embedded {
+    body {
+        transition: background-color $md-animation-duration $md-animation-curve-default;
+
+        > *:not(.pswp, .drawer) {
+            transition: opacity $md-animation-duration $md-animation-curve-default;
+        }
+    }
+}
+
+
+html.embedded.pswp-transparent {
+    body {
+        background-color: transparent;
+        transition: none;
+
+        > *:not(.pswp) {
+            opacity: 0;
+            max-width: 24rem;
+            transition: none;
+        }
+    }
+}

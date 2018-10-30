@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+  <meta name="turbolinks-cache-control" content="no-preview">
+  <title>@Html.Title(Title)</title>
+  @Html.ThemeHead()
+  @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
+  @RenderSection("styles", required: false)
+  @if (WeavyRequestContext.Current.Browser.Browser == "IE") {
+    @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+  }
+  @Bundler.Scripts("~/scripts/weavy.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+  @RenderSection("scripts", required: false)
+</head>
+<body class="@BodyClasses("has-navbar" + (IsSectionDefined("navbar_secondary") ? " has-navbar-secondary" : ""))" @BodyAttributes>
+    @Html.SvgSprite()
+    <nav class="navbar-theme fixed-top">
+        <div class="navbar navbar-primary">
+            @if (IsSectionDefined("navbar_left")) {
+                @RenderSection("navbar_left", required: false)
+            } else {
+            <div class="navbar-icons">
+                @if (Back != null) {
+                    <a class="btn btn-icon" href="@Back" data-link>@Html.SvgIcon("arrow-left")</a>
+                } else {
+                    if (WeavyContext.Space != null) {
+                        <button type="button" class="btn btn-icon" data-toggle="drawer" data-target="#drawer-space">@WeavyContext.Space.AvatarImg(24)</button>
+                    } else {
+                        <a class="btn btn-icon d-embedded" href="@WeavyContext.ApplicationPath">@Html.SvgIcon("arrow-left")</a>
+                        <a class="btn btn-icon d-standalone" href="@WeavyContext.ApplicationPath">@Html.IconImg(24)</a>
+                    }
+                }
+            </div>
+            }
+
+            @if (IsSectionDefined("navbar_middle")) {
+                @RenderSection("navbar_middle", required: false)
+            } else {
+                <div class="navbar-middle"><span class="navbar-text">@Title</span></div>
+            }
+
+            @if (IsSectionDefined("navbar_right")) {
+                @RenderSection("navbar_right", required: false)
+            } else {
+                <div class="navbar-icons">
+                    <button type="button" class="btn btn-icon btn-badge d-standalone" data-toggle="drawer" data-target="#drawer-user">@User.AvatarImg(24)@Html.NotificationsBadge()</button>
+                    <button type="button" class="btn btn-icon d-embedded visibility-h">@Html.SvgIcon("expand-window")</button>
+                    <button type="button" class="btn btn-icon d-embedded visibility-h">@Html.SvgIcon("close")</button>
+                </div>
+            }
+        </div>
+        @if (IsSectionDefined("navbar_secondary")) {
+            <div class="navbar navbar-secondary">
+                @RenderSection("navbar_secondary", required: false)
+            </div>
+        }
+    </nav>
+    <div class="alerts">@Html.AlertMessages()</div>
+    <main @if (IsSectionDefined("fab")) { <text> class="has-fab" </text> }>
+        @RenderBody()
+        @RenderSection("fab", required: false)
+    </main>
+    @{
+        Html.RenderPartial("_DrawerPersonal");
+        Html.RenderPartial("_PhotoSwipe");
+        Html.RenderPartial("_Preview");
+        Html.RenderPartial("_ProfileModal");
+        @RenderSection("footer", required: false)
+    }
+    <div class="drawer-backdrop"></div>
+    <audio id="notification-sound" src="~/media/notification.mp3" preload="none"></audio>
+    @Html.Scripts()
+</body>
+</html>

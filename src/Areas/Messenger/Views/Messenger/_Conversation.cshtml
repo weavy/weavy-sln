@@ -1,0 +1,46 @@
+﻿@using Weavy.Web.Areas.Messenger.Controllers
+@model Conversation
+@{
+    bool active = ViewBag.Active as bool? ?? false;
+}
+
+<a class="list-group-item list-group-item-action conversation@(!Model.IsRead ? " unread" : "")@(active ? " active" : "")" href="@Url.Action(nameof(MessengerController.Conversation), new { id = Model.Id })" data-conversation="@Model.Id" data-room="@Model.IsRoom.ToString().ToLower()">
+    <div class="media">
+        <div class="mr-3">
+            @Model.AvatarImg(48, presence: true)
+        </div>
+        <div class="media-body">
+            @Html.TimeWhen(Model.LastMessageAt, abbrev: true)
+            <div class="media-title">@Model.GetTitle()</div>
+            <div class="media-text">
+                <span class="typing-hide">
+                    @(Model.LastMessageById != null ? (Model.LastMessageById == User.Id ? "You: " : Model.IsRoom ? Model.LastMessageBy.GetTitle() + ": " : "") : "") @(Model.Description.IsNullOrEmpty() ? (Model.Description == null ? MvcHtmlString.Empty : Html.SvgIcon("attachment", htmlAttributes: new { @class="i-inline"})) : Html.Raw(Emojione.ShortnameToImage(Html.Encode(Model.Description.Ellipsis(48))))) 
+                </span>
+                <span class="typing-show"></span>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown">@Html.SvgIcon("dots-vertical")</button>
+            <div class="dropdown-menu dropdown-menu-right">
+                @if (Model.LastMessageAt.HasValue) {
+                    if (!Model.IsRead) {
+                        <button type="button" class="dropdown-item" data-read="@Model.Id">Mark as read</button>
+                    } else {
+                        <button type="button" class="dropdown-item" data-unread="@Model.Id">Mark as unread</button>
+                    }
+                }
+
+                @if (Model.ArchivedAt == null) {
+                    <button type="button" class="dropdown-item" data-archive="@Model.Id">Archive conversation</button>
+                } else {
+                    <button type="button" class="dropdown-item" data-unarchive="@Model.Id">Unarchive conversation</button>
+                }
+
+
+                @if (Model.IsRoom && Model.HasPermission(Permission.Join)) {
+                   <button type="button" class="dropdown-item" data-leave="@Model.Id">Leave room</button>
+                }
+            </div>
+        </div>
+    </div>
+</a>

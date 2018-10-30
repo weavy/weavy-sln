@@ -1,0 +1,33 @@
+/// <reference path="../_core.scss" />
+.controller-widget {
+    .space-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        a {
+            flex: 0 0 6.375rem; // 0 0 102px;
+            height: 5.625rem; //90px;
+            margin-bottom: 1rem; //18px;
+            border: $border-width solid $border-color;
+            text-align: center;
+            position: relative;
+            background: $gray-100;
+
+            &.add {
+                padding-top: .3125rem;
+                text-align: center;
+            }
+
+            .star {
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+        }
+    }
+
+    .all-spaces {
+        text-align: center;
+    }
+}

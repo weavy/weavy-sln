@@ -1,0 +1,29 @@
+﻿@model CommentUpdateModel
+<form class="modal-content" action="@(Url.Action<CommentController>(x => x.Update(Model.Id, null)))" method="post">
+    @Html.HttpMethodOverride(HttpVerbs.Put)    
+    
+
+    <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">Edit comment</h5>
+        <button type="button" class="btn btn-icon" data-dismiss="modal">@Html.SvgIcon("close")</button>
+    </div>
+    <div class="modal-body">
+        <textarea id="text" class="form-control" name="text" data-editor-location="comment-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))">@Model.Text</textarea>
+
+        <div class="attachments">
+            <table class="table table-attachments">
+                @foreach (var file in Model.Files) {
+                    <tr>
+                        <td class="table-icon">@Html.SvgIcon(file)</td>
+                        <td>@file.GetTitle()</td>
+                        <td class="table-icon"><a class="btn btn-icon remove" data-file="file.title" href="#" data-remove-attachment="@file.Id" title="Remove file">@Html.SvgIcon("close")</a><input type="hidden" name="attachments" value="@file.Id" /></td>
+                    </tr>
+                }
+            </table>
+            <div id="removedAttachments"></div>
+        </div>
+    </div>
+    <div class="modal-footer border-0">        
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

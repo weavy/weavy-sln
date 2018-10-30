@@ -1,0 +1,231 @@
+/// <reference path="../_core.scss" />
+/* Modal Reworked Flex Styles */
+
+// .modal           - container to scroll within
+// .modal-dialog    - positioning shell for the actual modal
+// .modal-content   - actual modal w/ bg and corners and stuff
+
+// Container that the modal scrolls within
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $zindex-modal;
+    flex-direction: column;
+    display: none;
+    padding: $modal-dialog-margin; // TODO: Rename to $modal-padding
+    @include scroll-y;
+    // custom click handling to close modal
+    pointer-events: all;
+    // Prevent Chrome on Windows from adding a focus outline. For details, see
+    // https://github.com/twbs/bootstrap/pull/10951.
+    outline: 0;
+    // We deliberately don't use `-webkit-overflow-scrolling: touch;` due to a
+    // gnarly iOS Safari bug: https://bugs.webkit.org/show_bug.cgi?id=158342
+    // See also https://github.com/twbs/bootstrap/issues/17695
+    // When fading in the modal, animate it to slide down
+    &.fade .modal-dialog {
+        @include transition($modal-transition);
+        transform: translate(0, -25%);
+    }
+
+    &.show {
+        display: flex !important;
+
+        .modal-dialog {
+            transform: translate(0, 0);
+        }
+    }
+}
+
+
+// Shell div to position the modal with bottom padding
+.modal-dialog {
+    position: relative;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    // counteract the pointer-events: none; in the .modal-dialog
+    pointer-events: auto;
+    background-color: $modal-content-bg;
+    background-clip: padding-box;
+    border: $modal-content-border-width solid $modal-content-border-color;
+    @include scroll-y;
+    @include border-radius($border-radius-lg);
+    @include box-shadow($modal-content-box-shadow-xs);
+}
+
+// Actual modal
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    // Remove focus outline from opened modal
+    outline: 0;
+
+    .top-right {
+        right: .5rem;
+    }
+}
+
+// Modal background
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $zindex-modal-backdrop;
+    background-color: $modal-backdrop-bg;
+    // Fade for backdrop
+    &.fade {
+        opacity: 0;
+    }
+
+    &.show {
+        opacity: $modal-backdrop-opacity;
+    }
+}
+
+// Modal header
+// Top section of the modal w/ title and dismiss
+.modal-header {
+    display: flex;
+    align-items: flex-start; // so the close btn always stays on the upper right corner
+    justify-content: space-between; // Put modal header elements (title and dismiss) on opposite ends
+    padding: $modal-header-padding;
+    border-bottom: $modal-header-border-width solid $modal-header-border-color;
+    @include border-top-radius($border-radius-lg);
+    flex: 0 0 auto; // Fixed size
+
+    .close {
+        padding: $modal-header-padding;
+        // auto on the left force icon to the right even when there is no .modal-title
+        margin: (-$modal-header-padding) (-$modal-header-padding) (-$modal-header-padding) auto;
+    }
+}
+
+// Title text within header
+.modal-title {
+    margin-bottom: 0;
+    line-height: $modal-title-line-height;
+}
+
+// Modal body
+// Where all modal content resides (sibling of .modal-header and .modal-footer)
+.modal-body {
+    position: relative;
+    // Set overflow-y: auto; when you want header and footer to stay visible
+    // Enable `flex-grow: 1` so that the body take up as much space as possible
+    // when should there be a fixed height on `.modal-dialog`.
+    flex: 1 1 auto;
+    padding: $modal-inner-padding;
+}
+
+// Footer (for actions)
+.modal-footer {
+    display: flex;
+    align-items: center; // vertically center
+    justify-content: flex-end; // Right align buttons with flex property because text-align doesn't work on flex items
+    padding: $modal-inner-padding;
+    border-top: $modal-footer-border-width solid $modal-footer-border-color;
+    flex: 0 0 auto; // Fixed size
+    // Easily place margin between footer elements
+    > :not(:first-child) {
+        margin-left: .25rem;
+    }
+
+    > :not(:last-child) {
+        margin-right: .25rem;
+    }
+}
+
+
+// Scale up the modal
+@include media-breakpoint-up(sm) {
+    // Automatically set modal's width for larger viewports
+    .modal-dialog {
+        max-width: $modal-md;
+        margin: $modal-dialog-margin-y-sm-up auto;
+        @include box-shadow($modal-content-box-shadow-sm-up);
+    }
+
+    .modal-sm {
+        max-width: $modal-sm;
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    .modal-lg {
+        max-width: $modal-lg;
+    }
+}
+
+
+
+
+/* Custom Modal Styles */
+.modal-content {
+    .spinner {
+        display: block;
+        margin: 1rem auto;
+    }
+
+    .cover {
+        margin: 0;
+        padding: 0;
+        background-clip: padding-box;
+        //border-top-left-radius: $border-radius-lg;
+        //border-top-right-radius: $border-radius-lg;
+        .btn-icon {
+            top: .5rem;
+            right: .5rem;
+        }
+    }
+
+    .emojionearea-editor {
+        @include overscroll-behavior-contain;
+    }
+}
+
+/* fix for IE11 */
+html.ie .modal-content .emojionearea {
+    width: 100%;
+}
+
+.modal-header {
+    .btn-icon {
+        margin-right: -.5rem;
+    }
+}
+
+.modal-title {
+    @include text-truncate();
+}
+
+.modal .form-buttons:last-child {
+    @extend .modal-footer;
+    margin-top: -$modal-inner-padding/2;
+    margin-right: -$modal-inner-padding;
+    margin-left: -$modal-inner-padding;
+    margin-bottom: -$modal-inner-padding;
+    padding-top: $modal-inner-padding/2;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    position: sticky;
+    bottom: -$modal-inner-padding;
+    background: rgba($modal-content-bg, $opacity-backdrop);
+
+    > :not(:first-child) {
+        margin-left: 0;
+        margin-right: .25rem;
+    }
+
+    > :not(:last-child) {
+        margin-left: .25rem;
+        margin-right: 0;
+    }
+}

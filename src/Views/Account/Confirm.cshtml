@@ -1,0 +1,44 @@
+﻿@model Weavy.Web.Models.ConfirmationModel
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = "Confirm email";
+}
+
+@section scripts {
+    <script>
+        // init pincode input
+        document.addEventListener("turbolinks:load", function () {
+            $(".pincode").pincode();
+        });
+
+        // destroy pincode input
+        document.addEventListener("turbolinks:before-cache", function () {
+            var pincode = $('.pincode').pincode();
+            if (pincode.length) {
+                pincode.data('plugin_pincode').destroy();
+            }
+        });
+    </script>
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-6">
+            <div class="text-center mb-3">
+                @Html.IconImg(48)
+            </div>
+            <h1 class="display-3">Check your email</h1>
+            <p>We’ve sent a @Model.Invite.Code.Length-digit confirmation code to <strong>@Model.Invite.Email</strong>. It will expire shortly, so enter your code soon.</p>
+            @using (Html.BeginForm(nameof(AccountController.Confirm), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
+                @Html.AntiForgeryToken()
+                <div class="form-group mt-4 d-flex flex-column align-items-center">
+                @Html.EditorsForModel(formGroups: false, formLabels : false)
+                </div>
+                <div class="form-buttons justify-content-center">
+                    <button type="submit" id="btn-confirm" class="btn btn-primary btn-load">Confirm</button>
+                </div>
+            }
+            <p class="text-muted">Keep this window open while checking for your code. Haven't received our email? Try your spam folder!</p>
+        </div>
+    </div>
+</div>

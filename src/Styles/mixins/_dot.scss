@@ -1,0 +1,9 @@
+﻿/// <reference path="../_core.scss" />
+@mixin dot($color: $deep-orange, $size: .5rem) {
+    content: "";
+    background-color: $color;
+    display: inline-block;
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+}

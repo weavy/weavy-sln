@@ -1,0 +1,117 @@
+﻿@model Blob
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var value = Model;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+    bool remove = ViewData["Remove"] as bool? ?? true;
+    bool plain = ViewData["Plain"] as bool? ?? false;
+    string id = ViewData.TemplateInfo.GetFullHtmlFieldId("");
+    string name = ViewData.TemplateInfo.GetFullHtmlFieldName("");
+    string displayName = (ViewData["DisplayLabel"] as string) ?? prop.DisplayName();
+    int size = 128;
+
+    var attrs = new Dictionary<string, object>();
+    attrs["id"] = id;
+    attrs["type"] = "file";
+    attrs["class"] = "custom-file-input";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+
+    if (prop.Extensions() != null) {
+        attrs["accept"] = string.Join(", ", prop.Extensions().Split('|').Select(x => "." + x));
+    }
+
+    attrs["data-drop-zone"] = "#dz-" + id;
+
+    if (prop.MaxSize() != null) {
+        attrs["data-max-size"] = prop.MaxSize();
+    }
+
+    attrs["data-single-file-uploads"] = false;
+    attrs["data-url"] = WeavyRequestContext.Current.ApplicationPath + "api/blobs";
+
+    if (prop.IsRequired()) {
+        attrs["required"] = null;
+    }
+
+    string placeholder = meta.Watermark;
+    string thumb = null;
+    if (prop.PlaceholderImage() != null) {
+        placeholder = placeholder ?? "Choose image";
+        thumb = Url.Content(prop.PlaceholderImage());
+    } else {
+        placeholder = placeholder ?? "Choose file";
+    }
+
+    string attributes = "";
+    foreach (var attr in attrs) {
+        attributes += " ";
+        if (attr.Value == null) {
+            attributes += attr.Key;
+        } else {
+            attributes += string.Concat(attr.Key, "=", @"""" + Html.AttributeEncode(attr.Value) + @"""");
+        }
+    }
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+@if (label) {
+    @Html.Label(prop.DisplayName(), displayName)
+}
+
+<div class="file-upload" id="dz-@id">
+    <input type="hidden" name="@name" value="@(value != null ? value.Id.ToString() : "delete")" />
+    @if (plain) {
+        <div class="custom-file">
+            <input @Html.Raw(attributes.Trim()) />
+            <label class="custom-file-label custom-file-control" for="@id">@(value?.Name)</label>
+        </div>
+        <div class="progress invisible">
+            <div class="progress-bar" role="progressbar"></div>
+        </div>
+    } else if (thumb == null) {
+        var fmt = FileHelper.GetPreviewFormat(Model.Name);
+        var icon = FileHelper.GetIcon(Model.Name);
+        var imageUrl = (value != null && fmt == PreviewFormat.Image ? value.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both) : "");
+        <label class="custom-file custom-image">
+
+            <img class="img-@size @(fmt == PreviewFormat.Image ? "" : "d-none")" src="@imageUrl" data-thumb="" alt="" width="@size" height="@size" />
+
+            <span class="custom-icon @(fmt != PreviewFormat.Image ? "" : "d-none")">
+                @Html.SvgIcon(icon.Name, size: 96, color: icon.Color)
+            </span>
+
+            <input @Html.Raw(attributes.Trim()) />
+            <span class="custom-file-control">@(value?.Name)</span>
+        </label>
+        <div class="progress invisible">
+            <div class="progress-bar" role="progressbar"></div>
+        </div>
+    } else {
+        IHasAvatar avatarfor = ViewData["AvatarFor"] as IHasAvatar;
+        <label class="custom-file custom-image">
+            <img class="img-@size" src="@(value != null ? (avatarfor?.AvatarUrl(size, size) ?? value.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both)) : thumb)" data-thumb="@thumb" alt="" width="@size" height="@size" />
+            <span class="custom-file-label">@placeholder</span>
+            <input @Html.Raw(attributes.Trim()) />
+            <span class="progress invisible"><span class="progress-bar" role="progressbar"></span></span>
+        </label>
+    }
+    <div class="invalid-feedback@(feedback != null ? " d-block" : "")">@feedback</div>
+    <div class="form-text@(feedback != null ? " d-none" : "")">@meta.Description 
+    @if (remove) {
+        <a href="javascript:;" class="clear@(value == null ? " d-none" : "")">Remove @displayName.ToLower().</a>
+    }
+    </div>
+</div>
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}

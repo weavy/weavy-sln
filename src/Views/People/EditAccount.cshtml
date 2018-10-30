@@ -1,0 +1,40 @@
+﻿@model EditAccountModel
+@using Microsoft.Owin.Security
+@{
+    Title = "Edit user";
+    var user = Model.User;
+    Back = Url.Back(user.Url());
+}
+
+
+@section navbar_secondary {
+    @{Html.RenderPartial("_Navbar", user); }
+}
+
+<div class="container my-3">
+
+    @using (Html.BeginForm(nameof(PeopleController.UpdateAccount), typeof(PeopleController).ControllerName(), FormMethod.Post, new { id = "update-account-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.AntiForgeryToken()
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsExternal), nameof(Model.IsSuspended) })
+
+        <div class="form-group">
+            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsExternal, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { FormGroup = false })
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+        </div>
+    }
+
+    @if (user.Logins.Any()) {
+        <h6>Linked accounts</h6>
+        <ul class="list-unstyled">
+            @foreach (Login login in user.Logins) {
+                <li>@login.Provider / @(login.Email ?? login.ProviderId)</li>
+            }
+        </ul>
+    }
+</div>

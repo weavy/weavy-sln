@@ -1,0 +1,75 @@
+﻿@model SpaceModel
+@{
+    Title = WeavyContext.Space.Name;
+}
+
+@section navbar_middle {
+    @{ Html.RenderPartial("_NavbarMenu");}
+}
+
+@if (WeavyContext.Space.HasPermission(Permission.Apps)) {
+    @section navbar_secondary {
+        <nav class="nav nav-tabs">
+            <div class="ml-auto my-2 px-1">
+                <a href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" class="btn btn-icon" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="Add tab" title="Add tab">@Html.SvgIcon("plus") Add tab</a>
+            </div>
+        </nav>
+    }
+}
+
+<div class="cover cover-bg cover-under-navbar">
+    <div class="text-center my-4" style="padding-bottom:2.5rem;">
+        @WeavyContext.Space.AvatarImg(128)
+    </div>
+    <div class="facepile">
+        @Model.Members.Facepile(size: 32, link:true, presence: true)
+
+        @if (WeavyContext.Space.IsMember) {
+            if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
+                <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Html.SvgIcon("plus")</button>
+            }
+        } else if (WeavyContext.Space.HasPermission(Permission.Join)) {
+            var pending = SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id);
+            if (pending) {
+                <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Undo membership request">@Html.SvgIcon("account-minus")</button>
+                </form>
+            } else {
+                <form action="@(Url.Action<SpaceController>(c => c.Join(WeavyContext.Space.Id)))" method="post" data-turboform>
+                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Join space">@Html.SvgIcon("account-plus", "white")</button>
+                </form>
+            }
+        }
+    </div>
+</div>
+
+<div class="container my-4">
+    @if (!WeavyContext.Space.Description.IsNullOrEmpty()) {
+        <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
+    }
+    <p class="small text-center text-muted">
+        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>@(" · " + WeavyContext.Space.Privacy.GetDisplayName())
+    </p>
+
+    @if (!WeavyContext.Space.IsMember && SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id)) {
+        <div class="alert alert-info d-flex">
+            @Html.SvgIcon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2" })
+            <span>Your membership request is waiting for approval.</span>
+        </div>
+    } else {
+        <h5 class="display-4 text-center mb-3">Sorry, nothing to see here yet!</h5>
+    }
+
+
+    @if (WeavyContext.Space.HasPermission(Permission.Apps)) {
+        <a class="alert alert-info fade show d-flex" role="alert" href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="Add tab" title="Add tab">
+            @Html.SvgIcon("information-outline", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-sm-block" })
+            <span class="mr-2">Let's <span class="alert-link">add some tabs</span> to get started.</span>
+            <span class="btn btn-outline-info ml-auto">Add tab</span>
+        </a>
+    }
+
+
+</div>
+

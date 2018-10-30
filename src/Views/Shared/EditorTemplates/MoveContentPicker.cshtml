@@ -1,0 +1,75 @@
+﻿@model int?
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+
+    var attrs = new Dictionary<string, object>();
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+    if (prop.IsRequired()) {
+        attrs["required"] = null;
+    }
+
+    var source = ViewData["Source"] as Content;
+    var app = source?.App() as FilesApp;
+
+    // get spaces where we have content permission
+    var spaces = SpaceService.Search(new SpaceQuery() { Archived = false, Filter = true, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Content));
+
+    //  get FileApps for each space above
+    var apps = spaces.Select(s => AppService.GetApps<FilesApp>(s.Id).FirstOrDefault()).Where(a => a != null);
+}
+
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+@if (label) {
+    <label for="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")">Space</label>
+}
+
+<select class="form-control custom-select app-picker" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")" name="AppId" data-content-picker="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+    @foreach (var a in apps) {
+        <option value="@a.Id" @if (a.SpaceId == source?.SpaceId.Value) { <text> selected</text>}>@a.Space().Name</option>
+    }
+</select>
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}
+
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+@if (label) {
+    @Html.LabelFor(m => m)
+}
+
+<select class="form-control custom-select content-picker" name="@ViewData.TemplateInfo.GetFullHtmlFieldName("")" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("")" data-source="@(source?.Id)">
+    @if (source != null) {
+        @Html.ContentPickerOptions(app, source)
+    } else if (!spaces.IsNullOrEmpty()) {
+        @Html.ContentPickerOptions(app)
+    }
+
+</select>
+
+@if (feedback != null) {
+    <div class="invalid-feedback">@feedback</div>
+} else if (text) {
+    <div class="form-text">@meta.Description</div>
+}
+
+@if (group) {
+    WriteLiteral(@"</div>");
+}
+

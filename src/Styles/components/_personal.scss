@@ -1,0 +1,25 @@
+/// <reference path="../_core.scss" />
+body.controller-stripaccount {
+
+    .navbar-secondary .navbar-title {
+        justify-content: unset;
+    }
+
+    .navbar-icons {
+        [data-widget-name="minimize"], [data-widget-name="maximize"] {
+            visibility: hidden;
+        }
+    }
+}
+
+.notification-alerts .alert {
+    display: none;
+}
+
+.notification-required {
+    cursor: pointer;
+
+    &.alert-link {
+        font-weight: bold;
+    }
+}

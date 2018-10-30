@@ -1,0 +1,39 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = ViewBag.Title as string ?? "Notify";
+    var message = ViewBag.Message as string;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-6">
+            <div class="text-center mb-3">
+                @Html.IconImg(48)
+            </div>
+            <h1 class="display-3 text-center">@(ViewBag.Title as string)</h1>
+            <p>@message</p>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    @if (Title == "Notify") {
+        <script>
+        var win = null;
+
+        if (window.opener) {
+            win = window.opener.parent;
+        }
+        @if (User.IsAuthenticated()) {
+            <text>weavy.postal.post({ name: "signedIn" }, win, true);</text>
+        } else {
+            <text>weavy.postal.post({ name: "signedOut" }, win, true);</text>
+        }
+
+        if (win != null) {
+            window.close();
+        }
+        </script>
+    }
+}

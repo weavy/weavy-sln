@@ -1,0 +1,15 @@
+﻿@model ErrorModel
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = Model.Code + " " + Model.Description;
+}
+
+<div class="container my-4">
+    <h1 class="display-1">@Model.Code @Model.Description</h1>
+    @if (string.IsNullOrEmpty(Model.Message)) {
+        <p>The specified space is not allowed on the current url. Please update the allowed urls on the space's strip settings.</p>
+    } else {
+        <p>@Model.Message</p>
+    }
+    @{ Html.RenderPartial("_Back"); }
+</div>

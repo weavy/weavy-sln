@@ -1,0 +1,50 @@
+// Mixins
+
+@mixin opacity($opacity) {
+  opacity: $opacity;
+}
+
+@mixin vertical-gradient($startColor, $endColor) {
+  background-color: mix($startColor, $endColor, 60%);
+  @if $has-gradients { 
+    background-image: linear-gradient(to bottom, $startColor, $endColor); 
+    background-repeat: repeat-x;
+  } @else {
+    background-color: mix($startColor, $endColor, 60%);
+  }
+}
+
+@mixin border-radius($radius)  {
+  @if ($has-radius = true) {
+    border-radius: $radius;
+  }
+}
+
+@mixin box-shadow($shadow)  {
+  @if $has-boxshadow {
+    box-shadow: $shadow;
+  }
+}
+
+@mixin transition($transition) {
+  transition: $transition;
+}
+
+@mixin inline-block() {
+  display: inline-block;
+}
+
+@mixin reset-gradient() {
+  background: transparent;
+}
+
+@mixin word-wrap() {
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}

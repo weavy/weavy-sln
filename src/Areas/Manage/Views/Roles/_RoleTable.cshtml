@@ -1,0 +1,40 @@
+﻿@model SearchResult<Role, RoleQuery>
+
+@if (Model.Any()) {
+    foreach (var role in Model) {
+        <tr @(Html.Raw(role.IsTrashed() ? @"class=""table-trashed""" : "")) data-href="@role.Url()">
+            <td class="table-icon">@Html.SvgIcon("account-multiple", "blue")</td>
+            <td><a href="@role.Url()">@role.Name</a></td>
+            <td>@role.Description</td>
+            <td class="text-right">@role.MemberIds.Count()</td>
+            <td class="table-icon">
+                <div class="dropdown">
+                    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                        @Html.SvgIcon("dots-vertical")
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="@(Url.Action<RolesController>(c => c.Edit(role.Id)))">@Html.SvgIcon("pencil", "primary") Edit</a>
+                        @if (role.IsTrashed()) {
+                            <form action="@(Url.Action<RolesController>(c => c.Restore(role.Id)))" method="post" data-turboform>
+                                <button class="dropdown-item" type="submit">@Html.SvgIcon("backup-restore", "success") Restore</button>
+                            </form>
+                        } else {
+                            <form action="@(Url.Action<RolesController>(c => c.Trash(role.Id)))" method="post" data-turboform>
+                                @Html.AntiForgeryToken()
+                                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                <button class="dropdown-item" type="submit">@Html.SvgIcon("delete", "danger") Trash</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+
+
+            </td>
+        </tr>
+    }
+
+    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+        <td colspan="4"></td>
+    </tr>
+}
+

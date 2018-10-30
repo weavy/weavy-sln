@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <meta name="turbolinks-cache-control" content="no-preview">
+    <title>@Html.Title(Title)</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400|Open+Sans" rel="stylesheet">
+    @Html.ThemeStyle("~/areas/signup/styles/signup.scss")
+    @RenderSection("styles", required: false)
+    @Bundler.Scripts("~/areas/signup/scripts/signup.bundle")
+    @RenderSection("scripts", required: false)
+</head>
+<body class="@BodyClasses("no-navbar")" @BodyAttributes>
+    @Html.SvgSprite()
+    @RenderSection("back", required: false)
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md-10 col-lg-7">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</body>
+</html>

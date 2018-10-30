@@ -1,0 +1,47 @@
+/// <reference path="../_core.scss" />
+
+// search form with search icon
+.form-group[role=search] {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+
+    .form-control {
+        padding-right: 2.25rem;
+
+        &:focus, &.focus {
+            @extend .form-control:focus;
+        }
+    }
+
+    .btn-icon {
+        position: absolute;
+        bottom: $spacer/4;
+        right: $spacer/4;
+        z-index: 4;
+    }
+}
+
+// filter form (on people and spaces page etc).
+.filter-form {
+    margin-bottom: .5rem;
+    @include media-breakpoint-up(md) {
+        max-width: 20rem;
+    }
+}
+
+.highlight {
+    background-color: color("yellow", 200);
+    padding: .125em .2em;
+    @include border-radius;
+}
+
+.search-result-item {
+    
+    margin: 1rem 0;
+    color: $text-color;
+
+    .i {
+        margin-top: .125rem;
+    }
+}

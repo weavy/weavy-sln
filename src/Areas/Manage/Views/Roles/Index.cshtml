@@ -1,0 +1,34 @@
+﻿@model SearchResult<Role, RoleQuery>
+@{
+    Title = "Roles";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+
+@section fab {
+    <div class="fab">
+        <a class="btn btn-round btn-primary" href="@(Url.Action<RolesController>(c => c.New()))" title="Add role">@Html.SvgIcon("plus")</a>
+    </div>
+}
+
+<div class="container-fluid my-3">
+    @(Html.FilterForm<RolesController>(c => c.Index(null), Model.Query))
+
+    <table class="table table-hover table-roles">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Members</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody id="infinite-scroll-target">
+            @{ Html.RenderPartial("_RoleTable", Model); }
+        </tbody>
+    </table>
+    @Html.ScrollMore(Model)
+
+
+</div>

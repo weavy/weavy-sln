@@ -1,0 +1,85 @@
+// ButtonGroup
+
+.#{$prefix}-toolbar .#{$prefix}-btn-group {
+  margin: 0;
+  padding: 2px 0;
+}
+
+@mixin btn-group-border-left($border-color) { 
+  @if ($has-button-borders = true) {
+    border-left: 1px solid $border-color;
+  }
+}
+
+@mixin btn-group-border-right($border-color) { 
+  @if ($has-button-borders = true) {
+  border-right: 1px solid $border-color;
+  }
+}
+
+.#{$prefix}-btn-group .#{$prefix}-btn {
+  border-width: $btn-group-border-width;
+  margin: 0;
+  @include border-radius(0);
+  margin-left: $flow-layout-spacing;
+}
+
+.#{$prefix}-btn-group .#{$prefix}-btn { 
+  @if ($has-button-borders = true) {
+  border-left-width: 0;
+  border-right-width: 0;
+  margin-left: 0;
+  }
+}
+
+.#{$prefix}-btn-group:not(:first-child) { 
+  @if ($has-button-borders = true) {
+  padding-left: 1px;
+  margin-left: 1px;
+  }
+}
+
+.#{$prefix}-btn-group:not(:first-child) { 
+  @if ($has-button-borders = true) {
+  border-left: 1px solid darken($btn-bg, 15%);
+  padding-left: 0;
+  margin-left: $flow-layout-spacing;
+  }
+}
+
+.#{$prefix}-btn-group {
+  @include border-radius(3px 0 0 3px);
+  @include btn-group-border-left($btn-border-left);
+  margin-left: 2px;
+}
+
+.#{$prefix}-btn-group .#{$prefix}-last {
+  @include border-radius(0 3px 3px 0);
+  @include btn-group-border-right($btn-border-right);
+}
+
+.#{$prefix}-btn-group .#{$prefix}-first.#{$prefix}-last {
+  @include border-radius(3px);
+}
+
+.#{$prefix}-btn-group .#{$prefix}-btn.#{$prefix}-flow-layout-item {
+  margin: 0;
+}
+
+// RTL
+
+.#{$prefix}-rtl .#{$prefix}-btn-group .#{$prefix}-btn {
+  margin-left: 0;
+  margin-right: $flow-layout-spacing;
+}
+
+.#{$prefix}-rtl .#{$prefix}-btn-group .#{$prefix}-first {
+  margin-right: 0;
+}
+
+.#{$prefix}-rtl .#{$prefix}-btn-group:not(:first-child) {
+  border-left: none;
+  border-right:1px solid darken($btn-bg, 15%);
+  padding-right: $flow-layout-spacing + 2px;
+  margin-right: $flow-layout-spacing + 2px;
+}

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<IDaemon>
+@{
+    Title = "Scheduled tasks";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container-fluid mt-3">
+
+@if (Model.HasItems()) {
+    <table class="table table-hover table-daemons">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Last run</th>
+                <th>Next run</th>
+                <th>Schedule (UTC)</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var daemon in Model) {
+                <tr @(Html.Raw(daemon.Status() == "Failed" ? @"class=""table-danger""" : !daemon.IsLoaded() ? @"class=""table-warning""" : !daemon.IsEnabled ? @"class=""table-disabled""" : "")) data-href="@(Url.Action<DaemonsController>(c => c.Get(daemon.Id)))">
+                    <td class="table-icon"><a class="btn btn-icon" href="@(Url.Action<DaemonsController>(c => c.Get(daemon.Id)))">@Html.SvgIcon(daemon.Icon, daemon.Color)</a></td>
+                    <td><a href="@(Url.Action<DaemonsController>(c => c.Get(daemon.Id)))">@daemon.Name</a></td>
+                    <td>@Html.Time(daemon.FinishedAt)</td>
+                    <td>@(daemon.NextRun() != null ? Html.Time(daemon.NextRun(), daemon.NextRun().Value >= DateTime.UtcNow ? null : "Now") : null)</td>
+                    <td title="@daemon.Schedule">@(daemon.Crontab != null ? Weavy.Core.Cron.ExpressionDescriptor.GetDescription(daemon.Schedule) : null)</td>
+                    <td class="table-icon">
+                        @if (!daemon.IsLoaded()) {
+                            using (Html.BeginForm(nameof(DaemonsController.Delete), null, new { id = daemon.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
+                                @Html.HttpMethodOverride(HttpVerbs.Delete);
+                                <button type="submit" class="btn btn-icon btn-danger" title="Delete">@Html.SvgIcon("close")</button>
+                            }
+                        } else if (daemon.IsRunning()) {
+                            <button type="button" class="btn btn-icon btn-muted" title="Running" disabled>@Html.SvgIcon("play")</button>
+                        } else if (daemon.IsRunnable()) {
+                            <form action="@Url.Action(nameof(DaemonsController.Run), null, new { id = daemon.Id })" method="post" data-turboform>
+                                <button type="submit" class="btn btn-icon btn-primary" title="Run now">@Html.SvgIcon("play")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+</div>

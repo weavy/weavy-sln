@@ -1,0 +1,39 @@
+﻿@model User
+@{
+    Title = Model.GetTitle();
+    Back = Url.Back<PeopleController>(c => c.Index(null, null, null));
+    var profiledata = Html.DisplayGroups(Model.Profile, exclude: new[] { "Avatar", "Name" })?.ToHtmlString();
+}
+
+<div class="cover cover-bg cover-under-navbar">
+    <div class="container text-center py-4">
+            @Model.AvatarImg(128)
+
+        @if (Model.Username == Title) {
+            <p class="pt-2 mb-0">@@@Model.Username @Html.Badge(Model)</p>
+        } else {
+            <p class="pt-2 mb-0">@Title <small>@@@Model.Username</small> @Html.Badge(Model)</p>
+        }
+    </div>
+    <div class="top-right">@{ Html.RenderPartial("_UserMenu", Model);}</div>
+</div>
+
+
+<div class="container my-3">
+    @if (profiledata.IsNullOrWhiteSpace() && Model.Email == null) {
+        if (Model.Id == User.Id) {
+            <p class="text-muted text-center py-3 empty">You should <a href="@Url.Action(nameof(AccountController.EditProfile), typeof(AccountController).ControllerName())">edit your profile</a> and add some information to this page...</p>
+        } else {
+            <p class="text-muted text-center py-3 empty">You should let @Title know that their profile page is empty...</p>
+        }
+    } else {
+        @Html.Raw(profiledata);
+    }
+
+    @if (Model.Email != null) {
+        <div class="display-group" data-type="string">
+            <label class="font-weight-bold">Email</label>
+            <div>@Html.DisplayFor(x => Model.Email)</div>
+        </div>
+    }
+</div>

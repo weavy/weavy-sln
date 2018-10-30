@@ -1,0 +1,61 @@
+﻿@using Weavy.Web.Controllers
+@model Member
+
+<div class="dropdown d-inline-block">
+    <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+        @Html.SvgIcon("dots-vertical")
+    </button>
+    <div class="dropdown-menu dropdown-menu-right" prevent-modal>
+        @if (Model.Id == User.Id) {
+            // menu items for current user
+            using (Html.BeginForm(nameof(SpaceController.UpdateMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
+                @Html.HttpMethodOverride(HttpVerbs.Put)
+                if (Model.Access == Access.Admin) {
+                    <input type="hidden" name="access" value="@Access.Write" />
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("account-key") Remove as admin</button>
+                } else if (User.IsAdmin || !(bool)ViewBag.HasAdmin) {
+                    <input type="hidden" name="access" value="@Access.Admin" />
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("account-key") Make me admin</button>
+                }
+            }
+            <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button type="submit" class="dropdown-item">@Html.SvgIcon("account-minus") Leave space</button>
+            </form>
+
+        } else {
+            // menu items for other space members
+            <a class="dropdown-item" href="@(Url.Action<Weavy.Web.Areas.Messenger.Controllers.MessengerController>(c => c.GetConversationWithUser(Model.Id)))" data-role="messenger" target="_blank">@Html.SvgIcon("message-text") Message</a>
+
+            if (Model.IsPending && WeavyContext.Space.HasPermission(Permission.ApproveMembers)) {
+                using (Html.BeginForm(nameof(SpaceController.ApproveMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("check") Approve</button>
+                }
+                using (Html.BeginForm(nameof(SpaceController.DenyMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("close") Deny</button>
+                }
+            }
+
+            if (WeavyContext.Space.HasPermission(Permission.Admin)) {
+                // additional menu items for space admins
+                using (Html.BeginForm(nameof(SpaceController.UpdateMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
+                    @Html.HttpMethodOverride(HttpVerbs.Put)
+                    if (Model.Access == Access.Admin) {
+                        <input type="hidden" name="access" value="@Access.Write" />
+                        <button type="submit" class="dropdown-item">@Html.SvgIcon("account-minus") Remove as admin</button>
+                    } else if (!Model.IsPending && !Model.IsExternal) {
+                        <input type="hidden" name="access" value="@Access.Admin" />
+                        <button type="submit" class="dropdown-item">@Html.SvgIcon("account-key") Make admin</button>
+                    }
+                }
+
+                using (Html.BeginForm(nameof(SpaceController.RemoveMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button type="submit" class="dropdown-item">@Html.SvgIcon("account-minus") Remove</button>
+                }
+            }
+        }
+    </div>
+</div>
+

@@ -1,0 +1,57 @@
+﻿@using Microsoft.Owin.Security
+@using Weavy.Web.Controllers
+@model Weavy.Web.Models.SignInModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>@Theme.Name</title>
+    @Html.ThemeStyle("~/styles/weavy.scss")
+    @Bundler.Scripts("~/scripts/msofba.bundle")
+</head>
+<body class="@BodyClasses("body-dark")">
+    @if (Model != null) {
+        @Html.SvgSprite()
+        <main>
+            <div class="container">
+                <div class="row justify-content-sm-center">
+                    <div class="col-sm-8 col-md-6 col-lg-5">
+                        <div class="text-center mb-3">
+                            @Html.IconImg(96)
+                        </div>
+
+                        @using (Html.BeginForm(nameof(AccountController.SignIn), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post, new { novalidate = "" })) {
+                            <div class="form-group">
+                                @Html.EditorFor(x => x.Username, new { HideSurroundingHtml = true })
+                            </div>
+                            <div class="form-group">
+                                @Html.EditorFor(x => x.Password, new { HideSurroundingHtml = true })
+                            </div>
+                            <div class="form-buttons align-items-baseline">
+                                @Html.EditorFor(x => x.RememberMe)
+                                <button type="submit" class="btn btn-primary ml-auto">Sign in</button>
+                            </div>
+                        }
+
+                        @if (Bootstrapper.Status == SystemStatus.Ok && Model.Settings.HasExternalAuthentication) {
+                            <div class="mb-3 text-center">or</div>
+                            var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().OrderBy(x => x.AuthenticationType);
+                            using (Html.BeginForm(nameof(AccountController.SignInExternal), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post, new { target = "_blank" })) {
+                                <div class="form-buttons justify-content-center">
+                                    @foreach (AuthenticationDescription p in loginProviders) {
+                                        <button type="submit" class="btn btn-@p.AuthenticationType.Slugify()" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType">@Html.SvgIcon(p.AuthenticationType.Slugify()) Sign in with @p.Caption</button>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </main>
+    }
+</body>
+</html>

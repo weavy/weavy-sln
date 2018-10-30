@@ -1,0 +1,18 @@
+﻿@model Content
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Title = "New " + Model.MetaData().Name;
+    Back = Url.Back(WeavyContext.Content.Url() ?? WeavyContext.App.Url());
+    ViewData["turboform"] = true;
+}
+
+@if (Html.HasHtmlEditor()) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
+
+<div class="container my-3">
+    @{ Html.RenderPartial("_New", Model); }
+</div>
+

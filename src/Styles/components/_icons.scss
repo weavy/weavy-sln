@@ -1,0 +1,63 @@
+/// <reference path="../_core.scss" />
+
+.icon-sprite {
+    color: $icon-color;
+}
+
+// See https://google.github.io/material-design-icons/#styling-icons-in-material-design
+.i {
+    fill: currentColor;
+    flex: 0 0 auto;
+    width: 1.5rem; // 24px
+    height: 1.5rem; // 24px
+    &.i-18 {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+
+    &.i-24 {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    &.i-36 {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+
+    &.i-48 {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    &.i-96 {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    &.i-inline {
+        vertical-align: middle;
+    }
+
+    &.i-dark {
+        color: $icon-color;
+    }
+
+    &.i-light {
+        color: $white;
+    }
+
+    &.rotate-45 {
+        transform: rotate(45deg);
+    }
+
+    &.rotate-90 {
+        transform: rotate(90deg);
+    }
+}
+
+// fix for click event being swallowed by svg <use> in Edge
+// see: https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10583086/
+button > svg, a > svg {
+    pointer-events: none;
+}

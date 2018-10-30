@@ -1,0 +1,22 @@
+﻿@model Content
+@{ 
+    var draftable = Model as IDraftable;
+    var lockable = Model as ILockable;
+    var meta = Model.MetaData();
+}
+<tr data-id="@Model.Id" data-item-guid="@Model.ContentGuid" data-allowed-children="@meta.AllowedChildren()" data-allowed-parents="@meta.AllowedParents()" data-href="@Model.Url()">
+  <td class="table-icon">@Html.SvgIcon(Model)</td>
+  <td class="py-2 align-middle" title="@Model.Name">
+    <div class="d-flex align-items-center">
+      <a href="@Model.Url()" class="text-truncate">@Model.Name</a>
+      @Html.ContentBadge(Model)
+      @if (Model is IStarrable starrable) {
+        @Html.StarToggle(starrable, true, htmlAttributes: new { @class = "ml-auto flex-noscale" })
+      }
+    </div>
+  </td>
+  <td>@Html.Time(Model.ModifiedAt, format: "g")</td>
+  <td>@Model.Kind()</td>
+  <td>--</td>
+  <td class="table-icon">@{ Html.RenderPartial("_ContentMenu", Model);}</td>
+</tr>

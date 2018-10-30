@@ -1,0 +1,108 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Serialization;
+@{
+    var bubbles = BubbleService.GetForUser(WeavyContext.User.Id).Where(x => x.SpaceId != WeavyContext.HQ?.Id).Select(x => x.SpaceBubble).ToList();
+
+    if (WeavyContext.Space != null && !bubbles.Any(s => s.SpaceId == WeavyContext.Space.Id) && !WeavyContext.Space.IsHQ) {
+        bubbles.Add(new SpaceBubble(WeavyContext.Space, BubbleType.Personal));
+    }
+}
+
+<section class="weavy-widget-nav d-standalone">
+    <div class="weavy-widget weavy-middle weavy-default" id="weavy-widget">
+        <div class="weavy-dragimage"></div>
+        <div class="weavy-buttons">
+            <div class="weavy-draggable" draggable="true">
+                <div class="weavy-bubble-item weavy-bubble-weavy" id="weavy-bubble-weavy">
+                    <div class="weavy-button weavy-logo weavy-button-transparent">@Html.IconImg(48, htmlAttributes: new { draggable = false, @class = "weavy-avatar" })</div>
+                </div>
+                @*
+
+                    <div class="weavy-bubble-item weavy-bubble-personal" id="weavy-bubble-personal">
+                        <div class="weavy-button weavy-personal weavy-button-transparent" data-count="0">@Html.SvgIcon("account-circle")</div>
+                        <div id="weavy-bubble-tooltip-personal" class="weavy-bubble-tooltip"><span class="weavy-bubble-tooltip-text">Weavy</span></div>
+                    </div>
+                *@
+                @if (!WeavyContext.Browser.WebView) {
+                    <div class="weavy-bubble-item weavy-bubble-messenger block-link" id="weavy-bubble-messenger" data-href="/messenger">
+                        <div class="weavy-button weavy-messenger weavy-button-transparent" data-count="0">
+                            <div class="weavy-icon">@Html.SvgIcon("weavy-messenger")</div>
+                            <div class="weavy-conversations" draggable="false"></div>
+                        </div>
+                        <div id="weavy-bubble-tooltip-messenger" class="weavy-bubble-tooltip"><span class="weavy-bubble-tooltip-text">Messenger</span></div>
+                    </div>
+                }
+                <div id="weavy-bubbles-cache" class="weavy-cache weavy-bubbles-cache weavy-bubbles">
+                </div>
+                <div id="weavy-bubbles-global" class="weavy-bubbles-global weavy-bubbles">
+                    @if (WeavyContext.HQ != null) {
+                        var space = WeavyContext.HQ;
+                        <div class="weavy-bubble-item weavy-bubble-@space.Id block-link" id="weavy-bubble-@space.Id" data-bubble-id="" data-type="global" data-id="@space.Id" data-href="@space.Url()">
+                            <div data-name="@space.Name" class="weavy-button weavy-bubble-@space.Id" data-type="global" style="background-image: url(@space.AvatarUrl(64));"></div>
+                            <div id="weavy-bubble-tooltip-@space.Id" class="weavy-bubble-tooltip">
+                                <span class="weavy-bubble-tooltip-text">
+                                    <span>@space.Name</span>@if (space.Teamname != null) {<small>&nbsp;@@@space.Teamname</small>}
+                                </span>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                <div id="weavy-bubbles-personal" class="weavy-bubbles-personal weavy-bubbles">
+                    @foreach (var bubble in bubbles) {
+                        var space = SpaceService.Get(bubble.SpaceId);
+                        string spaceBubbleId = new {
+                            spaceId = bubble.SpaceId,
+                            bubbleId = bubble.BubbleId
+                        }.SerializeToJson(Formatting.None, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+                        <div class="weavy-bubble-item weavy-bubble-@space.Id@(space.Id == WeavyContext.Space?.Id ? " active" : "") block-link" data-bubble-id="@bubble.BubbleId" data-type="personal" data-id="@space.Id" data-href="@space.Url()">
+                            <div data-name="@space.Name" class="weavy-button weavy-bubble-@space.Id" data-type="personal" style="background-image: url(@space.AvatarUrl(64));"></div>
+                            <div class="weavy-bubble-action weavy-bubble-close" data-remove-bubble="@spaceBubbleId" title="Close">@Html.SvgIcon("close-circle")</div>
+                            <div id="weavy-bubble-tooltip-@space.Id" class="weavy-bubble-tooltip">
+                                <span class="weavy-bubble-tooltip-text">
+                                    <span>@space.Name</span>@if (space.Teamname != null) {<small>&nbsp;@@@space.Teamname</small>}
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div id="weavy-add-container">
+                    <a class="weavy-bubble-item weavy-bubble-add" id="weavy-bubble-add" href="/">
+                        <div class="weavy-button weavy-add weavy-button-transparent">
+                            <div class="weavy-icon">@Html.SvgIcon("close", htmlAttributes: new { style = "transform: rotate(45deg)" })</div>
+                        </div>
+                        <div id="weavy-bubble-tooltip-personal" class="weavy-bubble-tooltip"><span class="weavy-bubble-tooltip-text">Open</span></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @*
+            <div class="weavy-strips">
+                <div class="weavy-strip" id="weavy-strip-personal">
+                    <div class="weavy-controls">
+                        <div class="weavy-icon weavy-expand" title="Expand">@Html.SvgIcon("arrow-expand")</div>
+                        <div class="weavy-icon weavy-collapse" title="Collapse">@Html.SvgIcon("arrow-collapse")</div>
+                        <div class="weavy-icon" title="Close">@Html.SvgIcon("close")</div>
+                    </div>
+                    <iframe class="weavy-strip-frame" id="weavy-strip-frame-personal" name="weavy-strip-frame-personal" allowfullscreen="" data-src="/widget/notifications"></iframe>
+                </div>
+                <div class="weavy-strip" id="weavy-strip-messenger">
+                    <div class="weavy-controls">
+                        <div class="weavy-icon weavy-expand" title="Expand">@Html.SvgIcon("arrow-expand")</div>
+                        <div class="weavy-icon weavy-collapse" title="Collapse">@Html.SvgIcon("arrow-collapse")</div>
+                        <div class="weavy-icon" title="Close">@Html.SvgIcon("close")</div>
+                    </div>
+                    <iframe class="weavy-strip-frame" id="weavy-strip-frame-messenger" name="weavy-strip-frame-messenger" allowfullscreen="" data-src="/messenger"></iframe>
+                </div>
+                <div class="weavy-strip" id="weavy-strip-add">
+                    <div class="weavy-controls">
+                        <div class="weavy-icon weavy-expand" title="Expand">@Html.SvgIcon("arrow-expand")</div>
+                        <div class="weavy-icon weavy-collapse" title="Collapse">@Html.SvgIcon("arrow-collapse")</div>
+                        <div class="weavy-icon" title="Close">@Html.SvgIcon("close")</div>
+                    </div>
+                    <iframe class="weavy-strip-frame" id="weavy-strip-frame-add" name="weavy-strip-frame-add" allowfullscreen="" data-src="/"></iframe>
+                </div>
+            </div>            
+        *@
+    </div>
+</section>

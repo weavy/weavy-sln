@@ -1,0 +1,57 @@
+﻿@using System.Linq;
+@{
+    Title = "Cloud Pickers Test";
+    Back = Url.Action<TestController>(c => c.Index());
+
+}
+<iframe id="filebrowser" src="about:blank" style="display:none;width:100%;height:100%;position:absolute;top:0;left:0" frameborder="0" scrolling="no"></iframe>
+
+@section scripts{
+    
+    <script>
+
+        // FOR RESEARCH ONLY - NO PRODUCTION CODE!
+
+        var loadIframe = function(origin){
+            $("#filebrowser").attr("src", "https://filebrowser.weavycloud.com?origin=" + origin);
+            $("#filebrowser").show();
+        }
+
+        $(function () {
+            if (weavy.browser.embedded) {
+                window.parent.postMessage({ name: 'requestOrigin' }, "*");
+            } else {
+                loadIframe("@Request.Url.GetLeftPart(UriPartial.Authority)");
+            }
+            
+        })
+
+        window.addEventListener("message", function (e) {
+            if (e.data.name === "insert") {
+                pickerHelpers.addLink(e.data.link);
+                console.log("Message", e)
+                alert("Top window received file: " + e.data.link)
+            }
+
+            if (e.data.name === "origin") {
+                loadIframe(e.data.url);                
+            }
+            
+        })
+        
+        var pickerHelpers = (function () {
+
+            var addLink = function (link) {
+                $link = $("<div><a href='" + link + "'>" + link + "<a/></div>");
+                $("#links").append($link);
+            }
+
+            return {
+                addLink: addLink
+            }
+        })();
+        
+    </script>
+    
+
+}

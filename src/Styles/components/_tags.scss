@@ -1,0 +1,57 @@
+/// <reference path="../_core.scss" />
+
+// tags input control
+.bootstrap-tagsinput {
+    cursor: text;
+    padding: .25rem .25rem 0;
+
+    &.focus {
+        @extend .form-control:focus;
+    }
+
+    input {
+        border: none;
+        box-shadow: none;
+        outline: none;
+        background-color: transparent;
+        width: auto;
+        max-width: inherit;
+        display: inline-block;
+        padding: .25rem 0;
+        height: 1.75rem;
+        margin: 0 0 .25rem 0;
+
+        &:focus {
+            border: none;
+            box-shadow: none;
+        }
+    }
+
+    .tag {
+        font-weight: normal;
+        background: theme-color(primary);
+        color: color-yiq(theme-color(primary));
+        border-radius: $border-radius;
+        display: inline-flex;
+        padding: 0 0 0 .5rem;
+        align-items: center;
+        margin-bottom: .25rem;
+        vertical-align: top;
+
+        [data-role="remove"] {
+            cursor: pointer;
+            padding: .25rem;
+
+            &:after {
+                content: str-replace(url("data:image/svg+xml,%EF%BB%BF%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C%21DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20version%3D%221.1%22%20baseProfile%3D%22full%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024.00%2024.00%22%20enable-background%3D%22new%200%200%2024.00%2024.00%22%20xml%3Aspace%3D%22preserve%22%3E%0A%09%3Cpath%20fill%3D%22#{color-yiq(theme-color(primary))}%22%20fill-opacity%3D%221%22%20stroke-linejoin%3D%22round%22%20d%3D%22M%2019%2C6.41L%2017.59%2C5L%2012%2C10.59L%206.41%2C5L%205%2C6.41L%2010.59%2C12L%205%2C17.59L%206.41%2C19L%2012%2C13.41L%2017.59%2C19L%2019%2C17.59L%2013.41%2C12L%2019%2C6.41%20Z%20%22%2F%3E%0A%3C%2Fsvg%3E%0A"), "#", "%23");
+                width: 1.25rem;
+                height: 1.25rem;
+                display: block;
+            }
+        }
+    }
+}
+
+select.form-control[data-role=tagsinput] {
+    height: 2.4375rem; // 39px;
+}

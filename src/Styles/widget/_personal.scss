@@ -1,0 +1,38 @@
+/// <reference path="../widget.scss" />
+
+// Personal strip and logo button
+
+.weavy-bubbles-personal {
+    &::before {
+        content: "";
+        border: 0;
+        height: rem(.0625);
+        background: $gray-400;
+        margin: rem(.5) rem(.25);
+        background-image: linear-gradient(to right, $gray-300, $gray-400, $gray-300);
+        transition: margin $md-animation-duration $md-animation-curve-default;
+        flex: 0 0 auto;
+    }
+    &:empty::before {
+        height: 0;
+        margin: 0 rem(.25);
+    }
+}
+
+.weavy-button {
+    &.weavy-personal, &.weavy-logo {
+        svg {
+            width: rem(1.75);
+            height: rem(1.75);
+            margin-top: 0;
+            fill: $theme;
+        }
+
+        img {
+            width: rem(1.5);
+            height: rem(1.5);
+            margin-top: 0;
+            border-radius: 0;
+        }
+    }
+}

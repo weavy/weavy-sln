@@ -1,0 +1,56 @@
+﻿@model Enum
+
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
+    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
+    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
+    var attrs = new Dictionary<string, object>();
+    attrs["class"] = "form-control";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+
+    string inputType = Model != null && Model.IsFlags() ? "checkbox" : prop.TemplateHint() == "Radio" ? "radio" : null;
+}
+
+@if (group) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+@if (label) {
+    @Html.LabelFor(m => m)
+}
+
+@if (inputType == null) {
+    @Html.EnumDropDownListFor(m => m, attrs)
+} else {
+    var inputName = ViewData.TemplateInfo.GetFullHtmlFieldName("");
+    Type underlyingType = Nullable.GetUnderlyingType(ViewData.ModelMetadata.ModelType) ?? ViewData.ModelMetadata.ModelType;
+    Array values = Enum.GetValues(underlyingType);
+    foreach (Enum item in values) {
+        var name = item.ToString();
+        if (inputType == "checkbox" && name == "None" || name == "All") {
+            continue;
+        } else {
+            name = item.GetDisplayName();
+        }
+        var desc = item.GetDisplayDescription();
+        <div class="custom-control custom-@inputType">
+            <input class="custom-control-input" id="@ViewData.TemplateInfo.GetFullHtmlFieldId(item.ToString())" name="@inputName" type="@inputType" value="@(Convert.ChangeType(item, item.GetTypeCode()))" @Html.Raw(Model.HasFlag(item) ? @"checked=""checked""" : "")>
+
+            <label class="custom-control-label" for="@ViewData.TemplateInfo.GetFullHtmlFieldId(item.ToString())">@name @if (desc != null) {<span class="form-text d-inline">@desc</span>}</label>
+        </div>
+    }
+}
+
+@if (feedback != null) {
+    <div class="invalid-feedback">@feedback</div>
+} else if (text) {
+    <div class="form-text">@meta.Description</div>
+}
+@if (group) {
+    WriteLiteral(@"</div>");
+}

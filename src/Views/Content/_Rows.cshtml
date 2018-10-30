@@ -1,0 +1,10 @@
+﻿@model SearchResult<Content, ContentQuery>
+
+@if (Model.Any()) {
+    foreach (var content in Model) {
+        Html.RenderPartialContent(Weavy.Core.Models.Layout.Table, content);
+    }
+    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+        <td colspan="6"></td>
+    </tr>
+}

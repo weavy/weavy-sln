@@ -1,0 +1,116 @@
+﻿@model TestViewModel
+@{
+    Title = "This is a test page with a really long title that should get truncated in smaller viewports";
+}
+
+@section styles {
+<style>
+    .body-dark .d-light {
+        display: none;
+    }
+
+    body:not(.body-dark) .d-dark {
+        display: none;
+    }
+</style>
+}
+
+@section scripts {
+    @* NOTE: adding inline scripts to a single page works just fine *@
+    <script>
+        console.info("head script on test page");
+
+        $(document).on("click", "[data-body-bg]", function (e) {
+            console.log("Going " + this.dataset.bodyBg);
+            if (this.dataset.bodyBg === "light") {
+
+                $(document.body).removeClass("body-dark");
+            } else {
+                $(document.body).addClass("body-dark");
+            }
+        });
+
+        $(document).on("click", ".fab .btn-round", function (e) {
+            $(this).toggleClass("show");
+        });
+
+        $(document).on("click", ".btn[data-alert]", function (e) {
+            var type = this.dataset.alert;
+            var text = $(this).text();
+            weavy.alert.alert(type, text, 3000);
+        });
+
+        document.addEventListener("turbolinks:load", function () {
+            // init tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        document.addEventListener("turbolinks:before-cache", function () {
+            // destroy tooltips
+            $('[data-toggle="tooltip"]').tooltip('dispose');
+        });
+    </script>
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        <a class="nav-link active" href="@Url.Action(nameof(TestController.Index))">Components</a>
+        <a class="nav-link" href="@(Url.Action<TestController>(c => c.Get("redirect")))">Redirect</a>
+        <a class="nav-link" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">Email</a>
+        <div class="dropdown align-self-center ml--1">
+            <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown"><svg class="i"><use xlink:href="#chevron-down"></use></svg></button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.ConversationEmail(false, null)))" data-turbolinks="false">@Html.SvgIcon("email") Conversation</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.DailyDigestEmail(false, null)))" data-turbolinks="false">@Html.SvgIcon("email") DailyDigest</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.InviteEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Invite</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.InviteExternalEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Invite External</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.NotificationEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Notification</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.PasswordResetEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Password Reset</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.SignupApprovalEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Signup Approval</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.SignupConfirmationEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Signup Confirmation</a>
+                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.WelcomeEmail(false)))" data-turbolinks="false">@Html.SvgIcon("email") Welcome</a>
+
+            </div>
+        </div>
+    </nav>
+    <div class="navbar-icons">
+        <button class="btn btn-icon d-dark" data-body-bg="light">@Html.SvgIcon("lightbulb-outline")</button>
+        <button class="btn btn-icon d-light" data-body-bg="dark">@Html.SvgIcon("lightbulb")</button>
+        <div class="dropdown">
+            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                @Html.SvgIcon("dots-vertical")
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="#alerts">Alerts</a>
+                <a class="dropdown-item" href="#buttons">Buttons</a>
+                <a class="dropdown-item" href="#colors">Colors</a>
+                <a class="dropdown-item" href="#forms">Forms</a>
+                <a class="dropdown-item" href="#icons">Icons</a>
+                <a class="dropdown-item" href="#navs">Navs</a>
+                <a class="dropdown-item" href="#spinners">Spinners</a>
+                <a class="dropdown-item" href="#tables">Tables</a>
+                <a class="dropdown-item" href="#text">Text</a>
+                <a class="dropdown-item" href="#pagination">Pagination</a>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container mt-3">
+    @Html.Partial("_Components")
+</div>
+
+
+@section fab {
+    <div class="fab dropup">
+        <button type="button" class="btn btn-round btn-success dropdown-toggle" data-toggle="dropdown" title="Create" aria-expanded="false" aria-haspopup="true">@Html.SvgIcon("plus")</button>
+        <div class="dropdown-menu dropdown-menu-right" role="menu">
+            <h6 class="dropdown-header">Office</h6>
+            <a class="dropdown-item" href="#">@Html.SvgIcon("file-word") Word</a>
+            <a class="dropdown-item" href="#">@Html.SvgIcon("file-excel") Excel</a>
+            <h6 class="dropdown-header">Content</h6>
+            <a class="dropdown-item" href="#">@Html.SvgIcon("file-document-box") Document</a>
+        </div>
+    </div>
+}
+

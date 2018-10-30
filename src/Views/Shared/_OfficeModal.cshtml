@@ -1,0 +1,41 @@
+﻿@if (WeavyContext.App.HasPermission(Permission.Content)) {
+    var action = WeavyContext.Content != null ? Url.Action<ContentController>(c => c.InsertFile(null, WeavyContext.Content.Id, null, null)) : Url.Action<ContentController>(c => c.InsertFile(WeavyContext.App.Id, null, null, null));
+    <div class="modal" id="filename-dialog" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New <span id="filename-dialog-type"></span> document</h5>
+                    <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                        @Html.SvgIcon("close")
+                    </button>
+                </div>
+                <form action="@action" method="post">
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Name" name="name" id="name" autofocus>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary" title="Add document"></button>
+                            </div>
+                        </div>
+                    </div>
+                    @Html.Hidden("ext")
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="upsert-content-modal" tabindex="-1" role="dialog" aria-labelledby="create-content-modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
+                        @Html.SvgIcon("close")
+                    </button>
+                </div>
+                @Html.SvgSpinner()
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+}

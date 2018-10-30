@@ -1,0 +1,15 @@
+﻿@model ErrorModel
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = Model.Code + " " + Model.Description;
+}
+
+<div class="container my-4">
+    <h1 class="display-1">@Model.Code @Model.Description</h1>
+    @if (string.IsNullOrEmpty(Model.Message)) {
+        <p>We are sorry but the page you requested cannot be found. The URL may me misspelled or the page you're looking for is no longer available.</p>
+    } else {
+        <p>@Model.Message</p>
+    }
+    @{ Html.RenderPartial("_Back"); }
+</div>

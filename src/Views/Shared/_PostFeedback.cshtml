@@ -1,0 +1,22 @@
+﻿@model Post
+@if (Model.IsLiked()) {
+    <a class="btn btn-primary btn-icon" href="@Model.Url()/like" title="Unlike" data-post-unlike="@Model.Id">@Html.SvgIcon("thumb-up", size: 18)</a>
+} else {
+    <a class="btn btn-primary btn-icon" href="@Model.Url()/like" title="Like" data-post-like="@Model.Id">@Html.SvgIcon("thumb-up-outline", size: 18)</a>
+}
+@if (Model.CommentIds.Any()) {
+    <a class="btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Html.SvgIcon("comment", size: 18)</a>
+} else {
+    <a class="btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Html.SvgIcon("comment-outline", size: 18)</a>
+}
+
+@if (Model.LikedByIds.Any()) {
+    <a class="likes" href="@Model.Url()/likes" data-toggle="modal" data-target="#feedback-modal" data-path="/posts/@Model.Id/likes" data-modal-title="Post liked by" title="Show likes">
+        @Model.LikedByIds.SingularizeOrPluralize("like", "likes")
+    </a>
+}
+@if (Model.CommentIds.Any()) {
+    <a class="comments" href="@Model.Url()/comments" data-toggle="comments" title="Toggle comments">
+        @Model.CommentIds.SingularizeOrPluralize("comment", "comments")
+    </a>
+}

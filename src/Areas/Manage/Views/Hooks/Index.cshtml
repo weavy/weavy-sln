@@ -1,0 +1,49 @@
+﻿@model IEnumerable<IHook>
+@{
+    Title = "Hooks";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container-fluid mt-3">
+@if (Model.HasItems()) {
+    <table class="table table-hover table-extensions">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hook in Model) {
+                <tr @(Html.Raw(!hook.IsLoaded() ? @"class=""table-warning""" : !hook.IsEnabled ? @"class=""table-disabled""" : "")) data-href="@(Url.Action<HooksController>(c => c.Get(hook.Id)))">
+                    <td class="table-icon"><a class="btn btn-icon" href="@(Url.Action<ToolsController>(c => c.Get(hook.Id)))">@Html.SvgIcon(hook.Icon, hook.Color)</a></td>
+                    <td><a href="@(Url.Action<HooksController>(c => c.Get(hook.Id)))">@hook.Name</a></td>
+                    <td>@hook.Description</td>
+                    <td class="table-icon">
+                        @if (!hook.IsLoaded()) {
+                            using (Html.BeginForm(nameof(HooksController.Delete), null, new { id = hook.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
+                                @Html.HttpMethodOverride(HttpVerbs.Delete);
+                                <button type="submit" class="btn btn-icon btn-danger" title="Remove">@Html.SvgIcon("close")</button>
+                            }
+                        } else if (!hook.IsCore()) {
+                            if (hook.IsEnabled) {
+                                using (Html.BeginForm(nameof(HooksController.Disable), null, new { id = hook.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
+                                    @Html.HttpMethodOverride(HttpVerbs.Put);
+                                    <button type="submit" class="btn btn-icon btn-success" title="Enabled" @if (hook.IsCore()) { <text> disabled</text> }>@Html.SvgIcon("checkbox-marked-outline")</button>
+                                }
+                            } else {
+                                using (Html.BeginForm(nameof(HooksController.Enable), null, new { id = hook.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
+                                    @Html.HttpMethodOverride(HttpVerbs.Put);
+                                    <button type="submit" class="btn btn-icon btn-warning" title="Disabled">@Html.SvgIcon("checkbox-blank-outline")</button>
+                                }
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+</div>

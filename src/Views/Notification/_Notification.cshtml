@@ -1,0 +1,18 @@
+﻿@model Notification
+@{ 
+    var html = Model.Html.TruncateQuotesAndConvertEmojiToImage(64);
+    var title = html.Contains("…") ? Model.Text.ExtractQuote() : null;
+}
+
+<a href="@Model.Url()" class="list-group-item list-group-item-action @(Model.IsRead ? "notification read": "notification")" data-entity="notification" data-id="@Model.Id">
+    <div class="media">
+        @Model.AvatarImg(size: 32, htmlAttributes: new { @class = "mt-1" })
+        <div class="media-body">
+            <p class="mb-2" title="@title">@Html.Raw(html)</p>
+            <div class="d-flex justify-content-between text-muted">
+                <small>@Html.Time(Model.CreatedAt) </small>
+                <button type="button" class="btn btn-icon btn-primary" data-toggle="notification" data-id="@Model.Id" title="@(Model.IsRead? "Mark as unread" : "Mark as read")">@Html.SvgIcon("check", size: 18)</button>
+            </div>
+        </div>
+    </div>
+</a>

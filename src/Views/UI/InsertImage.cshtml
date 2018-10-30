@@ -1,0 +1,130 @@
+﻿@model AttachmentsModel
+@using Weavy.Core.Helpers;
+@{
+    Layout = "_Layout.cshtml";
+    Title = Model.Image ? "Insert/edit image" : "Insert/edit file";
+    var blobs = Model.Attachments.Select(x => x.Blob).Concat(Model.Blobs);
+}
+
+@section scripts {
+  <script>
+    var editorType = "@(Model.Markdown ? "markdown": "html")";
+  </script>
+}
+
+<div class="container-fluid insert-image">
+
+  <header class="page-header">
+    @if (Model.Markdown) {
+      <button type="button" class="btn btn-transparent pull-right" data-close title="Close">@Html.SvgIcon("close")</button>
+      <div class="page-title">Insert image</div>
+    }
+    <nav class="nav nav-tabs" role="tablist">
+      <a class="nav-item nav-link active" href="#nav-properties" id="nav-properties-tab" aria-controls="nav-properties" aria-selected="false">Properties</a>
+      <a class="nav-item nav-link" id="nav-attachments-tab" data-toggle="tab" href="#nav-attachments" aria-controls="nav-attachments" aria-selected="true">Attachments  (<span id="filecount">@(Model.Image ? blobs.Count(x => FileHelper.IsWebImage(x.Name)) : blobs.Count())</span>)</a>
+      <a class="nav-item nav-link" href="#nav-upload" data-toggle="tab">Upload</a>
+    </nav>
+
+  </header>
+
+  <div class="tab-content mt-3">
+    <div class="tab-pane active" id="nav-properties">
+      <form method="get" class="properties">
+
+        <div class="form-group">
+          <label class="control-label" for="url">Url</label>
+          @Html.TextBox("url", Request.QueryString["src"] ?? Request.QueryString["href"], new { @class = "form-control", placeholder = Model.Image ? "Paste or type a link to an image..." : "Paste or type a link to a file..." })
+        </div>
+
+        @if (Model.Image) {
+          <div class="form-group">
+            <label class="control-label" for="alt">Description</label>
+            @Html.TextBox("alt", "", new { @class = "form-control" })
+          </div>
+
+          <div class="form-group" id="size">
+            <label class="control-label">Size</label><br />
+            <div class="btn-group" data-toggle="buttons">
+              <button type="button" name="size" id="small" class="btn btn-secondary">Small</button>
+              <button type="button" name="size" id="medium" class="btn btn-secondary">Medium</button>
+              <button type="button" name="size" id="large" class="btn btn-secondary">Large</button>
+              <button type="button" name="size" id="original" class="btn btn-secondary">Original</button>
+            </div>
+          </div>
+        }
+
+        @if (Model.SelectedAttachment != null) {
+          <input type="hidden" name="name" value="@Model.SelectedAttachment.Blob.Name" />
+          <input type="hidden" name="file_url" value="@Model.SelectedAttachment.FileUrl()" />
+          <input type="hidden" name="thumb_url" value="@Model.SelectedAttachment.ThumbPlaceholderUrl().LeftBefore("?")" />
+          <input type="hidden" name="width" value="@(Model.SelectedAttachment.Blob.Width ?? 0)" />
+          <input type="hidden" name="height" value="@(Model.SelectedAttachment.Blob.Height ?? 0)" />
+        } else if (Model.SelectedBlob != null) {
+          <input type="hidden" name="name" value="@Model.SelectedBlob.Name" />
+          <input type="hidden" name="file_url" value="@Model.SelectedBlob.FileUrl()" />
+          <input type="hidden" name="thumb_url" value="@Model.SelectedBlob.ThumbPlaceholderUrl().LeftBefore("?")" />
+          <input type="hidden" name="width" value="@(Model.SelectedBlob.Width ?? 0)" />
+          <input type="hidden" name="height" value="@(Model.SelectedBlob.Height ?? 0)" />
+        } else if (Model.SelectedFile != null) {
+          <input type="hidden" name="name" value="@Model.SelectedFile.Name" />
+          <input type="hidden" name="content_url" value="@Model.SelectedFile.FileUrl()" />
+          <input type="hidden" name="thumb_url" value="@Model.SelectedFile.ThumbPlaceholderUrl().LeftBefore("?")" />
+          <input type="hidden" name="width" value="@(Model.SelectedFile.Blob.Width ?? 0)" />
+          <input type="hidden" name="height" value="@(Model.SelectedFile.Blob.Height ?? 0)" />
+        } else {
+          <input type="hidden" name="name" />
+          <input type="hidden" name="file_url" />
+          <input type="hidden" name="thumb_url" />
+          <input type="hidden" name="width" />
+          <input type="hidden" name="height" />
+        }
+
+        <div class="buttons">
+          <button type="submit" class="btn btn-primary" id="insert">Insert</button>
+          <button type="button" class="btn btn-secondary" data-shortcut="Esc">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="tab-pane" id="nav-attachments">
+      <div class="result row p-3">
+        @foreach (var file in Model.Attachments) {
+          if (!Model.Image || (Model.Image && FileHelper.IsWebImage(file.Blob.Name))) {
+            <div class="card mr-1" style="width: 96px;">
+              <a href="javascript:;" data-name="@file.Blob.Name" data-file-url="@file.FileUrl()" data-thumb-url="@file.ThumbPlaceholderUrl().LeftBefore("?")" data-width="@file.Blob.Width" data-height="@file.Blob.Height" title="@file.Blob.Name">
+                <img alt="" src="@file.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" />
+                <div class="card-block p-1">
+                  <small>@file.Blob.Name.Ellipsis(10)</small>
+                  <div class="meta"><small>@FileHelper.FileSizeAsString(file.Blob.Size)</small></div>
+                </div>
+              </a>
+            </div>
+          }
+        }
+        @foreach (var blob in Model.Blobs) {
+          if (!Model.Image || (Model.Image && FileHelper.IsWebImage(blob.Name))) {
+            <div class="card mr-1" style="width: 96px;">
+              <a href="javascript:;" data-name="@blob.Name" data-file-url="@blob.FileUrl()" data-thumb-url="@blob.ThumbPlaceholderUrl().LeftBefore("?")" data-width="@blob.Width" data-height="@blob.Height" title="@blob.Name">
+                <img alt="" src="@blob.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" />
+                <div class="card-block p-1">
+                  <small>@blob.Name.Ellipsis(10)</small>
+                  @Html.Hidden("blobs", blob.Id)
+                  <div class="meta"><small>@FileHelper.FileSizeAsString(blob.Size)</small></div>
+                </div>
+              </a>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="tab-pane" id="nav-upload">
+      <div class="form-group">
+        <input type="file" name="files" data-url="@Url.Content("~/api/blobs")" data-single-file-uploads="true" />
+        <div class="help-block"></div>
+      </div>
+    </div>
+    <div class="progress progress-fixed"></div>
+  </div>
+</div>
+

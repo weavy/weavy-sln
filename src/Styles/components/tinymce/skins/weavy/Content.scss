@@ -1,0 +1,9 @@
+// Weavy
+@import 'core';
+
+// Default lightgray skin
+@import "../lightgray/Content";
+
+table {
+    @extend .table;
+}

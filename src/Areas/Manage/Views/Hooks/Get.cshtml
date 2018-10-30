@@ -1,0 +1,48 @@
+﻿@model IHook
+@{
+    Title = "Hooks";
+    Back = Url.Action<HooksController>(c => c.Index());
+}
+
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(HooksController.Update), null, FormMethod.Post, new { autocomplete = "off", data_turboform = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        <div class="form-group">
+            <label class="control-label">Id</label>
+            <p class="form-control-static">@Model.Id</p>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Type</label>
+            <p class="form-control-static">@Model.FullName</p>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Desciption</label>
+            <p class="form-control-static">@Model.Description</p>
+        </div>
+        if (!Model.IsLoaded()) {
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <p class="form-control-static">
+                    <span class="badge badge-danger">missing</span>
+                </p>
+            </div>
+        }
+
+        @Html.EditorsForModel()
+        <div class="form-buttons">
+            <button type="submit" name="button" value="@nameof(HooksController.Update)" class="btn btn-primary btn-load">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">Cancel</a>
+
+            @if (!Model.IsLoaded()) {
+                <button type="submit" name="button" value="@nameof(HooksController.Delete)" class="btn btn-danger btn-load" @if (Model.IsCore()) { <text> disabled</text> }>Delete</button>
+            } else if (!Model.IsCore()) {
+                if (Model.IsEnabled) {
+                    <button type="submit" name="button" value="@nameof(HooksController.Disable)" class="btn btn-outline-warning btn-load">Disable</button>
+                } else {
+                    <button type="submit" name="button" value="@nameof(HooksController.Enable)" class="btn btn-outline-success btn-load">Enable</button>
+                }
+            }
+        </div>
+    }
+</div>

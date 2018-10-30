@@ -1,0 +1,7 @@
+/// <reference path="../_core.scss" />
+.turbolinks-progress-bar {
+    height: .25rem;
+    background-color: rgba(color-yiq($theme), 0.9);
+    z-index: 2147483647; // max possible z-index
+    position: fixed;
+}

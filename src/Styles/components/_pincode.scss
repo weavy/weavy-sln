@@ -1,0 +1,35 @@
+﻿.pincode-container {
+    display: flex;
+    justify-content: center;
+
+    .pincode-text {
+        width: 3rem;
+        padding: .5rem;
+        text-align: center;
+
+        &:focus {
+            background: $theme-100;
+            position: relative;
+        }
+
+        &::selection {
+            background: transparent;
+        }
+
+        &:first-child {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        &:last-child {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-left: -$border-width;
+        }
+
+        &:not(:first-child, :last-child) {
+            border-radius: 0;
+            margin-left: -$border-width;
+        }
+    }
+}

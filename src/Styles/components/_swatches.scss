@@ -1,0 +1,39 @@
+/// <reference path="../_core.scss" />
+
+// color swatches
+.swatch {
+    width: 1.5rem; // 24px
+    height: 1.5rem; // 24px
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.swatch-theme {
+    background-color: $theme;
+    color: color-yiq($theme);
+}
+
+@each $shade, $percent in $shades {
+    .swatch-theme-#{$shade} {
+        background-color: theme-color('primary', $shade);
+        color: color-yiq(theme-color('primary', $shade));
+    }
+}
+
+@each $color, $value in $colors {
+    .swatch-#{$color} {
+        background-color: $value !important;
+        color: color-yiq($value) !important;
+    }
+
+    @each $shade, $percent in $shades {
+        .swatch-#{$color}-#{$shade} {
+            background-color: color($color, $shade);
+            color: color-yiq(color($color, $shade));
+        }
+    }
+}
+
+.table-color td {
+    border: none;
+}

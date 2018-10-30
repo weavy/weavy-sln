@@ -1,0 +1,20 @@
+﻿@model Content
+@{
+    Title = "Edit " + Model.MetaData().Name;
+    Back = Url.Back(Model.Url());
+    ViewData["turboform"] = true;
+}
+
+@section navbar_middle {
+    <div class="navbar-middle"><span class="navbar-text">@Title</span></div>
+}
+
+<div class="container mt-3">
+    @{ Html.RenderPartial("_Edit", Model); }
+</div>
+
+@if (Html.HasHtmlEditor()) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}

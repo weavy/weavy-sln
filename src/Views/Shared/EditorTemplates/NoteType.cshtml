@@ -1,0 +1,16 @@
+﻿@model AlertType
+
+@{
+    var inputName = ViewData.TemplateInfo.GetFullHtmlFieldName("");
+    Type underlyingType = Nullable.GetUnderlyingType(ViewData.ModelMetadata.ModelType) ?? ViewData.ModelMetadata.ModelType;
+    Array values = Enum.GetValues(underlyingType);
+    <div class="swatches">
+        @foreach (AlertType item in values) {
+            var name = item.GetDisplayName();
+            <div class="custom-control custom-radio" title="@name">
+                <input class="custom-control-input" id="@ViewData.TemplateInfo.GetFullHtmlFieldId(item.ToString())" name="@inputName" type="radio" value="@item" @(Model == item ? @"checked" : "")>
+                <label class="custom-control-label swatch swatch-@name.ToLower()"></label>
+            </div>
+        }
+    </div>
+}

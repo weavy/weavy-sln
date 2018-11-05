@@ -1,7 +1,11 @@
 ﻿@using Weavy.Web.Areas.Manage.Controllers
 @model User
 @{
-    bool editing = ControllerName == typeof(PeopleController).ControllerName() && (ActionName == nameof(PeopleController.EditAccount) || ActionName == nameof(PeopleController.EditProfile) || ActionName == nameof(PeopleController.EditSettings));
+    bool isEditing = ControllerName == typeof(PeopleController).ControllerName() && (ActionName == nameof(PeopleController.EditAccount) || ActionName == nameof(PeopleController.EditProfile) || ActionName == nameof(PeopleController.EditSettings));
+    bool isSelf = Model.Id == User.Id;
+    bool isOther = !isSelf;
+    bool hasDeleteAndTrash = isOther && Model.HasPermission(Permission.Delete) && !Model.IsTrashed();
+    bool hasEdit = !isEditing && Model.HasPermission(Permission.Edit);
 }
 
 @if (Model.IsTrashed()) {
@@ -11,23 +15,25 @@
         </form>
     }
 } else {
-    <div class="dropdown" prevent-modal>
+    <div class="dropdown @(isOther && !hasEdit && !hasDeleteAndTrash ? "d-desktop" : "")" prevent-modal>
         <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
             @Html.SvgIcon("dots-vertical")
         </button>
         <div class="dropdown-menu dropdown-menu-right">
-            @if (Model.Id != User.Id) {
+            @if (isOther) {
                 <a class="dropdown-item d-desktop" href="@(Url.Action<Weavy.Web.Areas.Messenger.Controllers.MessengerController>(c => c.GetConversationWithUser(Model.Id)))" data-role="messenger" target="_blank">@Html.SvgIcon("message-text", "light-blue") Message</a>
-                <div class="dropdown-divider d-desktop"></div>
-            }
-            @if (!editing && Model.HasPermission(Permission.Edit)) {
-                if (Model.Id == User.Id) {
-                    <a class="dropdown-item" href="@Url.Action(nameof(AccountController.EditProfile), typeof(AccountController).ControllerName())">@Html.SvgIcon("pencil", "primary") Edit</a>
-                } else {
-                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.EditProfile(Model.Id)))">@Html.SvgIcon("pencil", "primary") Edit</a>
+                if (hasEdit || hasDeleteAndTrash) {
+                    <div class="dropdown-divider d-desktop"></div>
                 }
             }
-            @if (Model.Id != User.Id && Model.HasPermission(Permission.Delete) && !Model.IsTrashed()) {
+            @if (hasEdit) {
+                if (isSelf) {
+                    <a class="dropdown-item" href="@Url.Action(nameof(AccountController.EditProfile), typeof(AccountController).ControllerName())" data-bubble-target="personal">@Html.SvgIcon("pencil", "primary") Edit</a>
+                } else {
+                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.EditProfile(Model.Id)))" data-bubble-target="add">@Html.SvgIcon("pencil", "primary") Edit</a>
+                }
+            }
+            @if (hasDeleteAndTrash) {
                 <button type="button" class="dropdown-item" data-trash="user" data-id="@Model.Id">@Html.SvgIcon("delete", "danger") Trash</button>
             }
         </div>

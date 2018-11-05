@@ -86,28 +86,36 @@ weavy.modal = (function ($) {
         }
     }
 
+
     function submitModalFormData($form, data, $submit) {
         var $modal = $form.closest(".modal");
         var $body = $(".modal-body", $modal);
 
-        var url = $submit && $submit.attr("formaction") || $form.attr("action");
+        var url = weavy.url.resolve($submit && $submit.attr("formaction") || $form.attr("action"));
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
 
+        var xhr = new XMLHttpRequest();
+
         $.ajax({
-            url: weavy.url.resolve(url),
+            url: url,
             type: method,
-            data: data
-        }).then(function (response) {
+            data: data,
+            xhr: function () {
+                // Use custom xhr to be able to read final location (xhr.responseURL)
+                return xhr;
+            }
+        }).done(function (response) {
             var $html = $(response);
 
             if ($html.find(".invalid-feedback").length !== 0) {
                 $body.html(response);
                 focusFirst($body);
             } else {
-                Turbolinks.visit(window.location.href);
+                var redirectLocation = xhr.responseURL !== url && xhr.responseURL || window.location.href;
+                Turbolinks.visit(redirectLocation);
             }
-        }).fail(function (xhr, status, error) {
-            var json = JSON.parse(xhr.responseText);
+        }).fail(function (jqXhr, status, error) {
+            var json = JSON.parse(jqXhr.responseText);
             weavy.alert.danger(json.message);
 
         }).always(function () {
@@ -116,7 +124,7 @@ weavy.modal = (function ($) {
     }
 
     return {
-
+        open: open
     };
 
 })($);

@@ -916,18 +916,18 @@
         </member>
         <member name="M:Weavy.Web.Areas.Api.Controllers.PostsController.GetPosts(System.Int32,Weavy.Core.Models.Query)">
             <summary>
-            Retrieves the stream of posts in a space.
+            Retrieves the stream of posts in an app.
             </summary>
-            <param name="id">The space id.</param>
+            <param name="id">The app id.</param>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>A list of posts.</returns>
             <example>GET api/spaces/1/posts?top=20</example>
         </member>
         <member name="M:Weavy.Web.Areas.Api.Controllers.PostsController.Insert(System.Int32,Weavy.Web.Areas.Api.Models.PostIn)">
             <summary>
-            Creates a new post in the specified space.
+            Creates a new post in the specified app.
             </summary>
-            <param name="id">The space id.</param>
+            <param name="id">The app id.</param>
             <param name="post">The post to insert.</param>
             <returns>The inserted post.</returns>
         </member>
@@ -3670,12 +3670,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Areas.Messenger.Controllers.MessengerController.SendInvites(System.String[])">
-            <summary>
-            Send email invites.
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:Weavy.Web.Areas.Messenger.MessengerAreaRegistration">
             <summary>
             Class for registering the messenger area.
@@ -3774,7 +3768,7 @@
         </member>
         <member name="P:Weavy.Web.Areas.Messenger.Models.MessengerModel.Settings">
             <summary>
-            Gets or sets the user settings for the current user
+            Gets or sets the user settings for the current user.
             </summary>
         </member>
         <member name="P:Weavy.Web.Areas.Messenger.Models.MessengerModel.UnreadConversations">
@@ -5501,9 +5495,9 @@
         </member>
         <member name="M:Weavy.Web.Controllers.PostController.Insert(System.Int32,Weavy.Web.Models.PostInsertModel)">
             <summary>
-            Insert a post into the specified space.
+            Insert a post into the specified app.
             </summary>
-            <param name="id">Space id</param>
+            <param name="id">App id</param>
             <param name="post">The post to insert.</param>
             <returns>The inserted post.</returns>
         </member>
@@ -7933,44 +7927,24 @@
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.InviteUsersModel.Invite1">
+        <member name="P:Weavy.Web.Models.InviteUsersModel.Email1">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.InviteUsersModel.Invite2">
+        <member name="P:Weavy.Web.Models.InviteUsersModel.Email2">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.InviteUsersModel.Invite3">
+        <member name="P:Weavy.Web.Models.InviteUsersModel.Email3">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Weavy.Web.Models.LocalDomainEmailAddress">
+        <member name="M:Weavy.Web.Models.InviteUsersModel.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.LocalDomainEmailAddress.Local">
-            <summary>
-            Gets or sets the local part of the email address.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.LocalDomainEmailAddress.Domain">
-            <summary>
-            Gets or sets the domain part of the email address.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.LocalDomainEmailAddress.Email">
-            <summary>
-            Gets or sets the full email address.
-            </summary>        
-        </member>
-        <member name="M:Weavy.Web.Models.LocalDomainEmailAddress.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
-            <summary>
-            Validate that the email address is valid (and part of the whitelisted domains).
+            Validate.
             </summary>
             <param name="validationContext"></param>
             <returns></returns>
@@ -8337,9 +8311,9 @@
             Model for moving a post.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.PostMoveModel.SpaceId">
+        <member name="P:Weavy.Web.Models.PostMoveModel.AppId">
             <summary>
-            Id of space where post should be moved.
+            Id of app where post should be moved.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.PostMoveModel.Post">
@@ -8355,16 +8329,6 @@
         <member name="M:Weavy.Web.Models.PostsModel.#ctor">
             <summary>
             
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.PostsModel.EnableEmbeds">
-            <summary>
-            Gets or sets a value indicating if embeds are enabled.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.PostsModel.EnableSharing">
-            <summary>
-            Gets or sets a value indicating whether sharing is enabled.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.PostsModel.Members">
@@ -8674,11 +8638,6 @@
         <member name="P:Weavy.Web.Models.ConfigurationModel.Smtp">
             <summary>
             Gets or sets the smtp configuration.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.ConfigurationModel.SystemOwnerEmail">
-            <summary>
-            Gets or sets the system owner email.
             </summary>
         </member>
         <member name="T:Weavy.Web.Models.ShareIn">

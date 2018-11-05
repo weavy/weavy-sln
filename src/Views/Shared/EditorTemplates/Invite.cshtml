@@ -1,0 +1,29 @@
+﻿@model string
+@{
+    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
+    var meta = ViewData.ModelMetadata;
+    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
+    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var attrs = new Dictionary<string, object>();
+
+    attrs["class"] = "form-control";
+    attrs["placeholder"] = "email address";
+    if (feedback != null) {
+        attrs.Append("class", "is-invalid");
+    }
+}
+
+<div class="form-group">
+    <div class="input-group">
+        <div class="input-group-append"><div class="input-group-text">@Html.SvgIcon("email", "primary")</div></div>
+        @Html.TextBoxFor(m => m, attrs)
+    </div>
+
+    @if (feedback != null) {
+        <div class="invalid-feedback d-flex">@feedback</div>
+    }
+</div>
+
+
+
+

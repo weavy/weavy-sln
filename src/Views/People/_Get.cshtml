@@ -18,23 +18,7 @@
 
 
 <div class="modal-body">
-
-    <div class="dropdown top-right" prevent-modal>
-        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-            @Html.SvgIcon("dots-vertical")
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-            @if (Model.HasPermission(Permission.Edit)) {
-                if (Model.Id == User.Id) {
-                    <a class="dropdown-item" href="@Url.Action(nameof(AccountController.EditProfile), typeof(AccountController).ControllerName())" data-bubble-target="personal">@Html.SvgIcon("pencil", "primary") Edit</a>
-                } else {
-                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.EditProfile(Model.Id)))" data-bubble-target="add">@Html.SvgIcon("pencil", "primary") Edit</a>
-                }
-            }
-            <a class="dropdown-item d-desktop" href="@(Url.Action<Weavy.Web.Areas.Messenger.Controllers.MessengerController>(c => c.GetConversationWithUser(Model.Id)))" data-role="messenger" target="_blank">@Html.SvgIcon("message-text", "light-blue") Message</a>
-        </div>
-    </div>
-
+    <div class="top-right">@{ Html.RenderPartial("_UserMenu", Model);}</div>
 
     @if (profiledata.IsNullOrWhiteSpace() && Model.Email == null) {
         if (Model.Id == User.Id) {

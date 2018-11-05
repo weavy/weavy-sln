@@ -6,6 +6,7 @@
     <h6 class="navbar-title mr-auto">Drafts</h6>
 </header>
 
-<div id="drafts">
-    @{ Html.RenderPartial("~/Views/Content/_Drafts.cshtml"); }
+<div id="tab-drafts">
+    <div class="tab-loading d-none">@Html.SvgSpinner()</div>
+    <div class="tab-remote loaded" data-url="@(Url.Action<ContentController>(c => c.Drafts()))"> @{ Html.RenderPartial("~/Views/Content/_Drafts.cshtml"); }</div>
 </div>

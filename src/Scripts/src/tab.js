@@ -2,32 +2,47 @@
 weavy.tab = (function ($) {
 
     // load remote tab content for specified tab-pane
-    function load(tabpane) {
+    function load(tabpane, optionalPromise) {
         var $tabpane = $(tabpane);
         var $remote = $(".tab-remote", $tabpane);
-
-        if ($remote.hasClass("loaded")) {
-            // already loaded
-            return;
-        }
 
         var url = $remote.data("url");
         if (url) {
             var $loading = $(".tab-loading", $tabpane);
-            $.ajax({
-                url: url,
-                method: "GET",
-                beforeSend: function (xhr) {
-                    $remote.addClass("d-none");
-                    $loading.removeClass("d-none").find(".spinner").addClass("spin");
-                }
-            }).done(function (html) {
+            $.when(
+                $.ajax({
+                    url: url,
+                    method: "GET",
+                    beforeSend: function (xhr) {
+                        // not previously loaded
+                        if (!$remote.hasClass("loaded")) {
+                            $remote.addClass("d-none");
+                            $loading.removeClass("d-none").find(".spinner").addClass("spin");
+                        }
+                    }
+                }),
+                optionalPromise
+            ).done(function (html) {
                 $remote.html(html).addClass("loaded");
             }).always(function () {
                 $loading.addClass("d-none").find(".spinner").removeClass("spin");
                 $remote.removeClass("d-none")
             });
         }
+
+    }
+
+    // Reload tabs on show
+    if (weavy.browser.embedded) {
+        window.addEventListener("message", function (e) {
+            switch (e.data.name) {
+                case "show":
+                    setTimeout(weavy.tab.load, 200, "#tab-notifications");
+                    setTimeout(weavy.tab.load, 200, "#tab-stars");
+                    setTimeout(weavy.tab.load, 200, "#tab-drafts");
+                    break;
+            }
+        });
 
     }
 

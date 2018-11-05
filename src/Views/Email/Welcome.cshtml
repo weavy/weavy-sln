@@ -1,4 +1,5 @@
 ﻿@model Weavy.Core.Models.WelcomeEmail
+@using Weavy.Core.Services
 @* STANDARD MODULE // *@
 <tr>
     <td align="center" valign="top">
@@ -53,7 +54,7 @@
                                                 <tr>
                                                     <td valign="top" class="textContent">
                                                         url: <a href="/">@Weavy.Core.Helpers.UrlHelper.ApplicationUrl(true)</a><br />
-                                                        username: <strong>@Model.User.Username</strong><br/>
+                                                        username: <strong>@Model.User.Username</strong><br />
                                                         password: <strong>@Model.Password</strong>
                                                     </td>
                                                 </tr>

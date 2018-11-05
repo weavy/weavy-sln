@@ -6,7 +6,7 @@
         <button type="button" class="btn btn-icon" data-dismiss="modal">@Html.SvgIcon("close")</button>
     </div>
     <div class="modal-body">
-        @Html.EditorFor(x => x.SpaceId, new { Permission = Permission.Post })
+        @Html.EditorFor(x => x.AppId, new { Source = Model.Post })
     </div>
     <div class="modal-footer border-0">
         <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>

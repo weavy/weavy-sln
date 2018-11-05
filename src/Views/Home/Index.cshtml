@@ -154,7 +154,9 @@
                 <button class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#" title="Add or invite user">@Html.SvgIcon("account-plus")</button>
                 <span class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.New()))">@Html.SvgIcon("account-plus", "primary") Add user</a>
-                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Html.SvgIcon("email", "deep-orange") Invite people</a>
+                    @if (PermissionService.HasSystemPermission(Permission.Invite)) {
+                        <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Html.SvgIcon("email", "deep-orange") Invite people</a>
+                    }
                 </span>
             </span>
         } else if (PermissionService.HasSystemPermission(Permission.Invite)) {

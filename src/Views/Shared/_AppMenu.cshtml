@@ -17,7 +17,6 @@
                     </form>
                 }
             }
-
             @if (WeavyContext.Space.HasPermission(Permission.Apps)) {
                 if (Model.HasPermission(Permission.Edit)) {
                     <div class="dropdown-divider"></div>
@@ -25,6 +24,7 @@
                 <a href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" class="dropdown-item" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="Add tab" title="Add tab">@Html.SvgIcon("plus") <span>Add tab</span></a>
 
             }
+
         </div>
     </div>
 }

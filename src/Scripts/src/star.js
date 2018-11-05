@@ -22,11 +22,17 @@ weavy.stars = (function ($) {
         // respond to realtime event starentity
         weavy.realtime.on("starentity", function (event, data) {
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").addClass("on").removeClass("d-none").attr("title", "Unstar");
+            if (weavy.browser.embedded) {
+                weavy.tab.load("#tab-stars");
+            }
         });
 
         // respond to realtime event unstarentity
         weavy.realtime.on("unstarentity", function (event, data) {
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").removeClass("on").attr("title", "Star");
+            if (weavy.browser.embedded) {
+                weavy.tab.load("#tab-stars");
+            }
         });
     }
 

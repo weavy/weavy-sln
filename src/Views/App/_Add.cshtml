@@ -1,6 +1,11 @@
 ﻿@model AppsModel
 @{
     var apps = Model.Available.Where(a => a.MetaData().AllowMultiple || !Model.Installed.Any(i => i.AppGuid == a.AppGuid));
+
+    var htmlAttributes = new Dictionary<string, object>() { { "class", "list-group-item list-group-item-action p-0 btn-list-group-item" } };
+    if (ViewData["turboform"] != null) {
+        htmlAttributes.Add("data-turboform", "");
+    }
 }
 
 @if (apps.Any()) {
@@ -9,7 +14,7 @@
         @foreach (var app in apps) {
             var meta = app.MetaData();
 
-            using (Html.BeginForm(nameof(AppController.Insert), typeof(AppController).ControllerName(), new { id = WeavyContext.Space.Id }, FormMethod.Post, new { @class = "list-group-item list-group-item-action p-0 btn-list-group-item", data_turboform = "" })) {
+            using (Html.BeginForm(nameof(AppController.Insert), typeof(AppController).ControllerName(), new RouteValueDictionary(new { id = WeavyContext.Space.Id }), FormMethod.Post, htmlAttributes)) {
                 @Html.Hidden("guid", app.AppGuid);
                 <button type="submit" class="btn w-100 text-left bg-transparent">
                     <div class="media flex-scale">

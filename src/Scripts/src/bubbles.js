@@ -195,7 +195,7 @@ weavy.bubbles = (function ($) {
             }
 
             // Bind Alt+W to navbar-menu
-            Mousetrap.bindGlobal('alt+w', function () {
+            Mousetrap.bindGlobal('ctrl+space', function () {
                 $('.navbar-menu .dropdown-toggle').click();
                 if ($('.navbar-menu').hasClass("show")) {
                     $('.navbar-menu .dropdown-item:first').focus();

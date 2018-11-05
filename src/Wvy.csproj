@@ -381,7 +381,6 @@
     <Content Include="Areas\Messenger\Views\Messenger\_ConversationMenu.cshtml" />
     <Content Include="Areas\Messenger\Views\Messenger\_Conversations.cshtml" />
     <Content Include="Areas\Messenger\Views\Messenger\_DrawerDetails.cshtml" />
-    <Content Include="Areas\Messenger\Views\Messenger\_DrawerInviteBody.cshtml" />
     <Content Include="Areas\Messenger\Views\Messenger\_DrawerMessageBody.cshtml" />
     <Content Include="Areas\Messenger\Views\Messenger\_DrawerSelectPeopleBody.cshtml" />
     <Content Include="Areas\Messenger\Views\Messenger\_DrawerSettingsBody.cshtml" />
@@ -536,8 +535,8 @@
     <Content Include="Scripts\src\widget\widget.js" />
     <Content Include="Scripts\src\widget-notifications.js" />
     <Content Include="Scripts\src\widget-personal.js" />
-    <Content Include="Scripts\weavy.bundle" />
     <Content Include="Scripts\vendor\**" />
+    <Content Include="Scripts\weavy.bundle" />
     <Content Include="Scripts\widget.bundle" />
     <Content Include="Styles\_bootstrap.scss" />
     <Content Include="Styles\_core.scss" />
@@ -687,8 +686,8 @@
     <Content Include="Styles\utilities\_position.scss" />
     <Content Include="Styles\utilities\_scroll.scss" />
     <Content Include="Styles\utilities\_text.scss" />
-    <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\vendor\**" />
+    <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\widget.scss" />
     <Content Include="Styles\widget\_alert.scss" />
     <Content Include="Styles\widget\_avatars.scss" />
@@ -706,9 +705,6 @@
     <Content Include="Styles\widget\_strips.scss" />
     <Content Include="Styles\widget\_variables.scss" />
     <Content Include="Styles\widget\_wide.scss" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\_Navbar.cshtml" />
     <Content Include="Views\Account\AddWindows.cshtml" />
@@ -842,7 +838,6 @@
     <Content Include="Views\Shared\_Poll.cshtml" />
     <Content Include="Views\Shared\_Post.cshtml" />
     <Content Include="Views\Shared\_PostFeedback.cshtml" />
-    <Content Include="Views\Shared\_PostForm.cshtml" />
     <Content Include="Views\Shared\_PostMenu.cshtml" />
     <Content Include="Views\Shared\_Posts.cshtml" />
     <Content Include="Views\Shared\_Preview.cshtml" />
@@ -874,8 +869,9 @@
     <Content Include="Views\Shared\EditorTemplates\Html.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Int32.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Int64.cshtml" />
-    <Content Include="Views\Shared\EditorTemplates\LocalDomainEmailAddress.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Invite.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\MoveContentPicker.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\MovePostPicker.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\MultilineText.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\NoteType.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Password.cshtml" />
@@ -913,6 +909,9 @@
     <Content Include="Views\UI\InsertLink.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Widget\FileBrowser.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

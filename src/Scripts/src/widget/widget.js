@@ -110,11 +110,20 @@
                     var $frame = $("iframe", $strip);
 
                     if (destination) {
+                        // load destination
                         loadInTarget(strip, destination);
                         loading.call(self, "weavy-strip-" + strip, true, true);
                     } else if (!$frame.attr("src") && $frame[0].dataset && $frame[0].dataset.src) {
+                        // start predefined loading
                         $frame.attr("src", $frame[0].dataset.src);
                         loading.call(self, "weavy-strip-" + strip, true);
+                    } else {
+                        // already loaded
+                        try {
+                            $frame[0].contentWindow.postMessage({ name: 'show' }, "*");
+                        } catch (e) {
+                            console.debug("Could not postMessage:show to frame");
+                        }
                     }
 
                     self.triggerEvent("open", { target: strip });

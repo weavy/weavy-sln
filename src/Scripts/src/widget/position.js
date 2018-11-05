@@ -105,6 +105,20 @@
             minimizeTimeout.apply(widget);
         }
 
+        function clearEvents() {
+            widget.container.removeEventListener("drop", drop, false);
+            widget.container.removeEventListener("dragover", dragOver, false);
+
+            widget.draggable.removeEventListener("mousedown", dragBeforeStart, true);
+            widget.draggable.removeEventListener("mouseup", dragBeforeStartEnd, false);
+            widget.draggable.removeEventListener("dragstart", dragStart, false);
+            widget.draggable.removeEventListener("dragend", drop, false);
+            widget.draggable.removeEventListener("click", widget.restore.bind(widget));
+            widget.draggable.removeEventListener("mouseover", minimizeTimeout.bind(widget), { passive: true });
+
+            document.documentElement.removeEventListener("mousedown", widget.collapse.bind(widget), false);
+        }
+
         function initializeEvents() {
             widget.container.addEventListener("drop", drop, false);
             widget.container.addEventListener("dragover", dragOver, false);
@@ -327,9 +341,10 @@
             }
         });
 
-        widget.one("load", function (e) {
-            console.debug("widget plugin oneload:", PLUGIN_NAME)
+        widget.on("load", function (e) {
+            console.debug("widget plugin onload:", PLUGIN_NAME)
             setPositionClasses.call(widget)
+            clearEvents.call(widget);
             initializeEvents.call(widget);
         })
     }

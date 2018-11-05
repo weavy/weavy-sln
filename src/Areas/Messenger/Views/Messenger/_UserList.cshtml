@@ -35,9 +35,6 @@
     }
 } else if (!Model.Query.Text.IsNullOrEmpty()) {
     <div class="list-group-separator reset">No match for <strong>@Model.Query.Text</strong>.</div>
-    if (PermissionService.HasSystemPermission(Permission.Invite)) {
-        <div class="list-group-separator reset text-center"><a href="@Url.Action(nameof(Invite), typeof(PeopleController).ControllerName(), new { area = "" })" target="_blank" data-toggle="drawer-invite">Can't find your team members? Invite them!</a></div>
-    }
 } else {
     <div class="list-group-separator text-center">@Html.SvgSpinner()</div>
 }

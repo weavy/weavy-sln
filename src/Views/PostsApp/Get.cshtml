@@ -45,8 +45,17 @@
         </div>
     }
 
-    @if (WeavyContext.Space.HasPermission(Permission.List)) {
-        @Html.Partial("_PostForm", WeavyContext.Space)
+    @if (Model.App.HasPermission(Permission.Post)) {
+        <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(Model.App.Id, null)))" method="post">
+            <textarea id="text" class="form-control" name="text" data-editor-location="discuss"></textarea>
+            <input type="hidden" name="hasContext" id="hasContext" value="true" />
+            <input type="hidden" name="contextUrl" id="contextUrl" />
+            <input type="hidden" name="contextTitle" id="contextTitle" />
+            <div class="post-backdrop"></div>
+        </form>
+    }
+
+    @if (WeavyContext.Space.HasPermission(Permission.List)) {        
         <div id="infinite-scroll-target" class="posts">
             @Html.Partial("_Posts", Model.Posts)
         </div>

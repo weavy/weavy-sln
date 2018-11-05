@@ -4,13 +4,13 @@
             @using (Html.BeginForm(nameof(SpaceController.InsertMembers), typeof(SpaceController).ControllerName(), new { id = WeavyContext.Space.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "" })) {
                 @Html.AntiForgeryToken()
                 <div class="modal-header">
-                    <h5 class="modal-title">Add or invite members</h5>
+                    <h5 class="modal-title">@(PermissionService.HasSystemPermission(Permission.Invite) ? "Add or invite members" : "Add members")</h5>
                     <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Html.SvgIcon("close")</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="form-control-label" for="users">Add people by entering their username or email address below.</label>
-                        <select class="form-control" name="users" multiple="multiple" data-role="users" data-user-invite style="width:100%;" autofocus></select>
+                        <select class="form-control" name="users" multiple="multiple" data-role="users" @(PermissionService.HasSystemPermission(Permission.Invite) ? "data-user-invite": "") style="width:100%;" autofocus></select>
                     </div>
                     <div class="form-group">
                         <p class="user-items"></p>

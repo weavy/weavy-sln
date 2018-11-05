@@ -3,13 +3,12 @@
     Title = "Invite people";
     Back = Url.Action<PeopleController>(c => c.Index(null, null, null));
 }
-
 <div class="container mt-3">
     <p>Invite people to @Theme.Name by entering their emails below.</p>
     <form class="invite-form" action="@Url.Action(nameof(PeopleController.Invite))" method="post" data-turboform>
-        @Html.EditorFor(m => m.Invite1)
-        @Html.EditorFor(m => m.Invite2)
-        @Html.EditorFor(m => m.Invite3)
+        @Html.EditorFor(m => m.Email1)
+        @Html.EditorFor(m => m.Email2)
+        @Html.EditorFor(m => m.Email3)
         <button type="submit" class="btn btn-primary">Invite</button>
         <a href="@Back" class="btn btn-outline-secondary">Cancel</a>
     </form>

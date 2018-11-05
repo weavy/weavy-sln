@@ -50,10 +50,10 @@ weavy.notifications = (function ($) {
     
     // callbacks for realtime events
     weavy.realtime.on("notification", function (event, data) {
-        $("#notifications .empty").remove();
+        $("#tab-notifications .empty").remove();
                 
         get(data.id).then(function (html) {            
-            $(html).prependTo("#notifications .list-group");            
+            $(html).prependTo("#tab-notifications .list-group");            
         });        
     });
 

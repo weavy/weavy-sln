@@ -6302,6 +6302,11 @@
             </summary>
             <param name="html"><c>true</c> to return html, <c>false</c> to return plain text.</param>
         </member>
+        <member name="P:Weavy.Core.Models.Post.AppId">
+            <summary>
+            Gets the id of the <see cref="T:Weavy.Core.Models.App"/> where the post  is located.
+            </summary>
+        </member>
         <member name="P:Weavy.Core.Models.Post.SpaceId">
             <summary>
             Gets the id of the <see cref="T:Weavy.Core.Models.Space"/> where the post lives.
@@ -6350,6 +6355,11 @@
             Initializes a new instance of the <see cref="T:Weavy.Core.Models.PostQuery"/> class with the specified <see cref="T:Weavy.Core.Models.Query"/>.
             </summary>
             <param name="query"></param>
+        </member>
+        <member name="P:Weavy.Core.Models.PostQuery.AppId">
+            <summary>
+            Gets or sets the id of the <see cref="T:Weavy.Core.Models.App"/> to search.
+            </summary>
         </member>
         <member name="T:Weavy.Core.Models.MinAttribute">
             <summary>
@@ -6725,7 +6735,7 @@
         </member>
         <member name="F:Weavy.Core.Models.Permission.List">
             <summary>
-            Permission to view child entities e.g. apps, content, comments etc.
+            Permission to view child entities e.g. apps, comments, content, posts etc.
             </summary>
         </member>
         <member name="F:Weavy.Core.Models.Permission.ManageUsers">
@@ -6745,7 +6755,7 @@
         </member>
         <member name="F:Weavy.Core.Models.Permission.Post">
             <summary>
-            Permission to post messages to a space.
+            Permission to post messages to an app.
             </summary>
         </member>
         <member name="F:Weavy.Core.Models.Permission.Star">
@@ -9559,6 +9569,17 @@
             </summary>
             <param name="fileName"></param>
             <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Helpers.PostExtensions">
+            <summary>
+            Extension methods for <see cref="T:Weavy.Core.Models.Post"/> objects.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Helpers.PostExtensions.App(Weavy.Core.Models.Post)">
+            <summary>
+            Gets the app where the post is located.
+            </summary>
+            <param name="post"></param>
         </member>
         <member name="T:Weavy.Core.Helpers.CryptoHelper">
             <summary>
@@ -13225,7 +13246,7 @@
         </member>
         <member name="M:Weavy.Core.Lucene.Helpers.IndexHelper.AddAppFields(Lucene.Net.Documents.Document,Weavy.Core.Models.App)">
             <summary>
-            Add index document fields for content.
+            Add index document fields for apps.
             </summary>
             <param name="doc"></param>
             <param name="app"></param>
@@ -15205,11 +15226,6 @@
             Gets or sets the base url for the application.
             </summary>
         </member>
-        <member name="P:Weavy.Core.Plugins.SystemSettings.SystemOwnerEmail">
-            <summary>
-            Gets or sets the email for the system owner.
-            </summary>
-        </member>
         <member name="P:Weavy.Core.Plugins.SystemSettings.MaxUploadSize">
             <summary>
             Gets or sets the maximum size for uploaded files (in bytes).
@@ -15219,20 +15235,6 @@
             <summary>
             Gets or sets the file extensions whitelist for file uploads.
             </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.SystemSettings.EnableEmbeds">
-            <summary>
-            Gets or sets a value indicating if external url:s should be scraped.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.SystemSettings.EnablePreviews">
-            <summary>
-            Gets or sets a value indicating whether we should enable file previews.
-            </summary>
-            <remarks>
-            File previewing requires converting files to PDF which can consume a lot of memory. 
-            In same cases it may be necessary to disable this function to avoid out-of-memory exceptions.
-            </remarks>
         </member>
         <member name="P:Weavy.Core.Plugins.SystemSettings.AllowOpenSpaces">
             <summary>
@@ -16981,12 +16983,12 @@
             </summary>
             <param name="id">Id of the post.</param>
         </member>
-        <member name="M:Weavy.Core.Repos.PostRepo.Get(System.Collections.Generic.IEnumerable{System.Int32})">
+        <member name="M:Weavy.Core.Repos.PostRepo.Get(System.Int32)">
             <summary>
-              Gets a list of <see cref="T:Weavy.Core.Models.Post"/> objects from the repository.
+              Gets a <see cref="T:Weavy.Core.Models.Post"/> object from the repository.
             </summary>
-            <param name="ids">Ids of the posts.</param>
-            <returns>Returns a list of <see cref="T:Weavy.Core.Models.Post"/> objects.</returns>
+            <param name="id">Id of the post.</param>
+            <returns>Returns a <see cref="T:Weavy.Core.Models.Post"/> object.</returns>
         </member>
         <member name="M:Weavy.Core.Repos.PostRepo.GetOption(System.Int32)">
             <summary>
@@ -20313,19 +20315,11 @@
             <param name="filter"><c>true</c> to filter out posts where the user does not have View permission, otherwise <c>false</c>.</param>
             <returns>Returns an instance of the <see cref="T:Weavy.Core.Models.Post"/> class.</returns>
         </member>
-        <member name="M:Weavy.Core.Services.PostService.Get(System.Collections.Generic.IEnumerable{System.Int32},System.Boolean)">
-            <summary>
-              Gets a list of <see cref="T:Weavy.Core.Models.Post"/> objects from the repository.
-            </summary>
-            <param name="ids">Ids of the posts to get.</param>
-            <param name="filter"></param>
-            <returns>Returns a list of <see cref="T:Weavy.Core.Models.Post"/> objects.</returns>
-        </member>
         <member name="M:Weavy.Core.Services.PostService.GetPosts(System.Int32,Weavy.Core.Models.Query)">
             <summary>
-            Get messages posted to the specified space.
+            Get messages posted to the specified app.
             </summary>
-            <param name="spaceId">Id of the space for which to get posts.</param>
+            <param name="appId">Id of the app for which to get posts.</param>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>Returns a paged list of <see cref="T:Weavy.Core.Models.Post"/> items.</returns>
         </member>
@@ -20351,24 +20345,24 @@
             <param name="id">Id of the <see cref="T:Weavy.Core.Models.PollOption"/>.</param> 
             <returns>Returns a list of users that voted for the option.</returns>
         </member>
-        <member name="M:Weavy.Core.Services.PostService.Insert(Weavy.Core.Models.Post,Weavy.Core.Models.Space,System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{Weavy.Core.Models.PollOption},System.Boolean)">
+        <member name="M:Weavy.Core.Services.PostService.Insert(Weavy.Core.Models.Post,Weavy.Core.Models.App,System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{Weavy.Core.Models.PollOption},System.Boolean)">
             <summary>
               Inserts a <see cref="T:Weavy.Core.Models.Post"/>.
             </summary>
             <param name="post"><see cref="T:Weavy.Core.Models.Post"/> to insert.</param>
-            <param name="space">Space where <see cref="T:Weavy.Core.Models.Post"/> is inserted.</param>
+            <param name="app">App where <see cref="T:Weavy.Core.Models.Post"/> should be inserted.</param>
             <param name="blobs">Ids of <see cref="T:Weavy.Core.Models.Blob"/>s to attach.</param>
-            <param name="embeds"></param>
+            <param name="embeds">Ids of <see cref="T:Weavy.Core.Models.Embed"/>s to attach</param>
             <param name="options">Poll options.</param>
             <param name="auth"><c>true</c> to check if the user has permission to insert the <see cref="T:Weavy.Core.Models.Post"/>, otherwise <c>false</c>.</param>
             <returns>The inserted <see cref="T:Weavy.Core.Models.Post"/></returns>
         </member>
-        <member name="M:Weavy.Core.Services.PostService.Move(System.Int32,System.Int32,System.Boolean)">
+        <member name="M:Weavy.Core.Services.PostService.Move(System.Int32,Weavy.Core.Models.App,System.Boolean)">
             <summary>
-              Moves a <see cref="T:Weavy.Core.Models.Post"/> to another <see cref="T:Weavy.Core.Models.Space"/>.
+              Moves a <see cref="T:Weavy.Core.Models.Post"/> to another <see cref="T:Weavy.Core.Models.App"/>.
             </summary>
             <param name="id">Id of <see cref="T:Weavy.Core.Models.Post"/> to move.</param>
-            <param name="spaceId">Id of the space where post should be moved.</param>
+            <param name="app">The destination app.</param>
             <param name="auth">True to check if the user has permission to edit the <see cref="T:Weavy.Core.Models.Post"/>, otherwise false.</param>
             <returns>The moved <see cref="T:Weavy.Core.Models.Post"/></returns>
         </member>
@@ -20404,18 +20398,20 @@
             <param name="auth"></param>
             <returns>The deleted <see cref="T:Weavy.Core.Models.Post"/></returns>
         </member>
-        <member name="M:Weavy.Core.Services.PostService.Trash(System.Int32)">
+        <member name="M:Weavy.Core.Services.PostService.Trash(System.Int32,System.Boolean)">
             <summary>
               Sends a <see cref="T:Weavy.Core.Models.Post"/> to the trash, i.e. sets the IsTrashed flag.
             </summary>
             <param name="id">Id of the <see cref="T:Weavy.Core.Models.Post"/> to trash.</param>
+            <param name="auth"></param>
             <returns>The trashed <see cref="T:Weavy.Core.Models.Post"/>.</returns>
         </member>
-        <member name="M:Weavy.Core.Services.PostService.Restore(System.Int32)">
+        <member name="M:Weavy.Core.Services.PostService.Restore(System.Int32,System.Boolean)">
             <summary>
               Restores a trashed <see cref="T:Weavy.Core.Models.Post"/>, i.e. clears the IsTrashed flag.
             </summary>
             <param name="id">Id of the <see cref="T:Weavy.Core.Models.Post"/> to restore.</param>
+            <param name="auth"></param>
             <returns>The restored <see cref="T:Weavy.Core.Models.Post"/>.</returns>
         </member>
         <member name="M:Weavy.Core.Services.PostService.Search(Weavy.Core.Models.PostQuery)">

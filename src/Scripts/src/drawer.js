@@ -12,6 +12,9 @@ weavy.drawer = (function ($) {
     function close() {
         $("html").removeClass("drawer-open");
         $(".drawer").removeClass("drawer-in");
+
+        setTimeout(weavy.notifications.sort, 200);
+        setTimeout(weavy.stars.prune, 200);
     }
 
     function toggle(drawer) {
@@ -49,7 +52,7 @@ weavy.drawer = (function ($) {
 
     // close drawer when toggling starred/followed
     $(document).on("click", "#drawer-space [data-toggle!=dropdown]", function () {
-        window.setTimeout("weavy.drawer.close();", 500);
+        setTimeout(close, 500);
     });
 
     //// close drawer on ESC

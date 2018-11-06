@@ -2,25 +2,31 @@
 
 ## Weavy 2.0
 
-Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional functionality. 
-See https://docs.weavy.com for more information.
+Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional 
+functionality. See https://docs.weavy.com for more information.
 
-### 2.0.0 (2018-??-??)
+### 2.0.0 (2018-11-06)
 
 ### Upgrade instructions
 
-There is no automated upgrade process for upgrading from Weavy 1.x to 2.x. 
-If you need to migrate an existing 1.x installation to 2.x you should contact support@weavy.com for instructions.
+There is no automated upgrade process for upgrading from Weavy 1.x to 2.x. If you need to migrate
+an existing 1.x installation to 2.x you should contact support@weavy.com for instructions.
 
 ## Weavy 1.1
 
-With Weavy 1.1 it is now possible to add files from your cloud file providers such as Google Drive, Onedrive, Dropbox and Box. You can also create new Google drive from Weavy, never have to leave the context that you are working in.
-Weavy 1.1 also gives you more possibilities how to connect a specific bubble to a web page url. You can choose between the domain (as in Weavy 1.0) or a specific path.
-When creating posts, comments and new messages in the chat, we have now added a possibility to attach the current web page that you are working on as a context. This gives the reader of the post, comment or message a link to where the content actually was created.
+With Weavy 1.1 it is possible to add files from cloud file providers such as Google Drive, OneDrive, 
+Dropbox and Box. You can also create new Google drive documents directly from Weavy, without leaving
+the context that you are working in.
+
+Weavy 1.1 also gives you more possibilities when connecting a space bubble to a web page url. You
+can choose between the domain (as in Weavy 1.0) or a specific path.
+
+When writing posts, comments and chat messages, we have added the possibility to attach contextual 
+links. This gives the reader of the post, comment or message a link to where it was created.
 
 ### 1.1.0 (2018-08-03)
 
-* Cloud file picker - Add links to files from Google Drive, Onedrive, Dropbox and Box.
+* Cloud file picker - Add links to files from Google Drive, OneDrive, Dropbox and Box.
 * Added more options how to connect a specific bubble to an url.
 * Added possibility to add the current url as a context to posts, comments and messages.
 * Introduced a new collapsed mode for the widget bubbles.

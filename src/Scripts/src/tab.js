@@ -23,6 +23,10 @@ weavy.tab = (function ($) {
                 }),
                 optionalPromise
             ).done(function (html) {
+                // jquery returns array instead of multiple arguments
+                if ($.isArray(html)) {
+                    html = html[0];
+                }
                 $remote.html(html).addClass("loaded");
             }).always(function () {
                 $loading.addClass("d-none").find(".spinner").removeClass("spin");
@@ -41,13 +45,18 @@ weavy.tab = (function ($) {
                     setTimeout(weavy.tab.load, 200, "#tab-stars");
                     setTimeout(weavy.tab.load, 200, "#tab-drafts");
                     break;
+                case "hide":
+                    setTimeout(weavy.notifications.sort, 200);
+                    setTimeout(weavy.stars.prune, 200);
+                    break;
             }
         });
 
     }
 
     return {
-        load: load
+        load: load,
+
     }
 
 })($);

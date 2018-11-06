@@ -81,11 +81,18 @@
 
         // close open strip
         Weavy.prototype.close = function () {
+            var $openFrame = $(".weavy-strip.weavy-open iframe", self.strips);
+
             $(self.container).removeClass("weavy-open");
             $(".weavy-strip", self.strips).removeClass("weavy-open");
             $(".weavy-button", self.buttons).removeClass("weavy-open");
             $(".weavy-notification-frame", self.container).remove();
             self.triggerEvent("close", null);
+            try {
+                $openFrame[0].contentWindow.postMessage({ name: 'hide' }, "*");
+            } catch (e) {
+                console.debug("Could not postMessage:hide to frame");
+            }
         }
 
         // open specified strip (personal, messenger or bubble)

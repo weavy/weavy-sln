@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.tiny = (function ($) {
 
     document.addEventListener("turbolinks:load", init);
@@ -306,6 +307,6 @@ weavy.tiny = (function ($) {
         destroy: destroy
     }
 
-})($)
+})(jQuery)
 
 

@@ -163,4 +163,4 @@ weavy.api = (function ($) {
         pin: pin,
         unpin: unpin
     };
-})($);
+})(jQuery);

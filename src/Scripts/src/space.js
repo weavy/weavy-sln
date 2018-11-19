@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.space = (function ($) {
 
     // attach click event handler to [data-toggle=join]
@@ -34,5 +35,5 @@ weavy.space = (function ($) {
         leave: leave
     };
 
-})($);
+})(jQuery);
 

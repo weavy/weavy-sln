@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.share = (function ($) {
 
     document.addEventListener("turbolinks:before-cache", function () {
@@ -31,42 +32,39 @@ weavy.share = (function ($) {
             onSubmit: function (e, d) {
                 e.preventDefault();
                 $textarea.val(d.text);
-                $(this).closest("form").submit();                
+                $(this).closest("form").submit();     
             }
         });
 
-        // reset form
+        // reset editor
         $editor.weavyEditor('reset');
     });
 
     // submit share
-    $(document).on("submit", "#share-modal", function (e) {
+    $(document).on("submit", "#share-form", function (e) {
         e.preventDefault();
-        
-        // hide modal
-        var $modal = $(this);
-        var $form = $modal.find("form");
 
-
-        var data = $form.serialize();
-        var method = $form.attr("method")
-        var url = weavy.url.resolve($form.attr("action"));
-        
         // post share
+        var $form = $(this);
+        var $modal = $form.closest(".modal");
+        var $editor = $form.find(".weavy-editor");
+
         $.ajax({
-            method: method,
-            url: url,
-            data: data
-        }).done(function () {            
+            method: $form.attr("method"),
+            url: weavy.url.resolve($form.attr("action")),
+            data: $form.serialize()
+        }).done(function () {           
+            // hide modal
             $modal.modal("hide");
         }).fail(function (xhr) {
             var json = JSON.parse(xhr.responseText);
-            weavy.alert.danger(json.message);
+            $form.find(".invalid-feedback").text(json.message);
+            $editor.addClass("is-invalid");
         }).always(function () {
             // enable button 
-            var $btn = $modal.find(".btn-load").removeAttr("disabled");
+            $form.find(".btn-load").removeAttr("disabled");
         });
     });
 
 
-})($);
+})(jQuery);

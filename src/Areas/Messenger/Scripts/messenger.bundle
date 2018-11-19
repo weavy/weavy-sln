@@ -6,7 +6,7 @@
 ~/scripts/vendor/jquery-textcomplete/jquery.textcomplete.min.js
 ~/scripts/vendor/emojione/emojione.js
 ~/scripts/vendor/emojionearea/emojionearea.min.js
-~/scripts/src/extensions.js
+~/scripts/src/_extensions.js
 ~/scripts/src/turbolinks.js 
 ~/scripts/src/browser.js
 ~/scripts/src/context.js

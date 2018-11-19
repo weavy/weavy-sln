@@ -1,43 +1,47 @@
-﻿// script for the personal widget
+﻿var weavy = weavy || {};
 
-//new message links
-$(document).on("click", "a[data-role=messenger]", function (e) {
-    if (weavy.browser.embedded) {
-        e.preventDefault();
-        var url = weavy.url.resolve($(this).attr("href"));
-        window.parent.postMessage({ "name": "messenger", "url": url }, "*");
-    }
-})
+// script for the personal widget
 
-// toggling desktop notifications
-if (window.Notification) {
-    if (window.Notification.permission === "denied") {
-        $(".alert.notification-denied").show();
-    }
+(function ($) {
 
-    $(document).on("change", "input[name=DesktopNotifications]", function (evt) {
-        if ($(this).is(":checked") && window.Notification.permission === "default") {
-            $(".alert.notification-required").show();
-            $(".notification-required").trigger("click");
+    //new message links
+    $(document).on("click", "a[data-role=messenger]", function (e) {
+        if (weavy.browser.embedded) {
+            e.preventDefault();
+            var url = weavy.url.resolve($(this).attr("href"));
+            window.parent.postMessage({ "name": "messenger", "url": url }, "*");
         }
-    });
+    })
 
-    $(document).on("click", ".notification-required", function (evt) {
-        evt.preventDefault();
-        Notification.requestPermission(function (result) {
-            if (result === "granted") {
-                $(".notification-alerts .alert").hide();
-            } else if (result === "denied") {
-                $(".alert.notification-required").hide();
-                $(".alert.notification-denied").show();
-            } else if (result === "default") {
-                // do nothing
+    // toggling desktop notifications
+    if (window.Notification) {
+        if (window.Notification.permission === "denied") {
+            $(".alert.notification-denied").show();
+        }
+
+        $(document).on("change", "input[name=DesktopNotifications]", function (evt) {
+            if ($(this).is(":checked") && window.Notification.permission === "default") {
+                $(".alert.notification-required").show();
+                $(".notification-required").trigger("click");
             }
         });
-    });
 
-} else {
-    $(".alert.notification-missing").show();
-}
+        $(document).on("click", ".notification-required", function (evt) {
+            evt.preventDefault();
+            Notification.requestPermission(function (result) {
+                if (result === "granted") {
+                    $(".notification-alerts .alert").hide();
+                } else if (result === "denied") {
+                    $(".alert.notification-required").hide();
+                    $(".alert.notification-denied").show();
+                } else if (result === "default") {
+                    // do nothing
+                }
+            });
+        });
 
+    } else {
+        $(".alert.notification-missing").show();
+    }
 
+})(jQuery);

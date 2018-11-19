@@ -1,28 +1,21 @@
 ﻿(function ($) {
     var PLUGIN_NAME = "position";
 
-    console.debug("registering widget plugin:", PLUGIN_NAME);
+    console.debug("Registering WeavyWidget plugin:", PLUGIN_NAME);
 
-    if (typeof Weavy === 'undefined' || !Weavy.plugins) {
-        throw new Error("Weavy widget prototype is required to register plugin: " + PLUGIN_NAME);
+    if (typeof WeavyWidget === 'undefined' || !WeavyWidget.plugins) {
+        throw new Error("WeavyWidget must be loaded before registering plugin: " + PLUGIN_NAME);
     }
 
-    Weavy.plugins[PLUGIN_NAME] = function (options) {
-        console.debug("running widget plugin:", PLUGIN_NAME);
-
+    WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         var widget = this;
         var minimizeTimer;
-
-        // add default options to widget.options
-        if (options && typeof options === "object") {
-            widget.options = widget.extendDefaults(Weavy.plugins[PLUGIN_NAME].defaults, options);
-        }
 
         // dom elements
         widget.dragData = null;
 
         // set collapsed widget
-        Weavy.prototype.collapse = function () {
+        WeavyWidget.prototype.collapse = function () {
             if (!$(widget.container).is(".weavy-no-collapse, .weavy-open, .weavy-before-drag, .weavy-drag, .weavy-snap")) {
                 $(widget.container).addClass("weavy-collapsed");
                 minimizeTimeout.apply(widget);
@@ -31,7 +24,7 @@
         };
 
         // set minimized widget
-        Weavy.prototype.minimize = function () {
+        WeavyWidget.prototype.minimize = function () {
             if (!$(widget.container).is(".weavy-no-collapse, .weavy-open, .weavy-before-drag, .weavy-drag, .weavy-snap")) {
                 var isCollapsed = $(widget.container).hasClass("weavy-collapsed");
                 $(widget.container).addClass("weavy-collapsed weavy-minimized");
@@ -48,7 +41,7 @@
         };
 
         // unset collapsed/minimized widget  
-        Weavy.prototype.restore = function () {
+        WeavyWidget.prototype.restore = function () {
             var $container = $(widget.container);
             if ($container.hasClass('weavy-collapsed') || $container.hasClass('weavy-minimized')) {
                 $container.removeClass("weavy-collapsed weavy-minimized");
@@ -69,7 +62,7 @@
         function minimizeTimeout() {
             clearMinimizeTimeout();
             if ($(widget.container).hasClass("weavy-collapsed")) {
-                minimizeTimer = setTimeout(widget.minimize.bind(widget), widget.options.minimize_delay || 30000);
+                minimizeTimer = setTimeout(widget.minimize.bind(widget), options.minimize_delay || 30000);
             }
         }
 
@@ -81,7 +74,7 @@
             }
 
             //Set Classes
-            widget.container.className += " " + widget.options.position_class_name
+            widget.container.className += " " + options.position_class_name
 
             // draggable
             widget.draggable.setAttribute("draggable", "true");
@@ -158,8 +151,8 @@
             // set snapping with options.snapping_x or CSS --weavy-snapping-x
             var draggableStyles = getComputedStyle(widget.draggable);
             var weavyRem = parseFloat(draggableStyles.getPropertyValue("--weavy-rem")) || 16;
-            var snappingX = weavyRem * (parseFloat(draggableStyles.getPropertyValue("--weavy-snapping-x")) || widget.options.snapping_x);
-            var snappingY = weavyRem * (parseFloat(draggableStyles.getPropertyValue("--weavy-snapping-y")) || widget.options.snapping_y);
+            var snappingX = weavyRem * (parseFloat(draggableStyles.getPropertyValue("--weavy-snapping-x")) || options.snapping_x);
+            var snappingY = weavyRem * (parseFloat(draggableStyles.getPropertyValue("--weavy-snapping-y")) || options.snapping_y);
 
             var isLeft = $(widget.container).hasClass("weavy-left");
             var isCollapsed = $(widget.container).hasClass("weavy-collapsed") && !$(widget.container).hasClass("weavy-open");
@@ -208,7 +201,7 @@
             // set snapping with options.snappingY or CSS --weavy-snapping-y
             var $draggable = $(widget.draggable);
             var weavyRem = parseInt($draggable.css("--weavy-rem")) || 16;
-            var snappingY = weavyRem * (parseFloat($draggable.css("--weavy-snapping-y")) || widget.options.snapping_y);
+            var snappingY = weavyRem * (parseFloat($draggable.css("--weavy-snapping-y")) || options.snapping_y);
 
             var isCollapsed = $(widget.container).hasClass("weavy-collapsed") && !$(widget.container).hasClass("weavy-open");
             var scale = isCollapsed ? 0.8 : 1.0;
@@ -342,18 +335,18 @@
         });
 
         widget.on("load", function (e) {
-            console.debug("widget plugin onload:", PLUGIN_NAME)
-            setPositionClasses.call(widget)
+            console.debug("WeavyWidget plugin onload:", PLUGIN_NAME);
+            setPositionClasses.call(widget);
             clearEvents.call(widget);
             initializeEvents.call(widget);
         })
     }
 
-    Weavy.plugins[PLUGIN_NAME].defaults = {
+    WeavyWidget.plugins[PLUGIN_NAME].defaults = {
         position_class_name: 'weavy-collapsed',
         snapping_x: 4,
         snapping_y: 4,
         minimize_delay: 15000
     }
 
-})($);
+})(jQuery);

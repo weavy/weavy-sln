@@ -1,18 +1,38 @@
 ﻿@model TestViewModel
 @{
-    Title = "Test";
-    Back = WeavyContext.ApplicationPath;
-}
-
-
-@section navbar_secondary {
-    <nav class="nav nav-tabs">
-        <a class="nav-link" href="@Url.Action(nameof(TestController.Index))">Components</a>
-        <a class="nav-link active" href="@Url.Action(nameof(TestController.Get), new { view = "redirect"})">Redirect</a>
-    </nav>
+    Title = "Redirect location";
+    Back = Url.Action<TestController>(c => c.Index());
 }
 
 <div class="container my-4">
-    <p><a class="btn btn-primary" href="@Url.Action(nameof(TestController.Get), new { view = "redirect"})">BACK</a></p>
+    <h1 id="title">@Title</h1>
+    <p><a href="#comments">Go to #comments</a></p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sagittis gravida fermentum. Ut luctus tristique placerat. Curabitur nec rutrum massa, quis porttitor mi. Praesent ullamcorper eros sit amet bibendum faucibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec in faucibus sem, sed efficitur diam. Sed ut blandit odio, ac tincidunt ligula. Morbi neque nulla, luctus vitae pretium eu, aliquet et velit. Mauris a sapien in diam rhoncus placerat. Suspendisse id bibendum risus. Etiam eget dolor non sem fringilla pharetra. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+    <p>In ut dui in felis ultricies auctor. Donec convallis eleifend semper. Nunc malesuada tempor mi, non semper lorem congue vitae. Sed id nunc libero. Nullam id mauris ac mi dictum scelerisque. Pellentesque mollis eros in magna pretium, ac hendrerit nisl dictum. Aliquam non ante at erat gravida sagittis ut nec eros. Donec a elementum turpis, id maximus enim.</p>
+    <p>Nam feugiat commodo eleifend. Quisque arcu leo, pharetra sed commodo non, elementum tristique risus. Morbi posuere tortor quis interdum pellentesque. Quisque ac lacus ultrices, tincidunt tellus nec, ornare urna. Maecenas id est quis dolor bibendum rutrum non id felis. Donec ut ornare risus. Phasellus sed elit interdum, hendrerit velit ac, pulvinar urna. Cras eget justo eu magna malesuada molestie. Sed ullamcorper, velit sed elementum hendrerit, eros neque scelerisque magna, sit amet commodo quam elit a justo. Donec in massa non orci egestas sollicitudin.</p>
+    <p>In ut dui in felis ultricies auctor. Donec convallis eleifend semper. Nunc malesuada tempor mi, non semper lorem congue vitae. Sed id nunc libero. Nullam id mauris ac mi dictum scelerisque. Pellentesque mollis eros in magna pretium, ac hendrerit nisl dictum. Aliquam non ante at erat gravida sagittis ut nec eros. Donec a elementum turpis, id maximus enim.</p>
+    <p>Nam feugiat commodo eleifend. Quisque arcu leo, pharetra sed commodo non, elementum tristique risus. Morbi posuere tortor quis interdum pellentesque. Quisque ac lacus ultrices, tincidunt tellus nec, ornare urna. Maecenas id est quis dolor bibendum rutrum non id felis. Donec ut ornare risus. Phasellus sed elit interdum, hendrerit velit ac, pulvinar urna. Cras eget justo eu magna malesuada molestie. Sed ullamcorper, velit sed elementum hendrerit, eros neque scelerisque magna, sit amet commodo quam elit a justo. Donec in massa non orci egestas sollicitudin.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sagittis gravida fermentum. Ut luctus tristique placerat. Curabitur nec rutrum massa, quis porttitor mi. Praesent ullamcorper eros sit amet bibendum faucibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec in faucibus sem, sed efficitur diam. Sed ut blandit odio, ac tincidunt ligula. Morbi neque nulla, luctus vitae pretium eu, aliquet et velit. Mauris a sapien in diam rhoncus placerat. Suspendisse id bibendum risus. Etiam eget dolor non sem fringilla pharetra. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+    <p>Nam feugiat commodo eleifend. Quisque arcu leo, pharetra sed commodo non, elementum tristique risus. Morbi posuere tortor quis interdum pellentesque. Quisque ac lacus ultrices, tincidunt tellus nec, ornare urna. Maecenas id est quis dolor bibendum rutrum non id felis. Donec ut ornare risus. Phasellus sed elit interdum, hendrerit velit ac, pulvinar urna. Cras eget justo eu magna malesuada molestie. Sed ullamcorper, velit sed elementum hendrerit, eros neque scelerisque magna, sit amet commodo quam elit a justo. Donec in massa non orci egestas sollicitudin.</p>
+    <p>In ut dui in felis ultricies auctor. Donec convallis eleifend semper. Nunc malesuada tempor mi, non semper lorem congue vitae. Sed id nunc libero. Nullam id mauris ac mi dictum scelerisque. Pellentesque mollis eros in magna pretium, ac hendrerit nisl dictum. Aliquam non ante at erat gravida sagittis ut nec eros. Donec a elementum turpis, id maximus enim.</p>
+    <p>Nam feugiat commodo eleifend. Quisque arcu leo, pharetra sed commodo non, elementum tristique risus. Morbi posuere tortor quis interdum pellentesque. Quisque ac lacus ultrices, tincidunt tellus nec, ornare urna. Maecenas id est quis dolor bibendum rutrum non id felis. Donec ut ornare risus. Phasellus sed elit interdum, hendrerit velit ac, pulvinar urna. Cras eget justo eu magna malesuada molestie. Sed ullamcorper, velit sed elementum hendrerit, eros neque scelerisque magna, sit amet commodo quam elit a justo. Donec in massa non orci egestas sollicitudin.</p>
+
+
+    <h2 id="comments">Comments</h2>
+    <p>Commment...</p>
+    <p>Commment...</p>
+    <p>Commment...</p>
+    <p>Commment...</p>
+    <p>Commment...</p>
+    <p>Commment...</p>
+    <p>Commment...</p>
+
 </div>
+
+@section fab {
+    <div class="fab dropup">
+        <a href="#title" class="btn btn-round btn-secondary" title="Back to top" data-turbolinks="false">@Html.SvgIcon("chevron-up")</a>       
+    </div>
+}
+
 

@@ -1,0 +1,57 @@
+﻿@model Content
+@{
+    var versionable = Model as IVersionable;
+    var creator = Model.CreatedBy();
+    var editor = Model.ModifiedBy();
+}
+
+@if (versionable == null || versionable.IsCurrent()) {
+    <section class="content-section d-flex">
+        <div class="facepile">
+            @creator.AvatarLink(24, htmlAttributes: new { title = "Created by " + creator.GetTitle() })
+            @if (Model.CreatedById != Model.ModifiedById) {
+                @editor.AvatarLink(24, htmlAttributes: new { title = "Last modified by " + editor.GetTitle() })
+            }
+        </div>
+        <div class="ml-1">
+            @if (versionable != null) {
+                <a href="@(Url.Action<ContentController>(c => c.Versions(Model.Id)))">@Html.Time(Model.ModifiedAt)</a>
+            } else {
+                @Html.Time(Model.ModifiedAt)
+            }
+        </div>
+        <div class="badges">
+            @Html.ContentBadge(Model)
+        </div>
+        @if (Model is ITaggable taggable) {
+            Html.RenderPartial("_Tags", taggable);
+        }
+    </section>
+} else {
+    <section class="content-section">
+        @if (!(Model is FileBase)) {
+        <p class="text-muted">
+            Created @Html.Time(Model.ModifiedAt, "g") by <a href="@editor.Url()">@editor.Link()</a>.
+        </p>
+        }
+
+        @if (Model.HasPermission(Permission.Edit)) {
+            <div class="buttons d-flex">
+                <a href="@(Url.Action<ContentController>(c => c.Versions(Model.Id)))" class="btn btn-icon btn-link mr-auto">@Html.SvgIcon("arrow-left") Back</a>
+                <form action="@Url.Action(nameof(ContentController.Revert), null, new { id = versionable.Id })" method="post">
+                    @Html.HttpMethodOverride(HttpVerbs.Put)
+                    @Html.Hidden(nameof(versionable.Version), versionable.Version)
+                    <button type="submit" class="btn btn-icon" title="Revert to this version">@Html.SvgIcon("undo")</button>
+                </form>
+                <form action="@Url.Action(nameof(ContentController.DeleteVersion), null, new { id = versionable.Id, version = versionable.Version })" method="post">
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button type="submit" class="btn btn-icon" title="Remove this version">@Html.SvgIcon("delete")</button>
+                </form>
+
+            </div>
+        }
+    </section>
+}
+
+
+

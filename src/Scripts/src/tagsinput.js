@@ -1,13 +1,3 @@
-// init tagsinput
-document.addEventListener("turbolinks:load", function () {
-    $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput();  
-});
-
-
-// reset tagsinput
-document.addEventListener("turbolinks:before-cache", function () {
-    $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput("destroy");
-});
 
 // slightly modified version of bootstrap-tagsinput v0.8.0 from https://github.com/bootstrap-tagsinput/bootstrap-tagsinput
 // TODO: we should update this component since the repo seems dead, maybe use https://github.com/hrobertson/bootstrap-tagsinput instead?
@@ -693,4 +683,15 @@ document.addEventListener("turbolinks:before-cache", function () {
     $(function () {
         $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput();
     });
-})(window.jQuery);
+
+    // init tagsinput
+    document.addEventListener("turbolinks:load", function () {
+        $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput();
+    });
+
+
+    // reset tagsinput
+    document.addEventListener("turbolinks:before-cache", function () {
+        $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput("destroy");
+    });
+})(jQuery);

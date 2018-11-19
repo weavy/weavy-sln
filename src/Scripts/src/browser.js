@@ -10,7 +10,7 @@ weavy.browser = {
     touch: false
 };
 
-(function () {
+(function ($) {
     if (document.documentElement.classList.contains("embedded")) {
         weavy.browser.embedded = true;
     } else if (window.name !== "weavy-standalone") {
@@ -53,5 +53,5 @@ weavy.browser = {
             default:
         }
     }, false);
-})();
+})(jQuery);
 

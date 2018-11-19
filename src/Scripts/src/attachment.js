@@ -22,4 +22,4 @@ weavy.attachment = (function ($) {
             weavy.alert.alert("success", "Attachment was restored.", 5000, "alert-attachment-" + id);
         });
     });
-})($);
+})(jQuery);

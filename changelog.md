@@ -5,7 +5,20 @@
 Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional 
 functionality. See https://docs.weavy.com for more information.
 
+### 2.0.1 (2018-11-16)
+
+* Added jQuery noConflict to the Weavy Widget
+* Fixed an issue where file size was not displayed in the Files app
+* Fixed "Could not find entity to share" error when trying to share a file
+* Fixed an issue where context link was not displayed
+* Fixed an issue where conversation displayed the wrong user avatar
+* Fixed issue where password could not contain certain characters
+* Fixed problem with sometimes not being able to add members to a space
+* Fixed issue where clicking a notification did not scroll the related entity (e.g. comment), into view 
+
 ### 2.0.0 (2018-11-06)
+
+Initial release of 2.0 with Weavy SDK for developers.
 
 ### Upgrade instructions
 

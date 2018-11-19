@@ -17,6 +17,6 @@
   </td>
   <td>@Html.Time(Model.ModifiedAt, format: "g")</td>
   <td>@Model.Kind()</td>
-  <td>--</td>
+  <td>@if (Model is FileBase file) { @FileHelper.FileSizeAsString(file.Blob.Size) }</td>
   <td class="table-icon">@{ Html.RenderPartial("_ContentMenu", Model);}</td>
 </tr>

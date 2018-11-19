@@ -1,6 +1,6 @@
 ﻿var weavy = weavy || {};
 
-weavy.emoji = (function () {
+weavy.emoji = (function ($) {
     var categories = [
         { name: 'Smileys and People', key: 'people', icon: '1f600' },// 😃
         { name: 'Animals and Nature', key: 'nature', icon: '1f436' }, // 🐶
@@ -1841,4 +1841,4 @@ weavy.emoji = (function () {
         icons: icons,
         categories: categories,
     }
-})();
+})(jQuery);

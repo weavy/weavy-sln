@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.notifications = (function ($) {
     
     // mark notification as read
@@ -104,4 +105,4 @@ weavy.notifications = (function ($) {
         sort: sortTabNotifications
     };
 
-})($);
+})(jQuery);

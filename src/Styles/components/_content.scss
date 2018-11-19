@@ -1,0 +1,105 @@
+/// <reference path="../_core.scss" />
+
+.content-section {
+    margin-bottom: 1rem;
+
+    h4 {
+        @include divider();
+    }
+
+    &.preview {
+        margin: 1rem auto;
+        max-width: map-get($container-max-widths, lg);
+        
+        // plain text document
+        .document {
+            background: #fff;
+            padding: 2rem;
+            box-shadow: $md-shadow-2dp;
+            min-height: 48rem; // 768px;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        // thumbnail image
+        .figure {
+            margin: 0;
+        }
+
+        .figure-img {
+            box-shadow: $md-shadow-2dp;
+        }
+    }
+
+
+    &.properties {
+        overflow-wrap: break-word;
+        // user supplied content
+        .display-group[data-type=html] {
+            blockquote {
+                @extend .blockquote;
+                padding: .5rem 1rem;
+                border-left: .25rem solid $table-border-color;
+
+                footer {
+                    @extend .blockquote-footer;
+                }
+            }
+
+            img:not(.eo) {
+                @include img-fluid;
+            }
+
+            pre:not([class*="language-"]) {
+                white-space: pre-wrap;
+            }
+
+            table {
+                @extend .table;
+            }
+        }
+    }
+
+    &.subscribers {
+        [data-toggle=subscribe] .i {
+            display: none !important;
+        }
+    }
+
+    .comment {
+
+        .file-list, .image-grid {
+            max-width: map-get($grid-breakpoints, sm);
+        }
+    }
+}
+
+.content-upload {
+    position: relative;
+
+    button {
+        cursor: pointer;
+    }
+
+    input[type=file] {
+        cursor: pointer;
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+
+.html-editor {
+    min-height: 500px;
+}
+
+.content-iframe {
+    border: 0;
+    display: block;
+    width: 100%;
+    height: calc(100% - #{$navbar-height});
+}

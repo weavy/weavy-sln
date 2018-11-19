@@ -22,7 +22,7 @@
         @WeavyContext.Space.AvatarImg(128)
     </div>
     <div class="facepile">
-        @Model.Members.Facepile(size: 32, link:true, presence: true)
+        @Model.Members.Facepile(size: 32, link: true, presence: true)
 
         @if (WeavyContext.Space.IsMember) {
             if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
@@ -49,7 +49,14 @@
         <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
     }
     <p class="small text-center text-muted">
-        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>@(" · " + WeavyContext.Space.Privacy.GetDisplayName())
+        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
+        @if (Model.ExternalMembers.TotalCount > 0) {
+            @(" · ")<a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.ExternalMembers.TotalCount + " external")</a>
+        }
+        @if (Model.Invites.TotalCount > 0) {
+            @(" · ")<a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.Invites.TotalCount + " invited")</a>
+        }
+        @(" · " + WeavyContext.Space.Privacy.GetDisplayName())
     </p>
 
     @if (!WeavyContext.Space.IsMember && SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id)) {

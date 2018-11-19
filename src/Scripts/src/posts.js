@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.posts = (function ($) {
 
     // init edit post editor
@@ -75,6 +76,7 @@ weavy.posts = (function ($) {
             "</div> ").prependTo($container);
 
         // reset form
+        $form.removeClass("is-invalid");
         $editor.weavyEditor('reset');
 
         // insert post
@@ -84,15 +86,14 @@ weavy.posts = (function ($) {
             url: url,
             data: JSON.stringify(data)
         }).then(function (post) {
-            // NOTE: insert from rtm for now
-            // TODO: find a better solution later...
-            //var $container = $(".posts");
-            //$(post).prependTo($container);
+            // NOTE: insert from rtm for now, see if we can find a better/faster solution later
 
             // reset form
             $editor.weavyEditor('reset');
         }).fail(function () {
-            $(".fake-post").remove();            
+            $form.addClass("is-invalid");
+
+            $(".fake-post").remove();
         }).always(function () {
             $button.prop("disabled", false);
         });
@@ -412,4 +413,4 @@ weavy.posts = (function ($) {
         insert: insertPost,
         updateFeedback: updateFeedback
     }
-})($);
+})(jQuery);

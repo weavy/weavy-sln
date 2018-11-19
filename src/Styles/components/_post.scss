@@ -23,6 +23,22 @@ body.controller-post.action-get {
         box-shadow: $md-shadow-4dp;
     }
 
+    &.is-invalid {
+
+        &.card::after  {
+            border-color: $form-feedback-invalid-color;
+        }
+
+        .weavy-editor {
+            //border: $border-width solid $form-feedback-invalid-color;
+            background: color("red", 50);
+
+            .emojionearea .emojionearea-editor:empty::before {
+                color: $form-feedback-invalid-color;
+            }
+        }
+    }
+
     .emojionearea.form-control {
         background: $white;
     }

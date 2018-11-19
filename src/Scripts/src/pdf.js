@@ -46,6 +46,23 @@ if (typeof Object.assign != 'function') {
     });
 }
 
+// Polyfill for closest https://developer.mozilla.org/en-US/docs/Web/API/Element/closest (needed because of IE)
+if (!Element.prototype.matches)
+    Element.prototype.matches = Element.prototype.msMatchesSelector ||
+        Element.prototype.webkitMatchesSelector;
+
+if (!Element.prototype.closest) {
+    Element.prototype.closest = function (s) {
+        var el = this;
+        if (!document.documentElement.contains(el)) return null;
+        do {
+            if (el.matches(s)) return el;
+            el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+        return null;
+    };
+}
+
 var weavy = weavy || {};
 weavy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
 (function () {
@@ -2431,7 +2448,7 @@ weavy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
                 // REVIEW: Consider marking event handler as 'passive' to make the page more responsive. See https://www.chromestatus.com/feature/5745543795965952
                 viewerContainer.addEventListener('touchstart', function (e) {
                     if (e.touches.length == 2) {
-                        currentPageNumber = $(e.target).closest(".page").data("page-number");
+                        currentPageNumber = e.target.closest(".page").dataset.pageNumber;
                         if (currentPageNumber) {
                             currentPage = pdfViewer._pages[currentPageNumber - 1];
                             pinchStartDistance = Math.sqrt(

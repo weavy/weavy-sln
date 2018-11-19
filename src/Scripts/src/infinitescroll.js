@@ -1,10 +1,49 @@
 var weavy = weavy || {};
+
 weavy.infinitescroll = (function ($) {
 
     var buffer = window.innerHeight / 2 || 0; // arbitrary value (set to whatever you think is a good distance before triggering automatic click)
     var hasnext = true;
     var loading = false;
     var throttle = null;
+
+    if (weavy.turbolinks.enabled) {
+        document.addEventListener("turbolinks:load", init);
+        document.addEventListener("turbolinks:before-cache", destroy);
+    } else {
+        $(document).ready(function () {
+            init();
+        });
+    }
+    
+    function init() {
+        // check if there is more data to load directly on init
+        loadMore(); 
+        // then check again on scroll
+        throttle = _.throttle(function (e) { if (!loading) { loadMore(e); } }, 250);
+        $(window).add("main").on("scroll", throttle);
+    }
+
+    function destroy() {
+        if (throttle != null) {
+            throttle.cancel();
+        }
+        $(window).add("main").off("scroll", throttle);
+    }
+
+    // loads data if $more is visible
+    function loadMore(e) {
+        var $more = $('.scroll-more:not([data-mode=prepend])').first();
+        var target = e && e.target !== document && e.target || window;
+        if ($more.length) {
+            // calculate distance until $more scrolls into view
+            var distance = 0 + $more.offset().top - $(target).scrollTop() - $(target).height();
+
+            if (distance < buffer) {
+                $more.click();
+            }
+        }
+    }
 
     // click on .scroll-more calls a server function that returns HTML that should be appended to the specified target element
     $(document).on("click", ".scroll-more", function (evt) {
@@ -16,12 +55,13 @@ weavy.infinitescroll = (function ($) {
         }
 
         var $more = $(this);
-        console.debug($more.attr("data-next"));
+        var url = $more.attr("data-next");
+        console.debug(url);
 
         $.ajax({
             type: "GET",
             cache: false,
-            url: $more.attr("data-next"),
+            url: url,
             beforeSend: function (xhr, settings) {
                 loading = true;
 
@@ -73,51 +113,4 @@ weavy.infinitescroll = (function ($) {
         });
     });
 
-    if (weavy.turbolinks.enabled) {
-        // init on load
-        document.addEventListener("turbolinks:load", init);
-
-        // check if we should load more data directly after page is loaded
-        loadMore();
-
-        // destroy on before cache
-        document.addEventListener("turbolinks:before-cache", destroy);
-    } else {
-        $(document).ready(function () {
-            // check if we should load more data directly after page is loaded
-            loadMore();
-            init();
-        });
-    }
-
-    function init() {
-        throttle = _.throttle(function (e) {
-            if (!loading) {
-                loadMore(e);
-            }
-        }, 250);
-        $(window).add("main").on("scroll", throttle);
-    }
-
-    function destroy() {
-        if (throttle != null) {
-            throttle.cancel();
-        }
-        $(window).add("main").off("scroll", throttle);
-    }
-
-    // load data if $more is visible
-    function loadMore(e) {
-        var $more = $('.scroll-more:not([data-mode=prepend])').first();
-        var target = e && e.target !== document && e.target || window;
-        if ($more.length) {
-            // calculate distance until $more scrolls into view
-            var distance = 0 + $more.offset().top - $(target).scrollTop() - $(target).height();
-
-            if (distance < buffer) {
-                $more.click();
-            }
-        }
-    }
-
-})($);
+})(jQuery);

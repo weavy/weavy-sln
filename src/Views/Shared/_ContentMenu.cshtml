@@ -1,8 +1,6 @@
 ﻿@model Content
 @{
-    var draftable = Model as IDraftable;
     var lockable = Model as ILockable;
-    var file = Model as FileBase;
 }
 
 <div class="dropdown">
@@ -12,21 +10,19 @@
     <div class="dropdown-menu dropdown-menu-right">
         <button type="button" class="dropdown-item" data-toggle="modal" data-target="#share-modal" data-share-type="@Model.Type" data-share-id="@Model.Id" data-share-title="Share @Model.Kind()">@Html.SvgIcon("share-variant", "success") Share</button>
 
-        @if (file != null && FileHelper.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
-            <a class="dropdown-item" href="@file.OfficeUrl()">@Html.SvgIcon(Model)<span>Open in @OfficeHelper.GetProductName(file.Name)</span></a>
+        @if (Model is FileBase file) {
+            if (FileHelper.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
+                <a class="dropdown-item" href="@file.OfficeUrl()">@Html.SvgIcon(Model)<span>Open in @OfficeHelper.GetProductName(file.Name)</span></a>
+            }
+            <a class="dropdown-item" href="@file.FileUrl(download: true)">@Html.SvgIcon("download", "primary")<span>Download</span></a>
         }
-
-        @if (file != null) {
-            <a class="dropdown-item" href="@file.FileUrl(download:true)">@Html.SvgIcon("download", "primary")<span>Download</span></a>
-        }
-
 
         @if (Model.HasPermission(Permission.Edit)) {
             if (lockable?.LockedById == User.Id) {
                 if (Model.MetaData().ModifyMode == UpsertMode.Page) {
                     <a class="dropdown-item" href="@Model.Url()/edit">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
                 } else if (Model.MetaData().ModifyMode == UpsertMode.Modal) {
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
+                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
                 }
 
             } else if (lockable?.IsLocked() ?? false) {
@@ -35,12 +31,11 @@
                 if (Model.MetaData().ModifyMode == UpsertMode.Page) {
                     <a class="dropdown-item" href="@Model.Url()/edit">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
                 } else if (Model.MetaData().ModifyMode == UpsertMode.Modal) {
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
+                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
                 }
             }
             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-content-modal" data-path="@(Url.Action<ContentController>(c => c.MoveModal(Model.Id)))" title="Move @Model.Kind()">@Html.SvgIcon("undo", "warning") Move</button>
         }
-
 
         @if (Model is IStarrable starrable) {
             @Html.StarToggle(starrable, false, htmlAttributes: new { @class = "dropdown-item toggle-dropdown" })
@@ -48,6 +43,10 @@
 
         @if (Model is IFollowable followable) {
             @Html.SubscribeToggle(followable, htmlAttributes: new { @class = "dropdown-item toggle-dropdown" })
+        }
+
+        @if (Model is IVersionable versionable) {
+            <a class="dropdown-item" href="@(Url.Action<ContentController>(c => c.Versions(versionable.Id)))">@Html.SvgIcon("backup-restore")<span>Versions</span></a>
         }
 
         @if (Model.HasPermission(Permission.Delete)) {

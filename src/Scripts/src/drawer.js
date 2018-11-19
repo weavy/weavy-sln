@@ -73,7 +73,7 @@ weavy.drawer = (function ($) {
         var $drawer = $("#drawer-user");
         var $active = $("[data-toggle=tab].active", $drawer);
 
-        weavy.tab.load($active.attr("href"), promiseTimeout(200));
+        weavy.tab.load($active.attr("href"), promiseTimeout(250));
     });
 
     // configure remote loading of tabs in #drawer-user
@@ -87,4 +87,4 @@ weavy.drawer = (function ($) {
         close: close,
         toggle: toggle
     }
-})($);
+})(jQuery);

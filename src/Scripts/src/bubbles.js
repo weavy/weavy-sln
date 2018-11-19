@@ -227,4 +227,4 @@ weavy.bubbles = (function ($) {
         requestOpen: requestOpen
     };
 
-})($);
+})(jQuery);

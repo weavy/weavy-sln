@@ -1,5 +1,6 @@
 ﻿@model Content
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     Title = "Edit " + Model.MetaData().Name;
     Back = Url.Back(Model.Url());
     ViewData["turboform"] = true;

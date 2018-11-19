@@ -1,11 +1,6 @@
-﻿// REVIEW: wrap in weavy.editor?
-//var weavy = weavy || {};
-//weavy.editor = (function ($) {
-//...
-//})($);
+﻿var weavy = weavy || {};
 
-
-; (function ($) {
+weavy.editor = (function ($) {
 
     var pluginName = 'weavyEditor';
 
@@ -532,6 +527,9 @@
          * Reset plugin
          */
         function reset() {
+            // remove validation error class
+            $wrapper.removeClass("is-invalid");
+
             // reset attachments
             $wrapper.find(".table-attachments tr").remove();
 

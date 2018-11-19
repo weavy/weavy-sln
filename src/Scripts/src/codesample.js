@@ -17,4 +17,4 @@ weavy.codesample = (function ($) {
         // destroy highlight ?
     });
 
-})($)
+})(jQuery)

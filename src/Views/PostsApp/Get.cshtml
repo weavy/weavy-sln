@@ -8,7 +8,7 @@
         @WeavyContext.Space.AvatarImg(128)
     </div>
     <div class="facepile">
-        @Model.Members.Facepile(size:32, link:true, presence : true)
+        @Model.Members.Facepile(size: 32, link: true, presence: true)
 
         @if (WeavyContext.Space.IsMember) {
             if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
@@ -34,9 +34,16 @@
     @if (!WeavyContext.Space.Description.IsNullOrEmpty()) {
         <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
     }
-    <p class="small text-center text-muted">
-        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>@(" · " + WeavyContext.Space.Privacy.GetDisplayName())
-    </p>
+        <p class="small text-center text-muted">
+            <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, "all", null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
+            @if (Model.ExternalMemberCount > 0) {
+                @(" · ")<a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.ExternalMemberCount + " external")</a>
+            }
+            @if (Model.InviteCount > 0) {
+                @(" · ")<a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.InviteCount + " invited")</a>
+            }
+            @(" · " + WeavyContext.Space.Privacy.GetDisplayName())
+        </p>
 
     @if (!WeavyContext.Space.IsMember && SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id)) {
         <div class="alert alert-info d-flex">
@@ -44,6 +51,8 @@
             <span>Your membership request is waiting for approval.</span>
         </div>
     }
+</div>
+<div class="container my-4">
 
     @if (Model.App.HasPermission(Permission.Post)) {
         <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(Model.App.Id, null)))" method="post">
@@ -55,7 +64,7 @@
         </form>
     }
 
-    @if (WeavyContext.Space.HasPermission(Permission.List)) {        
+    @if (WeavyContext.Space.HasPermission(Permission.List)) {
         <div id="infinite-scroll-target" class="posts">
             @Html.Partial("_Posts", Model.Posts)
         </div>

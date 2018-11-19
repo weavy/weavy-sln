@@ -1,4 +1,5 @@
 var weavy = weavy || {};
+
 weavy.turbolinks = (function ($) {
     // gets a value indicating whether turbolinks is enabled or not
     var enabled = typeof Turbolinks !== "undefined" && Turbolinks !== undefined && Turbolinks.supported !== undefined && Turbolinks.supported;
@@ -19,21 +20,39 @@ weavy.turbolinks = (function ($) {
         Turbolinks.HttpRequest.prototype.send = function () {
             var t;
             return this.xhr && !this.sent ? (this.notifyApplicationBeforeRequestStart(), this.setProgress(0), this.xhr.send(this.xhr.data), this.sent = !0, "function" === typeof (t = this.delegate).requestStarted ? t.requestStarted() : void 0) : void 0;
-        }
+        };
 
         // print state changes (for debugging purposes), see https://javascript.info/onload-ondomcontentloaded
         //console.debug("document:" + document.readyState);
         //document.addEventListener("readystatechange", function () { console.debug("document:" + document.readyState); });
         //document.addEventListener("DOMContentLoaded", function () { console.debug("document:ready"); });
-        //document.addEventListener("turbolinks:click", function (e) { console.debug(e.type); });
-        //document.addEventListener("turbolinks:before-visit", function (e) {console.debug(e.type);});
+
+        document.addEventListener("turbolinks:click", function (e) {
+            // anchors in same page should not be requested with turbolinks
+            if (e.target.getAttribute("href").charAt(0) === '#') {
+                console.log("Cancelling turbolinks navigation");
+                return e.preventDefault();
+            }
+        });
+
+        //document.addEventListener("turbolinks:before-visit", function (e) { console.debug(e.type); });
         //document.addEventListener("turbolinks:request-start", function (e) { console.debug(e.type); });
-        //document.addEventListener("turbolinks:visit", function (e) { console.debug(e);  });
+        //document.addEventListener("turbolinks:visit", function (e) { console.debug(e.type);  });
         //document.addEventListener("turbolinks:request-end", function (e) { console.debug(e.type); });
         //document.addEventListener("turbolinks:before-cache", function (e) { console.debug(e.type); });
         //document.addEventListener("turbolinks:before-render", function (e) {console.debug(e.type); });
         //document.addEventListener("turbolinks:render", function (e) { console.debug(e.type); });
-        //document.addEventListener("turbolinks:load", function (e) {console.debug(e.type);});
+
+        document.addEventListener("turbolinks:load", function (e) {
+            // if url has #fragment, we should scroll target element into view
+            if (window.location.hash) {
+                var element = document.getElementById(window.location.hash.substring(1));
+                if (element) {
+                    element.scrollIntoView();
+                }
+            }
+        });
+
         //window.addEventListener("load", function (e) { console.debug("window:" + e.type); });
         //window.addEventListener("beforeunload", function (e) { console.debug("window:" + e.type); });
         //window.addEventListener("unload", function (e) { console.debug("window:" + e.type); });
@@ -101,7 +120,7 @@ weavy.turbolinks = (function ($) {
         var url = $submit && $submit.attr("formaction") || $form.attr("action");
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
         var target = $submit && $submit.attr("data-bubble-formtarget") || $form.attr("data-bubble-target");
- 
+
         if ($form.hasClass("tab-content")) {
             // add active tab to data (so that we can activate the correct tab when the page reloads)
             var $tab = $form.find(".tab-pane.active");
@@ -160,4 +179,4 @@ weavy.turbolinks = (function ($) {
         enabled: enabled,
         visit: sendData
     };
-})($);
+})(jQuery);

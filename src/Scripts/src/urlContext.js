@@ -1,6 +1,6 @@
 ﻿var weavy = weavy || {};
 
-weavy.urlContext = (function () {
+weavy.urlContext = (function ($) {
 
     $(document).on("click", "a[data-context-url]", function (e) {
         
@@ -23,7 +23,7 @@ weavy.urlContext = (function () {
     }
 
     var checkForContext = function () {
-        var $input = $("input[name=contextUrl");
+        var $input = $("input[name=contextUrl]");
         if ($input.length) {
             weavy.postal.post({ name: 'request-url', space: weavy.context.space });
         }
@@ -76,12 +76,12 @@ weavy.urlContext = (function () {
         init: init,
         check: checkForContext
     }
-})();
+})(jQuery);
 
-(function () {
+(function ($) {
     if (weavy.turbolinks.enabled) {        
         document.addEventListener("turbolinks:load", weavy.urlContext.init);
     } else {        
         document.addEventListener("DOMContentLoaded", weavy.urlContext.init);
     }
-})()
+})(jQuery)

@@ -20,16 +20,21 @@
 
     // WEAVY PROTOTYPE
 
-    this.Weavy = function () {
+    this.WeavyWidget = function () {
+        var widget = this;
+
+        if (WeavyWidget.version) {
+            console.log("WeavyWidget", WeavyWidget.version);
+        }
 
         // public methods
-        Weavy.prototype.init = function () {
+        WeavyWidget.prototype.init = function () {
             connectAndLoad();
-            self.triggerEvent("init", null);
+            widget.triggerEvent("init", null);
         }
 
         // sign in using external authentication provider
-        Weavy.prototype.signIn = function (username, password) {
+        WeavyWidget.prototype.signIn = function (username, password) {
             var dfd = $.Deferred();
 
             // listen to signedIn message
@@ -45,7 +50,7 @@
             }, false);
 
             // post message to sign in user
-            loadInTarget("personal", self.options.url + "sign-in?path=/notify", "username=" + username + "&password=" + password, "POST");
+            loadInTarget("personal", widget.options.url + "sign-in?path=/notify", "username=" + username + "&password=" + password, "POST");
 
             // return promise
             return dfd.promise();
@@ -53,11 +58,11 @@
         }
 
         // sign out using external authentication provider
-        Weavy.prototype.signOut = function () {
+        WeavyWidget.prototype.signOut = function () {
             var dfd = $.Deferred();
 
             // sign out user in Weavy
-            loadInTarget("personal", self.options.url + "sign-out?path=/notify", "", "GET");
+            loadInTarget("personal", widget.options.url + "sign-out?path=/notify", "", "GET");
 
             // listen to signedOut message
             window.addEventListener("message", function (e) {
@@ -72,22 +77,22 @@
         }
 
         // open a conversation
-        Weavy.prototype.openConversation = function (conversationId, event) {
+        WeavyWidget.prototype.openConversation = function (conversationId, event) {
             event.preventDefault();
             event.cancelBubble = true;
-            self.messengerFrame.contentWindow.postMessage({ "name": "openConversation", "id": conversationId }, "*");
-            self.open("messenger");
+            widget.messengerFrame.contentWindow.postMessage({ "name": "openConversation", "id": conversationId }, "*");
+            widget.open("messenger");
         }
 
         // close open strip
-        Weavy.prototype.close = function () {
-            var $openFrame = $(".weavy-strip.weavy-open iframe", self.strips);
+        WeavyWidget.prototype.close = function () {
+            var $openFrame = $(".weavy-strip.weavy-open iframe", widget.strips);
 
-            $(self.container).removeClass("weavy-open");
-            $(".weavy-strip", self.strips).removeClass("weavy-open");
-            $(".weavy-button", self.buttons).removeClass("weavy-open");
-            $(".weavy-notification-frame", self.container).remove();
-            self.triggerEvent("close", null);
+            $(widget.container).removeClass("weavy-open");
+            $(".weavy-strip", widget.strips).removeClass("weavy-open");
+            $(".weavy-button", widget.buttons).removeClass("weavy-open");
+            $(".weavy-notification-frame", widget.container).remove();
+            widget.triggerEvent("close", null);
             try {
                 $openFrame[0].contentWindow.postMessage({ name: 'hide' }, "*");
             } catch (e) {
@@ -96,34 +101,34 @@
         }
 
         // open specified strip (personal, messenger or bubble)
-        Weavy.prototype.open = function (strip, destination) {
+        WeavyWidget.prototype.open = function (strip, destination) {
             // Treat strip numbers as bubbles
             if (strip === parseInt(strip, 10)) {
                 strip = "bubble-" + strip;
             }
-            if (self.isBlocked) {
+            if (widget.isBlocked) {
                 fallback(strip, destination);
             } else {
-                $(self.container).addClass("weavy-open");
+                $(widget.container).addClass("weavy-open");
 
-                var $strip = $("#weavy-strip-" + strip, self.strips);
+                var $strip = $("#weavy-strip-" + strip, widget.strips);
                 if (!$strip.hasClass("weavy-open")) {
-                    $(".weavy-strip", self.strips).removeClass("weavy-open");
-                    $(".weavy-button", self.buttons).removeClass("weavy-open");
-                    $(".weavy-button.weavy-" + strip, self.buttons).addClass("weavy-open");
-                    $("#weavy-strip-" + strip, self.strips).addClass("weavy-open");
-                    $(".weavy-notification-frame", self.notifications).remove();
+                    $(".weavy-strip", widget.strips).removeClass("weavy-open");
+                    $(".weavy-button", widget.buttons).removeClass("weavy-open");
+                    $(".weavy-button.weavy-" + strip, widget.buttons).addClass("weavy-open");
+                    $("#weavy-strip-" + strip, widget.strips).addClass("weavy-open");
+                    $(".weavy-notification-frame", widget.notifications).remove();
 
                     var $frame = $("iframe", $strip);
 
                     if (destination) {
                         // load destination
                         loadInTarget(strip, destination);
-                        loading.call(self, "weavy-strip-" + strip, true, true);
+                        loading.call(widget, "weavy-strip-" + strip, true, true);
                     } else if (!$frame.attr("src") && $frame[0].dataset && $frame[0].dataset.src) {
                         // start predefined loading
                         $frame.attr("src", $frame[0].dataset.src);
-                        loading.call(self, "weavy-strip-" + strip, true);
+                        loading.call(widget, "weavy-strip-" + strip, true);
                     } else {
                         // already loaded
                         try {
@@ -133,40 +138,40 @@
                         }
                     }
 
-                    self.triggerEvent("open", { target: strip });
+                    widget.triggerEvent("open", { target: strip });
                 }
             }
         }
 
-        Weavy.prototype.openContextFrame = function (weavyContext) {
+        WeavyWidget.prototype.openContextFrame = function (weavyContext) {
             if (weavyContext) {
                 var contextData = JSON.parse(weavyContext);
                 if (contextData.space === -2) {
-                    self.open("messenger", contextData.url);
+                    widget.open("messenger", contextData.url);
                 } else {
-                    self.open("bubble-" + contextData.space, contextData.url);
+                    widget.open("bubble-" + contextData.space, contextData.url);
                 }
             }
         }
 
         // toggle (open/close) specified strip (personal, messenger or bubble)
-        Weavy.prototype.toggle = function (strip, event, force) {
-            if (self.isBlocked) {
+        WeavyWidget.prototype.toggle = function (strip, event, force) {
+            if (widget.isBlocked) {
                 // NOTE: prevent incorrect fallback when result from pong has not yet been recieved. 
                 // If blocked: wait 100ms and call the method again to allow the test to be concluded before opening a fallback window
                 if (force) {
                     fallback(strip, null);
                 } else {
                     // call toggle after 100ms with force = true
-                    setTimeout(self.toggle.bind(this, strip, null, true), 100);
+                    setTimeout(widget.toggle.bind(this, strip, null, true), 100);
                 }
             } else {
-                $(".weavy-button.weavy-" + strip, self.container).hasClass("weavy-open") ? self.close() : self.open(strip);
+                $(".weavy-button.weavy-" + strip, widget.container).hasClass("weavy-open") ? widget.close() : widget.open(strip);
             }
         }
 
         // remove a bubble
-        Weavy.prototype.removeBubble = function (id, event) {
+        WeavyWidget.prototype.removeBubble = function (id, event) {
 
             if (event) {
                 event.preventDefault();
@@ -174,7 +179,7 @@
             }
 
             return $.ajax({
-                url: self.options.url + "api/bubble/" + id,
+                url: widget.options.url + "api/bubble/" + id,
                 type: "DELETE",
                 contentType: "application/json",
                 xhrFields: {
@@ -185,14 +190,14 @@
         }
 
         // show bubble modal
-        Weavy.prototype.connectBubble = function (id, type, event) {
+        WeavyWidget.prototype.connectBubble = function (id, type, event) {
 
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
 
-            var activeFrame = $(".weavy-strip.weavy-open iframe.weavy-strip-frame", self.container);
+            var activeFrame = $(".weavy-strip.weavy-open iframe.weavy-strip-frame", widget.container);
 
             if (activeFrame.length) {
                 activeFrame[0].contentWindow.postMessage({ "name": "connect", url: document.location.href, id: id, type: type }, "*");
@@ -200,45 +205,45 @@
         }
 
         // resize the panel
-        Weavy.prototype.resize = function () {
+        WeavyWidget.prototype.resize = function () {
             $(this.container).toggleClass("weavy-wide");
-            self.triggerEvent("resize", null);
+            widget.triggerEvent("resize", null);
         }
 
         // maximize the panel
-        Weavy.prototype.maximize = function () {
+        WeavyWidget.prototype.maximize = function () {
             $(this.container).addClass("weavy-wide");
-            self.triggerEvent("maximize", null);
+            widget.triggerEvent("maximize", null);
         }
 
         // toggle preview window
-        Weavy.prototype.togglePreview = function () {
+        WeavyWidget.prototype.togglePreview = function () {
             $(this.container).toggleClass("weavy-preview");
-            self.triggerEvent("resize", null);
+            widget.triggerEvent("resize", null);
         }
 
 
         // reload the page
-        Weavy.prototype.reload = function (options) {
-            this.options = self.extendDefaults(this.options, options);
+        WeavyWidget.prototype.reload = function (options) {
+            this.options = widget.extendDefaults(this.options, options);
             connectAndLoad();
 
-            self.triggerEvent("reload", this.options);
+            widget.triggerEvent("reload", this.options);
         }
 
-        Weavy.prototype.destroy = function () {
-            weavy.connection.disconnect();            
-            $(self.container).remove();
-            self.container = null;
+        WeavyWidget.prototype.destroy = function () {
+            weavy.connection.disconnect();
+            $(widget.container).remove();
+            widget.container = null;
 
-            $(self.root).remove();
-            self.root = null;
+            $(widget.root).remove();
+            widget.root = null;
 
-            self.triggerEvent("destroyed", null);
+            widget.triggerEvent("destroyed", null);
         }
 
         // refresh a panel
-        Weavy.prototype.refresh = function (strip) {
+        WeavyWidget.prototype.refresh = function (strip) {
 
             loading.call(this, strip, true);
 
@@ -247,18 +252,18 @@
             var frame = $strip.find("iframe");
 
             frame[0].contentWindow.postMessage({ "name": "reload" }, "*");
-            self.triggerEvent("refresh", { 'strip': strip });
+            widget.triggerEvent("refresh", { 'strip': strip });
         }
 
         // resets a panel to its original src
-        Weavy.prototype.reset = function (strip) {
+        WeavyWidget.prototype.reset = function (strip) {
             loading.call(this, strip, true);
             var $strip = $("#" + strip, this.container);
             var frame = $strip.find("iframe");
-            frame[0].src = frame[0].dataset.src || frame[0].src || "about:blank";            
+            frame[0].src = frame[0].dataset.src || frame[0].src || "about:blank";
         }
 
-        Weavy.prototype.preloadFrame = function(frameElement, callback) {
+        WeavyWidget.prototype.preloadFrame = function (frameElement, callback) {
             var strip = $(frameElement).closest(".weavy-strip").get(0);
             var bubbleTarget = strip && strip.id;
             var delayedFrameLoad = function () {
@@ -285,40 +290,43 @@
 
         }
 
-        Weavy.prototype.preloadFrames = function(force) {
-            if (self.options.is_mobile) {
+        WeavyWidget.prototype.preloadFrames = function (force) {
+            if (widget.options.is_mobile) {
                 return;
             }
 
             if (!preloading) {
                 console.debug("starting frames preloading");
-                var $currentlyLoadingFrames = $(self.strips).find("iframe[src][data-src]");
+                var $currentlyLoadingFrames = $(widget.strips).find("iframe[src][data-src]");
                 if ($currentlyLoadingFrames.length) {
                     // Wait until user loaded frames has loaded
-                    $currentlyLoadingFrames.first().one("load", function () { self.preloadFrames(force); });
+                    $currentlyLoadingFrames.first().one("load", function () { widget.preloadFrames(force); });
                     return;
                 }
             }
             if (!preloading || force) {
                 preloading = true;
 
-                var $systemFrames = $(self.strips).find("iframe[data-src]:not([data-type]):not([src])");
+                var $systemFrames = $(widget.strips).find("iframe[data-src]:not([data-type]):not([src])");
                 if ($systemFrames.length) {
-                    $systemFrames.each(function () { self.preloadFrame(this, function () { self.preloadFrames(force) }) });
-                } else if (force && !$(self.strips).find("iframe[src][data-src]:not([data-type])").length) {
+                    $systemFrames.each(function () { widget.preloadFrame(this, function () { widget.preloadFrames(force) }) });
+                } else if (force && !$(widget.strips).find("iframe[src][data-src]:not([data-type])").length) {
                     // After preloading system frames is done
-                    var $strips = $(self.strips).find("iframe[data-type]:not([src])");
+                    var $strips = $(widget.strips).find("iframe[data-type]:not([src])");
                     if ($strips.length) {
-                        self.preloadFrame($strips[0]);
-                        setTimeout(self.preloadFrames, 1500, "all");
+                        widget.preloadFrame($strips[0]);
+                        setTimeout(widget.preloadFrames, 1500, "all");
                     }
                 }
             }
         }
 
-        Weavy.prototype.extendDefaults = function (source, properties) {
+        WeavyWidget.prototype.extendDefaults = function (source, properties) {
+            source = source || {};
+            properties = properties || {};
+
             var property;
-            var https = properties.https || source.https;
+            var https = properties.https || source.https || widget.options.https || true;
 
             // Make a copy
             var copy = {};
@@ -334,12 +342,11 @@
                     copy[property] = this.httpsUrl(properties[property], https);
                 }
             }
-
             return copy;
         };
 
-        Weavy.prototype.httpsUrl = function (url, https) {
-            https = https || self.options.https;
+        WeavyWidget.prototype.httpsUrl = function (url, https) {
+            https = https || widget.options.https;
             if (typeof url === "string") {
                 if (https === "force") {
                     return url.replace(/^http:/, "https:");
@@ -353,7 +360,6 @@
         this.supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
         this.root = null;
 
-        var self = this;
         var previewingFullscreen = false;
         var disconnected = false;
         var preloading = false;
@@ -400,22 +406,34 @@
 
         this.isBlocked = false;
 
-        this.options = Weavy.defaults;
+        this.options = WeavyWidget.defaults;
 
         // extend default options with the passed in arugments
         if (arguments[0] && typeof arguments[0] === "object") {
-            this.options = self.extendDefaults(Weavy.defaults, arguments[0]);
+            this.options = widget.extendDefaults(WeavyWidget.defaults, arguments[0]);
         }
 
         // Run plugins
-        for (plugin in Weavy.plugins) {
-            if (typeof Weavy.plugins[plugin] === "function") {
-                Weavy.plugins[plugin].call(this, this.options);
+        // Disable all plugins by setting plugin option to false
+        if (this.options.plugins !== false) {
+            this.options.plugins = this.options.plugins || {};
+
+            for (plugin in WeavyWidget.plugins) {
+                if (typeof WeavyWidget.plugins[plugin] === "function") {
+
+                    // Disable plugins by setting plugin options to false
+                    if (this.options.plugins[plugin] !== false) {
+                        console.debug("Running WeavyWidget plugin:", plugin);
+                        this.options.plugins[plugin] = widget.extendDefaults(WeavyWidget.plugins[plugin].defaults, typeof this.options.plugins[plugin] === "object" && this.options.plugins[plugin] || {});
+                        WeavyWidget.plugins[plugin].call(this, this.options.plugins[plugin]);
+                    }
+                }
             }
         }
 
+
         $(document).on("locationchanged.event.weavy", function (objEvent, objData) {
-            $("iframe.weavy-strip-frame", self.container).each(function () {
+            $("iframe.weavy-strip-frame", widget.container).each(function () {
                 if ($(this)[0].contentWindow !== null) {
                     $(this)[0].contentWindow.postMessage({ "name": "context-url", "value": objData.currentHref, 'title': document.title, 'origin': document.location.origin }, "*");
                 }
@@ -424,11 +442,11 @@
         });
 
         function connectAndLoad() {
-            connect.call(self).then(function () {
-                self.options.conversations = null;
-                self.options.is_loaded = false;
-                self.options.href = window.location.href;
-                weavy.realtime.invoke("widget", "load", self.options);
+            connect.call(widget).then(function () {
+                widget.options.conversations = null;
+                widget.options.is_loaded = false;
+                widget.options.href = window.location.href;
+                weavy.realtime.invoke("widget", "load", widget.options);
             });
         }
 
@@ -444,14 +462,14 @@
                     $(alertMessage).remove();
                 }, 5200);
             }
-            self.container.appendChild(alertMessage);
+            widget.container.appendChild(alertMessage);
         }
 
         function removeBubbleItems(bubbleId, noCache, keepOpen) {
-            var strip = self.container.querySelector("#weavy-strip-bubble-" + bubbleId);
+            var strip = widget.container.querySelector("#weavy-strip-bubble-" + bubbleId);
             if (strip) {
                 var frame = strip.querySelector(".weavy-strip-frame");
-                var buttonContainer = self.container.querySelector("#weavy-bubble-" + bubbleId);
+                var buttonContainer = widget.container.querySelector("#weavy-bubble-" + bubbleId);
 
                 var duplicateButton = function (buttonContainer) {
                     var buttonContainerCopy = buttonContainer.cloneNode(true);
@@ -494,14 +512,14 @@
                 }
 
                 duplicateButton(buttonContainer);
-                self.bubblesCache.appendChild(buttonContainer);
+                widget.bubblesCache.appendChild(buttonContainer);
                 buttonContainer.classList.add("weavy-disabled", "weavy-removed");
 
                 if (!keepOpen) {
                     buttonContainer.querySelector(".weavy-button").classList.remove("weavy-open");
 
                     if (strip.classList.contains("weavy-open")) {
-                        self.container.classList.remove("weavy-open");
+                        widget.container.classList.remove("weavy-open");
                         strip.classList.remove("weavy-open");
                         setTimeout(removeBubbleElements, 250);
                     } else {
@@ -513,21 +531,21 @@
         }
 
         function removeBubbleCache(bubbleId) {
-            var $strip = $("#weavy-strip-bubble-" + bubbleId, self.container);
-            var $button = $("#weavy-bubble-" + bubbleId, self.container);
+            var $strip = $("#weavy-strip-bubble-" + bubbleId, widget.container);
+            var $button = $("#weavy-bubble-" + bubbleId, widget.container);
             if ($strip.length) {
-                self.stripCacheList.splice(self.stripCacheList.indexOf($strip[0]), 1);
+                widget.stripCacheList.splice(widget.stripCacheList.indexOf($strip[0]), 1);
                 $strip.remove();
             }
             if ($button.length) {
-                self.buttonCacheList.splice(self.buttonCacheList.indexOf($button[0]), 1);
+                widget.buttonCacheList.splice(widget.buttonCacheList.indexOf($button[0]), 1);
                 $button.remove();
             }
         }
 
         function truncateCache(limit) {
-            var overload = Math.max(self.buttonCacheList.length, limit) - limit;
-            var unusedStrips = self.buttonCacheList.filter(function (button, index) {
+            var overload = Math.max(widget.buttonCacheList.length, limit) - limit;
+            var unusedStrips = widget.buttonCacheList.filter(function (button, index) {
                 return !button.parentNode || button.parentNode.classList.contains("weavy-cache");
             });
             for (var i = unusedStrips.length; i > unusedStrips.length - overload; i--) {
@@ -535,7 +553,7 @@
             }
         }
 
- 
+
         function buildOutput() {
             // add container
             if (!this.container) {
@@ -561,7 +579,7 @@
 
                 this.statusFrame.addEventListener("load", function (a, b, c) {
                     // start testing for blocked iframe             
-                    self.isBlocked = true;
+                    widget.isBlocked = true;
                     try {
                         this.contentWindow.postMessage({ "name": "ping" }, "*");
                     } catch (e) { console.warn("Frame postMessage is blocked", e); }
@@ -815,33 +833,33 @@
 
                 // bubbles, global and user added
                 // Check if current open bubble is global and make sure it's not removed
-                self.options.bubbles = self.options.bubbles || [];
+                widget.options.bubbles = widget.options.bubbles || [];
                 var preservedBubble = [];
-                var currentOpenGlobal = $(self.spaces).children("[data-type='global'].weavy-open");
+                var currentOpenGlobal = $(widget.spaces).children("[data-type='global'].weavy-open");
 
 
                 if (currentOpenGlobal.length) {
-                    preservedBubble = self.bubbles.filter(function (bubble) {
+                    preservedBubble = widget.bubbles.filter(function (bubble) {
                         var isMatch = currentOpenGlobal[0].id === "weavy-strip-bubble-" + bubble.space_id;
                         if (isMatch) {
                             bubble.type = "personal";
-                            isMatch = self.options.bubbles.filter(function (newBubble) { return newBubble.space_id === bubble.space_id }).length === 0;
-                            $(self.draggable).find("#weavy-bubble-" + bubble.space_id).addClass("weavy-bubble-detached");
+                            isMatch = widget.options.bubbles.filter(function (newBubble) { return newBubble.space_id === bubble.space_id }).length === 0;
+                            $(widget.draggable).find("#weavy-bubble-" + bubble.space_id).addClass("weavy-bubble-detached");
                         }
                         return isMatch;
                     }).pop();
 
                     if (preservedBubble) {
-                        self.options.bubbles.unshift(preservedBubble);
+                        widget.options.bubbles.unshift(preservedBubble);
                     }
                 }
 
-                self.bubbles = self.options.bubbles;
+                widget.bubbles = widget.options.bubbles;
 
                 // Truncate the array; only 16 spaces allowed
-                if (self.bubbles.length >= self.options.bubble_limit) {
-                    self.bubbles.length = Math.min(self.bubbles.length, self.options.bubble_limit);
-                    showAlert.call(self, "<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
+                if (widget.bubbles.length >= widget.options.bubble_limit) {
+                    widget.bubbles.length = Math.min(widget.bubbles.length, widget.options.bubble_limit);
+                    showAlert.call(widget, "<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
                 }
 
                 addAndRemoveBubbles();
@@ -854,7 +872,7 @@
             }
 
             // version mismatch
-            if (self.options.should_update) {
+            if (widget.options.should_update) {
                 try {
                     if (typeof (browser) !== "undefined" && browser.runtime) {
                         browser.runtime.sendMessage({ name: 'sync' });
@@ -864,7 +882,7 @@
                 } catch (ex) {
                     console.error(ex);
                 }
-                showAlert.call(this, "<strong>" + self.options.installation_name + " has been upgraded</strong><br/>Reload page to get the latest version.", true);
+                showAlert.call(this, "<strong>" + widget.options.installation_name + " has been upgraded</strong><br/>Reload page to get the latest version.", true);
             }
         }
 
@@ -882,7 +900,7 @@
                     return isMatch;
                 }).pop();
 
-                bubble.url = self.httpsUrl(bubble.url);
+                bubble.url = widget.httpsUrl(bubble.url);
 
                 if (previous && previous.type !== "global") {
                     cleanedList[previousIndex] = bubble;
@@ -898,10 +916,10 @@
                 newBubbles = Array.isArray(newBubbles) ? newBubbles : [newBubbles];
 
                 newBubbles.forEach(function (newBubble) {
-                    newBubble.url = self.httpsUrl(newBubble.url);
-
-                    if (_.find(self.bubbles, function (b) { return b.space_id == newBubble.space_id })) {
-                        self.bubbles = self.bubbles.map(function (bubble) {
+                    newBubble.url = widget.httpsUrl(newBubble.url);
+  
+                    if ([].some.call(widget.bubbles, function (b) { return b.space_id == newBubble.space_id })) {
+                        widget.bubbles = widget.bubbles.map(function (bubble) {
                             if (bubble.space_id === newBubble.space_id) {
                                 return newBubble;
                             } else {
@@ -909,22 +927,22 @@
                             }
                         });
                     } else {
-                        if (self.bubbles.length >= self.options.bubble_limit) {
-                            showAlert.call(self, "<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
+                        if (widget.bubbles.length >= widget.options.bubble_limit) {
+                            showAlert.call(widget, "<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
                             return;
                         } else {
-                            self.bubbles.push(newBubble);
+                            widget.bubbles.push(newBubble);
                         }
                     }
                 });
             }
 
-            $(self.spaces).children().addClass("weavy-cache-hidden");
+            $(widget.spaces).children().addClass("weavy-cache-hidden");
 
-            [].forEach.call(self.bubbles, function (bubble) {
+            [].forEach.call(widget.bubbles, function (bubble) {
 
-                var strip = self.stripCacheList.filter(function (item) { return item.id === "weavy-strip-bubble-" + bubble.space_id; }).pop();
-                var buttonContainer = self.buttonCacheList.filter(function (item) { return item.id === "weavy-bubble-" + bubble.space_id; }).pop();
+                var strip = widget.stripCacheList.filter(function (item) { return item.id === "weavy-strip-bubble-" + bubble.space_id; }).pop();
+                var buttonContainer = widget.buttonCacheList.filter(function (item) { return item.id === "weavy-bubble-" + bubble.space_id; }).pop();
 
                 // add new bubble if not already added
                 if (!strip) {
@@ -935,7 +953,7 @@
                     strip.className = "weavy-strip";
                     strip.id = "weavy-strip-bubble-" + bubble.space_id;
 
-                    self.spaces.appendChild(strip);
+                    widget.spaces.appendChild(strip);
 
                     // frame
                     var frame = document.createElement("iframe");
@@ -946,7 +964,7 @@
                     frame.dataset.src = bubble.url;
                     frame.setAttribute('data-type', bubble.type);
 
-                    strip.appendChild(renderControls.call(self, "weavy-strip-bubble-" + bubble.space_id));
+                    strip.appendChild(renderControls.call(widget, "weavy-strip-bubble-" + bubble.space_id));
                     strip.appendChild(frame);
 
                     // button container
@@ -962,8 +980,8 @@
                     button.setAttribute('data-name', bubble.name);
                     button.className = "weavy-button weavy-bubble-" + bubble.space_id;
 
-                    button.style.backgroundImage = "url(" + trimUrl(self.options.url) + bubble.icon + ")";
-                    //button.innerHTML = '<img draggable="false" class="weavy-avatar" src="' + self.options.url + bubble.icon + '" />';
+                    button.style.backgroundImage = "url(" + trimUrl(widget.options.url) + bubble.icon + ")";
+                    //button.innerHTML = '<img draggable="false" class="weavy-avatar" src="' + widget.options.url + bubble.icon + '" />';
                     buttonContainer.appendChild(button);
 
                     // tooltip
@@ -983,7 +1001,7 @@
                         disconnect.title = "Disconnect from url";
                         //link: disconnect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2,5.27L3.28,4L20,20.72L18.73,22L14.73,18H13V16.27L9.73,13H8V11.27L5.5,8.76C4.5,9.5 3.9,10.68 3.9,12C3.9,14.26 5.74,16.1 8,16.1H11V18H8A6,6 0 0,1 2,12C2,10.16 2.83,8.5 4.14,7.41L2,5.27M16,6A6,6 0 0,1 22,12C22,14.21 20.8,16.15 19,17.19L17.6,15.77C19.07,15.15 20.1,13.7 20.1,12C20.1,9.73 18.26,7.9 16,7.9H13V6H16M8,6H11V7.9H9.72L7.82,6H8M16,11V13H14.82L12.82,11H16Z" /></svg>'
                         disconnect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2 5.27L3.28 4 20 20.72 18.73 22l-4.83-4.83-2.61 2.61a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.982 2.982 0 0 0 0 4.24 2.982 2.982 0 0 0 4.24 0l2.62-2.6-1.62-1.61c-.01.24-.11.49-.29.68-.39.39-1.03.39-1.42 0A4.973 4.973 0 0 1 7.72 11L2 5.27m10.71-1.05a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.982 2.982 0 0 0 0-4.24 2.982 2.982 0 0 0-4.24 0l-3.33 3.33-1.41-1.42 3.33-3.33m.7 4.95c.39-.39 1.03-.39 1.42 0a4.999 4.999 0 0 1 1.23 5.06l-1.78-1.77c-.05-.68-.34-1.35-.87-1.87a.973.973 0 0 1 0-1.42z"></path></svg>';
-                        disconnect.addEventListener("click", function (e) { self.removeBubble.call(self, buttonContainer.dataset["bubbleId"], e); });
+                        disconnect.addEventListener("click", function (e) { widget.removeBubble.call(widget, buttonContainer.dataset["bubbleId"], e); });
                         buttonContainer.appendChild(disconnect);
 
                         var connect = document.createElement("a");
@@ -993,9 +1011,9 @@
                         //link: connect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16,6H13V7.9H16C18.26,7.9 20.1,9.73 20.1,12A4.1,4.1 0 0,1 16,16.1H13V18H16A6,6 0 0,0 22,12C22,8.68 19.31,6 16,6M3.9,12C3.9,9.73 5.74,7.9 8,7.9H11V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H11V16.1H8C5.74,16.1 3.9,14.26 3.9,12M8,13H16V11H8V13Z" /></svg>';
                         connect.addEventListener("click", function (e) {
                             if (buttonContainer.classList.contains("weavy-bubble-detached")) {
-                                self.connectBubble.call(self, bubble.space_id, "space", e);
+                                widget.connectBubble.call(widget, bubble.space_id, "space", e);
                             } else {
-                                self.connectBubble.call(self, buttonContainer.dataset["bubbleId"], "bubble", e);
+                                widget.connectBubble.call(widget, buttonContainer.dataset["bubbleId"], "bubble", e);
                             }
                         });
                         buttonContainer.appendChild(connect);
@@ -1008,9 +1026,9 @@
 
                     close.addEventListener("click", function (e) {
                         if (buttonContainer.classList.contains("weavy-bubble-detached")) {
-                            removeBubbleItems.call(self, bubble.space_id);
+                            removeBubbleItems.call(widget, bubble.space_id);
                         } else {
-                            self.removeBubble.call(self, buttonContainer.dataset["bubbleId"], e);
+                            widget.removeBubble.call(widget, buttonContainer.dataset["bubbleId"], e);
                         }
                     });
 
@@ -1018,11 +1036,11 @@
 
                     buttonContainer.appendChild(tooltip);
 
-                    button.addEventListener("click", self.toggle.bind(self, "bubble-" + bubble.space_id));
+                    button.addEventListener("click", widget.toggle.bind(widget, "bubble-" + bubble.space_id));
                     //button.addEventListener("mouseenter", showTooltip);
 
-                    self.stripCacheList.unshift(strip);
-                    self.buttonCacheList.unshift(buttonContainer);
+                    widget.stripCacheList.unshift(strip);
+                    widget.buttonCacheList.unshift(buttonContainer);
                 } else {
                     var frame = strip.querySelector("iframe");
                     if (frame.src) {
@@ -1044,22 +1062,22 @@
 
                 try {
                     if (bubble.type === "personal") {
-                        if (buttonContainer.parentNode === self.bubblesGlobal) {
+                        if (buttonContainer.parentNode === widget.bubblesGlobal) {
                             // Bubble is moved from global to personal
                             removeBubbleItems(bubble.space_id, false, true);
                             buttonContainer.classList.add("weavy-disable-transition", "weavy-removed", "weavy-disabled");
-                            self.bubblesPersonal.appendChild(buttonContainer);
-                        } else if (buttonContainer.parentNode !== self.bubblesPersonal) {
-                            self.bubblesPersonal.appendChild(buttonContainer);
+                            widget.bubblesPersonal.appendChild(buttonContainer);
+                        } else if (buttonContainer.parentNode !== widget.bubblesPersonal) {
+                            widget.bubblesPersonal.appendChild(buttonContainer);
                         }
                     } else {
-                        if (buttonContainer.parentNode === self.bubblesPersonal) {
+                        if (buttonContainer.parentNode === widget.bubblesPersonal) {
                             // Bubble is moved from personal to global
                             removeBubbleItems(bubble.space_id, false, true);
                             buttonContainer.classList.add("weavy-disable-transition", "weavy-removed", "weavy-disabled");
-                            self.bubblesGlobal.appendChild(buttonContainer);
-                        } else if (buttonContainer.parentNode !== self.bubblesGlobal) {
-                            self.bubblesGlobal.appendChild(buttonContainer);
+                            widget.bubblesGlobal.appendChild(buttonContainer);
+                        } else if (buttonContainer.parentNode !== widget.bubblesGlobal) {
+                            widget.bubblesGlobal.appendChild(buttonContainer);
                         }
                     }
                 } catch (e) { console.warn("Could not attach bubble", bubble.space_id); }
@@ -1072,7 +1090,7 @@
                         if (bubble.force_open) {
                             setTimeout(function () {
                                 bubble.force_open = false;
-                                self.open("bubble-" + bubble.space_id, bubble.destination || bubble.url);
+                                widget.open("bubble-" + bubble.space_id, bubble.destination || bubble.url);
                             }, 100);
                         }
                     });
@@ -1082,8 +1100,8 @@
 
 
             // Close remaining spaces
-            $(self.spaces).children(".weavy-cache-hidden").each(function (index, strip) {
-                if (self.bubbles.filter(function (bubble) {
+            $(widget.spaces).children(".weavy-cache-hidden").each(function (index, strip) {
+                if (widget.bubbles.filter(function (bubble) {
                     return strip.id === "weavy-bubble-" + bubble.space_id;
                 }).length === 0) {
                     if (strip.classList.contains("weavy-open")) {
@@ -1094,7 +1112,7 @@
                 }
             });
 
-            setTimeout(function () { truncateCache(self.options.bubble_limit); }, 450);
+            setTimeout(function () { truncateCache(widget.options.bubble_limit); }, 450);
         }
 
         function renderControls(strip) {
@@ -1130,18 +1148,18 @@
         // open in a normal window when iframes are not allowed
         function fallback(strip, destination) {
             // fallback to windows via extension
-            self.close();
+            widget.close();
 
             var url = destination;
 
             if (!url) {
                 if (strip.startsWith("bubble-")) {
                     // get url for bubble
-                    var bubbleFrame = $(self.strips).find("#weavy-strip-" + strip).find("iframe")[0];
+                    var bubbleFrame = $(widget.strips).find("#weavy-strip-" + strip).find("iframe")[0];
                     url = bubbleFrame.src ? bubbleFrame.src : bubbleFrame.dataset.src;
                 } else {
                     // NOTE: remove strip param to trigger standalone bahaviour
-                    url = removeParameter(self.options[strip + "_url"], "strip");
+                    url = removeParameter(widget.options[strip + "_url"], "strip");
                 }
 
                 // fix for referrer not being set
@@ -1151,11 +1169,11 @@
             }
 
             // use the button container to get measurments
-            var measure = $(self.buttons);
+            var measure = $(widget.buttons);
 
             // NOTE: update if width of strip changes
             var stripWidth = 384;
-            var nudge = $(self.container).hasClass("weavy-left") ? -65 : (stripWidth);
+            var nudge = $(widget.container).hasClass("weavy-left") ? -65 : (stripWidth);
             var offset = measure.offset();
 
             message = {
@@ -1225,7 +1243,7 @@
         }
 
         function connect() {
-            return weavy.connection.init(self.options.url, null, true);
+            return weavy.connection.init(widget.options.url, null, true);
         }
 
         function updateConversations(conversations) {
@@ -1244,7 +1262,7 @@
                 avatar.className = "weavy-avatar";
                 avatar.setAttribute("draggable", "false");
 
-                avatar.src = trimUrl(self.options.url) + conversations[i].thumb_url.replace("{options}", "96x96-crop");
+                avatar.src = trimUrl(widget.options.url) + conversations[i].thumb_url.replace("{options}", "96x96-crop");
                 conversation.appendChild(avatar);
                 this.conversations.appendChild(conversation);
 
@@ -1262,19 +1280,19 @@
         }
 
         function conversationRead(id) {
-            this.unreadConversations = _.without(this.unreadConversations, _.findWhere(this.unreadConversations, { id: id }));
+            this.unreadConversations = this.unreadConversations.filter(function (unreadConversation) { return unreadConversation.id !== id });
             updateConversations.call(this, this.unreadConversations);
         }
 
         function appendConversation(conversation) {
             // remove if already in list - will be added again
-            this.unreadConversations = _.without(this.unreadConversations, _.findWhere(this.unreadConversations, { id: conversation.id }));
+            this.unreadConversations = this.unreadConversations.filter(function (unreadConversation) { return unreadConversation.id !== conversation.id });
             this.unreadConversations.unshift(conversation);
             updateConversations.call(this, this.unreadConversations);
         }
 
         function showNotification(notification) {
-            if (!$(".weavy-strip.weavy-open", self.container).length) {
+            if (!$(".weavy-strip.weavy-open", widget.container).length) {
                 var notificationFrame = document.createElement("iframe");
                 notificationFrame = document.createElement("iframe");
                 notificationFrame.className = "weavy-notification-frame";
@@ -1282,22 +1300,22 @@
 
                 if ($(this.notifications).children().length > 0) {
                     notificationFrame.setAttribute("style", "display:none");
-                    notificationFrame.setAttribute("data-src", trimUrl(self.options.url) + "/notifications/" + notification.id + "/preview");
+                    notificationFrame.setAttribute("data-src", trimUrl(widget.options.url) + "/notifications/" + notification.id + "/preview");
                 } else {
-                    notificationFrame.src = trimUrl(self.options.url) + "/notifications/" + notification.id + "/preview";
+                    notificationFrame.src = trimUrl(widget.options.url) + "/notifications/" + notification.id + "/preview";
                 }
 
                 this.notifications.appendChild(notificationFrame);
             }
 
             try {
-                $(".weavy-notification-sound", self.container)[0].play();;
+                $(".weavy-notification-sound", widget.container)[0].play();;
             } catch (e) { }
         }
 
         function closeNotification(id) {
 
-            var $notification = $("#weavy-notification-frame-" + id, self.container);
+            var $notification = $("#weavy-notification-frame-" + id, widget.container);
 
             if ($notification.length) {
                 $notification.fadeOut("normal", function () {
@@ -1315,11 +1333,11 @@
         }
 
         function registerLoading(stripId) {
-            var frame = $("#" + stripId, self.container).find("iframe").get(0);
+            var frame = $("#" + stripId, widget.container).find("iframe").get(0);
             if (frame && !frame.registered) {
                 var onload = function () {
                     sendWindowId(frame.contentWindow, frame.id, stripId);
-                    loading.call(self, stripId, false);
+                    loading.call(widget, stripId, false);
                     delete frame.dataset.src;
                     // add window to connections
                     weavy.connection.addWindow(frame.contentWindow)
@@ -1331,14 +1349,14 @@
 
         function loading(stripId, isLoading, fill) {
 
-            var $strip = $("#" + stripId, self.container);
-            var $bubble = $("#" + stripId.replace(/-strip(-bubble)*-/, '-bubble-'), self.container);
+            var $strip = $("#" + stripId, widget.container);
+            var $bubble = $("#" + stripId.replace(/-strip(-bubble)*-/, '-bubble-'), widget.container);
 
             if (isLoading) {
                 registerLoading(stripId);
                 $strip.addClass(fill ? "weavy-loading weavy-loading-fill" : "weavy-loading");
                 $bubble.addClass(fill ? "weavy-loading weavy-loading-fill" : "weavy-loading");
-                $strip.loadingTimeout = setTimeout(loading.bind(self, stripId, false), 15000);
+                $strip.loadingTimeout = setTimeout(loading.bind(widget, stripId, false), 15000);
             } else {
                 $strip.removeClass("weavy-loading weavy-loading-fill");
                 $bubble.removeClass("weavy-loading weavy-loading-fill");
@@ -1363,31 +1381,31 @@
         }
 
         function badgeChanged(badge) {
-            var prev = $(self.personalButton).attr("data-count");
-            $(self.personalButton).attr("data-count", badge.notifications);
+            var prev = $(widget.personalButton).attr("data-count");
+            $(widget.personalButton).attr("data-count", badge.notifications);
             if (badge.notifications === 0) {
                 // no notifications, remove dot and animation class
-                $(self.personalButton).removeClass("weavy-dot");
+                $(widget.personalButton).removeClass("weavy-dot");
             } else if (badge.notifications > prev) {
                 // new notifications, animate dot
-                $(self.personalButton).removeClass("weavy-pulse");
+                $(widget.personalButton).removeClass("weavy-pulse");
                 setTimeout(function () {
                     // we need a small delay here for the browser to notice that the weavy-pulse class was toggled
-                    $(self.personalButton).addClass("weavy-dot weavy-pulse");
+                    $(widget.personalButton).addClass("weavy-dot weavy-pulse");
                 }, 100);
             }
 
-            prev = $(self.messengerButton).attr("data-count");
-            $(self.messengerButton).attr("data-count", badge.conversations);
+            prev = $(widget.messengerButton).attr("data-count");
+            $(widget.messengerButton).attr("data-count", badge.conversations);
             if (badge.conversations === 0) {
                 // no conversations, remove dot and animation class
-                $(self.messengerButton).removeClass("weavy-dot");
+                $(widget.messengerButton).removeClass("weavy-dot");
             } else if (badge.conversations > prev) {
                 // new conversations, animate dot
-                $(self.messengerButton).removeClass("weavy-pulse");
+                $(widget.messengerButton).removeClass("weavy-pulse");
                 setTimeout(function () {
                     // we need a small delay here for the browser to notice that the weavy-pulse class was toggled
-                    $(self.messengerButton).addClass("weavy-dot weavy-pulse");
+                    $(widget.messengerButton).addClass("weavy-dot weavy-pulse");
                 }, 100);
             }
 
@@ -1406,19 +1424,19 @@
                     break;
                 case "request-connect":
                     if (e.source !== undefined) {
-                        self.connectBubble.call(self, e.data.space, "space");
+                        widget.connectBubble.call(widget, e.data.space, "space");
                     }
                     break;
                 case "request-disconnect":
                     if (e.source !== undefined) {
                         // get the requesting space
                         var spaceId = e.data.space;
-                        var bubble = _.find(self.bubbles, function (b) { return b.space_id == spaceId });
+                        var bubble = [].filter.call(widget.bubbles, function (b) { return b.space_id == spaceId }).pop();
 
                         var type = bubble ? bubble.type : "personal";
 
                         if (type === "global") {
-                            self.removeBubble.call(self, bubble.bubble_id);
+                            widget.removeBubble.call(widget, bubble.bubble_id);
                         }
                     }
                     break;
@@ -1426,9 +1444,9 @@
                     if (e.source !== undefined) {
                         var spaceId = e.data.spaceId;
                         var destination = e.data.destination;
-                        var bubble = self.bubbles.filter(function (b) { return b.space_id == spaceId });
+                        var bubble = widget.bubbles.filter(function (b) { return b.space_id == spaceId });
                         if (bubble.length) {
-                            self.open("bubble-" + spaceId, destination);
+                            widget.open("bubble-" + spaceId, destination);
                         } else {
                             requestOpen.push(spaceId);
                         }
@@ -1438,13 +1456,13 @@
                     if (e.source !== undefined) {
                         // get the requesting space
                         var spaceId = e.data.space;
-                        var bubble = _.find(self.bubbles, function (b) { return b.space_id == spaceId });
-                        var buttonContainer = self.buttonCacheList.filter(function (item) { return item.id === "weavy-bubble-" + bubble.space_id; }).pop();
+                        var bubble = [].filter.call(widget.bubbles, function (b) { return b.space_id == spaceId }).pop();
+                        var buttonContainer = widget.buttonCacheList.filter(function (item) { return item.id === "weavy-bubble-" + bubble.space_id; }).pop();
 
                         if (buttonContainer.classList.contains("weavy-bubble-detached")) {
-                            removeBubbleItems.call(self, bubble.space_id);
+                            removeBubbleItems.call(widget, bubble.space_id);
                         } else {
-                            self.removeBubble.call(self, bubble.bubble_id);
+                            widget.removeBubble.call(widget, bubble.bubble_id);
                         }
                     }
                     break;
@@ -1452,7 +1470,7 @@
                     if (e.source !== undefined) {
                         // get the requesting space
                         var spaceId = e.data.space;
-                        var bubble = _.find(self.bubbles, function (b) { return b.space_id == spaceId });
+                        var bubble = [].filter.call(widget.bubbles, function (b) { return b.space_id == spaceId }).pop();
 
                         var type = bubble ? bubble.type : "personal";
 
@@ -1463,8 +1481,8 @@
                     window.location.href = e.data.context;
                     break;
                 case "pong":
-                    self.isBlocked = false;
-                    self.openContextFrame(e.data.context);
+                    widget.isBlocked = false;
+                    widget.openContextFrame(e.data.context);
                     break;
                 case "invoke":
                     if (weavy.connection.connection.state === $.signalR.connectionState.connected) {
@@ -1477,7 +1495,7 @@
                 case "ready":
                     // page loaded
                     if (e.data.sourceStripId) {
-                        loading.call(self, e.data.sourceStripId, false);
+                        loading.call(widget, e.data.sourceStripId, false);
                     }
                     break;
                 case "reload":
@@ -1485,79 +1503,79 @@
                     connectAndLoad();
                     break;
                 case "reset":
-                    var active = $(".weavy-strip.weavy-open", self.container);
+                    var active = $(".weavy-strip.weavy-open", widget.container);
                     if (active.length) {
-                        self.reset(active.attr("id"));
+                        widget.reset(active.attr("id"));
                     }
                     break;
                 case "signingOut":
                     // disconnect from signalr
-                    self.options.user_id = null;
+                    widget.options.user_id = null;
                     weavy.connection.disconnect();
-                    self.close();
+                    widget.close();
                     break;
                 case "signedIn":
                 case "signedOut":
                     // force gui refresh                    
-                    self.options.user_id = null;
+                    widget.options.user_id = null;
                     connectAndLoad();
                     break;
                 case "close":
-                    self.close();
+                    widget.close();
                     break;
                 case "maximize":
-                    self.maximize();
+                    widget.maximize();
                     break;
                 case "close-preview":
-                    if (previewingFullscreen && $(self.container).hasClass("weavy-preview")) {
+                    if (previewingFullscreen && $(widget.container).hasClass("weavy-preview")) {
                         previewingFullscreen = false;
-                        self.togglePreview();
+                        widget.togglePreview();
                     }
                     break;
                 case "open-preview":
-                    if (!$(self.container).hasClass("weavy-preview")) {
+                    if (!$(widget.container).hasClass("weavy-preview")) {
                         previewingFullscreen = true;
-                        self.togglePreview();
+                        widget.togglePreview();
                     }
                     break;
                 case "personal":
-                    self.personalFrame.src = self.options.url + e.data.url;
-                    loading.call(self, "weavy-strip-personal", true);
-                    self.open("personal");
+                    widget.personalFrame.src = widget.options.url + e.data.url;
+                    loading.call(widget, "weavy-strip-personal", true);
+                    widget.open("personal");
                     break;
                 case "messenger":
-                    self.messengerFrame.src = self.options.url + e.data.url;
-                    loading.call(self, "weavy-strip-messenger", true);
-                    self.open("messenger");
+                    widget.messengerFrame.src = widget.options.url + e.data.url;
+                    loading.call(widget, "weavy-strip-messenger", true);
+                    widget.open("messenger");
                     break;
                 case "send":
                     loadInTarget(e.data.bubbleTarget, e.data.url, e.data.data, e.data.method);
-                    loading.call(self, "weavy-strip-" + e.data.bubbleTarget, true, true);
-                    self.open(e.data.bubbleTarget);
+                    loading.call(widget, "weavy-strip-" + e.data.bubbleTarget, true, true);
+                    widget.open(e.data.bubbleTarget);
                     break;
                 case "notificationLoaded":
                 case "notificationLayoutChanged":
-                    var notification = $("#weavy-notification-frame-" + e.data.id, self.container);
+                    var notification = $("#weavy-notification-frame-" + e.data.id, widget.container);
 
                     notification.show();
                     notification.css("height", e.data.height + "px");
                     // show set height
                     break;
                 case "notificationClosed":
-                    closeNotification.call(self, e.data.id);
+                    closeNotification.call(widget, e.data.id);
                     break;
             }
         }
 
         function loadInTarget(target, url, data, method, fill) {
-            var frameTarget = $(self.strips).find("#weavy-strip-" + target + " .weavy-strip-frame").get(0);
+            var frameTarget = $(widget.strips).find("#weavy-strip-" + target + " .weavy-strip-frame").get(0);
             if (frameTarget) {
                 if (frameTarget.dataset && frameTarget.dataset.src) {
                     // Not yet fully loaded
-                    sendToFrame(frameTarget.name, self.httpsUrl(url), data, method);
+                    sendToFrame(frameTarget.name, widget.httpsUrl(url), data, method);
                 } else {
                     // Fully loaded, send using turbolinks
-                    frameTarget.contentWindow.postMessage({ name: 'send', url: self.httpsUrl(url), data: data, method: method }, "*");
+                    frameTarget.contentWindow.postMessage({ name: 'send', url: widget.httpsUrl(url), data: data, method: method }, "*");
                 }
             }
         }
@@ -1566,7 +1584,7 @@
             method = String(method || "get").toLowerCase();
 
             // Ensure target exists
-            var frame = $("iframe[name='" + frameName + "']", self.container).get(0);
+            var frame = $("iframe[name='" + frameName + "']", widget.container).get(0);
 
             if (frame) {
                 var frameUrl = url;
@@ -1614,7 +1632,7 @@
                 }));
 
                 // Send the form and forget it
-                $form.appendTo(self.container).submit().remove();
+                $form.appendTo(widget.container).submit().remove();
             }
         }
 
@@ -1624,7 +1642,7 @@
         // signalR connection state has changed
         weavy.connection.on("statechanged", function (e, data) {
 
-            if (disconnected && data.state.newState === 1 && self.options.user_id) {
+            if (disconnected && data.state.newState === 1 && widget.options.user_id) {
                 disconnected = false;
 
                 // reload widget                
@@ -1641,11 +1659,11 @@
         weavy.realtime.on("bubbleopened", function (e, data) {
 
             if (data.isMessenger) {
-                self.messengerFrame.src = self.httpsUrl(data.url);
-                loading.call(self, "weavy-strip-messenger", true);
-                self.open("messenger");
+                widget.messengerFrame.src = widget.httpsUrl(data.url);
+                loading.call(widget, "weavy-strip-messenger", true);
+                widget.open("messenger");
             } else if (data.type === "personal" || data.type === "global" && connectedUrl(data.connected_to_url)) {
-                if (data.type === "personal" && _.find(self.bubbles, function (b) { return b.space_id == data.space_id && b.type === "global"; })) {
+                if (data.type === "personal" && [].some.call(widget.bubbles, function (b) { return b.space_id == data.space_id && b.type === "global"; })) {
                     data.type = "global";
                 }
 
@@ -1663,7 +1681,7 @@
 
         weavy.realtime.on("bubbleremoved", function (e, data) {
             // remove from array of added bubbles
-            self.bubbles = _.filter(self.bubbles, function (bubble) {
+            widget.bubbles = [].filter.call(widget.bubbles, function (bubble) {
                 if (data.space_id === bubble.space_id && data.bubble_id === bubble.bubble_id && bubble.type === data.type) {
                     removeBubbleItems(data.space_id);
                     return false;
@@ -1674,7 +1692,7 @@
 
         weavy.realtime.on("trashedspace", function (e, data) {
             // remove from array of added bubbles
-            self.bubbles = _.filter(self.bubbles, function (bubble) {
+            widget.bubbles = _.filter(widget.bubbles, function (bubble) {
                 if (data.id === bubble.space_id) {
                     removeBubbleItems(data.id, true);
                     return false;
@@ -1684,35 +1702,35 @@
         })
 
         weavy.realtime.on("conversationread", function (e, data) {
-            if (data.user.id === self.options.user_id) {
-                conversationRead.call(self, data.conversation.id);
-                self.triggerEvent("conversationread", data);
+            if (data.user.id === widget.options.user_id) {
+                conversationRead.call(widget, data.conversation.id);
+                widget.triggerEvent("conversationread", data);
             }
         });
 
         weavy.realtime.on("message", function (e, data) {
             var message = data;
-            if (message.created_by.id !== self.options.user_id && message.created_by.id > 0) {
+            if (message.created_by.id !== widget.options.user_id && message.created_by.id > 0) {
                 weavy.realtime.invoke("widget", "getConversation", message.conversation);
-                self.triggerEvent("message", data);
+                widget.triggerEvent("message", data);
             }
         });
 
         weavy.realtime.on("badge", function (e, data) {
-            badgeChanged.call(self, data);
-            self.triggerEvent("badge", data);
+            badgeChanged.call(widget, data);
+            widget.triggerEvent("badge", data);
         });
 
         weavy.realtime.on("notification", function (e, data) {
-            showNotification.call(self, data);
+            showNotification.call(widget, data);
         });
 
         weavy.realtime.on("notificationupdated", function (e, data) {
-            self.triggerEvent("notificationupdated", data);
+            widget.triggerEvent("notificationupdated", data);
         });
 
         weavy.realtime.on("notificationreadall", function (e, data) {
-            self.triggerEvent("notificationreadall", data);
+            widget.triggerEvent("notificationreadall", data);
         });
 
         weavy.realtime.on("loaded", function (e, data) {
@@ -1724,44 +1742,44 @@
 
             data.bubbles = cleanBubblesList(data.bubbles);
 
-            if (!data.user_id || data.user_id !== self.options.user_id) {
-                if (self.container) {
-                    self.buttonCacheList = [];
-                    self.stripCacheList = [];
-                    $(self.container).remove();
-                    self.container = null;
+            if (!data.user_id || data.user_id !== widget.options.user_id) {
+                if (widget.container) {
+                    widget.buttonCacheList = [];
+                    widget.stripCacheList = [];
+                    $(widget.container).remove();
+                    widget.container = null;
                 }
             }
 
-            self.options = self.extendDefaults(self.options, data);
+            widget.options = widget.extendDefaults(widget.options, data);
 
-            if (self.options.is_loaded === false) {
-                buildOutput.call(self);
-                self.options.is_loaded = true;
+            if (widget.options.is_loaded === false) {
+                buildOutput.call(widget);
+                widget.options.is_loaded = true;
 
-                self.triggerEvent("load", null);
+                widget.triggerEvent("load", null);
 
             }
 
         }, "rtmwidget");
 
         weavy.realtime.on("conversationReceived", function (e, data) {
-            appendConversation.call(self, data);
+            appendConversation.call(widget, data);
         }, "rtmwidget");
 
 
-        self.one("restore", function () {
-            setTimeout(self.preloadFrames, 2000, "all");
+        widget.one("restore", function () {
+            setTimeout(widget.preloadFrames, 2000, "all");
         });
 
         // init component
-        if (this.options.init === true) {     
-            
+        if (this.options.init === true) {
+
             this.init();
         }
     }
 
-    this.Weavy.defaults = {
+    WeavyWidget.defaults = {
         init: true,
         button: true,
         close_button: true,
@@ -1774,19 +1792,19 @@
         bubble_limit: 16,
         ext_auth_provider: false,
         is_mobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    }
+    };
 
-    this.Weavy.plugins = {};
+    WeavyWidget.plugins = {};
 
-    this.Weavy.prototype.on = function (event, cb) {
+    WeavyWidget.prototype.on = function (event, cb) {
         $(document).on(event + ".event.weavy", null, null, cb);
-    }
+    };
 
-    this.Weavy.prototype.one = function (event, cb) {
+    WeavyWidget.prototype.one = function (event, cb) {
         $(document).one(event + ".event.weavy", null, null, cb);
-    }
+    };
 
-    this.Weavy.prototype.triggerEvent = function (name, json) {
+    WeavyWidget.prototype.triggerEvent = function (name, json) {
         name = name + ".event.weavy";
         var event = $.Event(name);
         var isObject = json && typeof json === "object";
@@ -1796,11 +1814,11 @@
         $(document).triggerHandler(event, data);
     };
 
-    this.Weavy.prototype.storeItem = function (key, value, isJson) {
+    WeavyWidget.prototype.storeItem = function (key, value, isJson) {
         localStorage.setItem('weavy_' + window.location.hostname + "_" + key, isJson ? JSON.stringify(value) : value);
     };
 
-    this.Weavy.prototype.retrieveItem = function (key, isJson) {
+    WeavyWidget.prototype.retrieveItem = function (key, isJson) {
         var value = localStorage.getItem('weavy_' + window.location.hostname + "_" + key);
         if (value && isJson) {
             return JSON.parse(value)
@@ -1809,4 +1827,25 @@
         return value;
     };
 
-})($);
+    // Shim deprecated name, remove this in next version
+    this.Weavy = function () {
+        console.warn("Using new Weavy() is deprecated. Use new WeavyWidget() instead.");
+
+        for (var p in Weavy) {
+            if (p && Weavy.hasOwnProperty(p)) {
+                WeavyWidget[p] = Weavy[p];
+            }
+        }
+
+        return WeavyWidget.apply(this, arguments);
+    };
+
+    Weavy.prototype = Object.create(WeavyWidget.prototype);
+
+    for (var p in WeavyWidget) {
+        if (p && WeavyWidget.hasOwnProperty(p)) {
+            Weavy[p] = WeavyWidget[p];
+        }
+    }
+
+})(jQuery);

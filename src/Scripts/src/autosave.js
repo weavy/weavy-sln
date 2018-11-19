@@ -1,5 +1,5 @@
 var weavy = weavy || {};
-weavy.autosave = (function () {
+weavy.autosave = (function ($) {
 
     var _typing = false;
     var _started = false;
@@ -165,4 +165,4 @@ weavy.autosave = (function () {
     };
 
     // pull in jquery
-})($);
+})(jQuery);

@@ -1,4 +1,5 @@
 var weavy = weavy || {};
+
 weavy.realtime = (function ($) {
 
     // attach an event handler for the specified server event, e.g. "presence", "typing" etc (see RealTimeHub for a list of events)
@@ -52,4 +53,4 @@ weavy.realtime = (function ($) {
         invoke: invoke
     };
 
-})($);
+})(jQuery);

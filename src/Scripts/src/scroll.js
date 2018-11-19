@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.scroll = (function ($) {
     var currentScroll;
 
@@ -172,5 +173,5 @@ weavy.scroll = (function ($) {
 
     });
 
-})($);
+})(jQuery);
 

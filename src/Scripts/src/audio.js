@@ -23,4 +23,4 @@ weavy.audio = (function ($) {
         stop: stop
     };
 
-})($);
+})(jQuery);

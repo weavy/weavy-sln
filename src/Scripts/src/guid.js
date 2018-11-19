@@ -13,4 +13,4 @@ weavy.guid = (function($){
     return {
         get: get
     }
-})($)
+})(jQuery)

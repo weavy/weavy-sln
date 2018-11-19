@@ -6,7 +6,7 @@
 ~/scripts/vendor/emojionearea/emojionearea.min.js
 ~/scripts/vendor/twitter-text/punycode.js
 ~/scripts/vendor/twitter-text/twitter-text.js
-~/scripts/src/extensions.js
+~/scripts/src/_extensions.js
 ~/scripts/src/turbolinks.js 
 ~/scripts/src/browser.js
 ~/scripts/src/context.js

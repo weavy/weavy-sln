@@ -1,5 +1,6 @@
 ﻿// preview files in fullscreen overlay
 var weavy = weavy || {};
+
 weavy.preview = (function ($) {
 
     // default options
@@ -152,4 +153,4 @@ weavy.preview = (function ($) {
         close: close
     };
 
-})($);
+})(jQuery);

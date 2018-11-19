@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.modal = (function ($) {
 
     document.addEventListener("turbolinks:before-cache", function (e) {
@@ -127,4 +128,4 @@ weavy.modal = (function ($) {
         open: open
     };
 
-})($);
+})(jQuery);

@@ -1505,13 +1505,6 @@
             <remarks>Anonymous access is allowed.</remarks>
             <returns>The widget configuration.</returns>
         </member>
-        <member name="M:Weavy.Web.Areas.Api.Controllers.WidgetsController.GetLoader(System.Boolean)">
-            <summary>
-            Returns the loader script needed to embed the Weavy widget in an external system.
-            </summary>
-            <returns>The widget script.</returns>
-            <remarks>Anonymous access is allowed.</remarks>
-        </member>
         <member name="T:Weavy.Web.Areas.Api.Formatters.JsonContentNegotiator">
             <summary>
             A content negotiator that always returns aplication/json.
@@ -4997,7 +4990,7 @@
         </member>
         <member name="M:Weavy.Web.Controllers.ContentController.Subscribers(System.Int32)">
             <summary>
-            Get subscribers, i.e. people that follow the item and will get notified on changes.
+            Get subscribers, i.e. people that follow the content and will get notified on changes.
             </summary>
             <returns></returns>
         </member>
@@ -6143,9 +6136,16 @@
             Controller for widget actions.
             </summary>
         </member>
+        <member name="M:Weavy.Web.Controllers.WidgetController.Index(Weavy.Web.Models.WeavyLoaderOptions)">
+            <summary>
+            Display page for configuring the widget loader script.
+            </summary>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Controllers.WidgetController.FileBrowser">
             <summary>
-            Display filebrowser?.
+            Display filebrowser.
             </summary>
             <returns></returns>
         </member>
@@ -6156,9 +6156,16 @@
             <param name="url">The url to connect the bubble with.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.Script">
+        <member name="M:Weavy.Web.Controllers.WidgetController.WidgetScript(System.String)">
             <summary>
             Returns the widget script.
+            </summary>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.WidgetController.GetWidgetVersionFile">
+            <summary>
+            
             </summary>
             <returns></returns>
         </member>
@@ -6281,6 +6288,15 @@
             </summary>
             <param name="helper"></param>
             <param name="inline"><c>true</c> to render inline alerts, or <c>false</c> to render <see cref="T:Weavy.Web.Models.AlertModel"/> messages where the IsInline property is <c>false</c>. </param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Extensions.HtmlHelperExtensions.Breadcrumbs(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Content,System.Object)">
+            <summary>
+            Returns breadcrumb navigation for the specified content item.
+            </summary>
+            <param name="helper"></param>
+            <param name="content"></param>
+            <param name="htmlAttributes"></param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Extensions.HtmlHelperExtensions.Scripts(System.Web.Mvc.HtmlHelper,System.Object)">
@@ -6759,6 +6775,14 @@
             <param name="content">The entity for which to generate a badge.</param>
             <returns>A badge (span element).</returns>
         </member>
+        <member name="M:Weavy.Web.Extensions.HtmlHelperExtensions.ToJson(System.Web.Mvc.HtmlHelper,System.Object)">
+            <summary>
+            Serializes an object to Json
+            </summary>
+            <param name="htmlHelper"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Extensions.HtmlHelperExtensions.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Attachment)">
             <summary>
             Gets html attributes needed for triggering image and document preview.
@@ -6989,14 +7013,6 @@
             <param name="presence"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Extensions.WeavyHtmlExtensions.Breadcrumb(Weavy.Core.Models.Content,System.Object)">
-            <summary>
-            Returns breadcrumb navigation for the specified content item.
-            </summary>
-            <param name="entity"></param>
-            <param name="htmlAttributes"></param>
-            <returns></returns>
-        </member>
         <member name="M:Weavy.Web.Extensions.WeavyHtmlExtensions.Description(Weavy.Core.Models.IndexResult)">
             <summary>
             Returns a descriptive text for the specified search result.
@@ -7041,13 +7057,6 @@
             </summary>
             <param name="entity"></param>
             <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Extensions.WeavyHtmlExtensions.WidgetLoader(System.Boolean)">
-            <summary>
-            Returns the loader script needed to embed the Weavy widget in an external system.
-            </summary>
-            <param name="min"><c>true</c> to return a minified script, otherwise <c>false</c>.</param>
-            <returns>The widget script.</returns>
         </member>
         <member name="T:Weavy.Web.Filters.HandleExceptionFilter">
             <summary>
@@ -8336,6 +8345,16 @@
             Gets or sets the list of people to display on the posts screen.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.PostsModel.ExternalMemberCount">
+            <summary>
+            Gets or sets the number of external members in the space.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.PostsModel.InviteCount">
+            <summary>
+            Gets or sets the number of pending invites in the space
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.PostsModel.Posts">
             <summary>
             Gets or sets the posts to display on the posts screen.
@@ -8710,6 +8729,16 @@
             Gets or sets the list of people to display in the space header.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.SpaceModel.ExternalMembers">
+            <summary>
+            Gets or sets the list of external people to display in the space header.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.SpaceModel.Invites">
+            <summary>
+            Gets or sets the list of invites to display in the space header.
+            </summary>
+        </member>
         <member name="T:Weavy.Web.Models.TypingModel">
             <summary>
             
@@ -8739,6 +8768,38 @@
             <summary>
             Gets or sets the the list of versions for a content item.
             </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.WeavyLoaderOptions">
+            <summary>
+            Configuration options for the Weavy loader script.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Weavy.Web.Models.WeavyLoaderOptions"/> class.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Weavy.Web.Models.WeavyLoaderOptions"/> class from the specified <paramref name="options"/> string.
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Minified">
+            <summary>
+            Gets or sets a value indicating whether the script should be minified or not.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Slim">
+            <summary>
+            Gets or sets a value indicating whether the script should exclude required libs jquery.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.ToString">
+            <summary>
+            Returns the loader script.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Weavy.Web.Models.WidgetConfiguration">
             <summary>
@@ -9415,6 +9476,13 @@
         <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterRemoveBubble)">
             <summary>
             Push newly removed bubbles to clients.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.RealTimeEvent)">
+            <summary>
+            Push custom event to clients.
             </summary>
             <param name="e"></param>
             <returns></returns>

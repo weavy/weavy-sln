@@ -22,7 +22,6 @@
                     Html.RenderPartial("_Attachments", files);
                 }
 
-   
                 <div class="text-muted">
                     @Html.Time(comment.CreatedAt)
                     @if (comment.ModifiedAt != comment.CreatedAt) {<text>&middot;</text> @Html.Time(comment.ModifiedAt, @"e\di\te\d")}

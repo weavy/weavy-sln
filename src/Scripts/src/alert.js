@@ -77,4 +77,4 @@ weavy.alert = (function ($) {
         close: close
     };
 
-})($);
+})(jQuery);

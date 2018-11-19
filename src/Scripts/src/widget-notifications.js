@@ -165,4 +165,4 @@
             window.parent.postMessage({ "name": "notificationClosed", "id": _notificationId }, "*");
         }
     }
-})($);
+})(jQuery);

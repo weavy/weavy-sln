@@ -13,7 +13,7 @@ weavy.context = {
     enter: false
 };
 
-(function () {
+(function ($) {
     if (weavy.turbolinks.enabled) {
         document.addEventListener("turbolinks:load", init);
     } else {
@@ -53,4 +53,4 @@ weavy.context = {
         }
         
     }
-})();
+})(jQuery);

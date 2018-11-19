@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.subscribe = (function ($) {
 
     // attach click event handler to [data-toggle=subscribe]
@@ -51,5 +52,5 @@ weavy.subscribe = (function ($) {
         });
     }
 
-})($);
+})(jQuery);
 

@@ -211,4 +211,4 @@ weavy.connection = (function ($, w) {
         on: on
     };
 
-})($, window);
+})(jQuery, window);

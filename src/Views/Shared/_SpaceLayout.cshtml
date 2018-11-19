@@ -2,6 +2,12 @@
     Layout = "_Layout.cshtml";
 }
 
+@if (IsSectionDefined("styles")) {
+    @section styles {
+        @RenderSection("styles")
+    }
+}
+
 @if (IsSectionDefined("scripts")) {
     @section scripts {
         @RenderSection("scripts")

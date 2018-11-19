@@ -1,0 +1,35 @@
+﻿@model WeavyLoaderOptions
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = "Weavy Widget Wizard";
+}
+
+@section styles {
+    <style>
+        #weavy-loader {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+}
+
+@section scripts {
+    <script>
+        $(document).on("change", "#widget-wizard", function (e) {
+            $(this).submit();
+        });
+    </script>
+}
+
+<div class="container my-4">
+    <h1 class="display-1">@Title</h1>
+    <p>Select your preferred configuration below.</p>
+
+    <form action="@(Url.Action<WidgetController>(c => c.Index(null)))" method="post" id="widget-wizard" data-turboform>
+        @Html.EditorsForModel()
+    </form>
+
+    <h2 class="display-2">Weavy loader script</h2>
+    <p>Copy the following <code>&lt;script&gt;</code> element and insert into just before the ending <code>&lt;/body&gt;</code> tag on the page(s) where you want to embed Weavy.</p>
+    <pre id="weavy-loader">@Model.ToString()</pre>
+</div>

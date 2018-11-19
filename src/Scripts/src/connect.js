@@ -94,4 +94,4 @@ weavy.connect = (function ($) {
 
     return { connect: requestConnect, disconnect: requestDisconnect, close: requestClose };
 
-})($);
+})(jQuery);

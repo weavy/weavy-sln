@@ -1,7 +1,7 @@
 ﻿@using System.Linq;
 @{
     Layout = null;
-    
+    var loader = new WeavyLoaderOptions { Minified = true, Slim = false };
 
 }
 <!DOCTYPE html>
@@ -167,6 +167,9 @@
         Vestibulum eget scelerisque turpis. Nunc at scelerisque risus. Cras in vestibulum nibh, eget posuere massa. Mauris vel augue eget enim tempor sollicitudin et in ex. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer leo felis, porttitor vitae ligula facilisis, placerat feugiat felis. Fusce a pharetra mi, in elementum libero.
     </p>
 
-    @WeavyHtmlExtensions.WidgetLoader(min:true)
+    @*<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>*@
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" crossorigin="anonymous"></script>
+
+    @Html.Raw(loader.ToString())
 </body>
 </html>

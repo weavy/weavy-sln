@@ -1,5 +1,5 @@
 ﻿var weavy = weavy || {};
-weavy.attach = (function () {
+weavy.attach = (function ($) {
 
     document.addEventListener("turbolinks:load", function () {
         if (!weavy.browser.embedded) {
@@ -208,4 +208,4 @@ weavy.attach = (function () {
         }
     }
     
-})();
+})(jQuery);

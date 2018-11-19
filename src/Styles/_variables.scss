@@ -300,15 +300,17 @@ $list-group-item-padding-x: 1rem; // 1.25rem
 
 $list-group-disabled-color: $text-muted; // $gray-600
 
-$breadcrumb-padding-y: .5rem; // .75rem !default;
-$breadcrumb-padding-x: 0rem; // 1rem !default;
-$breadcrumb-item-padding: .5rem !default;
+$breadcrumb-padding-y: .25rem; // .75rem
+$breadcrumb-padding-x: 0; // 1rem
+$breadcrumb-item-padding: 0; // .5rem
 
-$breadcrumb-margin-bottom: 0; //1rem !default;
+$breadcrumb-margin-bottom: 0; // 1rem
 
-$breadcrumb-bg: $gray-200; // $gray-200
+$breadcrumb-bg: transparent; // $gray-200
 $breadcrumb-divider-color: $text-muted; // $gray-600
-$breadcrumb-active-color: $text-muted; //$gray-600
+$breadcrumb-active-color: $text-muted; // $gray-600
 $breadcrumb-divider: ""; // quote("/");
+
+$breadcrumb-border-radius: 0; // $border-radius;
 
 $close-font-weight: $font-weight-strong; // $font-weight-bold

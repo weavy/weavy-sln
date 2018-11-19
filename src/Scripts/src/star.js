@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.stars = (function ($) {
 
     // star specified entity
@@ -74,5 +75,5 @@ weavy.stars = (function ($) {
         prune: removeUnstarredInTab
     };
 
-})($);
+})(jQuery);
 

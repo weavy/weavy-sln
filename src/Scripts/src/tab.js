@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.tab = (function ($) {
 
     // load remote tab content for specified tab-pane
@@ -59,5 +60,5 @@ weavy.tab = (function ($) {
 
     }
 
-})($);
+})(jQuery);
 

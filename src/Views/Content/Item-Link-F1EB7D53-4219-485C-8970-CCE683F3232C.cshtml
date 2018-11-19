@@ -1,39 +1,24 @@
 ﻿@model Link
 @{
     Title = Model.Name ?? "Untitled";
-    Back = Url.Back(WeavyContext.Content.Parent().Url() ?? WeavyContext.App.Url());
-    var creator = Model.CreatedBy();
 }
 
-<div class="container my-3">
-  <article class="item" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
-    <header class="item-header">
-      <a class="btn btn-icon mr-1" href="@creator.Url()">@creator.AvatarImg(24)</a>
-      @if (Model.CreatedById != Model.ModifiedById) {
-        var editor = Model.ModifiedBy();
-        <a class="btn btn-icon mr-1" href="@editor.Url()">@editor.AvatarImg(24)</a>
-      }
-      <a href="@(Url.Action<ContentController>(c => c.Versions(Model.Id)))">@Html.Time(Model.ModifiedAt)</a>
-      @Html.ContentBadge(Model)
+@section navbar_content {
+    <nav class="navbar navbar-content">
+        @Html.Breadcrumbs(Model)
+        @if (Model is IStarrable starrable) {
+            @Html.StarToggle(starrable, true)
+        }
+        <div class="navbar-icons">
+            <a class="btn btn-icon" href="@Model.Uri" target="_blank" title="Open in new window">@Html.SvgIcon("open-in-new")</a>
+            @{ Html.RenderPartial("_ContentMenu", Model); }
+        </div>
+    </nav>
+}
 
-      @if (Model is ITaggable taggable) {
-        Html.RenderPartial("_Tags", taggable);
-      }
-
-      <div class="navbar-icons ml-auto">
-        <a class="btn btn-icon" href="@Model.Uri" target="_blank">@Html.SvgIcon("open-in-new") </a>
-        @{ Html.RenderPartial("_ContentMenu", Model); }
-      </div>
-    </header>
-
-    <section class="properties">
-      @if (Model.Embedded) {        
-        <iframe src="@Model.Uri" class="google-drive-iframe"></iframe>        
-      } else {
-        @Html.DisplayGroups()
-      }
-
-    </section>
-
-  </article>
+<div class="container">
+    <p class="text-center my-5">
+        <a href="@Model.Uri" target="_blank">@Html.SvgIcon(Model) @Model.Uri</a>
+    </p>
 </div>
+

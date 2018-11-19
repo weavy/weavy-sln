@@ -845,67 +845,6 @@ weavy.messenger = (function ($) {
             }
         });
 
-
-        // invite people
-        $(document).on("submit", ".invite-form", function (evt) {
-            evt.preventDefault();
-            var $form = $(this);
-            var $inputs = $form.find("input[type=text]");
-
-            $inputs.removeClass("is-invalid");
-            hasError = false;
-
-            // validate each email
-            $inputs.each(function (i, el) {
-                var $emails = null;
-                var email = $(this).val();
-                if (email != "") {
-                    if ($(this).attr("name") === "emails") {
-                        $emails = $(this);
-                    } else {
-                        $emails = $(this).parent().find("[name=emails]");
-                        var domain = $(this).parent().find("[name=domain]").val();
-                        email = email + "@" + domain;
-                        $emails.val(email);
-                    }
-
-                    if (!validateEmail(email)) {
-                        $(this).addClass("is-invalid");
-                        hasError = true;
-                    }
-                }
-            });
-
-            if (hasError) {
-                return;
-            }
-
-            // serialize the data            
-            var data = $form.serialize();
-
-            // disable button while sending
-            var $submit = $form.find("button[type='submit']").text("Sending invites").attr("disabled", true);
-            $(".invite-success").addClass("d-none");
-
-            $.ajax({
-                type: this.method,
-                url: this.action,
-                data: data
-            }).done(function (data, status, xhr) {
-                // clear fornm
-                $form[0].reset();
-
-                // show success
-                $(".invite-success").removeClass("d-none");
-            }).fail(function (xhr, status, error) {
-                log.error(error);
-            }).always(function (xhr, status) {
-                // enable button again
-                $submit.text("Send invites").attr("disabled", false);
-
-            });
-        });
-
         // search conversations
         $(document).on("input", ".search-conversations input[name=q]", function (evt) {
             evt.preventDefault();

@@ -1,0 +1,25 @@
+﻿@model Content
+@{
+    var versionable = Model as IVersionable;
+}
+
+<nav class="navbar navbar-content sticky-top">
+    @Html.Breadcrumbs(Model)
+    @if (Model is IStarrable starrable) {
+        @Html.StarToggle(starrable, true)
+    }
+    <div class="navbar-icons">
+        @if (versionable == null || versionable.IsCurrent()) {
+            if (Model is FileBase file && FileHelper.IsOfficeDocument(file.Name)) {
+                <a class="btn btn-icon" href="@file.OfficeUrl()" title="Open in @OfficeHelper.GetProductName(file.Name)">@Html.SvgIcon(Model, "icon")</a>
+            }
+            Html.RenderPartial("_ContentMenu", Model);
+        } else if (Model.HasPermission(Permission.Edit)) {
+            <form action="@Url.Action(nameof(ContentController.Revert), null, new { id = Model.Id })" method="post">
+                @Html.HttpMethodOverride(HttpVerbs.Put)
+                @Html.Hidden(nameof(versionable.Version), versionable.Version)
+                <button type="submit" class="btn btn-icon" title="Revert">@Html.SvgIcon("undo", "icon")</button>
+            </form>
+        }
+    </div>
+</nav>

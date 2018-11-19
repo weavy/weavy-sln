@@ -1,0 +1,24 @@
+﻿@model Content
+@{
+    var versionable = Model as IVersionable;
+}
+
+@if (Model is IHasAttachments attachable && (versionable == null || versionable.IsCurrent())) {
+    <section class="content-section">
+        <h4 class="display-4"><span>Attachments</span></h4>
+
+        @if (attachable.AttachmentIds.Any()) {
+            Html.RenderPartial("_Attachments", attachable.Attachments(), viewData: new ViewDataDictionary { { "byline", true } });
+        }
+
+        @if (Model.HasPermission(Permission.Attach)) {
+            <p class="content-upload text-center my-3">
+                <span class="text-muted">Drag and drop files here or</span>
+                <button type="button" class="btn btn-link btn-text">click to upload</button>.
+                <input type="file" data-single-file-uploads="false" data-url="/api/content/@Model.Id/attachments" multiple="">
+            </p>
+        }
+
+    </section>
+}
+

@@ -12,16 +12,24 @@ weavy.userspicker = (function ($) {
         return "<img class='img-32 avatar' src='" + weavy.url.thumb(user.thumb_url, "32x32-crop,both") + "'/> " + (user.profile && user.profile.name ? user.profile.name : user.username) + ' <small>@' + user.username + '</small>'+ (user.is_external ? " <span class='badge badge-warning'>external</span>" : "");
     }
 
-    function formatUserSelection(user) {
-        var name = (user.profile && user.profile.name ? user.profile.name : user.username);
+    function formatUserSelection(user) {                
+        var name = (user.profile && user.profile.name ? user.profile.name : user.username || user.text);
         if (user.invite) return user.email + " <span class='badge badge-info'>invite</span>";
         return name;
     }
 
-    // init picker
-    document.addEventListener("turbolinks:load", function () {
-        //console.debug("userspicker.js:init");
-        $("select[data-role=users]").select2({
+    function initPicker(element) {
+        
+
+        var $el;
+
+        if (element) {
+            $el = $(element);
+        } else {
+            $el = $("select[data-role=users]");
+        }
+
+        return $el.select2({
             ajax: {
                 url: weavy.url.resolve("api/users"),
                 dataType: 'json',
@@ -59,8 +67,16 @@ weavy.userspicker = (function ($) {
             minimumInputLength: 1,
             templateResult: formatUser,
             templateSelection: formatUserSelection,
-            selectOnClose: true
+            selectOnClose: true,
+            allowClear: true,
+            placeholder: $el.data("placeholder") || "",
         });
+    }
+
+    // init picker
+    document.addEventListener("turbolinks:load", function () {
+        //console.debug("userspicker.js:init");
+        initPicker();
     });
 
     // destroy picker
@@ -68,4 +84,8 @@ weavy.userspicker = (function ($) {
         //console.debug("userspicker.js:destroy");
         $('select[data-role=users]').select2('destroy');
     });
-})($);
+
+    return {
+        init: initPicker
+    }
+})(jQuery);

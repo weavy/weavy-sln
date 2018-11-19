@@ -34,4 +34,4 @@ weavy.discuss = (function ($) {
         $(".post-form").removeClass("focused");
     });
 
-})($);
+})(jQuery);

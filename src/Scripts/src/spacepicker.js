@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.spacepicker = (function ($) {
     function formatSpace(space) {
         if (space.loading) return space.text;
@@ -51,4 +52,4 @@ weavy.spacepicker = (function ($) {
     document.addEventListener("turbolinks:before-cache", function () {
         $('select[data-role=space]').select2('destroy');
     });
-})($);
+})(jQuery);

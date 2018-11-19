@@ -350,4 +350,4 @@ weavy.comments = (function ($) {
         initCommentEditor: initCommentEditor
     }
 
-})($)
+})(jQuery)

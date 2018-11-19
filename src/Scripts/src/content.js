@@ -48,7 +48,7 @@ weavy.content = (function ($) {
 
     // modal shown for modal based content
     $(document).on("show.bs.modal", "#upsert-content-modal", function (e) {
-        
+
         var target = $(e.relatedTarget);
         var path = target.data("path");
         var action = target.data("action");
@@ -64,7 +64,7 @@ weavy.content = (function ($) {
             url: weavy.url.resolve(path),
             type: "GET"
         }).then(function (html) {
-            $body.html(html);                        
+            $body.html(html);
             $body.find("input").filter(':visible:first').focus();
         }).always(function () {
             // hide spinner
@@ -73,7 +73,7 @@ weavy.content = (function ($) {
     });
 
     // focus first input on modal shown
-    $(document).on("shown.bs.modal", "#upsert-content-modal", function (e) {        
+    $(document).on("shown.bs.modal", "#upsert-content-modal", function (e) {
         var $modal = $(this);
         var $body = $(".modal-body", $modal);
         $body.find("input").filter(':visible:first').focus();
@@ -100,9 +100,9 @@ weavy.content = (function ($) {
     $(document).on("submit", "#upsert-content-modal form", function (e) {
         e.preventDefault();
 
-        var $form = $(this);        
+        var $form = $(this);
         var data = $form.serialize();
-        
+
         // check if we have exactly one submit button, in that case include the name and value of the button
         var $submits = $form.find("[type=submit][name][value]");
         if ($submits.length === 1) {
@@ -112,7 +112,7 @@ weavy.content = (function ($) {
         } else {
             submitModalFormData($form, data);
         }
-       
+
         return false;
     });
 
@@ -129,21 +129,19 @@ weavy.content = (function ($) {
             data: data
         }).then(function (response) {
             var $html = $(response);
-
-            if ($html.find(".invalid-feedback").length !== 0) {                
+            // TODO: find better way of detecting validation errors
+            if ($html.find(".is-invalid").length !== 0) {
                 $body.html(response);
             } else {
                 Turbolinks.visit(window.location.href);
             }
-        }).fail(function (xhr, status, error) {            
+        }).fail(function (xhr, status, error) {
             var json = JSON.parse(xhr.responseText);
-            weavy.alert.danger(json.message);            
-            
-            }).always(function () {                
-                $("button[type='submit']").prop("disabled", false);
-            });
+            weavy.alert.danger(json.message);
 
-        
+        }).always(function () {
+            $("button[type='submit']").prop("disabled", false);
+        });
     }
-})($);
+})(jQuery);
 

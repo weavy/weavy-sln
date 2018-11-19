@@ -66,5 +66,5 @@ weavy.postal = (function ($) {
         post: post
     }
 
-})($)
+})(jQuery)
 

@@ -222,7 +222,7 @@
 
     .embeds {
         width: 100%;
-        border-top: $border-width solid $border-color;        
+        border-top: $border-width solid $border-color;
     }
 
     .poll-options {
@@ -291,6 +291,19 @@
         flex-direction: row;
         padding: 0;
         margin: 0;
+
+        &.is-invalid {
+            border-color: $danger;
+
+            .emojionearea-editor {
+                border-color: $danger;
+            }
+
+            ~ .invalid-feedback {
+                display: initial;
+                padding-left: .5rem;
+            }
+        }
 
         .emojionearea .emojionearea-editor:empty::before {
             font-size: $font-size-sm;

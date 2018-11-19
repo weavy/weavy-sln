@@ -40,7 +40,6 @@ html {
     overflow-x: hidden;
     scroll-behavior: smooth;
     overscroll-behavior-x: none;
-
     // Scrollbar handling
     &:not(.overlay-scrollbar) {
         // custom scrollbar (for chrome), not present when native overlay scrollbar is enabled
@@ -199,12 +198,6 @@ body {
         color: $body-color;
     }
 
-    .breadcrumb-item {
-        &.active {
-            color: rgba(255,255,255, .3);
-        }
-    }
-
     .nav-tabs {
         border-color: rgba($white,.1);
 
@@ -260,6 +253,6 @@ body.controller-error {
     }
 }
 
-.visibility-h{
+.visibility-h {
     visibility: hidden !important;
 }

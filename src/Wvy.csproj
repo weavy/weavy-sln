@@ -2,7 +2,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="..\packages\JavaScriptEngineSwitcher.V8.Native.win-x64.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x64.props" Condition="Exists('..\packages\JavaScriptEngineSwitcher.V8.Native.win-x64.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x64.props')" />
   <Import Project="..\packages\JavaScriptEngineSwitcher.V8.Native.win-x86.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x86.props" Condition="Exists('..\packages\JavaScriptEngineSwitcher.V8.Native.win-x86.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x86.props')" />
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -75,8 +75,8 @@
     <Reference Include="DocumentFormat.OpenXml, Version=2.8.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\packages\DocumentFormat.OpenXml.2.8.1\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.8.7.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.8.7\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.8.10.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.8.10\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="HtmlRenderer, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlRenderer.Core.1.5.1-beta1\lib\net45\HtmlRenderer.dll</HintPath>
@@ -152,17 +152,17 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.3.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.3.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.NotificationHubs, Version=2.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Azure.NotificationHubs.1.0.9\lib\net45-full\Microsoft.Azure.NotificationHubs.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.IdentityModel.Protocol.Extensions, Version=1.0.40306.1554, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -201,7 +201,7 @@
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.5.9\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.5.11\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="NUglify, Version=1.5.12.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
       <HintPath>..\packages\NUglify.1.5.12\lib\net40\NUglify.dll</HintPath>
@@ -238,8 +238,8 @@
     <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="System.IO.Packaging, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IO.Packaging.4.4.1\lib\net46\System.IO.Packaging.dll</HintPath>
+    <Reference Include="System.IO.Packaging, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Packaging.4.5.0\lib\net46\System.IO.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
       <Private>True</Private>
@@ -255,6 +255,7 @@
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Transactions" />
@@ -296,16 +297,16 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy, Version=2.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.exe</HintPath>
     </Reference>
-    <Reference Include="Weavy.Bundler, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=2.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=2.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=2.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
@@ -466,6 +467,8 @@
     <Content Include="Scripts\notification.bundle" />
     <Content Include="Scripts\office.bundle" />
     <Content Include="Scripts\pickers.bundle" />
+    <Content Include="Scripts\src\_extensions.js" />
+    <Content Include="Scripts\src\_noconflict.js" />
     <Content Include="Scripts\src\alert.js" />
     <Content Include="Scripts\src\api.js" />
     <Content Include="Scripts\src\attach.js" />
@@ -489,7 +492,6 @@
     <Content Include="Scripts\src\dropdown.js" />
     <Content Include="Scripts\src\editor.js" />
     <Content Include="Scripts\src\emoji.js" />
-    <Content Include="Scripts\src\extensions.js" />
     <Content Include="Scripts\src\fab.js" />
     <Content Include="Scripts\src\fileupload.js" />
     <Content Include="Scripts\src\guid.js" />
@@ -531,6 +533,7 @@
     <Content Include="Scripts\src\user.js" />
     <Content Include="Scripts\src\userspicker.js" />
     <Content Include="Scripts\src\widget\_widget-plugin-helloworld.js" />
+    <Content Include="Scripts\src\widget\_widget-plugin-template.js" />
     <Content Include="Scripts\src\widget\position.js" />
     <Content Include="Scripts\src\widget\widget.js" />
     <Content Include="Scripts\src\widget-notifications.js" />
@@ -538,6 +541,7 @@
     <Content Include="Scripts\vendor\**" />
     <Content Include="Scripts\weavy.bundle" />
     <Content Include="Scripts\widget.bundle" />
+    <Content Include="Scripts\widgetlibs.bundle" />
     <Content Include="Styles\_bootstrap.scss" />
     <Content Include="Styles\_core.scss" />
     <Content Include="Styles\_functions.scss" />
@@ -550,6 +554,7 @@
     <Content Include="Styles\components\_card.scss" />
     <Content Include="Styles\components\_codemirror.scss" />
     <Content Include="Styles\components\_comment.scss" />
+    <Content Include="Styles\components\_content.scss" />
     <Content Include="Styles\components\_context.scss" />
     <Content Include="Styles\components\_cover.scss" />
     <Content Include="Styles\components\_custom_form.scss" />
@@ -561,14 +566,12 @@
     <Content Include="Styles\components\_emojione.scss" />
     <Content Include="Styles\components\_fab.scss" />
     <Content Include="Styles\components\_facepile.scss" />
-    <Content Include="Styles\components\_file.scss" />
     <Content Include="Styles\components\_file-list.scss" />
     <Content Include="Styles\components\_forms.scss" />
     <Content Include="Styles\components\_frame.scss" />
     <Content Include="Styles\components\_icons.scss" />
     <Content Include="Styles\components\_image-grid.scss" />
     <Content Include="Styles\components\_images.scss" />
-    <Content Include="Styles\components\_item.scss" />
     <Content Include="Styles\components\_layout.scss" />
     <Content Include="Styles\components\_media.scss" />
     <Content Include="Styles\components\_menu.scss" />
@@ -590,6 +593,7 @@
     <Content Include="Styles\components\_prism.scss" />
     <Content Include="Styles\components\_progress.scss" />
     <Content Include="Styles\components\_search.scss" />
+    <Content Include="Styles\components\_select2.scss" />
     <Content Include="Styles\components\_spinner.scss" />
     <Content Include="Styles\components\_swatches.scss" />
     <Content Include="Styles\components\_tables.scss" />
@@ -733,22 +737,21 @@
     <Content Include="Views\App\Get.cshtml" />
     <Content Include="Views\App\New.cshtml" />
     <Content Include="Views\Comment\_Edit.cshtml" />
-    <Content Include="Views\Content\_BreadcrumbMenu.cshtml" />
     <Content Include="Views\Content\_Card.cshtml" />
     <Content Include="Views\Content\_Cards.cshtml" />
+    <Content Include="Views\Content\_ContentAttachments.cshtml" />
+    <Content Include="Views\Content\_ContentComments.cshtml" />
+    <Content Include="Views\Content\_ContentMeta.cshtml" />
+    <Content Include="Views\Content\_ContentProps.cshtml" />
+    <Content Include="Views\Content\_ContentSubscribers.cshtml" />
     <Content Include="Views\Content\_Draft.cshtml" />
     <Content Include="Views\Content\_Drafts.cshtml" />
     <Content Include="Views\Content\_Edit.cshtml" />
     <Content Include="Views\Content\_ListItem.cshtml" />
-    <Content Include="Views\Content\_ListItem-CloudLink-4C11EB4C-80C1-42E2-8972-BF967AD48289.cshtml" />
     <Content Include="Views\Content\_ListItems.cshtml" />
-    <Content Include="Views\Content\_Nav.cshtml" />
     <Content Include="Views\Content\_New.cshtml" />
     <Content Include="Views\Content\_Row.cshtml" />
-    <Content Include="Views\Content\_Row-CloudLink-4C11EB4C-80C1-42E2-8972-BF967AD48289.cshtml" />
-    <Content Include="Views\Content\_Row-Link-F1EB7D53-4219-485C-8970-CCE683F3232C.cshtml" />
     <Content Include="Views\Content\_Rows.cshtml" />
-    <Content Include="Views\Content\_Subscribers.cshtml" />
     <Content Include="Views\Content\Drafts.cshtml" />
     <Content Include="Views\Content\Edit.cshtml" />
     <Content Include="Views\Content\Edit-File-1809C7D6-130A-4B35-9B16-C62A2DD23C01.cshtml" />
@@ -814,6 +817,7 @@
     <Content Include="Views\Shared\_ConnectModalContent.cshtml" />
     <Content Include="Views\Shared\_ContentLayout.cshtml" />
     <Content Include="Views\Shared\_ContentMenu.cshtml" />
+    <Content Include="Views\Shared\_ContentModal.cshtml" />
     <Content Include="Views\Shared\_ContextLink.cshtml" />
     <Content Include="Views\Shared\_DrawerPersonal.cshtml" />
     <Content Include="Views\Shared\_DrawerProfile.cshtml" />
@@ -830,6 +834,7 @@
     <Content Include="Views\Shared\_MoveModal.cshtml" />
     <Content Include="Views\Shared\_MoveModalContent.cshtml" />
     <Content Include="Views\Shared\_MovePostModal.cshtml" />
+    <Content Include="Views\Shared\_NavbarContent.cshtml" />
     <Content Include="Views\Shared\_NavbarMenu.cshtml" />
     <Content Include="Views\Shared\_OfficeModal.cshtml" />
     <Content Include="Views\Shared\_PeopleTable.cshtml" />
@@ -899,7 +904,6 @@
     <Content Include="Views\Test\Email.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Pickers.cshtml" />
-    <Content Include="Views\Test\Redirect.cshtml" />
     <Content Include="Views\Test\Redirected.cshtml" />
     <Content Include="Views\Test\Widget.cshtml" />
     <Content Include="Views\Trash\Index.cshtml" />
@@ -909,6 +913,7 @@
     <Content Include="Views\UI\InsertLink.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Widget\FileBrowser.cshtml" />
+    <Content Include="Views\Widget\Index.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -954,7 +959,7 @@
     <Error Condition="!Exists('..\packages\JavaScriptEngineSwitcher.V8.Native.win-x64.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JavaScriptEngineSwitcher.V8.Native.win-x64.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x64.props'))" />
     <Error Condition="!Exists('..\packages\JavaScriptEngineSwitcher.V8.Native.win-x86.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JavaScriptEngineSwitcher.V8.Native.win-x86.2.4.16\build\JavaScriptEngineSwitcher.V8.Native.win-x86.props'))" />
     <Error Condition="!Exists('..\packages\libsassnet.3.3.7\build\libsassnet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libsassnet.3.3.7\build\libsassnet.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

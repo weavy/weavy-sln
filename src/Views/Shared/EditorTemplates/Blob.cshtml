@@ -10,9 +10,11 @@
     bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
     bool remove = ViewData["Remove"] as bool? ?? true;
     bool plain = ViewData["Plain"] as bool? ?? false;
+    bool required = ViewData["Required"] as bool? ?? prop.IsRequired();
     string id = ViewData.TemplateInfo.GetFullHtmlFieldId("");
     string name = ViewData.TemplateInfo.GetFullHtmlFieldName("");
-    string displayName = (ViewData["DisplayLabel"] as string) ?? prop.DisplayName();
+    string displayName = ViewData["DisplayName"] as string ?? prop.DisplayName();
+    string description = ViewData["DisplayDescription"] as string ?? meta.Description;
     int size = 128;
 
     var attrs = new Dictionary<string, object>();
@@ -36,7 +38,7 @@
     attrs["data-single-file-uploads"] = false;
     attrs["data-url"] = WeavyRequestContext.Current.ApplicationPath + "api/blobs";
 
-    if (prop.IsRequired()) {
+    if (required) {
         attrs["required"] = null;
     }
 
@@ -105,7 +107,7 @@
         </label>
     }
     <div class="invalid-feedback@(feedback != null ? " d-block" : "")">@feedback</div>
-    <div class="form-text@(feedback != null ? " d-none" : "")">@meta.Description 
+    <div class="form-text@(feedback != null ? " d-none" : "")">@description
     @if (remove) {
         <a href="javascript:;" class="clear@(value == null ? " d-none" : "")">Remove @displayName.ToLower().</a>
     }

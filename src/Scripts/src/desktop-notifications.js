@@ -44,4 +44,4 @@ weavy.desktopNotifications = (function ($) {
             console.debug("Browser does not support notifications");
         }
     }
-})($)
+})(jQuery)

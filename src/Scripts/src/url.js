@@ -1,5 +1,6 @@
 ﻿var weavy = weavy || {};
-weavy.url = (function () {
+
+weavy.url = (function ($) {
 
     // helper function for resolving url to api controller for entity type, e.g. "comment" -> "/api/comments/"
     function api(entityType) {
@@ -45,4 +46,4 @@ weavy.url = (function () {
         resolve: resolve,
         thumb: thumb
     };
-})();
+})(jQuery);

@@ -1,5 +1,6 @@
 ﻿var weavy = weavy || {};
-weavy.fileupload = (function () {
+
+weavy.fileupload = (function ($) {
 
     // event handler for removing existing file from input field
     $(document).on("click", ".file-upload .clear", function (evt) {
@@ -309,4 +310,4 @@ weavy.fileupload = (function () {
         validate: validate
     };
 
-})();
+})(jQuery);

@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.presence = (function ($) {
     // variable for keeping track of current presence status
     var _active = true;
@@ -71,4 +72,4 @@ weavy.presence = (function ($) {
     return {
         isActive: isActive
     };
-})($);
+})(jQuery);

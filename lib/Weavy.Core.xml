@@ -573,7 +573,7 @@
         </member>
         <member name="P:Weavy.Core.Models.CloudLink.Embedded">
             <summary>
-            Gets or sets the a value indicating whether the custom link should be embedded or not.
+            Gets a value indicating whether the link should be embedded or not.
             </summary>      
         </member>
         <member name="M:Weavy.Core.Models.CloudLink.GetIcon">
@@ -1603,10 +1603,10 @@
             Gets or sets the uri of the linked resource.
             </summary>
         </member>
-        <member name="P:Weavy.Core.Models.Link.Embedded">
+        <member name="P:Weavy.Core.Models.Link.StarredByIds">
             <summary>
-            Gets or sets the a value indicating whether the custom link should be embedded or not.
-            </summary>       
+            Gets the ids of the users that have starred the item.
+            </summary>
         </member>
         <member name="T:Weavy.Core.Models.Note">
             <summary>
@@ -9346,6 +9346,26 @@
         <member name="P:Weavy.Core.Events.AfterResetPassword.User">
             <summary>
             Gets the user whose password is being reset.
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Events.RealTimeEvent">
+            <summary>
+            Runs just after a custom event is triggered.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.RealTimeEvent.EventName">
+            <summary>
+            The name of the event to trigger
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.RealTimeEvent.Data">
+            <summary>
+            Gets the custom data related to this event.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.RealTimeEvent.Receivers">
+            <summary>
+            Gets the user ids of the receivers of this event. <c>null</c> sends to everyone.
             </summary>
         </member>
         <member name="T:Weavy.Core.Helpers.CollectionExtensions">

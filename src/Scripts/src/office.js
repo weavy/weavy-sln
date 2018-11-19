@@ -1,4 +1,5 @@
 ﻿var weavy = weavy || {};
+
 weavy.office = (function ($) {
 
     $(document).ready(function () {
@@ -102,5 +103,4 @@ weavy.office = (function ($) {
         }
     }
 
-})($);
-
+})(jQuery);

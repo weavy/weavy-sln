@@ -5,6 +5,11 @@
 Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional 
 functionality. See https://docs.weavy.com for more information.
 
+### 2.0.2 (2018-11-20)
+
+* Increased height of embedded Google Doc on Mac.
+* Fixed "The request is invalid" error when adding file from cloud and folder already has an item with the same name as the selected file.
+
 ### 2.0.1 (2018-11-16)
 
 * Added jQuery noConflict to the Weavy Widget

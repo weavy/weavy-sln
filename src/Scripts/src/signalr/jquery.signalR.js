@@ -16,6 +16,7 @@
  * changed window.jQuery to scoped jQuery 
  * changed window.encodeURIComponent() to encodeURIComponent() (because of issue with Firefox browser extension)
  * adedd local variable asyncLocal to ajaxAbort (as a workaround because our minification fails otherwise)
+ * stop early return after subsequent calls to start, we need to do check for crossdomain and set connection.withCredentials
  */
 (function ($, window, undefined) {
 
@@ -450,10 +451,12 @@
                 deferred = connection._deferral || $.Deferred(), // Check to see if there is a pre-existing deferral that's being built on, if so we want to keep using it
                 parser = window.document.createElement("a"),
                 setConnectionUrl = function (connection, url) {
-                    if (connection.url === url && connection.baseUrl) {
-                        // when the url related properties are already set
-                        return;
-                    }
+
+                    // NOTE: commented out next three lines - we need to check for cross domain and set withCredentials
+                    //if (connection.url === url && connection.baseUrl) {
+                    //    // when the url related properties are already set
+                    //    return;
+                    //}
 
                     connection.url = url;
 

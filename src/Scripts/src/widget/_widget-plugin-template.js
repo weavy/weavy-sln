@@ -19,4 +19,4 @@
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
     };
 
-})($);
+})(jQuery);

@@ -5,6 +5,10 @@
 Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional 
 functionality. See https://docs.weavy.com for more information.
 
+### 2.0.3 (2018-12-13)
+
+* Fixed an issue with authentication on websocket connection
+
 ### 2.0.2 (2018-11-20)
 
 * Increased height of embedded Google Doc on Mac.

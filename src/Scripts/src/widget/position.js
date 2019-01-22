@@ -15,7 +15,7 @@
         widget.dragData = null;
 
         // set collapsed widget
-        WeavyWidget.prototype.collapse = function () {
+        widget.collapse = function () {
             if (!$(widget.container).is(".weavy-no-collapse, .weavy-open, .weavy-before-drag, .weavy-drag, .weavy-snap")) {
                 $(widget.container).addClass("weavy-collapsed");
                 minimizeTimeout.apply(widget);
@@ -24,7 +24,7 @@
         };
 
         // set minimized widget
-        WeavyWidget.prototype.minimize = function () {
+        widget.minimize = function () {
             if (!$(widget.container).is(".weavy-no-collapse, .weavy-open, .weavy-before-drag, .weavy-drag, .weavy-snap")) {
                 var isCollapsed = $(widget.container).hasClass("weavy-collapsed");
                 $(widget.container).addClass("weavy-collapsed weavy-minimized");
@@ -41,7 +41,7 @@
         };
 
         // unset collapsed/minimized widget  
-        WeavyWidget.prototype.restore = function () {
+        widget.restore = function () {
             var $container = $(widget.container);
             if ($container.hasClass('weavy-collapsed') || $container.hasClass('weavy-minimized')) {
                 $container.removeClass("weavy-collapsed weavy-minimized");
@@ -60,6 +60,7 @@
         }
 
         function minimizeTimeout() {
+            var options = widget.options.plugins[PLUGIN_NAME];
             clearMinimizeTimeout();
             if ($(widget.container).hasClass("weavy-collapsed")) {
                 minimizeTimer = setTimeout(widget.minimize.bind(widget), options.minimize_delay || 30000);
@@ -106,10 +107,10 @@
             widget.draggable.removeEventListener("mouseup", dragBeforeStartEnd, false);
             widget.draggable.removeEventListener("dragstart", dragStart, false);
             widget.draggable.removeEventListener("dragend", drop, false);
-            widget.draggable.removeEventListener("click", widget.restore.bind(widget));
+            widget.draggable.removeEventListener("click", widget.restore);
             widget.draggable.removeEventListener("mouseover", minimizeTimeout.bind(widget), { passive: true });
 
-            document.documentElement.removeEventListener("mousedown", widget.collapse.bind(widget), false);
+            console.log("mousedown", widget.collapse, document.documentElement.removeEventListener("mousedown", widget.collapse, false));
         }
 
         function initializeEvents() {
@@ -120,10 +121,10 @@
             widget.draggable.addEventListener("mouseup", dragBeforeStartEnd, false);
             widget.draggable.addEventListener("dragstart", dragStart, false);
             widget.draggable.addEventListener("dragend", drop, false);
-            widget.draggable.addEventListener("click", widget.restore.bind(widget));
+            widget.draggable.addEventListener("click", widget.restore);
             widget.draggable.addEventListener("mouseover", minimizeTimeout.bind(widget), { passive: true });
 
-            document.documentElement.addEventListener("mousedown", widget.collapse.bind(widget), false);
+            document.documentElement.addEventListener("mousedown", widget.collapse, false);
         }
 
         // drag and drop methods
@@ -332,6 +333,11 @@
             if (!widget.isBlocked) {
                 widget.restore();
             }
+        });
+
+        widget.on("destroyed", function () {
+            clearEvents();
+            clearMinimizeTimeout();
         });
 
         widget.on("load", function (e) {

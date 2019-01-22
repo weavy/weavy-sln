@@ -8795,6 +8795,11 @@
             Gets or sets a value indicating whether the script should exclude required libs jquery.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Raw">
+            <summary>
+            Gets or sets a value indicating whether the script should be in a script tag.
+            </summary>
+        </member>
         <member name="M:Weavy.Web.Models.WeavyLoaderOptions.ToString">
             <summary>
             Returns the loader script.

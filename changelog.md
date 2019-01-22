@@ -5,25 +5,32 @@
 Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional 
 functionality. See https://docs.weavy.com for more information.
 
+### 2.0.4 (2019-01-09)
+
+* Fixed an issue that caused a user with local account to be "locked out" when custom 
+  authentication had user with same username as the local account.
+* More extensive widget destruction
+
 ### 2.0.3 (2018-12-13)
 
-* Fixed an issue with authentication on websocket connection
+* Fixed an issue with authentication on websocket connection.
 
 ### 2.0.2 (2018-11-20)
 
 * Increased height of embedded Google Doc on Mac.
-* Fixed "The request is invalid" error when adding file from cloud and folder already has an item with the same name as the selected file.
+* Fixed "The request is invalid" error when adding file from cloud and folder already had an item 
+  with the same name as the selected file.
 
 ### 2.0.1 (2018-11-16)
 
-* Added jQuery noConflict to the Weavy Widget
-* Fixed an issue where file size was not displayed in the Files app
-* Fixed "Could not find entity to share" error when trying to share a file
-* Fixed an issue where context link was not displayed
-* Fixed an issue where conversation displayed the wrong user avatar
-* Fixed issue where password could not contain certain characters
-* Fixed problem with sometimes not being able to add members to a space
-* Fixed issue where clicking a notification did not scroll the related entity (e.g. comment), into view 
+* Added jQuery noConflict to the Weavy Widget.
+* Fixed an issue where file size was not displayed in the Files app.
+* Fixed "Could not find entity to share" error when trying to share a file.
+* Fixed an issue where context link was not displayed.
+* Fixed an issue where conversation displayed the wrong user avatar.
+* Fixed issue where password could not contain certain characters.
+* Fixed problem with sometimes not being able to add members to a space.
+* Fixed issue where clicking a notification did not scroll the related entity into view.
 
 ### 2.0.0 (2018-11-06)
 
@@ -31,8 +38,9 @@ Initial release of 2.0 with Weavy SDK for developers.
 
 ### Upgrade instructions
 
-There is no automated upgrade process for upgrading from Weavy 1.x to 2.x. If you need to migrate
-an existing 1.x installation to 2.x you should contact support@weavy.com for instructions.
+There is no automated upgrade process for upgrading from Weavy 1.x to 2.x. 
+If you need to migratean existing 1.x installation to 2.x you should contact support@weavy.com for 
+instructions.
 
 ## Weavy 1.1
 

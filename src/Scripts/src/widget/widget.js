@@ -23,18 +23,21 @@
     this.WeavyWidget = function () {
         var widget = this;
 
+        var _idleCallbacks = [];
+        var _timeouts = [];
+
         if (WeavyWidget.version) {
             console.log("WeavyWidget", WeavyWidget.version);
         }
 
         // public methods
-        WeavyWidget.prototype.init = function () {
+        widget.init = function () {
             connectAndLoad();
             widget.triggerEvent("init", null);
         }
 
         // sign in using external authentication provider
-        WeavyWidget.prototype.signIn = function (username, password) {
+        widget.signIn = function (username, password) {
             var dfd = $.Deferred();
 
             // listen to signedIn message
@@ -58,7 +61,7 @@
         }
 
         // sign out using external authentication provider
-        WeavyWidget.prototype.signOut = function () {
+        widget.signOut = function () {
             var dfd = $.Deferred();
 
             // sign out user in Weavy
@@ -77,7 +80,7 @@
         }
 
         // open a conversation
-        WeavyWidget.prototype.openConversation = function (conversationId, event) {
+        widget.openConversation = function (conversationId, event) {
             event.preventDefault();
             event.cancelBubble = true;
             widget.messengerFrame.contentWindow.postMessage({ "name": "openConversation", "id": conversationId }, "*");
@@ -85,7 +88,7 @@
         }
 
         // close open strip
-        WeavyWidget.prototype.close = function () {
+        widget.close = function () {
             var $openFrame = $(".weavy-strip.weavy-open iframe", widget.strips);
 
             $(widget.container).removeClass("weavy-open");
@@ -101,7 +104,7 @@
         }
 
         // open specified strip (personal, messenger or bubble)
-        WeavyWidget.prototype.open = function (strip, destination) {
+        widget.open = function (strip, destination) {
             // Treat strip numbers as bubbles
             if (strip === parseInt(strip, 10)) {
                 strip = "bubble-" + strip;
@@ -143,7 +146,7 @@
             }
         }
 
-        WeavyWidget.prototype.openContextFrame = function (weavyContext) {
+        widget.openContextFrame = function (weavyContext) {
             if (weavyContext) {
                 var contextData = JSON.parse(weavyContext);
                 if (contextData.space === -2) {
@@ -155,7 +158,7 @@
         }
 
         // toggle (open/close) specified strip (personal, messenger or bubble)
-        WeavyWidget.prototype.toggle = function (strip, event, force) {
+        widget.toggle = function (strip, event, force) {
             if (widget.isBlocked) {
                 // NOTE: prevent incorrect fallback when result from pong has not yet been recieved. 
                 // If blocked: wait 100ms and call the method again to allow the test to be concluded before opening a fallback window
@@ -171,7 +174,7 @@
         }
 
         // remove a bubble
-        WeavyWidget.prototype.removeBubble = function (id, event) {
+        widget.removeBubble = function (id, event) {
 
             if (event) {
                 event.preventDefault();
@@ -190,7 +193,7 @@
         }
 
         // show bubble modal
-        WeavyWidget.prototype.connectBubble = function (id, type, event) {
+        widget.connectBubble = function (id, type, event) {
 
             if (event) {
                 event.preventDefault();
@@ -205,45 +208,60 @@
         }
 
         // resize the panel
-        WeavyWidget.prototype.resize = function () {
+        widget.resize = function () {
             $(this.container).toggleClass("weavy-wide");
             widget.triggerEvent("resize", null);
         }
 
         // maximize the panel
-        WeavyWidget.prototype.maximize = function () {
+        widget.maximize = function () {
             $(this.container).addClass("weavy-wide");
             widget.triggerEvent("maximize", null);
         }
 
         // toggle preview window
-        WeavyWidget.prototype.togglePreview = function () {
+        widget.togglePreview = function () {
             $(this.container).toggleClass("weavy-preview");
             widget.triggerEvent("resize", null);
         }
 
 
         // reload the page
-        WeavyWidget.prototype.reload = function (options) {
+        widget.reload = function (options) {
             this.options = widget.extendDefaults(this.options, options);
             connectAndLoad();
 
             widget.triggerEvent("reload", this.options);
         }
 
-        WeavyWidget.prototype.destroy = function () {
+        widget.destroy = function () {
+            widget.triggerEvent("destroyed", null);
+
             weavy.connection.disconnect();
+
             $(widget.container).remove();
             widget.container = null;
 
             $(widget.root).remove();
             widget.root = null;
 
-            widget.triggerEvent("destroyed", null);
+            _timeouts.forEach(function (id) {
+                clearTimeout(id);
+            });
+            _timeouts = [];
+
+            _idleCallbacks.forEach(function (id) {
+                cancelIdleCallback(id);
+            });
+            _idleCallbacks = [];
+
+            _clearEventHandlers();
+
+            window.removeEventListener("message", onMessageReceived, false);
         }
 
         // refresh a panel
-        WeavyWidget.prototype.refresh = function (strip) {
+        widget.refresh = function (strip) {
 
             loading.call(this, strip, true);
 
@@ -256,14 +274,14 @@
         }
 
         // resets a panel to its original src
-        WeavyWidget.prototype.reset = function (strip) {
+        widget.reset = function (strip) {
             loading.call(this, strip, true);
             var $strip = $("#" + strip, this.container);
             var frame = $strip.find("iframe");
             frame[0].src = frame[0].dataset.src || frame[0].src || "about:blank";
         }
 
-        WeavyWidget.prototype.preloadFrame = function (frameElement, callback) {
+        widget.preloadFrame = function (frameElement, callback) {
             var strip = $(frameElement).closest(".weavy-strip").get(0);
             var bubbleTarget = strip && strip.id;
             var delayedFrameLoad = function () {
@@ -279,7 +297,7 @@
             };
             // Wait for idle
             if (window.requestIdleCallback) {
-                window.requestIdleCallback(delayedFrameLoad);
+                _idleCallbacks.push(window.requestIdleCallback(delayedFrameLoad));
             } else {
                 if (document.readyState === "complete") {
                     delayedFrameLoad();
@@ -290,7 +308,7 @@
 
         }
 
-        WeavyWidget.prototype.preloadFrames = function (force) {
+        widget.preloadFrames = function (force) {
             if (widget.options.is_mobile) {
                 return;
             }
@@ -315,13 +333,13 @@
                     var $strips = $(widget.strips).find("iframe[data-type]:not([src])");
                     if ($strips.length) {
                         widget.preloadFrame($strips[0]);
-                        setTimeout(widget.preloadFrames, 1500, "all");
+                        _timeouts.push(setTimeout(widget.preloadFrames, 1500, "all"));
                     }
                 }
             }
         }
 
-        WeavyWidget.prototype.extendDefaults = function (source, properties) {
+        widget.extendDefaults = function (source, properties) {
             source = source || {};
             properties = properties || {};
 
@@ -345,7 +363,7 @@
             return copy;
         };
 
-        WeavyWidget.prototype.httpsUrl = function (url, https) {
+        widget.httpsUrl = function (url, https) {
             https = https || widget.options.https;
             if (typeof url === "string") {
                 if (https === "force") {
@@ -432,7 +450,7 @@
         }
 
 
-        $(document).on("locationchanged.event.weavy", function (objEvent, objData) {
+        widget.on("locationchanged", function (objEvent, objData) {
             $("iframe.weavy-strip-frame", widget.container).each(function () {
                 if ($(this)[0].contentWindow !== null) {
                     $(this)[0].contentWindow.postMessage({ "name": "context-url", "value": objData.currentHref, 'title': document.title, 'origin': document.location.origin }, "*");
@@ -1082,19 +1100,19 @@
                     }
                 } catch (e) { console.warn("Could not attach bubble", bubble.space_id); }
 
-                setTimeout(function () {
+                _timeouts.push(setTimeout(function () {
                     requestAnimationFrame(function () {
                         buttonContainer.classList.remove("weavy-disable-transition", "weavy-removed", "weavy-disabled");
 
                         // if the bubble should be opened up
                         if (bubble.force_open) {
-                            setTimeout(function () {
+                            _timeouts.push(setTimeout(function () {
                                 bubble.force_open = false;
                                 widget.open("bubble-" + bubble.space_id, bubble.destination || bubble.url);
-                            }, 100);
+                            }, 100));
                         }
                     });
-                }, 0);
+                }, 0));
 
             });
 
@@ -1112,7 +1130,7 @@
                 }
             });
 
-            setTimeout(function () { truncateCache(widget.options.bubble_limit); }, 450);
+            _timeouts.push(setTimeout(function () { truncateCache(widget.options.bubble_limit); }, 450));
         }
 
         function renderControls(strip) {
@@ -1356,7 +1374,7 @@
                 registerLoading(stripId);
                 $strip.addClass(fill ? "weavy-loading weavy-loading-fill" : "weavy-loading");
                 $bubble.addClass(fill ? "weavy-loading weavy-loading-fill" : "weavy-loading");
-                $strip.loadingTimeout = setTimeout(loading.bind(widget, stripId, false), 15000);
+                _timeouts.push($strip.loadingTimeout = setTimeout(loading.bind(widget, stripId, false), 15000));
             } else {
                 $strip.removeClass("weavy-loading weavy-loading-fill");
                 $bubble.removeClass("weavy-loading weavy-loading-fill");
@@ -1640,7 +1658,7 @@
         window.addEventListener("message", onMessageReceived, false);
 
         // signalR connection state has changed
-        weavy.connection.on("statechanged", function (e, data) {
+        connectionOn("statechanged", function (e, data) {
 
             if (disconnected && data.state.newState === 1 && widget.options.user_id) {
                 disconnected = false;
@@ -1651,12 +1669,12 @@
         });
 
         // signalR connection disconnected
-        weavy.connection.on("disconnected", function (e, data) {
+        connectionOn("disconnected", function (e, data) {
             disconnected = true;
         });
 
         // real-time events
-        weavy.realtime.on("bubbleopened", function (e, data) {
+        realtimeOn("bubbleopened", function (e, data) {
 
             if (data.isMessenger) {
                 widget.messengerFrame.src = widget.httpsUrl(data.url);
@@ -1679,7 +1697,7 @@
             }
         });
 
-        weavy.realtime.on("bubbleremoved", function (e, data) {
+        realtimeOn("bubbleremoved", function (e, data) {
             // remove from array of added bubbles
             widget.bubbles = [].filter.call(widget.bubbles, function (bubble) {
                 if (data.space_id === bubble.space_id && data.bubble_id === bubble.bubble_id && bubble.type === data.type) {
@@ -1690,7 +1708,7 @@
             });
         })
 
-        weavy.realtime.on("trashedspace", function (e, data) {
+        realtimeOn("trashedspace", function (e, data) {
             // remove from array of added bubbles
             widget.bubbles = _.filter(widget.bubbles, function (bubble) {
                 if (data.id === bubble.space_id) {
@@ -1701,14 +1719,14 @@
             });
         })
 
-        weavy.realtime.on("conversationread", function (e, data) {
+        realtimeOn("conversationread", function (e, data) {
             if (data.user.id === widget.options.user_id) {
                 conversationRead.call(widget, data.conversation.id);
                 widget.triggerEvent("conversationread", data);
             }
         });
 
-        weavy.realtime.on("message", function (e, data) {
+        realtimeOn("message", function (e, data) {
             var message = data;
             if (message.created_by.id !== widget.options.user_id && message.created_by.id > 0) {
                 weavy.realtime.invoke("widget", "getConversation", message.conversation);
@@ -1716,24 +1734,24 @@
             }
         });
 
-        weavy.realtime.on("badge", function (e, data) {
+        realtimeOn("badge", function (e, data) {
             badgeChanged.call(widget, data);
             widget.triggerEvent("badge", data);
         });
 
-        weavy.realtime.on("notification", function (e, data) {
+        realtimeOn("notification", function (e, data) {
             showNotification.call(widget, data);
         });
 
-        weavy.realtime.on("notificationupdated", function (e, data) {
+        realtimeOn("notificationupdated", function (e, data) {
             widget.triggerEvent("notificationupdated", data);
         });
 
-        weavy.realtime.on("notificationreadall", function (e, data) {
+        realtimeOn("notificationreadall", function (e, data) {
             widget.triggerEvent("notificationreadall", data);
         });
 
-        weavy.realtime.on("loaded", function (e, data) {
+        realtimeOn("loaded", function (e, data) {
             if (!data.user_id) {
                 // NOTE: stop/disconnect directly if we are not authenticated 
                 // signalr does not allow the user identity to change in an active connection
@@ -1763,13 +1781,13 @@
 
         }, "rtmwidget");
 
-        weavy.realtime.on("conversationReceived", function (e, data) {
+        realtimeOn("conversationReceived", function (e, data) {
             appendConversation.call(widget, data);
         }, "rtmwidget");
 
 
         widget.one("restore", function () {
-            setTimeout(widget.preloadFrames, 2000, "all");
+            _timeouts.push(setTimeout(widget.preloadFrames, 2000, "all"));
         });
 
         // init component
@@ -1796,13 +1814,59 @@
 
     WeavyWidget.plugins = {};
 
+    // Event handling
+    var _events = [];
+
+    function _addEventHandler(event, cb) {
+        _events.push(arguments);
+    }
+
+    function _removeEventHandler(event, cb) {
+        var removeHandler = arguments;
+        _events = _events.filter(function (eventHandler) {
+            for (var i = 0; i < eventHandler.length; i++) {
+                if (eventHandler[i] !== removeHandler[i]) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    function _clearEventHandlers() {
+        _events.forEach(function (eventHandler) {
+            var event = eventHandler[0];
+            var cb = eventHandler[1];
+            $(document).off(event, null, cb);
+        });
+        _events = [];
+    }
+
+    function connectionOn(event, handler) {
+        _addEventHandler(event + ".connection.weavy", handler);
+        $(document).on(event + ".connection.weavy", null, null, handler);
+    }
+
+    function realtimeOn(event, handler, proxy) {
+        proxy = proxy || "rtm";
+        _addEventHandler(event + "." + proxy + ".weavy", handler);
+        $(document).on(event + "." + proxy + ".weavy", null, null, handler);
+    }
+
     WeavyWidget.prototype.on = function (event, cb) {
+        _addEventHandler(event + ".event.weavy", cb);
         $(document).on(event + ".event.weavy", null, null, cb);
     };
 
     WeavyWidget.prototype.one = function (event, cb) {
-        $(document).one(event + ".event.weavy", null, null, cb);
+        _addEventHandler(event + ".event.weavy", cb);
+        $(document).one(event + ".event.weavy", null, null, function () { cb.apply(this, arguments); _removeEventHandler(event + ".event.weavy", cb); });
     };
+
+    WeavyWidget.prototype.off = function (event, cb) {
+        $(document).off(event + ".event.weavy", null, cb);
+        _removeEventHandler(event + ".event.weavy", cb);
+    }
 
     WeavyWidget.prototype.triggerEvent = function (name, json) {
         name = name + ".event.weavy";

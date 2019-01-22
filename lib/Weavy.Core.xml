@@ -12192,9 +12192,7 @@
             first occurrence of another string.
             </summary>
             <param name="original">Required. String expression from which the leftmost characters are returned.</param>
-            <param name="search">The string where the beginning of it marks the 
-            characters to return.  If the string is not found, the whole string is 
-            returned.</param>
+            <param name="search">The string where the beginning of it marks the characters to return. If the string is not found, the whole string is returned.</param>
             <param name="comparisonType">Determines whether or not to use case sensitive search.</param>
             <returns>A string containing every character within the original string before the first occurrence of the search string.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown if str or searchstring is null.</exception>

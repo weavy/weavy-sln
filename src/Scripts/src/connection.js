@@ -1,11 +1,17 @@
 var weavy = weavy || {};
+if (weavy.connection && weavy.connection.destroy) {
+    console.log("recreating weavy.connection");
+    weavy.connection.destroy();
+}
 weavy.connection = (function ($, w) {
     // create a new hub connection
     var connection = $.hubConnection("/signalr", { useDefaultPath: false });
     var reconnecting = false;
     var hubProxies = { rtm: connection.createHubProxy('rtm'), widget: connection.createHubProxy('widget') };
     var wins = [w]; // all windows when in embedded mode
+    var _events = [];
     var _reconnectTimeout = null;
+    var _connectionTimeout = null;
     var reconnectRetries = 0;
     var explicitlyDisconnected = false;
 
@@ -54,8 +60,10 @@ weavy.connection = (function ($, w) {
         return connection.state;
     }
 
-    function on(event, handler, proxy) {
-        $(document).on(event + ".connection.weavy", null, null, handler);
+    function on(event, handler) {
+        var name = event + ".connection.weavy";
+        _events.push([name, handler]);
+        $(document).on(name, null, null, handler);
     }
 
     // configure logging and connection lifetime events
@@ -110,13 +118,14 @@ weavy.connection = (function ($, w) {
 
         if (!explicitlyDisconnected) {
             reconnectRetries++;
+            window.clearTimeout(_connectionTimeout);
 
             if (reconnecting) {
                 connection.start();
                 reconnecting = false;
             } else {
                 // connection dropped, try to connect again after 5s
-                setTimeout(function () {
+                _connectionTimeout = setTimeout(function () {
                     connection.start();
                 }, 5000);
             }
@@ -166,24 +175,28 @@ weavy.connection = (function ($, w) {
 
     // generic callback used by server to notify clients that a realtime event happened
     // NOTE: we only need to hook this up in standalone, in the widget we wrap realtime events in the cross-frame-event and post to the frames
+    function rtmEventRecieved(name, args) {
+        name = name + ".rtm.weavy";
+        triggerEvent(name, args);
+    }
+
     if (!weavy.browser || !weavy.browser.embedded) {
-        hubProxies["rtm"].on("eventReceived", function (name, args) {
-            name = name + ".rtm.weavy";
-            triggerEvent(name, args);
-        });
+        hubProxies["rtm"].on("eventReceived", rtmEventRecieved);
     }
 
     // callback from widget onload
-    hubProxies["widget"].on("loaded", function (args) {
+    function widgetLoaded(args) {
         var name = "loaded.rtmwidget.weavy";
         triggerEvent(name, args);
-    });
+    }
+    hubProxies["widget"].on("loaded", widgetLoaded);
 
     // callback from widget conversation received
-    hubProxies["widget"].on("conversationReceived", function (args) {
+    function widgetConversationsReceived(args) {
         var name = "conversationReceived.rtmwidget.weavy";
         triggerEvent(name, args);
-    });
+    }
+    hubProxies["widget"].on("conversationReceived", widgetConversationsReceived);
 
     function addWindow(win) {
         // add window to array if not already added
@@ -198,9 +211,42 @@ weavy.connection = (function ($, w) {
         });
     }
 
+    function destroy() {
+        disconnect();
+
+        reconnecting = false;
+        wins = [];
+
+        window.clearTimeout(_reconnectTimeout);
+        window.clearTimeout(_connectionTimeout);
+
+        try {
+            hubProxies["rtm"].off("eventReceived", rtmEventRecieved);
+        } catch (e) { }
+
+        try {
+            hubProxies["widget"].off("loaded", widgetLoaded);
+        } catch (e) { }
+
+        try {
+            hubProxies["widget"].off("conversationReceived", widgetConversationsReceived);
+        } catch (e) { }
+
+        _events.forEach(function (eventHandler) {
+            var name = eventHandler[0], handler = eventHandler[1];
+            $(document).off(name, null, handler);
+        });
+        _events = [];
+
+        weavy.connection = null;
+        delete weavy.connection;
+    }
+
+
     return {
         init: init,
         connect: connect,
+        destroy: destroy,
         disconnect: disconnect,
         proxies: hubProxies,
         connection: connection,

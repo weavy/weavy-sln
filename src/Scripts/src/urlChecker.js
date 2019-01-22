@@ -1,5 +1,8 @@
 ﻿var weavy = weavy || {};
-
+if (weavy.urlChecker && weavy.urlChecker.destroy) {
+    console.log("recreating weavy.urlChecker");
+    weavy.urlChecker.destroy();
+}
 weavy.urlChecker = (function ($) {
     
     // default to the current location.
@@ -8,6 +11,7 @@ weavy.urlChecker = (function ($) {
     var strPrevLocation = "";
     var strPrevHash = "";    
     var intIntervalTime = 100;
+    var _checkInterval = null;
 
     // removes the pound from the hash.
     var fnCleanHash = function (strHash) {
@@ -39,6 +43,15 @@ weavy.urlChecker = (function ($) {
             
         }
     }
+
     // set an interval to check the location changes.
-    setInterval(fnCheckLocation, intIntervalTime);
+    _checkInterval = setInterval(fnCheckLocation, intIntervalTime);
+
+    function destroy() {
+        clearInterval(_checkInterval);
+    }
+
+    return {
+        destroy: destroy
+    }
 })(jQuery);

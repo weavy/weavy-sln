@@ -1,0 +1,38 @@
+﻿@model UserSearchResult
+
+@if (Model.HasItems()) {
+    foreach (var group in Model.GroupBy(x => x.GetTitle().ToUpper().Trim().FirstOrDefault())) {
+        <div class="list-group-separator">@group.Key</div>
+        foreach (var user in group) {
+            <a class="list-group-item list-group-item-action" href="@Url.Action(nameof(MessengerController.GetConversationWithUser), new { id = user.Id })" data-user="@user.Id" @(user.IsSuspended ? @"data-profile=" + user.Id + @"" : "" )>
+                <div class="media">
+                    <div class="mr-3">
+                        @user.AvatarImg(48, presence: true)
+                    </div>
+                    <div class="media-body">
+                        @if (user.Presence == PresenceStatus.Active) {
+                            <time>active now</time>
+                        } else if (user.LastSeenAt != null) {
+                            @Html.Time(user.LastSeenAt.Value, abbrev: true)
+                        }
+                        <div class="media-title text-capitalize">@user.GetTitle()</div>
+                        <div class="media-text">
+                            @@@user.Username
+                            @if (user.IsSuspended) {
+                                <span class="badge badge-secondary">suspended</span>
+                            } else if (user.IsAdmin) {
+                                <span class="badge badge-primary">admin</span>
+                            } else if (user.IsExternal) {
+                                <span class="badge badge-warning">external</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+} else if (!Model.Query.Text.IsNullOrEmpty()) {
+    <div class="list-group-separator reset">No match for <strong>@Model.Query.Text</strong>.</div>
+} else {
+    <div class="list-group-separator text-center">@Html.SvgSpinner()</div>
+}

@@ -1,6 +1,8 @@
 var weavy = weavy || {};
 weavy.alert = (function ($) {
 
+    var _enabled = true;
+
     // cleanup before cache (needed when clicking back in the browser)
     $(document).on("turbolinks:before-cache", function () {
         $(".alerts .alert").alert('close');
@@ -39,22 +41,24 @@ weavy.alert = (function ($) {
     }
 
     function alert(type, message, duration, id) {
-        var $alerts = $(".alerts");
-        var $alert = $('<div class="alert alert-dismissible fade" role="alert"><button type="button" class="btn btn-icon close" data-dismiss="alert" aria-label="Close"><svg class="i"><use xlink:href="#close" /></svg></button></div>');
-        $alert.addClass("alert-" + type);
+        if (_enabled) {
+            var $alerts = $(".alerts");
+            var $alert = $('<div class="alert alert-dismissible fade" role="alert"><button type="button" class="btn btn-icon close" data-dismiss="alert" aria-label="Close"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg></button></div>');
+            $alert.addClass("alert-" + type);
         
-        if (typeof id !== "undefined") {
-            $alert.attr("id", id);
+            if (typeof id !== "undefined") {
+                $alert.attr("id", id);
 
-            // remove previous alert with specified id
-            $alerts.find("#" + id).remove();
-        }
+                // remove previous alert with specified id
+                $alerts.find("#" + id).remove();
+            }
 
-        $alert.append(message).appendTo($alerts).addClass("show");
+            $alert.append(message).appendTo($alerts).addClass("show");
 
-        // close after specified time?
-        if (Number(duration) > 0) {
-            setTimeout(function () { $alert.alert("close"); }, duration);
+            // close after specified time?
+            if (Number(duration) > 0) {
+                setTimeout(function () { $alert.alert("close"); }, duration);
+            }
         }
     }
 
@@ -63,6 +67,11 @@ weavy.alert = (function ($) {
         // remove previous alert with specified id
         $(".alerts #" + id).alert('close');
     }
+
+    window.addEventListener("beforeunload", function () {
+        _enabled = false;
+        $(".alerts .alert").alert('close');
+    }, true);
 
     return {
         alert: alert,

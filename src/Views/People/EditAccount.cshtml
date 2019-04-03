@@ -33,7 +33,7 @@
         <h6>Linked accounts</h6>
         <ul class="list-unstyled">
             @foreach (Login login in user.Logins) {
-                <li>@login.Provider / @(login.Email ?? login.ProviderId)</li>
+                <li>@login.Type / @(login.Email ?? login.Sub)</li>
             }
         </ul>
     }

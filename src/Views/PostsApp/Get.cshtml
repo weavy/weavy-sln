@@ -1,10 +1,10 @@
-﻿@model PostsModel
+﻿@model PostsViewModel
 @{
     Title = Model.App.Name;
 }
 
 <div class="cover cover-bg cover-under-navbar">
-    <div class="text-center my-4" style="padding-bottom:2.5rem;">
+    <div class="cover-content">
         @WeavyContext.Space.AvatarImg(128)
     </div>
     <div class="facepile">
@@ -12,18 +12,18 @@
 
         @if (WeavyContext.Space.IsMember) {
             if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
-                <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Html.SvgIcon("plus")</button>
+                <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Svg.Icon("plus")</button>
             }
         } else if (WeavyContext.Space.HasPermission(Permission.Join)) {
             var pending = SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id);
             if (pending) {
                 <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
                     @Html.HttpMethodOverride(HttpVerbs.Delete)
-                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Undo membership request">@Html.SvgIcon("account-minus")</button>
+                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Undo membership request">@Svg.Icon("account-minus")</button>
                 </form>
             } else {
                 <form action="@(Url.Action<SpaceController>(c => c.Join(WeavyContext.Space.Id)))" method="post" data-turboform>
-                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Join space">@Html.SvgIcon("account-plus", "white")</button>
+                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Join space">@Svg.Icon("account-plus", "white")</button>
                 </form>
             }
         }
@@ -47,7 +47,7 @@
 
     @if (!WeavyContext.Space.IsMember && SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id)) {
         <div class="alert alert-info d-flex">
-            @Html.SvgIcon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2" })
+            @Svg.Icon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2" })
             <span>Your membership request is waiting for approval.</span>
         </div>
     }
@@ -55,7 +55,7 @@
 <div class="container my-4">
 
     @if (Model.App.HasPermission(Permission.Post)) {
-        <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(Model.App.Id, null)))" method="post">
+        <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post">
             <textarea id="text" class="form-control" name="text" data-editor-location="discuss"></textarea>
             <input type="hidden" name="hasContext" id="hasContext" value="true" />
             <input type="hidden" name="contextUrl" id="contextUrl" />

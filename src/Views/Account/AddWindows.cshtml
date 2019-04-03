@@ -13,10 +13,10 @@
                 @if (Model.First) {
                     <h1 class="display-3">Confirm switch to Windows authentication</h1>
                     <p>Hi <strong>@Model.SamAccountName</strong>, it looks like you recently switched from using local accounts to windows authentication.</p>
-                    <p>To complete the switch we need you to enter the credentials of an administrator, e.g. the username and password of the person that installed @ConfigurationService.ApplicationName.</p>
+                    <p>To complete the switch we need you to enter the credentials of a local administrator account.</p>
                 } else {
                     <h1 class="display-3">Associate with existing account</h1>
-                    <p>In order to avoid duplicate accounts we need you to enter your username and password and associate <strong>@Model.SamAccountName</strong> with your existing account.</p>
+                    <p>In order to avoid duplicate accounts we need you to enter your username and password and associate <strong>@Model.SamAccountName</strong> with your existing local account.</p>
                 }
             </header>
 
@@ -28,7 +28,7 @@
                         <button type="submit" class="btn btn-primary btn-load">Confirm</button>
                     } else {
                         <button type="submit" class="btn btn-primary btn-load">Associate</button>
-                        @Html.ActionLink("Cancel", nameof(AccountController.RegisterWindows), typeof(AccountController).ControllerName(), null, new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Cancel", nameof(AccountController.RegisterWindows), typeof(AccountController).ControllerName(), null, new { @class = "btn btn-secondary" })
                     }
                 </div>
             }

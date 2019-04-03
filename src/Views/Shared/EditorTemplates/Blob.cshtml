@@ -88,7 +88,7 @@
             <img class="img-@size @(fmt == PreviewFormat.Image ? "" : "d-none")" src="@imageUrl" data-thumb="" alt="" width="@size" height="@size" />
 
             <span class="custom-icon @(fmt != PreviewFormat.Image ? "" : "d-none")">
-                @Html.SvgIcon(icon.Name, size: 96, color: icon.Color)
+                @Svg.Icon(icon.Name, size: 96, color: icon.Color)
             </span>
 
             <input @Html.Raw(attributes.Trim()) />

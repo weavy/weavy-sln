@@ -10,12 +10,12 @@ weavy.browser = {
     touch: false
 };
 
-(function ($) {
+(function () {
     if (document.documentElement.classList.contains("embedded")) {
         weavy.browser.embedded = true;
     } else if (window.name !== "weavy-standalone") {
         try {
-            weavy.browser.embedded = window.self !== window.top;
+            weavy.browser.embedded = (window.self !== window.top) ? true : false;
         } catch (e) {
             weavy.browser.embedded = true;
         }
@@ -45,7 +45,7 @@ weavy.browser = {
     window.addEventListener("message", function (e) {                    
         switch (e.data.name) {
             case "ping":
-                e.source.postMessage({ "name": "pong" }, e.origin);
+                e.source.postMessage({ "name": "ready" }, e.origin);
                 break;
             case "reload":
                 window.location.reload();
@@ -53,5 +53,5 @@ weavy.browser = {
             default:
         }
     }, false);
-})(jQuery);
+})();
 

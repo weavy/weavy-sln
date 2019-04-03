@@ -220,12 +220,11 @@ weavy.posts = (function ($) {
     });
 
     // rtm post
-    weavy.realtime.on("post", function (e, post) {
-
-        var uid = post.created_by.id;
+    weavy.realtime.on("post-inserted.weavy", function (e, post) {
+        var uid = post.createdBy.id;
 
         // do nothing of we are displaying another space
-        if (weavy.context.space !== post.space) {
+        if (weavy.context.space !== post.spaceId) {
             return;
         }
 
@@ -258,13 +257,17 @@ weavy.posts = (function ($) {
     });
 
     // rtm like post
-    weavy.realtime.on("likepost", function (e, post, user) {
-        updateFeedback(post.id)
+    weavy.realtime.on("like.weavy", function (e, liked) {
+        if (liked.type === 'post') {
+            updateFeedback(liked.id);
+        }
     });
 
     // rtm unlike post
-    weavy.realtime.on("unlikepost", function (e, post, user) {
-        updateFeedback(post.id)
+    weavy.realtime.on("unlike.weavy", function (e, unliked) {
+        if (unliked.type === 'post') {
+            updateFeedback(unliked.id);
+        }
     });
 
     // feedback details modal (likes, votes etc.)

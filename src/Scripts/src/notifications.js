@@ -61,7 +61,7 @@ weavy.notifications = (function ($) {
     });
     
     // callbacks for realtime events
-    weavy.realtime.on("notification", function (event, data) {
+    weavy.realtime.on("notification-inserted.weavy", function (event, data) {
         $("#tab-notifications .empty").remove();
                 
         get(data.id).then(function (html) {            
@@ -69,19 +69,19 @@ weavy.notifications = (function ($) {
         });        
     });
 
-    weavy.realtime.on("notificationupdated", function (event, data) {
-        if (data.is_read) {
+    weavy.realtime.on("notification-updated.weavy", function (event, data) {
+        if (data.isRead) {
             $("a.notification[data-id='" + data.id + "']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");                       
         } else {
             $("a.notification[data-id='" + data.id + "']").removeClass("read").find("[data-toggle=notification]").attr("title", "Mark as read");
         }
     });
 
-    weavy.realtime.on("notificationreadall", function (event, data) {
+    weavy.realtime.on("notifications-all-read.weavy", function (event, data) {
         $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
     });
 
-    weavy.realtime.on("badge", function (event, data) {                
+    weavy.realtime.on("badge.weavy", function (event, data) {                
         if (data.notifications > 0) {
             $(".badge[data-badge='notification']").text(data.notifications).removeClass("d-none");
         } else {

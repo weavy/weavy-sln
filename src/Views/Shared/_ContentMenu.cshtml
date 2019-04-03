@@ -5,36 +5,36 @@
 
 <div class="dropdown">
     <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-        @Html.SvgIcon("dots-vertical")
+        @Svg.Icon("dots-vertical")
     </button>
     <div class="dropdown-menu dropdown-menu-right">
-        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#share-modal" data-share-type="@Model.Type" data-share-id="@Model.Id" data-share-title="Share @Model.Kind()">@Html.SvgIcon("share-variant", "success") Share</button>
+        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#share-modal" data-share-type="@Model.Type" data-share-id="@Model.Id" data-share-title="Share @Model.Kind()">@Svg.Icon("share-variant", "success") Share</button>
 
-        @if (Model is FileBase file) {
+        @if (Model is IFile file) {
             if (FileHelper.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
-                <a class="dropdown-item" href="@file.OfficeUrl()">@Html.SvgIcon(Model)<span>Open in @OfficeHelper.GetProductName(file.Name)</span></a>
+                <a class="dropdown-item" href="@file.OfficeUrl()">@Svg.Icon(Model)<span>Open in @OfficeHelper.GetProductName(file.Name)</span></a>
             }
-            <a class="dropdown-item" href="@file.FileUrl(download: true)">@Html.SvgIcon("download", "primary")<span>Download</span></a>
+            <a class="dropdown-item" href="@file.FileUrl(download: true)">@Svg.Icon("download", "primary")<span>Download</span></a>
         }
 
         @if (Model.HasPermission(Permission.Edit)) {
             if (lockable?.LockedById == User.Id) {
                 if (Model.MetaData().ModifyMode == UpsertMode.Page) {
-                    <a class="dropdown-item" href="@Model.Url()/edit">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
+                    <a class="dropdown-item" href="@Model.Url()/edit">@Svg.Icon("pencil", "primary")<span>Edit</span></a>
                 } else if (Model.MetaData().ModifyMode == UpsertMode.Modal) {
-                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
+                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Svg.Icon("pencil", "primary")<span>Edit</span></a>
                 }
 
             } else if (lockable?.IsLocked() ?? false) {
-                <a class="dropdown-item" title="Unlock and Edit" href="@Model.Url()/edit?force=true">@Html.SvgIcon("pencil", "primary")<span>Unlock</span></a>
+                <a class="dropdown-item" title="Unlock and Edit" href="@Model.Url()/edit?force=true">@Svg.Icon("pencil", "primary")<span>Unlock</span></a>
             } else {
                 if (Model.MetaData().ModifyMode == UpsertMode.Page) {
-                    <a class="dropdown-item" href="@Model.Url()/edit">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
+                    <a class="dropdown-item" href="@Model.Url()/edit">@Svg.Icon("pencil", "primary")<span>Edit</span></a>
                 } else if (Model.MetaData().ModifyMode == UpsertMode.Modal) {
-                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Html.SvgIcon("pencil", "primary")<span>Edit</span></a>
+                    <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Svg.Icon("pencil", "primary")<span>Edit</span></a>
                 }
             }
-            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-content-modal" data-path="@(Url.Action<ContentController>(c => c.MoveModal(Model.Id)))" title="Move @Model.Kind()">@Html.SvgIcon("undo", "warning") Move</button>
+            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-content-modal" data-path="@(Url.Action<ContentController>(c => c.MoveModal(Model.Id)))" title="Move @Model.Kind()">@Svg.Icon("undo", "warning") Move</button>
         }
 
         @if (Model is IStarrable starrable) {
@@ -46,12 +46,12 @@
         }
 
         @if (Model is IVersionable versionable) {
-            <a class="dropdown-item" href="@(Url.Action<ContentController>(c => c.Versions(versionable.Id)))">@Html.SvgIcon("backup-restore")<span>Versions</span></a>
+            <a class="dropdown-item" href="@(Url.Action<ContentController>(c => c.Versions(versionable.Id)))">@Svg.Icon("backup-restore")<span>Versions</span></a>
         }
 
         @if (Model.HasPermission(Permission.Delete)) {
-            <form action="@(Url.Action(nameof(ContentController.Trash), typeof(ContentController).ControllerName(), new { id = Model.Id }))" method="post" data-turboform>
-                <button type="submit" class="dropdown-item">@Html.SvgIcon("delete", "danger") Trash</button>
+            <form action="@(Url.Action<ContentController>(c => c.Trash(Model.Id)))" method="post" data-turboform>
+                <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Trash</button>
             </form>
         }
     </div>

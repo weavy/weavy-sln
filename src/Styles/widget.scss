@@ -15,37 +15,49 @@
 
 // Widget styles (wrap all styles in .weavy-widget)
 .weavy-widget {
-    &.weavy-default {
-        z-index: $widget-zindex;
-        position: fixed;
+    &.weavy-default, &.weavy-extended, &.weavy-custom {
+        font-size: rem(1);
+        line-height: rem(1.5);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
+        flex: 1 1 100%;
+        height: 100%;
+        align-items: flex-start;
+        justify-content: flex-start;
+
+        @import "widget/avatars";
+        @import "widget/panels";
+        @import "widget/wide";
+        @import "widget/preview";
+        @import "widget/notifications";
+        @import "widget/filebrowser";
+    }
+
+    &.weavy-default, &.weavy-extended {
+        position: absolute;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
-        overflow: hidden;
         pointer-events: none;
-        transition: background $md-animation-duration $md-animation-curve-default;
-        font-size: rem(1);
-        line-height: rem(1.5);
 
-        @import "widget/avatars";
         @import "widget/buttons";
-        @import "widget/strips";
         @import "widget/dot";
-        @import "widget/bubbles";
-        @import "widget/notifications";
         @import "widget/personal";
         @import "widget/messenger";
-        @import "widget/filebrowser";
-
-        @import "widget/layout";
-        @import "widget/wide";
-        @import "widget/preview";
         @import "widget/collapsed";
+    }
+
+    &.weavy-extended {
+        @import "widget/dock";
+        @import "widget/layout";
         @import "widget/drag";
     }
 
-    .weavy-status-check {
+
+    .weavy-hidden-frame {
         display: none;
     }
 
@@ -57,6 +69,20 @@
         &, & * {
             transition-duration: 0s !important;
             transition-delay: 0s !important;
+        }
+    }
+
+    .weavy-overlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: $widget-zindex;
+        pointer-events: none;
+        
+        > * {
+            pointer-events: auto;
         }
     }
 

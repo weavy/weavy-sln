@@ -1,8 +1,8 @@
-﻿@model IndexResult
+﻿@model IndexSearchResult
 @{
     ViewBag.Title = "Insert link";
     Layout = "_Layout.cshtml";
-    var propsActive = string.IsNullOrEmpty(Model.Query.Text);
+    var propsActive = string.IsNullOrEmpty(Model.Query.WrappedQuery.Text);
     var searchActive = !propsActive;
     var attachments = ViewBag.Attachments as List<Weavy.Core.Models.File>;
     var isMarkdown = Request.QueryString["editortype"] == "markdown";
@@ -76,19 +76,19 @@
         <div class="tab-pane @(searchActive ? "active" : "")" id="nav-search" role="tabpanel" aria-labelledby="nav-search-tab">
             <form method="get" class="ml-auto d-flex" role="search">
 
-                @Html.TextBox("q", Model.Query.Text, new { @class = "form-control submit", placeholder = "Search..." })
+                @Html.TextBox("q", Model.Query.WrappedQuery.Text, new { @class = "form-control submit", placeholder = "Search..." })
                 @Html.Hidden("id", Request.QueryString["id"])
                 @Html.Hidden("url", Request.QueryString["url"])
                 @Html.Hidden("editortype", Request.QueryString["editortype"])
 
-                @if (Model.Query.Text.IsNullOrWhiteSpace()) {
-                    <button type="submit" class="btn btn-icon" title="Search">@Html.SvgIcon("magnify")</button>
+                @if (Model.Query.WrappedQuery.Text.IsNullOrWhiteSpace()) {
+                    <button type="submit" class="btn btn-icon" title="Search">@Svg.Icon("magnify")</button>
                 } else {
-                    <a class="btn btn-icon" href="@Url.Action(ActionName, new { id = Request.QueryString["id"], url = Request.QueryString["url"], editortype = Request.QueryString["editortype"] })" title="Clear search">@Html.SvgIcon("close")</a>
+                    <a class="btn btn-icon" href="@Url.Action(ActionName, new { id = Request.QueryString["id"], url = Request.QueryString["url"], editortype = Request.QueryString["editortype"], area = "" })" title="Clear search">@Svg.Icon("close")</a>
                 }
             </form>
             <div class="result">
-                @if (!Model.Query.Text.IsNullOrEmpty()) {
+                @if (!Model.Query.WrappedQuery.Text.IsNullOrEmpty()) {
                     <p>@Model.Description()</p>
                 }
                 @Html.Partial("_SearchResult", Model)

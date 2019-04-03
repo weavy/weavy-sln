@@ -1,13 +1,13 @@
 ﻿@model Post
 @if (Model.IsLiked()) {
-    <a class="btn btn-primary btn-icon" href="@Model.Url()/like" title="Unlike" data-post-unlike="@Model.Id">@Html.SvgIcon("thumb-up", size: 18)</a>
+    <a class="btn btn-primary btn-icon" href="@Model.Url()/like" title="Unlike" data-post-unlike="@Model.Id">@Svg.Icon("thumb-up", size: 18)</a>
 } else {
-    <a class="btn btn-primary btn-icon" href="@Model.Url()/like" title="Like" data-post-like="@Model.Id">@Html.SvgIcon("thumb-up-outline", size: 18)</a>
+    <a class="btn btn-primary btn-icon" href="@Model.Url()/like" title="Like" data-post-like="@Model.Id">@Svg.Icon("thumb-up-outline", size: 18)</a>
 }
 @if (Model.CommentIds.Any()) {
-    <a class="btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Html.SvgIcon("comment", size: 18)</a>
+    <a class="btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Svg.Icon("comment", size: 18)</a>
 } else {
-    <a class="btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Html.SvgIcon("comment-outline", size: 18)</a>
+    <a class="btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Svg.Icon("comment-outline", size: 18)</a>
 }
 
 @if (Model.LikedByIds.Any()) {

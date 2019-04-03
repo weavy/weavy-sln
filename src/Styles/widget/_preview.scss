@@ -3,7 +3,7 @@
 // Full window preview mode
 
 &.weavy-preview, &.weavy-left.weavy-preview {
-    .weavy-strips {
+    .weavy-panels {
         width: auto;
         left: 0;
         top: 0;
@@ -12,15 +12,18 @@
         max-width: none;
 
 
-        .weavy-strip:not(.weavy-open) {
+        .weavy-panel:not(.weavy-open) {
             visibility: hidden;
-            max-width: $widget-strip-width;
+            max-width: $widget-panel-width;
         }
 
-        .weavy-strip.weavy-open {
+        .weavy-panel.weavy-open {
+            position: fixed;
             border-radius: initial;
             top: 0;
             bottom: 0;
+            left: 0;
+            right: 0;
             box-shadow: none;
             max-width: none;
             width: 100%;
@@ -29,18 +32,14 @@
                 display: none;
             }
 
-            .weavy-strip-frame {
+            .weavy-panel-frame {
                 background-color: transparent;
             }
         }
 
     }
-
-    .weavy-buttons {
-        display: none;
-    }
 }
 
-.weavy-strip-frame {
+.weavy-panel-frame {
     transition: background-color $md-animation-duration $md-animation-curve-default;
 }

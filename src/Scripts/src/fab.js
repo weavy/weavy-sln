@@ -24,13 +24,11 @@
 
             var docType = $(e.relatedTarget).data("param");
             var name = $(e.relatedTarget).data("type");
-            var icon = $(e.relatedTarget).data("icon");
             var guid = $(e.relatedTarget).data("guid");
 
             var $that = $(this);
             $(this).find("button").data("type", docType);
             $(this).find("button").data("guid", guid);
-            $(this).find(".docicon")[0].setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#google-' + icon + '-color');
             $(this).find("#doctype").text(name);
             $(this).find(".doctitle").val("");
             setTimeout(function () { $that.find(".doctitle").focus() }, 1);

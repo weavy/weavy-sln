@@ -1,0 +1,108 @@
+﻿@model InviteSearchResult
+@{
+    Title = "People";
+    var u = new User();
+}
+
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @(Html.ActionLink<PeopleController>(c => c.Index(null, null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<PeopleController>(c => c.Index(null, "internal"), text: "Internal", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<PeopleController>(c => c.Index(null, "external"), text: "External", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @if (PermissionService.HasSystemPermission(Permission.ManageUsers)) {
+            @(Html.ActionLink<PeopleController>(c => c.Pending(null), text: "Pending", badge: Model.TotalCount, htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Action))
+        }
+    </nav>
+
+    @if (PermissionService.HasSystemPermission(Permission.ManageUsers)) {
+        if (PermissionService.HasSystemPermission(Permission.Invite)) {
+            <div class="fab dropdown">
+                <button class="btn btn-round btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#" title="Add or invite user">@Svg.Icon("plus")</button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.New()))">@Svg.Icon("account", "primary") Add user</a>
+                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Svg.Icon("email", "deep-orange") Invite people</a>
+                </div>
+            </div>
+        } else {
+            <div class="fab">
+                <a class="btn btn-round btn-primary" href="@(Url.Action<PeopleController>(c => c.New()))" title="Add user">@Svg.Icon("plus")</a>
+            </div>
+        }
+    } else if (PermissionService.HasSystemPermission(Permission.Invite)) {
+        <div class="fab">
+            <a class="btn btn-round btn-primary" href="@(Url.Action<PeopleController>(c => c.Invite()))" title="Invite people">@Svg.Icon("plus")</a>
+        </div>
+    }
+}
+
+<div class="container-fluid my-3">
+    @(Html.FilterForm<PeopleController>(c => c.Pending(null), Model.Query))
+
+    @if (Model.HasItems()) {
+
+        <table class="table table-hover table-signups">
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var invite in Model) {
+                    bool expired = invite.ExpiresAt < DateTime.UtcNow;
+                    <tr @if (expired) { <text> class="table-muted" title="@(invite.IsInvite ? "Invite" : "Signup request") has expired" </text> }>
+                        <td class=" table-icon">@u.AvatarImg(32)</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="text-truncate">@invite.Email</div>
+                                @if (invite.IsExternal) {
+                                    <span class="badge badge-warning ml-1" @if (invite.Space != null) { Html.Raw($@"title=""Invited to {invite.Space?.Name}"""); }>external</span>
+                                }
+                            </div>
+                        </td>
+                        <td title="@(invite.IsInvite ? $"Invited by {invite.CreatedBy.GetTitle()}": $"Signed up {invite.CreatedAt.ToLocal().When()}")">
+                            @(invite.IsInvite ? "Invite" : "Signup")
+                        </td>
+                        @if (invite.Status == InviteStatus.Approved) {
+                            <td title="Sign-up request is approved">@(expired ? "Expired" : invite.Status.ToString())</td>
+                            <td class="table-icon">
+                                <form method="post" action="@(Url.Action<PeopleController>(c => c.UpdateInvite(invite.Id, null)))" data-turboform>
+                                    <button type="submit" name="button" class="btn btn-icon" value="email" title="Resend @(invite.IsSignup ? "approval": "invite") email">@Svg.Icon("email")</button>
+                                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete" title="Remove @(invite.IsSignup ? "sign-up request": "invite")">@Svg.Icon("close")</button>
+                                </form>
+                            </td>
+                        } else if (invite.Status == InviteStatus.Verified) {
+                            <td title="Email is verified">@(expired ? "Expired" : invite.Status.ToString())</td>
+                            <td class="table-icon">
+                                <form method="post" action="@(Url.Action<PeopleController>(c => c.UpdateInvite(invite.Id, null)))" data-turboform>
+                                    <button type="submit" name="button" class="btn btn-icon btn-success" value="approve" title="Approve @(invite.IsSignup ? "sign-up request": "invite")">@Svg.Icon("check")</button>
+                                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete" title="Remove @(invite.IsSignup ? "sign-up request": "invite")">@Svg.Icon("close")</button>
+                                </form>
+                            </td>
+                        } else {
+                            <td title="Pending email verification">@(expired ? "Expired" : invite.Status.ToString())</td>
+                            <td class="table-icon">
+                                <form method="post" action="@(Url.Action<PeopleController>(c => c.UpdateInvite(invite.Id, null)))" data-turboform>
+                                    @if (!invite.IsSignup) {
+                                        <button type="submit" name="button" class="btn btn-icon" value="email" title="Resend @(invite.IsSignup ? "email confirmation" : "invite")">@Svg.Icon("email")</button>
+                                    }
+
+                                    <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete" title="Remove @(invite.IsSignup ? "sign-up request": "invite")">@Svg.Icon("close")</button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    } else {
+        <p class="text-muted text-center">There are no invites or sign-up requests at this time.</p>
+    }
+</div>

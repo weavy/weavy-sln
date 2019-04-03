@@ -1,8 +1,8 @@
 ﻿@model Comment
 @if (Model.IsLiked()) {
-    <a class="btn btn-primary btn-icon" href="#" title="Unlike" data-comment-unlike="@Model.Id">@Html.SvgIcon("thumb-up", size: 18)</a>
+    <a class="btn btn-primary btn-icon" href="#" title="Unlike" data-comment-unlike="@Model.Id">@Svg.Icon("thumb-up", size: 18)</a>
 } else {
-    <a class="btn btn-primary btn-icon" href="#" title="Like" data-comment-like="@Model.Id">@Html.SvgIcon("thumb-up-outline", size: 18)</a>
+    <a class="btn btn-primary btn-icon" href="#" title="Like" data-comment-like="@Model.Id">@Svg.Icon("thumb-up-outline", size: 18)</a>
 }
 <a class="likes" href="#" data-toggle="modal" data-target="#feedback-modal" data-path="/comments/@Model.Id/likes" data-modal-title="Comment liked by" title="Show likes">
     @if (Model.LikedByIds.Any()) {

@@ -1,0 +1,122 @@
+/// <reference path="../_core.scss" />
+
+// overrides for dark mode
+.body-dark {
+    background: $theme-800 !important;
+    $color: color-yiq($theme-800);
+    color: $color !important;
+
+    .navbar-theme {
+        background: rgba($theme-900, .8);
+    }
+
+    .navbar-content {
+        background-color: rgba($theme-800, $opacity-panel);
+    }
+
+    .drawer-header {
+        background-color: $theme-900;
+    }
+
+    a:not(.btn) {
+        color: $theme-400;
+
+        :hover {
+            color: darken($theme-400, 15%);
+        }
+    }
+
+    a.alert {
+        color: $link-color;
+    }
+
+    .alert .btn-icon {
+        color: $icon-color;
+    }
+
+    a.dropdown-item {
+        color: $dropdown-link-color;
+    }
+
+    .btn-icon {
+        color: rgba(255, 255, 255, 0.70);
+
+        &:hover, &:focus {
+            color: rgba(255, 255, 255, 1.0);
+        }
+    }
+
+    .btn-link:not(.alert-link), .text-primary {
+        color: $theme-300;
+    }
+
+    code {
+        color: $color;
+        background: $theme-700;
+    }
+
+    pre {
+        color: $color;
+
+        code {
+            background: transparent;
+        }
+    }
+
+    .blockquote-footer {
+        color: rgba(255,255,255, .5);
+    }
+
+    .modal-content {
+
+        .text-muted {
+            color: $text-muted !important;
+        }
+
+        color: $body-color;
+    }
+
+    .nav-tabs {
+        border-color: rgba($white,.1);
+
+        .nav-link {
+            @include hover-focus {
+                border-color: rgba($theme-400, .3);
+            }
+
+            &.active {
+                color: $theme-400;
+                border-color: $theme-400;
+            }
+
+            &.disabled {
+                color: rgba(255,255,255, .3);
+                border-color: transparent;
+            }
+        }
+    }
+
+    .text-icon {
+        color: rgba(255, 255, 255, 0.70) !important;
+    }
+
+    .text-muted, .form-text {
+        color: rgba(255,255,255, .5) !important;
+    }
+
+    .invalid-feedback {
+        color: theme-color("danger", 400);
+    }
+
+    
+    // tables
+    @each $color, $value in $theme-colors {
+        @include table-row-variant($color, theme-color-level($color, 2));
+
+        .table-#{$color} {
+            a {
+                color: color-yiq(theme-color-level($color, 2));
+            }
+        }
+    }
+}

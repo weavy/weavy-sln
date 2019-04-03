@@ -6,6 +6,14 @@
         //mix-blend-mode: normal;
         z-index: 4;
     }
+
+    textarea {
+        border: none;
+        resize: none;
+        height: calc(6.125rem + 2px);
+        box-shadow: none;
+        pointer-events: none;
+    }
 }
 
 .weavy-editor {
@@ -321,6 +329,9 @@
             .emojionearea-editor {
                 min-height: 2em;
                 margin-bottom: $border-width * -1;
+                margin-right: 0;
+                border-bottom: none;
+                box-shadow: 0 $border-width 0 0 $border-color;
 
                 > div {
                     // Makes the scrollbar appear on the very right side where it should

@@ -25,13 +25,12 @@
     @Bundler.Scripts("~/scripts/notification.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
 </head>
 <body class="@BodyClasses()" @BodyAttributes>
-    @Html.SvgSprite()
     <main>
         <div class="container-fluid">
             <div class="card card-notification" data-notification-id="@Model.Id">
                 <div class="card-header media">
                     <button type="button" class="btn btn-icon close" role="button">
-                        @Html.SvgIcon("close")
+                        @Svg.Icon("close")
                     </button>
                     <img class="img-32 d-flex mr-3" src="@Model.CreatedBy().AvatarUrl(32, retina: true)" alt="">
                     <div class="media-body">
@@ -43,8 +42,8 @@
                     @if (subject is ILikeable) {
                         <div class="card-feedback">
                             <div class="list-group">
-                                <a class="list-group-item list-group-item-action @(((ILikeable)subject).IsLiked() ? "" : "d-none")" href="#" data-type="@subject.Type.ToString().ToLower()" data-entity-unlike="@subject.Id">@Html.SvgIcon("thumb-up", size: 18) Unlike</a>
-                                <a class="list-group-item list-group-item-action @(((ILikeable)subject).IsLiked() ? "d-none" : "")" href="#" data-type="@subject.Type.ToString().ToLower()" data-entity-like="@subject.Id">@Html.SvgIcon("thumb-up-outline", size: 18) Like</a>
+                                <a class="list-group-item list-group-item-action @(((ILikeable)subject).IsLiked() ? "" : "d-none")" href="#" data-type="@subject.Type.ToString().ToLower()" data-entity-unlike="@subject.Id">@Svg.Icon("thumb-up", size: 18) Unlike</a>
+                                <a class="list-group-item list-group-item-action @(((ILikeable)subject).IsLiked() ? "d-none" : "")" href="#" data-type="@subject.Type.ToString().ToLower()" data-entity-like="@subject.Id">@Svg.Icon("thumb-up-outline", size: 18) Like</a>
                             </div>
                         </div>
                     }

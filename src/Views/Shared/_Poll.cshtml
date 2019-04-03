@@ -21,19 +21,17 @@
                     </div>
                     <label for="option-@option.Id">@Html.Raw(option.Html)</label>
                 </td>
-                <td class="facepile">
-                    @option.Voters.Take(max).Facepile(size: 32, link:true)
-                    @if (more > 0) {
+                <td class="facepile">@if (option.VoteCount > 0) {
+                    @option.Voters.Take(max).Facepile(size: 32, link: true)
+                    if (more > 0) {
                         <button class="btn btn-sm btn-round btn-light justify-content-center" type="button" data-modal-title="People who voted on this option" data-path="/posts/@Model.Id/votes/@option.Id" data-target="#feedback-modal" data-toggle="modal" title="@Weavy.Core.Helpers.StringExtensions.SingularizeOrPluralize(more, "other person", "other people")">
                             <span>+@more</span>
                         </button>
                     }
-                </td>
-                <td class="votes">
-                    @if (option.VoteCount > 0) { 
-                        <a href="#votes" class="more" title="@Weavy.Core.Helpers.StringExtensions.SingularizeOrPluralize(option.VoteCount, "vote", "votes")" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="People who voted on this option"><img src="@(WeavyRequestContext.Current.ApplicationPath)img/pixel.png" class="img-32 avatar" alt=""/><span>@option.VoteCount</span></a>
-                    }
-                </td>
+                }</td>
+                <td class="votes">@if (option.VoteCount > 0) {
+                            <a href="#votes" class="more" title="@Weavy.Core.Helpers.StringExtensions.SingularizeOrPluralize(option.VoteCount, "vote", "votes")" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="People who voted on this option"><img src="@(WeavyRequestContext.Current.ApplicationPath)img/pixel.png" class="img-32 avatar" alt="" /><span>@option.VoteCount</span></a>
+                }</td>
             </tr>
         }
     </table>

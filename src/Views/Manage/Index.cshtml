@@ -1,0 +1,56 @@
+﻿@using Weavy.Web.Owin;
+
+@{
+    Title = "Manage";
+}
+
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
+}
+
+<div class="container-fluid my-3">
+
+    @if (!Request.GetOwinContext().IsWebSocketsEnabled()) {
+        <div class="alert alert-warning" role="alert">
+            We recommend enabling WebSockets on the server for the best possible experience.
+        </div>
+    }
+
+    <table class="table table-hover table-manage">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-href="@(Url.Action<ManageController>(x => x.About()))">
+                <td class="table-icon">@Svg.Icon("information-outline", "primary")</td>
+                <td><a href="@(Url.Action<ManageController>(x => x.About()))">About</a></td>
+                <td>About @ConfigurationService.ApplicationName v@(Bootstrapper.SemVer).</td>
+            </tr>
+            <tr data-href="@(Url.Action<ManageController>(x => x.License()))">
+                <td class="table-icon">@Svg.Icon("certificate", "amber")</td>
+                <td><a href="@(Url.Action<ManageController>(x => x.License()))">License</a></td>
+                <td>Manage your license.</td>
+            </tr>
+            <tr data-href="@(Url.Action<LogsController>(x => x.Index()))">
+                <td class="table-icon">@Svg.Icon("file-document")</td>
+                <td><a href="@(Url.Action<LogsController>(x => x.Index()))">Log files</a></td>
+                <td>View and download log files.</td>
+            </tr>
+            <tr data-href="@(Url.Action<RolesController>(x => x.Index(null)))">
+                <td class="table-icon">@Svg.Icon("account-multiple", "primary")</td>
+                <td><a href="@(Url.Action<RolesController>(x => x.Index(null)))">Roles</a></td>
+                <td>Manage security roles for authorization.</td>
+            </tr>
+            <tr data-href="@(Url.Action<ManageController>(x => x.Statistics()))">
+                <td class="table-icon">@Svg.Icon("chart-line", "green")</td>
+                <td><a href="@(Url.Action<ManageController>(x => x.Statistics()))">Usage statistics</a></td>
+                <td>Check the usage of @ConfigurationService.ApplicationName.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+

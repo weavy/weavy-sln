@@ -50,15 +50,6 @@
     }
 }
 
-// hide navbar items when office taskpane
-.controller-office {
-    .navbar-preview {
-        a.btn-icon, .dropdown {
-            display: none;
-        }
-    }
-}
-
 // hide default photoswipe header
 .pswp__ui {
     .pswp__top-bar {

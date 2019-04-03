@@ -46,11 +46,13 @@ body.controller-post.action-get {
 
 .post {
     margin-bottom: 1rem;
+    display: block;
 
     .card-header {
         background: none;
         border: none;
-        padding: $card-spacer-x;
+        padding: $card-spacer-x $card-spacer-x 0;
+        margin-bottom: $card-spacer-x;
     }
 
     .card-title {
@@ -59,12 +61,20 @@ body.controller-post.action-get {
     }
 
     .card-body {
-        padding-top: $card-spacer-y;
-        padding-bottom: $card-spacer-y;
+        margin-top: $card-spacer-y;
+        margin-bottom: $card-spacer-y;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .card-text {
+        margin-bottom: $card-spacer-y;
     }
 
     .card-files {
-        padding: $card-spacer-y $card-spacer-x;
+        margin-top: $card-spacer-y;
+        margin-bottom: $card-spacer-y;
+        padding: 0 $card-spacer-x;
     }
 
     .card-context {
@@ -78,10 +88,15 @@ body.controller-post.action-get {
     }
 
     .card-feedback {
-        padding: $card-spacer-y;
+        margin-top: $card-spacer-y;
+        padding: 0 $card-spacer-x $card-spacer-y;
         display: flex;
         font-size: $font-size-sm;
         align-items: center;
+
+        .btn {
+            margin-right: .25rem;
+        }
 
         a:not(.btn) {
             @extend .text-muted;
@@ -246,8 +261,8 @@ body.controller-post.action-get {
 @include media-breakpoint-down(xs) {
     html:not(.embedded) {
         .post, .post-form {
-            margin-left: calc(-#{$grid-gutter-width/2});
-            margin-right: calc(-#{$grid-gutter-width/2});
+            margin-left: calc(-#{$grid-gutter-width/2 + $edge-margin});
+            margin-right: calc(-#{$grid-gutter-width/2 + $edge-margin});
 
             &, > *, &::after {
                 border-radius: 0;
@@ -262,11 +277,17 @@ body.controller-post.action-get {
 
     html.embedded {
         .post {
-            .card-header,
+            .card-header {
+                padding: $card-spacer-y $card-spacer-y 0;
+                margin-bottom: $card-spacer-y;
+            }
+
             .card-body,
             .card-files,
-            .post-comments {
-                padding: $card-spacer-y;
+            .post-comments,
+            .card-feedback {
+                padding-left: $card-spacer-y;
+                padding-right: $card-spacer-y;
             }
 
             .card-context {

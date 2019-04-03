@@ -1,4 +1,4 @@
-﻿@model IndexResult
+﻿@model IndexSearchResult
 @{
     Title = "Search";
     string tab = ViewContext.RouteData.Values["tab"] as string;
@@ -9,18 +9,18 @@
     @WeavyContext.Space.AvatarImg(32, htmlAttributes: new { @class = "my-4" })
     <form action="@Url.Rebuild("q", null)" method="get" data-turboform>
         <div class="form-group" role="search">
-            <input class="form-control" type="search" name="q" id="search-q" value="@Model.Query.Text" placeholder="Search @WeavyContext.Space.Name" />
-            @if (Model.Query.Text.IsNullOrEmpty()) {
-                <button type="submit" class="btn btn-icon">@Html.SvgIcon("magnify")</button>
+            <input class="form-control" type="search" name="q" id="search-q" value="@Model.Query.WrappedQuery.Text" placeholder="Search @WeavyContext.Space.Name" />
+            @if (Model.Query.WrappedQuery.Text.IsNullOrEmpty()) {
+                <button type="submit" class="btn btn-icon">@Svg.Icon("magnify")</button>
             } else {
-                <a href="@WeavyContext.App.Url()" class="btn btn-icon">@Html.SvgIcon("close")</a>
+                <a href="@WeavyContext.App.Url()" class="btn btn-icon">@Svg.Icon("close")</a>
             }
         </div>
     </form>
 </div>
 
 <div class="container my-4">
-    @if (!string.IsNullOrEmpty(Model.Query.Text)) {
+    @if (!string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
         <nav class="nav nav-tabs mb-4">
             @if (tab == null) {
                 @(Html.ActionLink<AppController>(c => c.Get(WeavyContext.App.Id, null), qs: qs, text: "Everything", htmlAttributes: new { @class = "nav-link active" }))
@@ -34,12 +34,12 @@
         </nav>
     }
 
-    @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.Text)) {
-        <p>Your search - <strong>@Model.Query.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab) in @WeavyContext.Space.Name.</p>
+    @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
+        <p>Your search - <strong>@Model.Query.WrappedQuery.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab) in @WeavyContext.Space.Name.</p>
         <p>Suggestions:</p>
         <ul>
-            @if (Model.Query.SpaceId != null) {
-                <li>@(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: "Try searching all spaces.", htmlAttributes: new { data_bubble_target = "add" }))</li>
+            @if (Model.Query.WrappedQuery.SpaceId != null) {
+                <li>@(Html.ActionLink<Weavy.Web.Controllers.HomeController>(c => c.Search(null, null), qs: qs, text: "Try searching all spaces.", htmlAttributes: new { data_bubble_target = "start" }))</li>
             }
             <li>Make sure that all words are spelled correctly.</li>
             <li>Try different keywords.</li>

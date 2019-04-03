@@ -1,0 +1,45 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (IsSectionDefined("styles")) {
+    @section styles {
+        @RenderSection("styles")
+    }
+}
+
+@if (IsSectionDefined("scripts")) {
+    @section scripts {
+        @RenderSection("scripts")
+    }
+}
+
+@if (IsSectionDefined("navbar_middle")) {
+    @section navbar_middle {
+        @RenderSection("navbar_middle", required: false)
+    }
+}
+
+@if (IsSectionDefined("navbar_secondary")) {
+    @section navbar_secondary {
+        @RenderSection("navbar_secondary")
+    }
+}
+
+@RenderBody()
+
+@if (IsSectionDefined("fab")) {
+    @section fab {
+        @RenderSection("fab")
+    }
+}
+
+@section footer {
+    @{
+        Html.RenderPartial("_AjaxModal");
+        Html.RenderPartial("_ConnectModal");
+        Html.RenderPartial("_DrawerSpace");
+        Html.RenderPartial("_MembersAddModal");
+        @RenderSection("footer", required: false)
+    }
+}

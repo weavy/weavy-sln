@@ -1,0 +1,247 @@
+﻿@{
+    Layout = null;
+
+
+    var firstSpace = -1;
+    if (!SpaceService.GetByPermission(Permission.View).IsNullOrDefault()) {
+        firstSpace = SpaceService.GetByPermission(Permission.View).First().Id;
+    }
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Widget Panels</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script src="/javascript/widget.slim.js"></script>
+
+    <style>
+        html, body {
+            overflow-x: hidden;
+            background: #666;
+        }
+
+        .i {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: currentColor;
+        }
+
+        .navbar {
+            height: 3.5rem;
+        }
+
+        .navbar-brand img {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .widget-drawer {
+            position: fixed;
+            top: 3.5rem;
+            bottom: 0;
+            z-index: 1039;
+            transition: transform, opacity;
+            transition-duration: 0.2s;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            right: 0;
+            width: 20rem;
+            transform: translateX(20rem);
+            pointer-events: none;
+            border-left: 1px solid #333;
+        }
+
+        .widget-drawer.widget-drawer-in {
+            transform: none;
+        }
+
+        .widget-panel-block {
+            width: 320px;
+            height: 472px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            display: none;
+        }
+    </style>
+
+    <style id="widgetStyleOverrides" media="not all">
+        .weavy-dock {
+            border-radius: .5rem !important;
+            background-color: rgba(33,33,33,0.85) !important;
+        }
+
+        .weavy-button:not(.weavy-open) svg {
+            fill: #fafafa !important;
+        }
+
+        .weavy-button-messenger.weavy-dot {
+            background: #666 !important;
+        }
+
+        /*#widget-panel-authentication-wy-full, #widget-panel-authentication-wy-full{
+            display:none;
+        }*/
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark text-light">
+        <a class="navbar-brand mr-auto" href="#">@Html.IconImg(24) Navbar</a>
+        <a id="widgetRightButtonPersonal" class="nav-link p-2">@Svg.Icon("bell")</a>
+        <a id="widgetRightButtonMessenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
+    </nav>
+
+    <div class="container-fluid py-3">
+        <div>
+            <button id="widgetPanelBlockToggle" class="btn btn-danger">A-team</button>            
+            <div id="widgetPanelBlock" class="widget-panel-block"></div>
+        </div>
+
+        <div class="widget-panel-right">
+            <div id="widgetPanelRight" class="widget-drawer"></div>
+        </div>
+
+    </div>
+
+
+    <script>
+        (function ($) {
+
+            // FULL STANDARD WIDGET
+            // WITH STYLE OVERRIDES
+
+            var widgetFull = new WeavyWidget({
+                className: "weavy-left",
+                id: "full"                
+            });
+
+            widgetFull.addStyles($("#widgetStyleOverrides")[0].textContent);
+
+            widgetFull.on("load", function () {
+                if (widgetFull.isAuthenticated()) {
+                    widgetFull.alert("Full widget loaded");               
+                }
+            });
+
+
+
+
+            // RIGHT SLIDING DRAWER
+            // TOGGLED BY BUTTONS
+
+            var widgetRight = new WeavyWidget(WeavyWidget.presets.panel, {
+                container: $("#widgetPanelRight"),
+                className: "weavy-default",
+                id: "right",
+                plugins: {
+                    alert: true,
+                    messenger: true,
+                    personal: true,
+                    panels: {
+                        controls: true
+                    },
+                    theme: {
+                        styles: ".weavy-wide { background: none !important; } .weavy-wide .weavy-panels .weavy-panel { top: 3.5rem !important; width: 100vw !important; }"
+                    }
+                }
+            });
+                        
+            // Link the alerts
+            widgetRight.alert = widgetFull.alert;
+
+            widgetRight.on("open", function () {
+                $("#widgetPanelRight").addClass("widget-drawer-in");
+            });
+
+            widgetRight.on("close", function () {
+                $("#widgetPanelRight").removeClass("widget-drawer-in");
+                widgetRight.nodes.container.classList.remove("weavy-wide");
+            });
+
+            widgetRight.on("load", function () {
+                if (widgetRight.isAuthenticated()) {
+                    widgetRight.alert("Right Widget loaded");
+                    widgetRight.preloadFrames();
+                }
+            });
+
+            function setBadge(selector, count) {
+                if (count > 0) {
+                    var $badge = $(selector + " .badge");
+                    if ($badge.length) {
+                        $badge.text(count);
+                    } else {
+                        $('<span class="badge badge-info">' + count + '</span>').appendTo(selector);
+                    }
+                } else {
+                    $(selector + " .badge").remove();
+                }
+
+            }
+
+            widgetRight.on("badge", function (e, data) {
+                setBadge("#widgetRightButtonPersonal", data.notifications);
+                setBadge("#widgetRightButtonMessenger", data.conversations);
+            });
+
+            $("#widgetRightButtonPersonal").on("click", widgetRight.toggle.bind(widgetBlock, "personal"))
+            $("#widgetRightButtonMessenger").on("click", widgetRight.toggle.bind(widgetBlock, "messenger"))
+
+
+
+
+            // EXPANDING PANEL
+            // TOGGLED BY BUTTONS
+
+            var widgetBlock = new WeavyWidget(WeavyWidget.presets.core, {
+                container: $("#widgetPanelBlock"),
+                className: "",
+                id: "block",
+                plugins: {
+                    alert: true,
+                    panels: {
+                        controls: {
+                            close: true,
+                            expand: false
+                        }
+                    },
+                    preview: true,
+                    theme: true,
+                    context: true
+                }
+            });
+
+            // Link the alerts
+            widgetBlock.alert = widgetFull.alert;
+
+            widgetBlock.on("load", function () {
+                widgetBlock.addPanel("space-@firstSpace", { url: "/spaces/@firstSpace/" });
+
+                if (widgetBlock.isAuthenticated()) {
+                    widgetBlock.alert("Toggle Widget loaded");
+                }
+            });
+
+            $("#widgetPanelBlockToggle").on("click", widgetBlock.toggle.bind(widgetBlock, "space-@firstSpace"));
+
+            widgetBlock.on("open", function () {
+                $("#widgetPanelBlock").slideDown();
+            });
+
+            widgetBlock.on("close", function () {
+                $("#widgetPanelBlock").slideUp();
+            });
+
+
+        })(jQuery);
+    </script>
+</body>
+</html>

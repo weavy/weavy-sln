@@ -108,7 +108,7 @@ weavy.tiny = (function ($) {
             dataType: "json",
             pasteZone: null,
             add: function (e, data) {
-                var uploadErrors = []; //incentiveFileUpload.validateFileUpload(data.files, $(this).data("max-size"), $(this).data("allowed-extensions"));
+                var uploadErrors = [];
                 var group = $(this).closest(".form-group");
                 group.find(".help-block").text("");
                 group.removeClass("has-error");
@@ -164,7 +164,6 @@ weavy.tiny = (function ($) {
             },
             fail: function (e, data) {
                 //var json = JSON.parse(data.jqXHR.responseText);
-                //incentiveAlert.display(json.message);
             },
             always: function () {
                 // reset progress bar

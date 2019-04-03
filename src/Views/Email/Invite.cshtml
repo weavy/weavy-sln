@@ -17,7 +17,7 @@
                                             Hi,
                                             <br />
                                             <br />
-                                            @if (Model.Invite.IsExternal) {
+                                            @if (Model.Invite.Space != null) {
                                                 <text>I invite you to join <strong>@Model.Invite.Space.Name</strong> on @Model.Theme.Name.</text>
                                             } else {
                                                 <text>I want you to join @Model.Theme.Name.</text>

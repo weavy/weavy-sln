@@ -15,19 +15,19 @@ weavy.connect = (function ($) {
 
     var requestConnect = function (spaceId) {
         if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request-connect', space: spaceId || weavy.context.space });
+            weavy.postal.post({ name: 'request:connect', spaceId: spaceId || weavy.context.space });
         }
     }
 
     var requestDisconnect = function (spaceId) {
         if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request-disconnect', space: spaceId || weavy.context.space });
+            weavy.postal.post({ name: 'request:disconnect', spaceId: spaceId || weavy.context.space });
         }
     }
 
     var requestClose = function (spaceId) {
         if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request-close', space: spaceId || weavy.context.space });
+            weavy.postal.post({ name: 'request:close', spaceId: spaceId || weavy.context.space });
         }
     }
 

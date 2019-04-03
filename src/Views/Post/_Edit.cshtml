@@ -5,7 +5,7 @@
 
     <div class="modal-header border-0 pb-0">
         <h5 class="modal-title">Edit post</h5>
-        <button type="button" class="btn btn-icon" data-dismiss="modal">@Html.SvgIcon("close")</button>
+        <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
     </div>
     <div class="modal-body">
         <textarea id="text" class="form-control" name="text" data-editor-location="post-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Text</textarea>
@@ -14,9 +14,9 @@
             <table class="table table-attachments">
                 @foreach (var file in Model.Files) {
                     <tr>
-                        <td class="table-icon">@Html.SvgIcon(file)</td>
+                        <td class="table-icon">@Svg.Icon(file)</td>
                         <td>@file.GetTitle()</td>
-                        <td class="table-icon"><a class="btn btn-icon remove" data-file="file.title" href="#" data-remove-attachment="@file.Id" title="Remove file">@Html.SvgIcon("close")</a><input type="hidden" name="attachments" value="@file.Id" /></td>
+                        <td class="table-icon"><a class="btn btn-icon remove" data-file="file.title" href="#" data-remove-attachment="@file.Id" title="Remove file">@Svg.Icon("close")</a><input type="hidden" name="attachments" value="@file.Id" /></td>
                     </tr>
                 }
             </table>

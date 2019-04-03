@@ -145,23 +145,23 @@ weavy.fileupload = (function ($) {
                         weavy.alert.warning('There is already a file named ' + data.result.skipped[0].name + '.' +
                             '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
-                            '<button type="submit" class="btn btn-icon"><svg class="i">' +
-                            '<use xmlns: xlink="http://www.w3.org/1999/xlink" xlink: href="#check"></use></svg> Replace the file' +
+                            '<button type="submit" class="btn btn-icon">' +
+                            '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the file' +
                             '</button > ' +
                             '</form>' +
                             '<button type="button" class="btn btn-icon upload-skip" data-uploaded="' + uploaded + '">' +
-                            '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg> Skip this file' +
+                            '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this file' +
                             '</button>');
                     } else {
                         weavy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
                             '<form action="' + action +'" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +
-                            '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check"></use></svg> Replace the files' +
+                            '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the files' +
                             '</button>' +
                             '</form>' +
                             '<button type="button" class="btn btn-icon upload-skip" data-uploaded="' + uploaded + '">' +
-                            '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg> Skip these files' +
+                            '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip these files' +
                             '</button>');
                     }
                 } else {
@@ -201,23 +201,23 @@ weavy.fileupload = (function ($) {
                         weavy.alert.warning('There is already a file named ' + data.result.skipped[0].name + '.' +
                             '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
-                            '<button type="submit" class="btn btn-icon"><svg class="i">' +
-                            '<use xmlns: xlink="http://www.w3.org/1999/xlink" xlink: href="#check"></use></svg> Replace the file' +
+                            '<button type="submit" class="btn btn-icon">' +
+                            '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the file' +
                             '</button > ' +
                             '</form>' +
                             '<button type="button" class="btn btn-icon upload-skip" data-uploaded="' + uploaded + '">' +
-                            '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg> Skip this file' +
+                            '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this file' +
                             '</button>');
                     } else {
                         weavy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
                             '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +
-                            '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check"></use></svg> Replace the files' +
+                            '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the files' +
                             '</button>' +
                             '</form>' +
                             '<button type="button" class="btn btn-icon upload-skip" data-uploaded="' + uploaded + '">' +
-                            '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg> Skip these files' +
+                            '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip these files' +
                             '</button>');
                     }
                 } else {
@@ -263,20 +263,10 @@ weavy.fileupload = (function ($) {
     function validate(files, maxSize, accept) {
         var errors = [];
 
-        // global settings for accepted file types and size
-        var whitelist = $("html").data("whitelist");
-        var maxUploadSize = $("html").data("maxuploadsize");
+        // global setting for file size
+        var maxUploadSize = $("html").data("file-size");
 
         $.each(files, function (index, file) {
-
-            // globally accepted file types
-            if (whitelist && whitelist.length && file["name"].length) {
-                var rx = new RegExp("(\.|\/)(" + whitelist + ")$", "i");
-                //console.debug("Validating " + file["name"] + " against " + rx.source);
-                if (!rx.test(file["name"])) {
-                    errors.push("File type is not allowed.");
-                }
-            }
 
             // accepted file types for this field
             if (errors.length === 0 && accept && accept.length && file["name"].length) {

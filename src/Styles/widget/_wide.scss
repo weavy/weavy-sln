@@ -1,42 +1,66 @@
 /// <reference path="../widget.scss" />
 
-// Wide expanded strip mode
+// Wide expanded panel mode
 
 &.weavy-wide {
-    &.weavy-open {
-        background-color: $backdrop-bg;
-    }
+    position: fixed;
+    z-index: $widget-zindex;
 
-    .weavy-strips {
-        .weavy-strip.weavy-open {
-            max-width: none;
-            width: calc(100% - #{$widget-icon-size + rem(1.75 + .5)});
+    &, &.weavy-left {
+        &.weavy-open {
+            background-color: $backdrop-bg;
         }
 
-        @include media-breakpoint-down(sm) {
-            left: 0;
-            top: 0;
-            bottom: 0;
-            right: 0;
+        .weavy-panels {
+            max-width: none;
 
-            .weavy-strip.weavy-open {
+            .weavy-panel.weavy-open {
+                max-width: none;
+                width: calc(100% - #{$widget-icon-size + rem(1.75 + .5)});
+                margin: auto;
+            }
+
+            @include media-breakpoint-down(md) {
                 left: 0;
                 top: 0;
                 bottom: 0;
                 right: 0;
-                border-radius: 0;
-                width: auto;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+
+                .weavy-panel.weavy-open {
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    right: 0;
+                    border-radius: 0;
+                    width: auto;
+                }
+            }
+        }
+
+        .weavy-controls {
+            .weavy-collapse {
+                display: inline-flex;
+            }
+
+            .weavy-expand {
+                display: none;
+            }
+        }
+
+        @include media-breakpoint-down(md) {
+            .weavy-dock-container {
+                left: 0;
+                top: 0;
+                bottom: 0;
+                right: 0;
             }
         }
     }
 
-    .weavy-controls {
-        .weavy-collapse {
-            display: inline-flex;
-        }
-
-        .weavy-expand {
-            display: none;
-        }
+    .weavy-scroll-blocker {
+        position: fixed;
     }
 }

@@ -17,6 +17,9 @@
     }
 
     .nav-link {
+        background: none;
+        outline: none;
+        cursor: pointer;
         border: none;
         border-bottom: .25rem solid $nav-tabs-link-active-bg;
         border-top-right-radius: 0;
@@ -30,12 +33,25 @@
         font-weight: $font-weight-medium;
         text-align: center;
         line-height: 1.75rem;
+        position: relative; // so that we can position badges
+        
+        .badge {
+            top: .5rem;
+        }
+
+        &.nav-icon {
+            padding: .375rem .25rem .625rem .25rem;
+        }
 
         &:not(.nav-icon) {
             display: flex;
             flex: 0 1 auto;
             min-width: 0;
             justify-content: center;
+
+            .badge {
+                right: -.5rem;
+            }
         }
 
         &.active {
@@ -43,42 +59,7 @@
             border-color: $nav-tabs-link-active-border-color;
         }
     }
-
-    .nav-icon {
-        padding: .5rem .25rem;
-
-        &.nav-search {
-            // navbar search icon
-            margin-left: auto;
-            margin-right: .25rem;
-        }
-
-
-        &.nav-badge {
-            position: relative;
-
-            .badge {
-                @include badge-notification;
-            }
-        }
-    }
-
-    .btn-icon {
-        align-self: center;
-    }
-
-    .btn-sm {
-        min-width:unset;
-        min-height:unset;
-        margin-bottom: .25rem;
-    }
-
-    > .dropdown .btn-sm {
-        padding-left:0;
-        padding-right:0;
-    }
-
- }
+}
 
 .nav-title {
     line-height: 2rem;

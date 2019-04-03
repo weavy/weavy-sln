@@ -17,23 +17,28 @@
 </div>
 
 
-@section scripts {
-    @if (Title == "Notify") {
-        <script>
-        var win = null;
+@if (Title == "Notify") {
+    <script id="@(User.IsAuthenticated() ? "signedInScript" : "signedOutScript")">
+        $(function () {
+            var win = null;
 
-        if (window.opener) {
-            win = window.opener.parent;
-        }
-        @if (User.IsAuthenticated()) {
-            <text>weavy.postal.post({ name: "signedIn" }, win, true);</text>
-        } else {
-            <text>weavy.postal.post({ name: "signedOut" }, win, true);</text>
-        }
+            if (window.opener) {
+                win = window.opener.parent;
+            }
 
-        if (win != null) {
-            window.close();
-        }
-        </script>
-    }
+            var forced = win ? true : false;
+
+            @if (User.IsAuthenticated()) {
+                <text>var message = { name: "signed-in" };</text>
+            } else {
+                <text>var message = { name: "signed-out" };</text>
+            }
+
+            weavy.postal.post(message, win, forced);
+
+            if (win != null) {
+                window.close();
+            }
+        });
+    </script>
 }

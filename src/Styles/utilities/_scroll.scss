@@ -25,6 +25,8 @@ $scrollbar-size: .5rem !default;
 @mixin scroll {
     // to enable HW acceleration and not cause repaint on scroll
     will-change: scroll-position;
+    backface-visibility: hidden;
+
     overflow-x: auto;
     overflow-y: auto;
 
@@ -57,6 +59,12 @@ $scrollbar-size: .5rem !default;
     -ms-scroll-chaining: none;
     // overscroll-behavior unfortunately does not support blocking iframe scrollchaning, so we have scroll.js to take care of that
     overscroll-behavior: contain;
+    // Variable fallback for javascript
+    --overscroll-behavior: contain !important;
+
+    > * {
+        --overscroll-behavior: auto;
+    }
 }
 
 .scroll {

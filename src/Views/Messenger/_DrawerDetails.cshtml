@@ -1,0 +1,74 @@
+﻿@model MessengerModel
+<header class="pane-header">
+    <div class="navbar navbar-secondary">
+        <div class="navbar-middle">
+            @if (Model.Conversation?.IsRoom ?? false) {
+                <text>Details</text>
+            } else {
+                <text>@(Model.Other?.GetTitle())</text>
+            }
+        </div>
+        <div class="navbar-icons">
+            <button type="button" class="btn btn-icon" data-hide="drawer-details">@Svg.Icon("close")</button>
+        </div>
+    </div>
+</header>
+
+<div class="drawer-body drawer-body-padded scroll-y">
+
+    @if (Model.Conversation != null && Model.Conversation.IsRoom) {
+
+        if (Model.Conversation.HasPermission(Permission.Edit)) {
+            <form class="edit-room-form" action="@Url.Action(nameof(MessengerController.UpdateRoom), new { id = Model.Conversation.Id })" method="post">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="Name" value="@Model.Conversation.Name" placeholder="Room name">
+                </div>
+            </form>
+        }
+
+        <fieldset>
+            <legend>People</legend>
+            <table class="table table-users">
+                <tr>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("plus")</button></td>
+                    <td><a href="javascript:;" data-toggle="drawer-add-people">Add People</a></td>
+                    <td></td>
+                </tr>
+                @foreach (var member in Model.Conversation.Members) {
+                    <tr>
+                        <td class="table-icon">@member.AvatarImg(32, presence:true)</td>
+                        <td>@member.GetTitle()</td>
+                        <td class="table-icon dropdown">
+                            @if (member.Id == User.Id) {
+                                <button type="button" class="btn btn-icon" data-leave="@member.Id">@Svg.Icon("close")</button>
+                            } else {
+                                <button type="button" class="btn btn-icon" data-remove-user="@member.Id">@Svg.Icon("close")</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </fieldset>
+
+    } else if (Model.Other != null) { 
+        Html.RenderPartial("_DrawerUserBody", Model.Other);
+    }
+
+    @if (Model.Attachments.Any()) {
+    <fieldset>
+        <legend>Recent files</legend>
+        <table class="table table-files">
+            @foreach (var attachment in Model.Attachments) {
+              var attrs = Html.PreviewAttributes(attachment);
+              var href = attrs["data-href"] ?? attachment.FileUrl(download:true);
+                <tr @Html.Raw(attrs.AsHtmlAttributes())>
+                    <td class="table-icon">@Svg.Icon(attachment)</td>
+                    <td><a href="@href">@attachment.Blob.Name</a></td>
+                </tr>
+            }
+        </table>
+    </fieldset>
+    }
+
+</div>
+

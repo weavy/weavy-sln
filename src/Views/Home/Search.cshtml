@@ -1,4 +1,4 @@
-﻿@model IndexResult
+﻿@model IndexSearchResult
 @{
     Title = "Search";
     Back = WeavyContext.ApplicationPath;
@@ -12,18 +12,18 @@
     </div>
     <form action="@Url.Rebuild("q", null)" method="get" data-turboform>
         <div class="form-group" role="search">
-            <input class="form-control" type="search" name="q" value="@Model.Query.Text" placeholder="Search @WeavyContext.System.Name" />
-            @if (Model.Query.Text.IsNullOrEmpty()) {
-                <button type="submit" class="btn btn-icon">@Html.SvgIcon("magnify")</button>
+            <input class="form-control" type="search" name="q" value="@Model.Query.WrappedQuery.Text" placeholder="Search @WeavyContext.System.Name" />
+            @if (Model.Query.WrappedQuery.Text.IsNullOrEmpty()) {
+                <button type="submit" class="btn btn-icon">@Svg.Icon("magnify")</button>
             } else {
-                <a href="@(Url.Action<HomeController>(c => c.Search(null, null)))" class="btn btn-icon">@Html.SvgIcon("close")</a>
+                <a href="@(Url.Action<HomeController>(c => c.Search(null, null)))" class="btn btn-icon">@Svg.Icon("close")</a>
             }
         </div>
     </form>
 </div>
 
 <div class="container my-4">
-    @if (!string.IsNullOrEmpty(Model.Query.Text)) {
+    @if (!string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
         <nav class="nav nav-tabs mb-4">
             @if (tab == null) {
                 @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: "Everything", htmlAttributes: new { @class = "nav-link active" }))
@@ -37,8 +37,8 @@
         </nav>
     }
 
-    @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.Text)) {
-        <p>Your search - <strong>@Model.Query.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab).</p>
+    @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
+        <p>Your search - <strong>@Model.Query.WrappedQuery.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab).</p>
         <p>Suggestions:</p>
         <ul>
             <li>Make sure that all words are spelled correctly.</li>

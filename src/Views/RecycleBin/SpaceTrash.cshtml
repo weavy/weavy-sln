@@ -1,0 +1,74 @@
+﻿@model TrashSearchResult
+@{
+    Title = "Recycle bin";
+    string tab = ViewContext.RouteData.Values["tab"] as string;
+    Back = WeavyContext.Space.Url();
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @if (tab == null) {
+            @(Html.ActionLink<RecycleBinController>(c => c.SpaceTrash(WeavyContext.Space.Id, null, null), text: "Everything", htmlAttributes: new { @class = "nav-link active" }))
+        } else {
+            @(Html.ActionLink<RecycleBinController>(c => c.SpaceTrash(WeavyContext.Space.Id, null, null), text: "Everything", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        }
+        @(Html.ActionLink<RecycleBinController>(c => c.SpaceTrash(WeavyContext.Space.Id, "tabs", null), text: "Tabs", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<RecycleBinController>(c => c.SpaceTrash(WeavyContext.Space.Id, "posts", null), text: "Posts", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<RecycleBinController>(c => c.SpaceTrash(WeavyContext.Space.Id, "files", null), text: "Files", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<RecycleBinController>(c => c.SpaceTrash(WeavyContext.Space.Id, "comments", null), text: "Comments", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    </nav>
+}
+
+<div class="container-fluid mt-3">
+    @if (Model.HasItems()) {
+
+        <table class="table table-hover table-recycle-bin">
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th>Name</th>
+                    <th>Kind</th>
+                    <th>Trashed by</th>
+                    <th>Trashed at</th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                <tr class="table-trashed">
+                    <td class="table-icon">@Svg.Icon(item)</td>
+                    <td>@item.Title.Ellipsis(128)</td>
+                    <td>@item.Kind()</td>
+                    <td>@item.TrashedBy().Link()</td>
+                    <td>@Html.Time(item.TrashedAt, format: "g")</td>
+                    <td class="table-icon text-right">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                                @Svg.Icon("dots-vertical")
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <button type="button" class="dropdown-item" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore", "success") Restore</button>
+
+                                <form method="post" action="@Url.Action(nameof(RecycleBinController.Delete))" data-turboform>
+                                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                    <input type="hidden" name="@nameof(item.Id)" value="@item.Id" />
+                                    <input type="hidden" name="@nameof(item.Type)" value="@item.Type" />
+                                    <input type="hidden" name="@nameof(tab)" value="@tab" />
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    } else {
+        if (tab == null) {
+            <p class="text-muted text-center">The recycle bin is empty (trashed items are automatically deleted after 30 days).</p>
+        } else {
+            <p class="text-muted text-center">No @tab in the recycle bin (trashed @tab are automatically deleted after 30 days).</p>
+        }
+
+    }
+</div>

@@ -32,7 +32,7 @@ weavy.bubbles = (function ($) {
 
     function requestOpen(spaceId, destination) {
         if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request-open', spaceId: spaceId, destination: destination });
+            weavy.postal.post({ name: 'request:open', spaceId: spaceId, destination: destination });
         }
     }
 
@@ -57,6 +57,7 @@ weavy.bubbles = (function ($) {
         var $oldBody = $("body");
         var currentSpaceId = $oldBody.get(0).getAttribute("data-space");
         var newSpaceId = $body.data("space");
+        var wasSignedOut = parseInt($oldBody.get(0).getAttribute("data-user"), 10) === -1;
 
         if (!weavy.browser.embedded) {
             // Open bubble on page load
@@ -71,10 +72,10 @@ weavy.bubbles = (function ($) {
         var urlBase = $body.data("path").indexOf("http") === 0 ? $body.data("path") : document.location.origin + $body.data("path");
         var redirSpaceId = visitUrl.indexOf(urlBase + "search") === 0 ? -1 : newSpaceId;
 
-        if (redirSpaceId && newSpaceId != currentSpaceId) {
+        if (!wasSignedOut && redirSpaceId && newSpaceId != currentSpaceId) {
 
             if (redirSpaceId === -1) {
-                openBubble("add", visitUrl);
+                openBubble("start", visitUrl);
             } else {
                 // restore page and open bubble 
                 open(newSpaceId, visitUrl);
@@ -110,11 +111,11 @@ weavy.bubbles = (function ($) {
     });
 
     function addBubble(data) {
-        var existingBubble = $(".weavy-bubble-item.weavy-bubble-" + data.space_id);
+        var existingBubble = $(".weavy-bubble-item.weavy-bubble-" + data.spaceId);
         if (existingBubble.length) {
             // Update existing bubble
-            existingBubble.attr("bubble-id", data.bubble_id);
-            existingBubble.find("[data-remove-bubble]").attr("data-remove-bubble", JSON.stringify({ spaceId: data.space_id, bubbleId: data.bubble_id }));
+            existingBubble.attr("bubble-id", data.bubbleId);
+            existingBubble.find("[data-remove-bubble]").attr("data-remove-bubble", JSON.stringify({ spaceId: data.spaceId, bubbleId: data.bubbleId }));
         } else {
             // Add new bubble
 
@@ -124,13 +125,13 @@ weavy.bubbles = (function ($) {
                 var $activeSpaces = $(".navbar-menu .active-spaces");
 
                 var $closeButton = $('<button class="btn btn-icon i weavy-bubble-close ml-3" title="Close">')
-                    .attr("data-remove-bubble", JSON.stringify({ spaceId: data.space_id, bubbleId: data.bubble_id }))
-                    .append('<svg class="i"><use xlink:href="#close"></use></svg>');
+                    .attr("data-remove-bubble", JSON.stringify({ spaceId: data.spaceId, bubbleId: data.bubbleId }))
+                    .append('<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg>');
 
                 var $dropdownItem = $('<div class="dropdown-item weavy-bubble-item">')
-                    .addClass("weavy-bubble-" + data.space_id)
-                    .addClass(data.space_id == $("body").data("space") ? "active" : "")
-                    .attr("data-bubble-id", data.bubble_id)
+                    .addClass("weavy-bubble-" + data.spaceId)
+                    .addClass(data.spaceId == $("body").data("space") ? "active" : "")
+                    .attr("data-bubble-id", data.bubbleId)
                     .attr("data-href", data.url)
                     .append('<img class="avatar img-24" src="' + data.icon + '" />')
                     .append('<span>' + data.name + '</span>')
@@ -142,23 +143,23 @@ weavy.bubbles = (function ($) {
             // Widget nav
             if ($(".weavy-widget-nav").length) {
                 var $avatarButton = $('<div class="weavy-button" data-type="personal">')
-                    .addClass("weavy-bubble-" + data.space_id)
+                    .addClass("weavy-bubble-" + data.spaceId)
                     .css("background-image", "url(" + data.icon + ")")
                     .attr("data-name", data.name);
 
                 var $closeAction = $('<div class="weavy-bubble-action weavy-bubble-close" title="Close">')
-                    .attr("data-remove-bubble", JSON.stringify({ spaceId: data.space_id, bubbleId: data.bubble_id }))
-                    .append('<svg class="i"><use xlink:href="#close-circle"></use></svg>');
+                    .attr("data-remove-bubble", JSON.stringify({ spaceId: data.spaceId, bubbleId: data.bubbleId }))
+                    .append('<svg class="i i-close-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.53 0 10 4.47 10 10s-4.47 10-10 10-10-4.47-10-10 4.47-10 10-10m3.59 5-3.59 3.59-3.59-3.59-1.41 1.41 3.59 3.59-3.59 3.59 1.41 1.41 3.59-3.59 3.59 3.59 1.41-1.41-3.59-3.59 3.59-3.59z"/></svg>');
 
                 var $bubbleTooltip = $('<div class="weavy-bubble-tooltip">')
-                    .attr('id', "weavy-bubble-tooltip-" + data.space_id)
+                    .attr('id', "weavy-bubble-tooltip-" + data.spaceId)
                     .append('<span class="weavy-bubble-tooltip-text"><span>' + data.name + '</span>' + (data.teamname ? '<small>&nbsp;' + data.teamname + '</small>' : '') + '</span>');
 
                 var $bubble = $('<div class="weavy-bubble-item block-link" data-type="personal">')
-                    .addClass("weavy-bubble-" + data.space_id)
-                    .addClass(data.space_id == $("body").data("space") ? "active" : "")
-                    .attr("data-bubble-id", data.bubble_id)
-                    .attr("data-id", data.space_id)
+                    .addClass("weavy-bubble-" + data.spaceId)
+                    .addClass(data.spaceId == $("body").data("space") ? "active" : "")
+                    .attr("data-bubble-id", data.bubbleId)
+                    .attr("data-id", data.spaceId)
                     .attr("data-href", data.url)
                     .append($avatarButton)
                     .append($closeAction)
@@ -170,7 +171,7 @@ weavy.bubbles = (function ($) {
     }
 
     function removeBubble(data, forced) {
-        var $existingBubbles = $(".weavy-bubble-item.weavy-bubble-" + data.space_id);
+        var $existingBubbles = $(".weavy-bubble-item.weavy-bubble-" + data.spaceId);
         $existingBubbles.each(function () {
             if (forced || $(this).data("type") !== "global") {
                 $(this).remove();
@@ -207,21 +208,22 @@ weavy.bubbles = (function ($) {
 
     });
 
-    weavy.realtime.on("bubbleopened", function (e, data) {
-        addBubble(data);
-    });
+    if (weavy.realtime) {
+        weavy.realtime.on("bubble-added.weavy", function (e, data) {
+            addBubble(data);
+        });
 
-    weavy.realtime.on("bubbleremoved", function (e, data) {
-        removeBubble(data);
-    });
+        weavy.realtime.on("bubble-removed.weavy", function (e, data) {
+            removeBubble(data);
+        });
 
-    weavy.realtime.on("trashedspace", function (e, data) {
-        removeBubble({ space_id: data.id }, true);
-        if ($("body").data("path") && data.id == $("body").data("space")) {
-            weavy.turbolinks.visit($("body").data("path"));
-        }
-    })
-
+        weavy.realtime.on("space-trashed.weavy", function (e, data) {
+            removeBubble({ spaceId: data.id }, true);
+            if ($("body").data("path") && data.id == $("body").data("space")) {
+                weavy.turbolinks.visit($("body").data("path"));
+            }
+        })
+    }
     return {
         open: open,
         requestOpen: requestOpen

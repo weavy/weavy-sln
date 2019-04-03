@@ -9,7 +9,7 @@
             image = ((IHasAvatar)entity).Avatar;
         }
     }
-    var file = entity as FileBase;
+    var file = entity as IFile;
     if (image == null && file != null && FileHelper.IsWebImage(file.Name)) {
         image = file.Blob;
     }
@@ -63,7 +63,7 @@
     }
 
     @if (editMode) {
-        <button type="button" class="btn btn-icon close-embed" data-url="@Model.OriginalUrl">@Html.SvgIcon("close")</button>
+        <button type="button" class="btn btn-icon close-embed" data-url="@Model.OriginalUrl">@Svg.Icon("close")</button>
     }
 
     @if (editMode) {

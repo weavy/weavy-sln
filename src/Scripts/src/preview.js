@@ -72,7 +72,7 @@ weavy.preview = (function ($) {
         // add navbar
         var $container = $(".preview-container");
         $container.find(".navbar-preview").remove();
-        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-widget-event data-widget-name="close-preview"><svg class="i"><use xlink:href="#arrow-left" /></svg></button></div></nav>');
+        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-widget-event data-widget-name="close-preview"><svg class="i i-arrow-left" height="24" viewBox="0 0 24 24" width="24"><path d="m20 11v2h-12l5.5 5.5-1.42 1.42-7.92-7.92 7.92-7.92 1.42 1.42-5.5 5.5z"/></svg></button></div></nav>');
         var $middle = $('<div class="navbar-middle" />');
         $middle.append('<span class="navbar-text">' + opts.name + '</span>');
         $navbar.append($middle);
@@ -83,7 +83,7 @@ weavy.preview = (function ($) {
             var match = opts.preview.match(/\/(files|attachments)\/([0-9]+)\//);
             var type = match[1] === "files" ? "content" : "attachment";
             var id = match[2];
-            var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-entity="' + type + '" data-id="' + id + '"><svg class="i d-block"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#star-outline"></use></svg><svg class="i d-none"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#star"></use></svg></button>');
+            var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-entity="' + type + '" data-id="' + id + '"><svg class="i i-star-outline d-block" height="24" viewBox="0 0 24 24" width="24"><path d="m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37 1.71-4.04 1.71 4.04 4.38.37-3.32 2.88.99 4.28m6.24-8.42-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.45 4.73-1.63 7.03 6.18-3.73 6.18 3.73-1.64-7.03z"/></svg><svg class="i i-star d-none" height="24" viewBox="0 0 24 24" width="24"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"/></svg></button>');
             if (opts.starred) {
                 $star.addClass("on");
             } else {
@@ -94,10 +94,10 @@ weavy.preview = (function ($) {
         }
         var $icons = $('<div class="navbar-icons"/>');
         if (opts.office) {
-            $icons.append('<a href="' + opts.office + '" class="btn btn-icon" title="Open in Office"><svg class="i"><use xlink:href="#' + opts.icon + '" /></svg></a>');
+            $icons.append('<a href="' + opts.office + '" class="btn btn-icon" title="Open in Office"><svg class="i i-office" height="24" viewBox="0 0 24 24" width="24"><path d="m3 18 4-1.25v-9.75l7-2v14.5l-10.5-1.25 10.5 3.75 6-1.25v-17.25l-6.05-1.5-10.95 3.75z" fill="#e64a19"/></svg></a>');
         }
         if (opts.download) {
-            $icons.append('<a href="' + opts.download + '" class="btn btn-icon" title="Download"><svg class="i"><use xlink:href="#download" /></svg></a>');
+            $icons.append('<a href="' + opts.download + '" class="btn btn-icon" title="Download"><svg class="i i-download" height="24" viewBox="0 0 24 24" width="24"><path d="m5 20h14v-2h-14m14-9h-4v-6h-6v6h-4l7 7z"/></svg></a>');
         }
         $navbar.append($icons);
         $container.append($navbar);
@@ -107,7 +107,7 @@ weavy.preview = (function ($) {
 
         if (weavy.browser.embedded) {
             // maximize widget window
-            weavy.postal.post({ name: "open-preview" });
+            weavy.postal.post({ name: "preview-open" });
         }
     }
 
@@ -120,7 +120,7 @@ weavy.preview = (function ($) {
 
         if (weavy.browser.embedded) {
             // close widget preview
-            weavy.postal.post({ name: "close-preview" });
+            weavy.postal.post({ name: "preview-close" });
         }
 
         // remove event handler for ESC

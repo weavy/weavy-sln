@@ -1,7 +1,7 @@
 ﻿var weavy = weavy || {};
 weavy.desktopNotifications = (function ($) {
     // callbacks for realtime events
-    weavy.realtime.on("notification", function (event, data) {
+    weavy.realtime.on("notification-inserted.weavy", function (event, data) {
         
         // get notification data
         $.ajax({

@@ -11,11 +11,11 @@
 ~/scripts/src/browser.js
 ~/scripts/src/context.js
 ~/scripts/src/url.js
+~/scripts/src/emoji.js
 ~/scripts/src/guid.js
 ~/scripts/src/api.js
 ~/scripts/src/star.js
 ~/scripts/src/editor.js
-~/scripts/src/emoji.js
 ~/scripts/src/alert.js
 ~/scripts/src/postal.js
 ~/scripts/src/bubbles.js

@@ -7,12 +7,7 @@
  * Copyright (c) .NET Foundation. All rights reserved.
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
  *
- */
-
-/// <reference path="Scripts/jquery-1.6.4.js" />
-/// <reference path="jquery.signalR.version.js" />
-
-/* CHANGES BY WEAVY:
+ * CHANGES BY WEAVY:
  * changed window.jQuery to scoped jQuery 
  * changed window.encodeURIComponent() to encodeURIComponent() (because of issue with Firefox browser extension)
  * adedd local variable asyncLocal to ajaxAbort (as a workaround because our minification fails otherwise)

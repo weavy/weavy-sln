@@ -1,15 +1,21 @@
 /// <reference path="../_core.scss" />
 
-.icon-sprite {
-    color: $icon-color;
-}
-
 // See https://google.github.io/material-design-icons/#styling-icons-in-material-design
 .i {
-    fill: currentColor;
     flex: 0 0 auto;
     width: 1.5rem; // 24px
     height: 1.5rem; // 24px
+    // icon sizes
+    &.i-9 {
+        width: .5625rem;
+        height: .5625rem;
+    }
+
+    &.i-12 {
+        width: .75rem;
+        height: .75rem;
+    }
+
     &.i-18 {
         width: 1.125rem;
         height: 1.125rem;
@@ -34,26 +40,29 @@
         width: 6rem;
         height: 6rem;
     }
+}
 
-    &.i-inline {
-        vertical-align: middle;
-    }
+// stacked icons
+&.i-stack {
+    display: inline-block;
+    position: relative;
+    line-height: 1;
 
-    &.i-dark {
-        color: $icon-color;
+    .i:last-child {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: $white;
+        border-radius: 50%;
+        //filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, .55));
     }
+}
 
-    &.i-light {
-        color: $white;
-    }
-
-    &.rotate-45 {
-        transform: rotate(45deg);
-    }
-
-    &.rotate-90 {
-        transform: rotate(90deg);
-    }
+// icon colors
+svg.i:not(.text-native) * {
+    // by default, every icon will inherit the text color of its parent,
+    // to override this and show the icon with its native colors (for example on logos) add the text-native class
+    fill: currentColor;
 }
 
 // fix for click event being swallowed by svg <use> in Edge

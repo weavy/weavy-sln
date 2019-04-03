@@ -1,0 +1,90 @@
+﻿@model StatisticsEntry
+@{
+    Title = "Usage statistics";
+    Back = Url.Action<ManageController>(c => c.Index());
+}
+
+<div class="container-fluid mt-3">
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Statistics</th>
+            <th class="text-right" style="width:100px;">Count</th>
+            <th class="text-right" style="width:100px;">Size</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Apps</td>
+            <td class="text-right">@Model.AppCount</td>
+            <td class="text-right">--</td>
+        </tr>
+        <tr>
+            <td>Blobs</td>
+            <td class="text-right">@Model.BlobCount</td>
+            <td class="text-right">@FileHelper.FileSizeAsString(Model.BlobSize)</td>
+        </tr>
+        <tr>
+            <td>Comments</td>
+            <td class="text-right">@Model.CommentCount</td>
+            <td class="text-right">--</td>
+        </tr>
+        <tr>
+            <td>Content</td>
+            <td class="text-right">@Model.ContentCount</td>
+            <td class="text-right">--</td>
+        </tr>
+        <tr>
+            <td>Database</td>
+            <td class="text-right">--</td>
+            <td class="text-right">@FileHelper.FileSizeAsString(Model.DatabaseSize)</td>
+        </tr>
+        <tr>
+            <td>Index</td>
+            <td class="text-right">@Model.IndexCount</td>
+            <td class="text-right">@FileHelper.FileSizeAsString(Model.IndexSize)</td>
+        </tr>
+        <tr>
+            <td>Likes</td>
+            <td class="text-right">@Model.LikeCount</td>
+            <td class="text-right">--</td>
+        </tr>
+        <tr>
+            <td>Messages</td>
+            <td class="text-right">@Model.MessageCount</td>
+            <td class="text-right">--</td>
+
+        </tr>
+        <tr>
+            <td>Posts</td>
+            <td class="text-right">@Model.PostCount</td>
+            <td class="text-right">--</td>
+
+        </tr>
+        <tr>
+            <td>Spaces</td>
+            <td class="text-right">@Model.SpaceCount</td>
+            <td class="text-right">--</td>
+
+        </tr>
+        <tr>
+            <td>Stars</td>
+            <td class="text-right">@Model.StarCount</td>
+            <td class="text-right">--</td>
+
+        </tr>
+        <tr>
+            <td>Tags</td>
+            <td class="text-right">@Model.TagCount</td>
+            <td class="text-right">--</td>
+
+        </tr>
+        <tr>
+            <td>Users</td>
+            <td class="text-right">@Model.UserCount</td>
+            <td class="text-right">--</td>
+
+        </tr>
+    </tbody>
+</table>
+</div>

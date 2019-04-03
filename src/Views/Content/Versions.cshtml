@@ -25,7 +25,7 @@
             var href = item.IsCurrent() ? item.Url() : Url.Action<ContentController>(c => c.GetVersion(item.Id, item.Version));
 
             <tr data-href="@href">
-                <td class="table-icon">@Html.SvgIcon(item)</td>
+                <td class="table-icon">@Svg.Icon(item)</td>
                 <td class="d-flex"><a href="@href" class="text-truncate">@num. @item.GetTitle()</a> @if (item.IsCurrent()) {<span class="badge badge-primary align-self-center ml-1">current</span>}</td>
                 <td>@Html.Time(item.ModifiedAt, format: "g")</td>
                 <td>@item.GetKind()</td>
@@ -34,17 +34,16 @@
                     @if (edit && !item.IsCurrent()) {
                         <div class="dropdown">
                             <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                @Html.SvgIcon("dots-vertical")
+                                @Svg.Icon("dots-vertical")
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <form action="@Url.Action(nameof(ContentController.Revert), null, new { id = item.Id })" method="post">
+                                <form action="@(Url.Action<ContentController>(c => c.Revert(item.Id, item.Version)))" method="post">
                                     @Html.HttpMethodOverride(HttpVerbs.Put)
-                                    @Html.Hidden(nameof(item.Version), item.Version)
-                                    <button type="submit" class="dropdown-item">@Html.SvgIcon("undo") Revert</button>
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("undo") Revert</button>
                                 </form>
-                                <form action="@Url.Action(nameof(ContentController.DeleteVersion), null, new { id = item.Id, version = item.Version })" method="post">
+                                <form action="@(Url.Action<ContentController>(c => c.DeleteVersion(item.Id, item.Version)))" method="post">
                                     @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                    <button type="submit" class="dropdown-item">@Html.SvgIcon("close") Remove</button>
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("close") Remove</button>
                                 </form>
                             </div>
                         </div>

@@ -1,15 +1,15 @@
-﻿@model FilesModel
+﻿@model FilesViewModel
 @{
     Title = WeavyContext.App.Name;
 }
 
-@if (Model.Layout == Weavy.Core.Models.Layout.Card) {
+@if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.Card) {
     <div class="cards" id="infinite-scroll-target">
-        @{ Html.RenderPartial("~/Views/Content/_Cards.cshtml", Model.Items); }
+        @{ Html.RenderPartial(Model.Items); }
     </div>
-} else if (Model.Layout == Weavy.Core.Models.Layout.List) {
+} else if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.List) {
     <div class="list-group" id="infinite-scroll-target">
-        @{ Html.RenderPartial("~/Views/Content/_ListItems.cshtml", Model.Items); }
+        @{ Html.RenderPartial(Model.Items); }
     </div>
 } else {
     <table class="table table-hover table-content">
@@ -36,7 +36,7 @@
             </tfoot>
         }
         <tbody id="infinite-scroll-target">
-            @{ Html.RenderPartial("~/Views/Content/_Rows.cshtml", Model.Items); }
+            @{ Html.RenderPartial(Model.Items); }
         </tbody>
     </table>
 }

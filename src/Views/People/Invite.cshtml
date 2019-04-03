@@ -1,11 +1,11 @@
 ﻿@model InviteUsersModel
 @{
     Title = "Invite people";
-    Back = Url.Action<PeopleController>(c => c.Index(null, null, null));
+    Back = Url.Action<PeopleController>(c => c.Index(null, null));
 }
 <div class="container mt-3">
     <p>Invite people to @Theme.Name by entering their emails below.</p>
-    <form class="invite-form" action="@Url.Action(nameof(PeopleController.Invite))" method="post" data-turboform>
+    <form class="invite-form" action="@(Url.Action<PeopleController>(c => c.Invite()))" method="post" data-turboform>
         @Html.EditorFor(m => m.Email1)
         @Html.EditorFor(m => m.Email2)
         @Html.EditorFor(m => m.Email3)

@@ -1,0 +1,32 @@
+﻿@model Content
+@{
+    Title = Model.Name ?? "Untitled";
+    var current = Model is IVersionable versionable ? versionable.IsCurrent() : true;
+    if (!current) {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+        Back = Url.Action<ContentController>(c => c.Versions(Model.Id));
+    }
+}
+
+@if (current) {
+    @section navbar_content {
+        @{Html.RenderPartial("_Navbar", Model); }
+    }
+}
+
+
+<article class="container my-3" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+    @{
+        <section class="content-section properties">
+            @Html.DisplayGroups(exclude: new string[] { nameof(Model.Name) })
+        </section>
+
+        Html.RenderPartial("_Meta");
+        if (current) {
+            Html.RenderPartial("_ContentAttachments");
+            Html.RenderPartial("_Comments");
+            Html.RenderPartial("_Subscribers");
+        }
+    }
+</article>
+

@@ -40,5 +40,4 @@ ehthumbs.db
 !**/packages/build/
 
 # Include our libs
-!/lib/Debug/
-!/lib/Release/
+!/lib/

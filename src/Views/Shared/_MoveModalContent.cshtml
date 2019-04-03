@@ -6,7 +6,7 @@
   @Html.HttpMethodOverride(HttpVerbs.Put)
   <div class="modal-header border-0 pb-0">
     <h5 class="modal-title">Move @Model.Source.GetKind()</h5>
-    <button type="button" class="btn btn-icon" data-dismiss="modal">@Html.SvgIcon("close")</button>
+    <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
   </div>
   <div class="modal-body">
     @Html.EditorFor(x => x.ParentId, new { Model.Source })

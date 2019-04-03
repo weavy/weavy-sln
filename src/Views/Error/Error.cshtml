@@ -1,0 +1,22 @@
+﻿@model ErrorModel
+@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = Model.Code + " " + Model.Description;
+}
+
+<div class="container my-4">
+    @if (Model.Code == 500) {
+        <h1 class="display-1">Aw, Snap!</h1>
+    } else {
+        <h1 class="display-1">@Model.Code @Model.Description</h1>
+    }
+
+    <p>@Model.Message</p>
+
+    @if (User.IsAdmin && Model.Exception != null && !Model.Exception.StackTrace.IsNullOrEmpty()) {
+        <pre>@Model.Exception.GetType().FullName: @Model.Exception.Message<br />@Model.Exception.StackTrace</pre>
+    }
+
+    <a class="btn btn-icon btn-link px-0 d-standalone" href="@Url.Back(WeavyRequestContext.Current.ApplicationPath)" data-turbolinks="false">@Svg.Icon("arrow-left")<span>Back</span></a>
+    <button class="btn btn-icon btn-link px-0 d-embedded" onclick="weavy.postal.post({ name: 'reset' });">@Svg.Icon("arrow-left")<span>Back</span></button>
+</div>

@@ -100,6 +100,15 @@ weavy.api = (function ($) {
         });
     }
 
+    // get badges for the current user
+    function badges() {        
+        return $.ajax({
+            url: weavy.url.api("notification") + "badges",
+            method: "GET",
+            contentType: "application/json"
+        });
+    }
+
     // marks notification as read
     function read(notificationId) {
         return $.ajax({
@@ -161,6 +170,7 @@ weavy.api = (function ($) {
         unread: unread,
         readAll: readAll,
         pin: pin,
-        unpin: unpin
+        unpin: unpin,
+        badges: badges
     };
 })(jQuery);

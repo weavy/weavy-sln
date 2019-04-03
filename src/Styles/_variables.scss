@@ -2,6 +2,8 @@
 $font-size-xs: .75rem; // 9pt 12px
 $font-size-xxs: .625rem; // 7.5pt 10px
 
+$edge-margin: .25rem; // Extra margin on devices with narrow edges (sm)
+
 $font-weight-thin: 200;
 $font-weight-light: 400; // 300 is incorrectly displayed as 200 on chrome/win
 $font-weight-medium: 500;
@@ -211,7 +213,7 @@ $hr-border-color: rgba($black,.1); // rgba($black,.1)
 $table-cell-padding: .75rem; //.75rem
 $table-cell-padding-sm: .25rem; //.3rem
 
-$table-border-color: $gray-200; //$gray-300
+$table-border-color: $hr-border-color; //$gray-300
 
 $table-head-bg: $body-bg; //$gray-200;
 $table-head-color: $panel-color; // $gray-700;
@@ -296,7 +298,8 @@ $alert-border-width: 0; // $border-width
 
 $progress-border-radius: 0; // $border-radius
 
-$list-group-item-padding-x: 1rem; // 1.25rem
+$list-group-item-padding-y: .75rem; // 75rem
+$list-group-item-padding-x: .75rem; // 1.25rem
 
 $list-group-disabled-color: $text-muted; // $gray-600
 

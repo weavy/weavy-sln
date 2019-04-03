@@ -1,0 +1,26 @@
+﻿@model Conversation
+<div class="dropdown">
+    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown">@Svg.Icon("dots-vertical")</button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <button type="button" class="dropdown-item" data-show="drawer-details">Details</button>
+
+        @if (Model.LastMessageAt.HasValue) {
+            if (!Model.IsRead) {
+                <button type="button" class="dropdown-item" data-read="@Model.Id">Mark as read</button>
+            } else {
+                <button type="button" class="dropdown-item" data-unread="@Model.Id">Mark as unread</button>
+            }
+        }
+
+        @if (Model.ArchivedAt == null) {
+            <button type="button" class="dropdown-item" data-archive="@Model.Id">Archive conversation</button>
+        } else {
+            <button type="button" class="dropdown-item" data-unarchive="@Model.Id">Unarchive conversation</button>
+        }
+
+        @if (Model.IsRoom && Model.HasPermission(Permission.Join)) {
+            <button type="button" class="dropdown-item" data-leave="@Model.Id">Leave room</button>
+        }
+
+    </div>
+</div>

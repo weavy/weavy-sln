@@ -13,20 +13,7 @@
     if (feedback != null) {
         attrs.Append("class", "is-invalid");
     }
-
-    // get allowed values
-    var allowed = SpaceService.GetAllowedPrivacyLevels();
-
-    // always allow the current privacy level
-    if (Model != null && !allowed.Contains(Model.Value)) {
-        foreach (Privacy val in Enum.GetValues(typeof(Privacy))) {
-            if (val == Model.Value) {
-                allowed.Add(Model.Value);
-                break;
-            }
-        }
-    }
-
+    
     var inputName = ViewData.TemplateInfo.GetFullHtmlFieldName("");
 
 }
@@ -38,7 +25,7 @@
     @Html.LabelFor(m => m)
 }
 
-@foreach (Privacy item in allowed) {
+@foreach (Privacy item in Enum.GetValues(typeof(Privacy))) {
     var name = item.GetDisplayName();
     var desc = item.GetDisplayDescription();
     <div class="custom-control custom-radio">

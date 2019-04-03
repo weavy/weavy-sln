@@ -52,13 +52,14 @@
         }
     }
 
-
+    .cover-content {
+        @extend .text-center, .py-4;
+    }
 
     .facepile {
-        position: absolute;
+        position: relative;
         bottom: -1rem;
-        left: 0;
-        right: 0;
+        margin-top: -1rem;
         justify-content: center;
 
         a {

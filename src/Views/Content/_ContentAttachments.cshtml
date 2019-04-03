@@ -8,7 +8,7 @@
         <h4 class="display-4"><span>Attachments</span></h4>
 
         @if (attachable.AttachmentIds.Any()) {
-            Html.RenderPartial("_Attachments", attachable.Attachments(), viewData: new ViewDataDictionary { { "byline", true } });
+            Html.RenderPartial("~/Views/Shared/_Attachments.cshtml", attachable.Attachments(), viewData: new ViewDataDictionary { { "byline", true } });
         }
 
         @if (Model.HasPermission(Permission.Attach)) {

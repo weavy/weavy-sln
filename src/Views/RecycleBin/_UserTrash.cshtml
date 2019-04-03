@@ -1,0 +1,43 @@
+﻿@model TrashSearchResult
+
+@if (Model.IsNullOrEmpty()) {
+    <div class="container-fluid mt-3 empty">
+        <p class="text-muted">Your recycle bin is empty!</p>
+    </div>
+}
+
+<table class="table table-hover table-trash">
+    <tbody>
+        @if (Model.HasItems()) {
+            var img = new Space().AvatarImg(32);
+            foreach (var item in Model) {
+                string href = null;
+                if (item.Type == EntityType.Space) {
+                    href = Url.Action<SpaceController>(x => x.Index(null, null)) + "?trashed=true";
+                } else if (item.SpaceId != null) {
+                    href = Url.Action<RecycleBinController>(x => x.SpaceTrash(item.SpaceId.Value, null, null));
+                }
+
+                <tr class="table-trashed" @if (href != null) { @Html.Raw(@"data-href=""" + href + @"""") }>
+                    <td class="table-icon">
+                        @if (item.Type == EntityType.Space) {
+                            @img
+                        } else {
+                            @Svg.Icon(item)
+                        }
+                    </td>
+                    <td>
+                        @if (href != null) {
+                        <a href="@href">@item.Title.Ellipsis(128)</a>
+                        } else {
+                            @item.Title.Ellipsis(128)
+                        }
+                    </td>
+                    <td class="table-icon">
+                        <button type="button" class="btn btn-icon btn-success btn-load" title="Restore" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore")</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

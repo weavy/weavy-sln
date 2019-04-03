@@ -12,7 +12,9 @@
 }
 
 svg.spinner {
-    transform-origin: center center;
+    g {
+        transform-origin: center center;
+    }
 
     circle {
         stroke-dasharray: 1, 100;
@@ -20,7 +22,9 @@ svg.spinner {
     }
     // add class .spin to animate the spinner (otherwise it will not be visible)
     &.spin {
-        animation: rotate 2s linear infinite;
+        g {
+            animation: rotate 2s linear infinite;
+        }
 
         circle {
             animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
@@ -31,7 +35,10 @@ svg.spinner {
         // Disable spinner in Android WebView
         html.android.webview & {
             display: none !important;
-            animation: none !important;
+            
+            g {
+                animation: none !important;
+            }
 
             circle {
                 animation: none !important;
@@ -58,29 +65,29 @@ svg.spinner {
 
     50% {
         stroke-dasharray: 44.5, 100;
-        stroke-dashoffset: -17.5px;
+        stroke-dashoffset: -17.5;
     }
 
     100% {
         stroke-dasharray: 44.5, 100;
-        stroke-dashoffset: -62px;
+        stroke-dashoffset: -62;
     }
 }
 
 @keyframes color {
     100%, 0% {
-        stroke: $blue;
+        stroke: $cover-gradient-start;
     }
 
     40% {
-        stroke: $red;
+        stroke: $cover-gradient-end;
     }
 
     66% {
-        stroke: $yellow;
+        stroke: $cover-gradient-start;
     }
 
     80%, 90% {
-        stroke: $green;
+        stroke: $cover-gradient-end;
     }
 }

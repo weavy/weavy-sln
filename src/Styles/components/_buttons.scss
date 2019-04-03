@@ -11,21 +11,35 @@
     display: inline-flex;
     flex-shrink: 0;
     flex-grow: 0;
+    
+    .eo {
+        margin: .125rem;
+    }
 
-    &:not(.btn-icon, .btn-round, .dropdown-toggle-split) {
-        > .i:first-child {
-            margin-right: .25rem;
+    > * {
+        display: inline-flex;
+    }
+
+    &:not(.btn-icon, .btn-round, .btn-square, .dropdown-toggle-split, .btn-link) {
+
+        > .i:first-child, > .eo:first-child {
+            margin-left: -.125rem;
+        }
+
+        > .i, > .eo {
+            margin-right: .375rem;
         }
     }
 
     &.btn-sm {
-        > .i {
+        > .i, > .eo {
             width: 1.25rem;
             height: 1.25rem;
         }
     }
+
     &.btn-lg {
-        > .i {
+        > .i, > .eo {
             width: 2rem;
             height: 2rem;
         }
@@ -45,10 +59,10 @@
     text-transform: none;
     min-width: 2rem;
     min-height: 2rem;
-
+    position: relative; // so that we can position .badge
     @include hover-focus {
         outline: none;
-        color: darken($icon-color, 10%);
+        color: rgba($icon-color, .87);
     }
     // color variants
     @each $color, $value in $theme-colors {
@@ -73,20 +87,7 @@
     span {
         margin-left: .25rem;
     }
-
-
-    &.btn-badge {
-        position: relative;
-
-        .badge {
-            @include badge-notification;
-        }
-    }
 }
-
-/*a.btn-icon {
-    color: inherit;
-}*/
 
 .btn-text {
     border: none;
@@ -98,6 +99,18 @@
 
     &:active {
         box-shadow: none !important;
+    }
+}
+
+.btn-square {
+    padding: $btn-padding-y;
+
+    &.btn-sm {
+        padding: $btn-padding-y-sm;
+    }
+
+    &.btn-lg {
+        padding: $btn-padding-y-lg;
     }
 }
 
@@ -125,25 +138,8 @@
     }
 }
 
-
-.btn-azure {
-    @include button-variant(#2771ed, darken(#2771ed, 5%));
-}
-
-.btn-facebook {
-    @include button-variant(#3c65c4, darken(#3c65c4, 5%));
-}
-
-.btn-google {
-    @include button-variant(#dd4b39, darken(#dd4b39, 5%));
-}
-
-.btn-microsoft {
+.btn-black {
     @include button-variant(#000, #000);
-}
-
-.btn-twitter {
-    @include button-variant(#1da1f3, darken(#1da1f3, 5%));
 }
 
 .btn-list-group-item {

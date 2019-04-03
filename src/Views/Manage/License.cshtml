@@ -1,0 +1,78 @@
+﻿@model LicenseModel
+@{
+    if (Model.IsInvalid) {
+        Layout = "~/Views/Setup/_Layout.cshtml";
+    }
+    Title = "License";
+    Back = Url.Action<ManageController>(c => c.Index());
+    var feedback = string.Join(" ", ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        <div class="form-group">
+            <label for="LicenseKey">
+                License key <button type="button" title="License details" class="btn btn-icon" data-toggle="modal" data-target="#license-details">@Svg.Icon("information")</button>
+            </label>
+            <div class="input-group">
+                @Html.TextBoxFor(x => x.LicenseKey, new { @class = "form-control" + (feedback.IsNullOrEmpty() ? "" : " is-invalid") })
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" title="Update">@Svg.Icon("refresh")</button>
+                </div>
+            </div>
+            @if (!feedback.IsNullOrEmpty()) {
+                <div class="invalid-feedback d-block">@feedback</div>
+            }
+        </div>
+    }
+</div>
+
+@section footer {
+    <div class="modal fade" id="license-details" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">License details</h5>
+                    <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Svg.Icon("close")</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-control-label">License key</label>
+                        <p class="form-control-static text-muted">@Model.License.Key</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-control-label">Issued to</label>
+                        <p class="form-control-static text-muted">@Model.License.IssuedTo</p>
+                    </div>
+
+                    @if (Model.License.MaxUsers != null) {
+                        <div class="form-group">
+                            <label class="form-control-label">Max users</label>
+                            <p class="form-control-static text-muted">@(Model.License.MaxUsers.HasValue ? Model.License.MaxUsers.ToString() : "Unlimited")</p>
+                        </div>
+                    }
+
+                    @if (Model.License.MaxSpaces != null) {
+                        <div class="form-group">
+                            <label class="form-control-label">Max spaces</label>
+                            <p class="form-control-static text-muted">@(Model.License.MaxSpaces.HasValue ? Model.License.MaxSpaces.ToString() : "Unlimited")</p>
+                        </div>
+                    }
+
+                    @if (Model.License.MaintenanceExpiresAt != null) {
+                        <div class="form-group">
+                            <label class="form-control-label">Support and maintenance until</label>
+                            <p class="form-control-static @(Model.License.MaintenanceExpiresAt < DateTime.UtcNow ? "text-warning" : "text-muted")">@(Model.License.MaintenanceExpiresAt.ToLocal().ToShortDateString())</p>
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label class="form-control-label">License expires</label>
+                        <p class="form-control-static @(Model.IsGracePeriod ? "text-warning" : Model.IsExpired ? "text-danger": "text-muted")">@(Model.License.ExpiresAt.HasValue ? Model.License.ExpiresAt.ToLocal().ToShortDateString() : "Never")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -35,7 +35,7 @@
 
                 @if (context != null) {
                     <a class="btn btn-icon" href="@context.OriginalUrl" target="_blank" title="Open in context - @context.OriginalUrl" data-context-url="@context.OriginalUrl" data-weavy-context-url="@comment.Url(absolute: true)" data-weavy-context-space="@comment.SpaceId">
-                        @Html.SvgIcon("open-in-new", size: 18)
+                        @Svg.Icon("open-in-new", size: 18)
                     </a>
                 }
                 @Html.StarToggle(comment)

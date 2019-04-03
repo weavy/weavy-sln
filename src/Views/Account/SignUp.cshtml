@@ -17,7 +17,7 @@
                 @Html.EditorsForModel(formLabels: false, formText: false)
                 <div class="form-buttons">
                     <button type="submit" class="btn btn-primary btn-load">Sign up</button>
-                    <a href="@Url.Action(nameof(AccountController.SignIn), typeof(AccountController).ControllerName())" class="btn btn-outline-secondary">Cancel</a>
+                    <a href="@(Url.Action<AccountController>(x => x.SignIn(null)))" class="btn btn-outline-secondary">Cancel</a>
                 </div>
             }
         </div>

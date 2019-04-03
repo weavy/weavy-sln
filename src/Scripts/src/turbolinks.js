@@ -111,7 +111,9 @@ weavy.turbolinks = (function ($) {
         });
 
         $(document).on("DOMContentLoaded turbolinks:load", function (e) {
-            weavy.postal.post({ name: "ready" });
+            if (weavy.postal) {
+                weavy.postal.post({ name: "ready" });
+            }            
         });
     }
 
@@ -142,8 +144,6 @@ weavy.turbolinks = (function ($) {
             weavy.postal.post({ name: 'send', url: absolutePath(url), data: data, method: method, bubbleTarget: bubbleTarget });
             return;
         }
-
-        console.debug("sending turbolinks data");
 
         if (!method || method === "get") {
             // append data to querystring

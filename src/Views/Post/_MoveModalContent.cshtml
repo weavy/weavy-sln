@@ -3,7 +3,7 @@
 <form class="modal-content" action="@(Url.Action<PostController>(x => x.Move(Model.Post.Id, null)))" method="post" data-turboform>
     <div class="modal-header border-0 pb-0">
         <h5 class="modal-title">Move post</h5>
-        <button type="button" class="btn btn-icon" data-dismiss="modal">@Html.SvgIcon("close")</button>
+        <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
     </div>
     <div class="modal-body">
         @Html.EditorFor(x => x.AppId, new { Source = Model.Post })

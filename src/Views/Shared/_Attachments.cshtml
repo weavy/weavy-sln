@@ -4,7 +4,7 @@
         var attrs = Html.PreviewAttributes(attachment);
         <a class="list-group-item list-group-item-action" href="@attachment.FileUrl()" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
             <div class="media">
-                @Html.SvgIcon(attachment, size:48)
+                @Svg.Icon(attachment, size:48)
                 <div class="media-body">
                     <h6 class="media-title">@attachment.Blob.Name</h6>
                     <small class="text-muted">
@@ -21,10 +21,10 @@
                     <div class="media-icons">
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                @Html.SvgIcon("dots-vertical")
+                                @Svg.Icon("dots-vertical")
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <button type="button" data-trash="attachment" data-id="@attachment.Id" class="dropdown-item">@Html.SvgIcon("delete","danger") Trash</button>
+                                <button type="button" data-trash="attachment" data-id="@attachment.Id" class="dropdown-item">@Svg.Icon("delete","danger") Trash</button>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,56 @@
+﻿@model FolderViewModel
+@{
+    Title = WeavyContext.App.Name;
+}
+
+@if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.Card) {
+    <div class="cards" id="infinite-scroll-target">
+        @{ Html.RenderPartial(Model.Items); }
+    </div>
+} else if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.List) {
+    <div class="list-group" id="infinite-scroll-target">
+        @{ Html.RenderPartial(Model.Items); }
+    </div>
+} else {
+    <table class="table table-hover table-content">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Modified</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        @if (Model.Items.IsNullOrEmpty()) {
+            <tfoot>
+                <tr>
+                    <td class="empty text-center text-muted py-4" colspan="6">
+                        Nothing in this folder yet.
+                        @if (WeavyContext.App.HasPermission(Permission.Content)) {
+                            <text>Go ahead and add some files!</text>
+                        }
+                    </td>
+                </tr>
+            </tfoot>
+        }
+        <tbody id="infinite-scroll-target">
+            @{ Html.RenderPartial(Model.Items); }
+        </tbody>
+    </table>
+}
+@Html.ScrollMore(Model.Items)
+
+
+@section fab {
+    @Model.Content.FAB()
+}
+
+@section footer {
+    @{
+        Html.RenderPartial("_AttachModal");
+        Html.RenderPartial("_ContentModal");
+        Html.RenderPartial("_OfficeModal");
+    }
+}

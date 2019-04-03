@@ -6,6 +6,7 @@
 
 // Bootstrap overrides and custom components
 @import 'components/layout';
+@import 'components/dark';
 @import 'components/badge';
 @import 'components/alert';
 @import 'components/breadcrumb';
@@ -23,7 +24,7 @@
 @import 'components/facepile';
 @import 'components/file-list';
 @import 'components/forms';
-@import 'components/frame';
+@import 'components/grid';
 @import 'components/display';
 @import 'components/icons';
 @import 'components/image-grid';
@@ -51,3 +52,4 @@
 @import 'components/turbolinks';
 @import 'components/type';
 @import 'components/select2';
+

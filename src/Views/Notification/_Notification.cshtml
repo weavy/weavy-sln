@@ -11,7 +11,7 @@
             <p class="mb-2" title="@title">@Html.Raw(html)</p>
             <div class="d-flex justify-content-between text-muted">
                 <small>@Html.Time(Model.CreatedAt) </small>
-                <button type="button" class="btn btn-icon btn-primary" data-toggle="notification" data-id="@Model.Id" title="@(Model.IsRead? "Mark as unread" : "Mark as read")">@Html.SvgIcon("check", size: 18)</button>
+                <button type="button" class="btn btn-icon btn-primary" data-toggle="notification" data-id="@Model.Id" title="@(Model.IsRead? "Mark as unread" : "Mark as read")">@Svg.Icon("check", size: 18)</button>
             </div>
         </div>
     </div>

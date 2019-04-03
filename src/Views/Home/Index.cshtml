@@ -1,7 +1,7 @@
 ﻿@model HomeModel
 
 @{
-    Title = "Start";
+    Title = "Start";  
 }
 
 @section navbar_left {
@@ -16,31 +16,16 @@
 
 <div class="cover">
     <div class="container d-flex flex-column">
-        @if (PermissionService.HasSystemPermission(Permission.ManageSystem) && WeavyContext.Theme.Logo == null) {
-            <a href="@(Url.Action<Weavy.Web.Areas.Manage.Controllers.HomeController>(c => c.Theme()))" class="my-4 d-flex flex-column align-items-center mx-auto btn btn-outline-primary border-transparent align-self-center">
-                @Html.IconImg(128)
-                <div class="small">Add your logo...</div>
-            </a>
-        } else {
-            <div class="my-4 d-flex flex-column align-items-center mx-auto align-self-center">
-                @Html.IconImg(128)
-            </div>
-
-        }
+        <div class="my-4 d-flex flex-column align-items-center mx-auto align-self-center">
+            @Html.IconImg(128)
+        </div>
         <form action="@(Url.Action<HomeController>(c => c.Search(null, null)))" method="get" class="main-search" data-turboform>
             <div class="form-group" role="search">
                 <input id="weavy-main-search" class="form-control" type="search" name="q" value="" placeholder="Search" />
-                <button type="submit" class="btn btn-icon">@Html.SvgIcon("magnify")</button>
+                <button type="submit" class="btn btn-icon">@Svg.Icon("magnify")</button>
             </div>
         </form>
     </div>
-
-    @if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
-        <div class="top-right d-flex align-items-center">
-            <a href="@(Url.Action<Weavy.Web.Areas.Manage.Controllers.HomeController>(c => c.Index()))" class="btn btn-icon">@Html.SvgIcon(Model.ManageAlert ? "alert" : "settings", Model.ManageAlert ? "warning" : null)</a>
-            <a href="@(Url.Action<Weavy.Web.Areas.Manage.Controllers.HomeController>(c => c.Index()))" class="d-none d-md-inline-block text-muted pr-1">Manage</a>
-        </div>
-    }
 </div>
 
 @if (WeavyContext.HQ != null || PermissionService.HasSystemPermission(Permission.ManageSystem)) {
@@ -51,14 +36,14 @@
                 @if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
                     <div class="dropdown ml-auto">
                         <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                            @Html.SvgIcon("dots-vertical")
+                            @Svg.Icon("dots-vertical")
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
                             @if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
-                                <span class="dropdown-item" data-toggle="modal" data-target="#hq-modal" data-keyboard="true">@Html.SvgIcon("heart-box-outline") Select main space</span>
+                                <span class="dropdown-item" data-toggle="modal" data-target="#hq-modal" data-keyboard="true">@Svg.Icon("heart-box-outline") Select main space</span>
                                 <form action="@(Url.Action<HomeController>(c => c.SetHQ(null)))" method="post" data-turboform>
                                     @Html.HttpMethodOverride(HttpVerbs.Put)
-                                    <button type="submit" class="dropdown-item">@Html.SvgIcon("minus-box-outline") Unset main space</button>
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("minus-box-outline") Unset main space</button>
                                 </form>
                             }
                         </div>
@@ -83,14 +68,14 @@
             <h5 class="d-flex">
                 Set up your main space!
                 @if (Model.HQSpaces.Any()) {
-                    <a href="#hq-modal" data-toggle="modal" data-target="#hq-modal" data-keyboard="true" class="btn btn-icon ml-auto" title="Set main space">@Html.SvgIcon("plus-box-outline")</a>
+                    <a href="#hq-modal" data-toggle="modal" data-target="#hq-modal" data-keyboard="true" class="btn btn-icon ml-auto" title="Set main space">@Svg.Icon("plus-box-outline")</a>
                 } else {
-                    <a href="@(Url.Action<HomeController>(c => c.HQ()))" class="btn btn-icon ml-auto" title="Set main space">@Html.SvgIcon("plus-box-outline")</a>
+                    <a href="@(Url.Action<HomeController>(c => c.HQ()))" class="btn btn-icon ml-auto" title="Set main space">@Svg.Icon("plus-box-outline")</a>
                 }
             </h5>
             <div class="alert alert-primary d-flex flex-column align-items-center flex-md-row align-items-md-start">
                 <div class="d-flex">
-                    @Html.SvgIcon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-md-block" })
+                    @Svg.Icon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-md-block" })
                     <span class="mr-auto">The main space is the communications hub for your organization. It's a great place to put announcements, notes and stuff everyone needs to know.</span>
                 </div>
                 @if (Model.HQSpaces.Any()) {
@@ -103,14 +88,12 @@
     </div>
 }
 
-
-
 <div class="container d-flex flex-column my-4">
 
     <h5 class="d-flex">
-        <a href="@(Url.Action<SpaceController>(c => c.Index(null,null,null)))" class="text-hyphens">Spaces</a>
+        <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))" class="text-hyphens">Spaces</a>
         @if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
-            <a href="@(Url.Action<SpaceController>(c => c.New(null)))" class="btn btn-icon ml-auto" title="Add space">@Html.SvgIcon("plus-box-outline")</a>
+            <a href="@(Url.Action<SpaceController>(c => c.New()))" class="btn btn-icon ml-auto" title="Add space">@Svg.Icon("plus-box-outline")</a>
         }
     </h5>
 
@@ -136,9 +119,9 @@
         <p class="text-muted">
             All your active spaces will show up right here.
             @if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
-                <text>For now, you can <a href="@(Url.Action<SpaceController>(c => c.New(null)).ToLower())">add a new space</a> or <a href="@(Url.Action<SpaceController>(c => c.Index(null, null, null)))">find an existing space</a> to join.</text>
+                <text>For now, you can <a href="@(Url.Action<SpaceController>(c => c.New()).ToLower())">add a new space</a> or <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">find an existing space</a> to join.</text>
             } else {
-                <text>Check out the <a href="@(Url.Action<SpaceController>(c => c.Index(null, null, null)))">spaces page</a> to see if there are any interesting teams or projects to join.</text>
+                <text>Check out the <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">spaces page</a> to see if there are any interesting teams or projects to join.</text>
             }
 
         </p>
@@ -148,26 +131,30 @@
 <div class="container d-flex flex-column my-4">
 
     <h5 class="d-flex">
-        <a href="@(Url.Action<PeopleController>(c => c.Index(null,null,null)))" class="text-hyphens">People</a>
+        <a href="@(Url.Action<PeopleController>(c => c.Index(null, null)))" class="text-hyphens">People</a>
         @if (PermissionService.HasSystemPermission(Permission.ManageUsers)) {
-            <span class="dropdown ml-auto">
-                <button class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#" title="Add or invite user">@Html.SvgIcon("account-plus")</button>
-                <span class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.New()))">@Html.SvgIcon("account-plus", "primary") Add user</a>
-                    @if (PermissionService.HasSystemPermission(Permission.Invite)) {
-                        <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Html.SvgIcon("email", "deep-orange") Invite people</a>
-                    }
+            if (PermissionService.HasSystemPermission(Permission.Invite)) {
+                <span class="dropdown ml-auto">
+                    <button class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#" title="Add or invite user">@Svg.Icon("account-plus")</button>
+                    <span class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.New()))">@Svg.Icon("account-plus") Add user</a>
+                        @if (PermissionService.HasSystemPermission(Permission.Invite)) {
+                            <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Svg.Icon("email") Invite people</a>
+                        }
+                    </span>
                 </span>
-            </span>
+            } else {
+                <a class="btn btn-icon ml-auto" href="@(Url.Action<PeopleController>(c => c.New()))" title="Add user">@Svg.Icon("account-plus")</a>
+            }
         } else if (PermissionService.HasSystemPermission(Permission.Invite)) {
-            <a class="btn btn-icon ml-auto" href="@(Url.Action<PeopleController>(c => c.Invite()))" title="Invite people">@Html.SvgIcon("account-plus")</a>
+            <a class="btn btn-icon ml-auto" href="@(Url.Action<PeopleController>(c => c.Invite()))" title="Invite people">@Svg.Icon("account-plus")</a>
         }
     </h5>
 
     <div class="facepile facepile-lg">
         @Model.People.Facepile(size: 48, link: true)
         @if (Model.People.HasNextPage) {
-            <a href="@(Url.Action<PeopleController>(c => c.Index(null, null, null)))" class="btn btn-round btn-light" title="More people">@Html.SvgIcon("dots-horizontal", color: "icon")</a>
+            <a href="@(Url.Action<PeopleController>(c => c.Index(null, null)))" class="btn btn-round btn-light" title="More people">@Svg.Icon("dots-horizontal", color: "icon")</a>
         }
     </div>
 </div>
@@ -182,7 +169,7 @@
                         @Html.HttpMethodOverride(HttpVerbs.Put)
                         <div class="modal-header">
                             <h5 class="modal-title">Set up your main space</h5>
-                            <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Html.SvgIcon("close")</button>
+                            <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Svg.Icon("close")</button>
                         </div>
                         <div class="modal-body pb-0">
                             <div class="form-group">

@@ -6,7 +6,7 @@
     padding: rem(.25) rem(.5);
     background-color: #d4edda;
     text-align: center;
-    width: $widget-strip-width;
+    width: $widget-panel-width;
     color: #155724;
     border-radius: rem(.1875);
     margin: 0 auto;
@@ -15,6 +15,9 @@
     position: relative;
     z-index: 10;
     box-shadow: $md-shadow-8dp;
+    max-width: calc(100% - 3rem);
+    pointer-events: none;
+    user-select: none;
 
     &.fade {
         transition: opacity $md-animation-duration $md-animation-curve-default;

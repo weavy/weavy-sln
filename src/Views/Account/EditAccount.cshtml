@@ -3,14 +3,13 @@
 @{
     Title = "Edit profile";
     Back = Url.Back(User.Url()) ?? WeavyContext.ApplicationPath;
-    var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
     string embeddedBack = Url.Back<NotificationController>(c => c.Index());
 }
 
 @section navbar_left {
     <div class="navbar-icons">
-        <a class="btn btn-icon d-embedded" href="@embeddedBack" data-link>@Html.SvgIcon("arrow-left")</a>
-        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Html.SvgIcon("arrow-left")</a>
+        <a class="btn btn-icon d-embedded" href="@embeddedBack" data-link>@Svg.Icon("arrow-left")</a>
+        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Svg.Icon("arrow-left")</a>
     </div>
 }
 
@@ -32,41 +31,30 @@
         </div>
     }
 
-    @if (User.Logins.Any()) {
+    @if (!ConfigurationService.WindowsAuthentication && User.Logins.Any()) {
         <table class="table">
             <thead>
                 <tr>
+                    <th>Linked logins</th>
                     <th>Account</th>
-                    <th>Provider</th>
                     <th class="text-right">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (Login login in User.Logins) {
                     <tr>
-                        <td>@(login.Email ?? login.ProviderId)</td>
-                        <td>@login.Provider</td>
-
+                        <td>@login.Type</td>
+                        <td>@(login.Email ?? login.Sub)</td>
                         <td class="table-icon text-right">
                             @using (Html.BeginForm(nameof(AccountController.RemoveLogin), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
-                                @Html.Hidden("Provider", login.Provider)
-                                @Html.Hidden("ProviderId", login.ProviderId)
-                                <button type="submit" class="btn btn-icon" title="Remove">@Html.SvgIcon("close")</button>
+                                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                @Html.Hidden(nameof(Login.Id), login.Id)
+                                <button type="submit" class="btn btn-icon" title="Remove">@Svg.Icon("close")</button>
                             }
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-    }
-
-    @if (loginProviders.Any()) {
-        using (Html.BeginForm(nameof(AccountController.AddLogin), typeof(AccountController).ControllerName(), FormMethod.Post)) {
-            <div class="form-buttons">
-                @foreach (AuthenticationDescription p in loginProviders) {
-                    <button type="submit" class="btn btn-load btn-@p.AuthenticationType.Slugify()" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType">@Html.SvgIcon(p.AuthenticationType.Slugify()) Sign in with @p.Caption</button>
-                }
-            </div>
-        }
     }
 </div>

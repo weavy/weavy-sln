@@ -90,15 +90,19 @@
                     editor.execCommand("mceBeginUndoLevel");
 
                     if (/.(jpg|jpeg|gif|png)$/i.test(props.url)) {
+                        var pswpSize = props.width && props.height ? props.width + "x" + props.height : '';
+
                         // image
                         if (elm != null && elm.nodeName == "IMG") {
                             // update existing
                             dom.setAttrib(elm, "src", props.url);
                             dom.setAttrib(elm, "alt", props.description);
                             var parentNode = elm.parentNode;
-                            if (parentNode != null && parentNode.nodeName == "A" && parentNode.hasAttribute("rel") && parentNode.getAttribute("rel") == "lightbox") {
+                            if (parentNode != null && parentNode.nodeName === "A" && (parentNode.hasAttribute("rel") && parentNode.getAttribute("rel") === "lightbox" || parentNode.hasAttribute("data-photoswipe"))) {
                                 // update anchor
                                 dom.setAttrib(parentNode, "href", props.file_url);
+                                dom.setAttrib(parentNode, "data-photoswipe", "document");
+                                dom.setAttrib(parentNode, "data-size", pswpSize)
                             }
                         } else {
                             // create new
@@ -106,7 +110,11 @@
                             dom.setAttrib(elm, "src", props.url);
                             dom.setAttrib(elm, "alt", props.description);
 
-                            var a = dom.create('a', { href: props.file_url, "rel": "lightbox" });
+                            var a = dom.create('a', {
+                                href: props.file_url,
+                                "data-photoswipe": "document",
+                                "data-size": pswpSize
+                            });
                             dom.add(a, elm);
                             editor.selection.setNode(a);
                         }

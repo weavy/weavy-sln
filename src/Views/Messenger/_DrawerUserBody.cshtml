@@ -1,0 +1,16 @@
+﻿@model User
+
+@Model.AvatarImg(128, presence: true)
+
+<fieldset class="text-center">
+    <div class="media-title">@Model.GetTitle() <small>@@@Model.Username</small></div>
+
+    @if (Model.Email != null) {
+        <div class="media-separator"></div>
+        <div class="media-text"><a href="mailto:@Model.Email">@Model.Email</a></div>
+    }
+    @if (Model.Profile["Phone"] != null) {
+        <div class="media-separator"></div>
+        <div class="media-text"><a href="tel:@Model.Profile["Phone"]">@Model.Profile["Phone"]</a></div>
+    }
+</fieldset>

@@ -1,0 +1,52 @@
+﻿@{
+    Layout = "~/Views/Space/_Layout.cshtml";
+}
+
+@if (IsSectionDefined("scripts")) {
+    @section scripts {
+        @RenderSection("scripts")
+    }
+}
+
+@section navbar_middle {
+    @if (IsSectionDefined("navbar_middle")) {
+        @RenderSection("navbar_middle")
+    } else {
+        Html.RenderPartial("_NavbarMenu");
+    }
+}
+
+@section navbar_secondary {
+    @if (IsSectionDefined("navbar_secondary")) {
+        @RenderSection("navbar_secondary")
+    } else {
+        Html.RenderPartial("~/Views/Space/_Tabs.cshtml");
+    }
+}
+
+@if (IsSectionDefined("navbar_content")) {
+    @RenderSection("navbar_content")
+} else {
+    Html.RenderPartial("_Navbar", WeavyContext.Content);
+}
+
+@RenderBody()
+
+@if (IsSectionDefined("fab")) {
+    @section fab {
+        @RenderSection("fab")
+    }
+}
+
+@section footer {
+    @{
+        Html.RenderPartial("_EditCommentModal");
+        Html.RenderPartial("_FeedbackModal");
+        Html.RenderPartial("_ContentModal");
+        Html.RenderPartial("_MoveModal");
+        Html.RenderPartial("_ShareModal");
+        @RenderSection("footer", required: false)
+    }
+}
+
+

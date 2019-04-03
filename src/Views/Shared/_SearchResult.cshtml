@@ -1,7 +1,7 @@
-﻿@model IndexResult
+﻿@model IndexSearchResult
 @foreach (var item in Model) {
   <a href="@item.Url()" class="search-result-item media">
-    @Html.SvgIcon(item.Icon, item.Color)
+    @Svg.Icon(item.Icon, item.Color)
     <div class="media-body">
       @if (item.Title != null) {
         <h5>@if (item.TitleHighlight != null) {@Html.Raw(item.TitleHighlight) } else { @item.Title}</h5>
@@ -15,7 +15,7 @@
       }
       <small class="d-block mt-1 text-muted">
         @Html.Time(item.ModifiedAt) by @(item.ModifiedBy()?.GetTitle())
-        @if (Model.Query.SpaceId == null && item.SpaceId != null) {
+        @if (Model.Query.WrappedQuery.SpaceId == null && item.SpaceId != null) {
           var space = SpaceService.Get(item.SpaceId.Value);
           if (space != null) {
             <text> in @SpaceService.Get(item.SpaceId.Value).Name</text>

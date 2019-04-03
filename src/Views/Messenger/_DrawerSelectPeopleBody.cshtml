@@ -1,0 +1,17 @@
+﻿@{ 
+    var selected = ViewData["selected"] as IEnumerable<User> ?? new List<User>();
+}
+<div class="form-group search search-users">
+    <input type="text" class="form-control" name="q" value="@Model.Query.Text" placeholder="Find people..." data-search="room-members" />
+    <button type="button" class="btn btn-icon btn-search">@Svg.Icon("magnify")</button>
+    <button type="button" class="btn btn-icon btn-reset d-none">@Svg.Icon("close")</button>
+
+    @foreach (var u in selected) {
+        <input type="hidden" name="users" value="@u.Id" />
+    }
+    <button type="submit" class="btn btn-success btn-block mt-2" @(!selected.Any() ? "disabled" : "")>Create room</button>
+</div>
+
+<div class="list-group list-group-users">
+    @{ Html.RenderPartial("_SelectPeopleList"); }
+</div>

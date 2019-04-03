@@ -1,0 +1,41 @@
+﻿@model IEnumerable<RouteModel>
+@{
+    Title = "Routes";
+    Back = Url.Action<ManageController>(c => c.Index());
+}
+
+@section navbar_secondary {
+    <nav class="nav nav-tabs">
+        @if (ViewContext.RouteData.Values["tab"] == null) {
+            @(Html.ActionLink<ManageController>(c => c.Routes("mvc"), text: "MVC", htmlAttributes: new { @class = "nav-link active" }))
+        } else {
+            @(Html.ActionLink<ManageController>(c => c.Routes("mvc"), text: "MVC", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        }
+        @(Html.ActionLink<ManageController>(c => c.Routes("api"), text: "API", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    </nav>
+}
+
+<div class="container-fluid my-3">
+    <table class="table table-hover table-fixed">
+        <thead>
+            <tr>
+                <th style="width:100px;">Methods</th>
+                <th>Url</th>
+                <th style="width:100px;">Area</th>
+                <th style="width:200px;">Controller</th>
+                <th style="width:250px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var route in Model) {
+                <tr>
+                    <td>@(route.Methods?.ToUpper())</td>
+                    <td>@route.Url</td>
+                    <td>@(route.Area?.ToTitleCase())</td>
+                    <td>@route.Controller</td>
+                    <td>@route.Action</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

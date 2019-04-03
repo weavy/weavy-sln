@@ -1,0 +1,47 @@
+﻿@model IEnumerable<System.IO.FileInfo>
+@{
+    Title = "Log files";
+    Back = Url.Action<ManageController>(c => c.Index());
+}
+
+<div class="container-fluid mt-3">
+@if (Model.HasItems()) {
+    <table class="table table-hover table-logs" id="table-logfiles">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Modified</th>
+                <th>Size</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.AsSmartEnumerable()) {
+                <tr data-href="@(Url.Action<LogsController>(c => c.Get(item.Value.Name.ToLower(), null)))">
+                    <td class="table-icon"><a class="btn btn-icon" href="@Url.Action(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() })" target="_blank">@Svg.Icon("file-document")</a></td>
+                    <td>@Html.ActionLink(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() }, new { target = "_blank" })</td>
+                    <td>@Html.Time(item.Value.LastWriteTimeUtc, format: "g")</td>
+                    <td>@FileHelper.FileSizeAsString(item.Value.Length)</td>
+                    <td class="table-icon text-right">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                                @Svg.Icon("dots-vertical")
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="@(Url.Action<LogsController>(c => c.Get(item.Value.Name.ToLower(), null)))" class="dropdown-item">@Svg.Icon("file-document") View</a>
+                                <a href="@(Url.Action<LogsController>(c => c.Get(item.Value.Name.ToLower(), null)))?download=true" class="dropdown-item">@Svg.Icon("download") Download</a>
+                                <div class="dropdown-divider"></div>
+                                <form action="@(Url.Action<LogsController>(c => c.Delete(item.Index)))" method="post" data-turboform>
+                                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                    <button type="submit" name="name" value="@item.Value.Name.ToLower()" class="dropdown-item">@Svg.Icon("delete", "danger") Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+</div>

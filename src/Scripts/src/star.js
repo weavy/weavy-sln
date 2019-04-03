@@ -42,8 +42,9 @@ weavy.stars = (function ($) {
     });
 
     if (weavy.realtime) {
-        // respond to realtime event starentity
-        weavy.realtime.on("starentity", function (event, data) {
+        // respond to realtime star event
+        weavy.realtime.on("star.weavy", function (e, data) {
+            
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").addClass("on").removeClass("d-none").attr("title", "Unstar");
 
             // Add to stars tab
@@ -52,7 +53,7 @@ weavy.stars = (function ($) {
                 var $starItem = $('<tr data-href="' + data.url + '"></tr>');
 
                 if (data.type === "space" || data.type === "user") {
-                    $starItem.append('<td class="table-icon"><img alt="" class="img-32 avatar" src="' + data.thumb_url.replace(/{options}/, "64x64") + '"></td>');
+                    $starItem.append('<td class="table-icon"><img alt="" class="img-32 avatar" src="' + data.thumbUrl.replace(/{options}/, "64x64") + '"></td>');
                 } else {
                     $starItem.append('<td class="table-icon"><svg class="i' + (data.icon.color ? " text-" + data.icon.color : "") + '"><use xlink: href="#' + data.icon.name + '"></use></svg></td>')
                 }
@@ -63,8 +64,8 @@ weavy.stars = (function ($) {
             }
         });
 
-        // respond to realtime event unstarentity
-        weavy.realtime.on("unstarentity", function (event, data) {
+        // respond to realtime unstar event
+        weavy.realtime.on("unstar.weavy", function (e, data) {            
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").removeClass("on").attr("title", "Star");
         });
     }

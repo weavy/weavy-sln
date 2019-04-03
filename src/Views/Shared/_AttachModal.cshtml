@@ -9,14 +9,14 @@
         <div class="modal-header border-bottom-0">
             <h5 class="modal-title">New Office 365 document</h5>
             <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
-                @Html.SvgIcon("close")
+                @Svg.Icon("close")
             </button>
         </div>
         <div class="modal-body">
             <div class="list-group list-group-flush">
-                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".docx" data-type="Word">@Html.SvgIcon(FileHelper.GetIcon(".docx")) <span class="mx-1">Word</span></a>
-                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".xlsx" data-type="Excel">@Html.SvgIcon(FileHelper.GetIcon(".xlsx")) <span class="mx-1">Excel</span></a>
-                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".pptx" data-type="Powerpoint">@Html.SvgIcon(FileHelper.GetIcon(".pptx")) <span class="mx-1">Powerpoint</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".docx" data-type="Word">@Svg.Icon(FileHelper.GetIcon(".docx")) <span class="mx-1">Word</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".xlsx" data-type="Excel">@Svg.Icon(FileHelper.GetIcon(".xlsx")) <span class="mx-1">Excel</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#filename-dialog" data-param=".pptx" data-type="Powerpoint">@Svg.Icon(FileHelper.GetIcon(".pptx")) <span class="mx-1">Powerpoint</span></a>
             </div>
         </div>
     </div>
@@ -27,14 +27,14 @@
         <div class="modal-header border-bottom-0">
             <h5 class="modal-title">New Google Drive file</h5>
             <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
-                @Html.SvgIcon("close")
+                @Svg.Icon("close")
             </button>
         </div>
         <div class="modal-body">
             <div class="list-group list-group-flush">
-                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="document" data-type="Docs" data-icon="docs">@Html.SvgIcon("google-docs-color") <span class="mx-1">Google Docs</span> </a>
-                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="spreadsheet" data-type="Sheets" data-icon="sheets">@Html.SvgIcon("google-sheets-color") <span class="mx-1">Google Sheets</span></a>
-                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="presentation" data-type="Slides" data-icon="slides">@Html.SvgIcon("google-slides-color") <span class="mx-1">Google Slides</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="document" data-type="Docs" data-icon="docs">@Svg.Icon("file-document-box", "native") <span class="mx-1">Google Docs</span> </a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="spreadsheet" data-type="Sheets" data-icon="sheets">@Svg.Icon("file-sheet-box", "native") <span class="mx-1">Google Sheets</span></a>
+                <a class="list-group-item d-flex align-items-center px-1" href="#" data-toggle="modal" data-target="#google-create-modal" data-guid="@(typeof(CloudLink).GUID)" data-param="presentation" data-type="Slides" data-icon="slides">@Svg.Icon("file-slide-box", "native") <span class="mx-1">Google Slides</span></a>
             </div>
         </div>
 
@@ -47,14 +47,14 @@
             <div class="modal-header border-bottom-0">
                 <h5 class="modal-title">New Google <span id="doctype"></span> document</h5>
                 <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
-                    @Html.SvgIcon("close")
+                    @Svg.Icon("close")
                 </button>
             </div>
             <div class="modal-body">
                 <div class="input-group">
                     <input type="text" class="form-control doctitle" placeholder="Name" name="name" id="name" autofocus>
                     <div class="input-group-append">
-                        <button type="submit" class="btn btn-gray" title="Add document"><svg class="i m-0"><use class="docicon" xlink:href="#google-docs"></use></svg></button>
+                        <button type="submit" class="btn btn-primary" title="Add document">@Svg.Icon("plus", htmlAttributes: new { @class="m-0"})</button>
                     </div>
                 </div>
             </div>
@@ -68,15 +68,15 @@
             <div class="modal-header border-bottom-0">
                 <h5 class="modal-title">Add file</h5>
                 <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">
-                    @Html.SvgIcon("close")
+                    @Svg.Icon("close")
                 </button>
             </div>
             <div class="modal-body">
                 <div class="list-group list-group-flush">
-                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="dropbox">@Html.SvgIcon("dropbox-color") <span class="mx-1">Dropbox</span> </a>
-                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="box">@Html.SvgIcon("box-color") <span class="mx-1">Box</span></a>
-                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="onedrive">@Html.SvgIcon("onedrive-color") <span class="mx-1">Onedrive</span></a>
-                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="google-drive">@Html.SvgIcon("google-drive-color") <span class="mx-1">Google Drive</span></a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="box">@Svg.Icon("box", "native") <span class="mx-1">Box</span></a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="dropbox">@Svg.Icon("dropbox", "native") <span class="mx-1">Dropbox</span> </a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="google-drive">@Svg.Icon("google-drive", "native") <span class="mx-1">Google Drive</span></a>
+                    <a class="list-group-item d-flex align-items-center px-1" href="#" data-guid="@(typeof(CloudLink).GUID)" data-provider="onedrive">@Svg.Icon("onedrive", "native") <span class="mx-1">Onedrive</span></a>                    
                 </div>
                 @Html.SvgOverlaySpinner(spin: false, size: 48, id: "attach-modal-spinner")
             </div>

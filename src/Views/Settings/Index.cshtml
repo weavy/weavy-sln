@@ -1,0 +1,39 @@
+﻿@model IEnumerable<IPlugin>
+@{
+    Title = "Settings";
+    Back = Url.Action<HomeController>(c => c.Index());
+}
+
+<div class="container-fluid my-3">
+
+@if (Model.HasItems()) {
+    <table class="table table-hover table-extensions">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plug in Model) {
+                <tr @(Html.Raw(!plug.IsLoaded() ? @"class=""table-warning""" : !plug.IsEnabled ? @"class=""table-muted""" : "")) data-href="@(Url.Action<SettingsController>(c => c.Get(plug.Id)))">
+                    <td class="table-icon"><a class="btn btn-icon" href="@(Url.Action<SettingsController>(c => c.Get(plug.Id)))">@Svg.Icon(plug.Icon, plug.Color)</a></td>
+                    <td><a href="@(Url.Action<SettingsController>(c => c.Get(plug.Id)))">@plug.Name</a></td>
+                    <td>@plug.Description</td>
+                    <td class="table-icon">
+                        @if (!plug.IsLoaded()) {
+                            using (Html.BeginForm(nameof(SettingsController.Delete), null, new { id = plug.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
+                                @Html.HttpMethodOverride(HttpVerbs.Delete);
+                                <button type="submit" class="btn btn-icon btn-danger" title="Remove">@Svg.Icon("close")</button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+</div>

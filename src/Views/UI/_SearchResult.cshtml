@@ -1,4 +1,4 @@
-﻿@model IndexResult
+﻿@model IndexSearchResult
 <div class="list-group">
     
     @foreach (var item in Model) {
@@ -7,7 +7,7 @@
                 @if (item.Title != null) {
                 <h5 class="mb-1">@if (item.TitleHighlight != null) { @Html.Raw(item.TitleHighlight) } else { @item.Title }</h5>
                 }
-                <small>@Html.SvgIcon(item)</small>
+                <small>@Svg.Icon(item)</small>
             </div>
             @if (item.Description != null) {
                 <p class="mb-1">@if (item.DescriptionHighlight != null) { @Html.Raw(item.DescriptionHighlight) } else { @item.Description.Ellipsis(256) }</p>

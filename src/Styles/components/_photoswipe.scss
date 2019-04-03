@@ -10,8 +10,7 @@ $pswp__error-text-color: $danger; // "Image not loaded" text color
 @import "../vendor/photoswipe/default-skin/default-skin";
 
 .pswp {
-    overscroll-behavior: contain;
-    -ms-scroll-chaining: none;
+    @include overscroll-behavior-contain;
 }
 
 html.embedded {

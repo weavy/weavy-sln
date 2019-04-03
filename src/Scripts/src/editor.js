@@ -26,11 +26,6 @@ weavy.editor = (function ($) {
          */
         function init() {
             // Add any initialization logic here...
-            emojione.imagePathSVG = weavy.url.resolve("/img/eo/");
-            emojione.imageType = "svg";
-            $.fn.emojioneArea.defaults.useInternalCDN = false;
-            $.fn.emojioneArea.defaults.imageType = "svg";
-
             $wrapper = $("<div class='weavy-editor'/>");
             $wrapper.insertBefore($el);
             $wrapper.on("click", function (e) {
@@ -43,7 +38,7 @@ weavy.editor = (function ($) {
                 options.emojis = false;
             }
 
-            var $textarea = $el.emojioneArea({
+            var $textarea = $el.removeAttr("disabled").emojioneArea({
                 attributes: {
                     dir: "ltr",
                     spellcheck: true,
@@ -52,19 +47,8 @@ weavy.editor = (function ($) {
                     autocapitalize: "on",
                     tabindex: "1"
                 },
-                container: $wrapper,
-                tonesStyle: "bullet",
-                hidePickerOnBlur: true,
-                saveEmojisAs: 'shortname',
                 buttonTitle: "Insert emoji",
-                inline: options.inline,
-                placeholder: options.placeholder,
-                pickerPosition: options.mode === 'default' ? (options.inline ? "bottom" : "top") : options.mode,
-                shortcuts: false,
-                textcomplete: {
-                    maxCount: 5,
-                    placement: null
-                },
+                container: $wrapper,
                 events: {
                     "picker.show": function (picker, evt) {
                         toggleMore(false);
@@ -73,12 +57,23 @@ weavy.editor = (function ($) {
                     "picker.hide": function (picker, evt) {
                         picker.hide();
                     }
-                }
+                },
+                imageType: "svg",
+                inline: options.inline,
+                pickerPosition: options.mode === 'default' ? (options.inline ? "bottom" : "top") : options.mode,
+                placeholder: options.placeholder,
+                saveEmojisAs: "shortname",
+                searchPlaceholder: "Search...",
+                shortcuts: false,
+                textcomplete: {
+                    maxCount: 5,
+                    placement: null
+                },
+                tonesStyle: "bullet",
+                useInternalCDN: false
             });
 
             if ($textarea[0] !== null) {
-                $textarea.removeAttr("disabled");
-
                 _emojiarea = $textarea[0].emojioneArea;
 
                 // collapsed mode
@@ -143,7 +138,6 @@ weavy.editor = (function ($) {
                         },
                         index: 1,
                         template: function (item) {
-                            //return '<img class="img-24 avatar" src="' + weavy.url.thumb(item.thumb_url, "48x48-crop,both") + '" alt="" /><span>' + (item.name || item.username) + ' <small>@' + item.username + '</small></span>';
                             var html = '<img class="img-24 avatar" src="' + weavy.url.thumb(item.thumb_url, "48x48-crop,both") + '" alt="" /><span>' + (item.name || item.username);
                             if (item.username) {
                                 html += ' <small>@' + item.username + '</small>';
@@ -178,7 +172,7 @@ weavy.editor = (function ($) {
                         },
                         index: 1,
                         template: function (item) {
-                            var icon = "<svg class='i text-" + item.icon.color + "'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#" + item.icon.name + "'></use></svg>"
+                            var icon = '<svg class="i i-link-variant" height="24" viewBox="0 0 24 24" width="24"><path d="m10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0-1.95-1.95-1.95-5.12 0-7.07l3.54-3.54c1.95-1.95 5.12-1.95 7.07 0s1.95 5.12 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48c1.18-1.17 1.18-3.07 0-4.24-1.17-1.18-3.07-1.18-4.24 0l-3.53 3.53c-1.18 1.17-1.18 3.07 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0 1.95 1.95 1.95 5.12 0 7.07l-3.54 3.54c-1.95 1.95-5.12 1.95-7.07 0s-1.95-5.12 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47c-1.18 1.17-1.18 3.07 0 4.24 1.17 1.18 3.07 1.18 4.24 0l3.53-3.53c1.18-1.17 1.18-3.07 0-4.24-.41-.39-.41-1.03 0-1.42z"/></svg>'
                             return icon + '<span>' + item.title + ' <small class="text-muted">' + item.kind + '</small></span>';
                         },
                         replace: function (item) {
@@ -194,7 +188,7 @@ weavy.editor = (function ($) {
                     // file upload
                     if (options.fileupload) {
                         // add file button
-                        var $file = $("<div class='btn-file btn btn-icon' title='Add files'><svg class='i'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#image'></use></svg><svg class='i'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#attachment'></use></svg><input type='file' name='files' multiple=''></div>");
+                        var $file = $('<div class="btn-file btn btn-icon" title="Add files"><svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg><svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg><input type="file" name="files" multiple /></div>');
                         $file.appendTo($buttoncontainer);
 
                         // add upload container
@@ -227,9 +221,9 @@ weavy.editor = (function ($) {
 
                                 $.each(blobs.data, function (index, blob) {
                                     $wrapper.find(".uploads .table-attachments").append('<tr>' +
-                                        '<td class="table-icon"><svg class="i text-' + blob.icon.color + '"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#' + blob.icon.name + '"></use></svg></td>' +
+                                        '<td class="table-icon"><svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg></td>' +
                                         '<td>' + blob.name + '</td>' +
-                                        '<td class="table-icon"><a class="btn btn-icon remove"><svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg></a><input type="hidden" name="blobs" value="' + blob.id + '" /></td>' +
+                                        '<td class="table-icon"><a class="btn btn-icon remove"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg></a><input type="hidden" name="blobs" value="' + blob.id + '" /></td>' +
                                         '</tr>');
                                 });
 
@@ -362,7 +356,7 @@ weavy.editor = (function ($) {
                     if (options.polls) {
 
                         // add options button
-                        var $optionsbutton = $("<button type='button' class='btn btn-icon btn-poll' title='Add poll'><svg class='i'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#poll-box'></use></svg></button>");
+                        var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
                         $optionsbutton.appendTo($buttoncontainer);
 
                         // add options container
@@ -437,11 +431,11 @@ weavy.editor = (function ($) {
                 // add context button
                 if (options.context) {
 
-                    var $context = $("<div class='context'>" +
-                        "<div class='context-data'><img class='context-icon' src=''/><span class='context-url'></span><a href='#' title='Remove url as context' class='remove-context btn btn-icon'><svg class='i i-18'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#close-circle'></use></svg></a></div>" +
-                        "</div>");
+                    var $context = $('<div class="context">' +
+                        '<div class="context-data"><img class="context-icon" src=""/><span class="context-url"></span><a href="#" title="Remove context url" class="remove-context btn btn-icon"><svg class="i i-18 i-close-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.53 0 10 4.47 10 10s-4.47 10-10 10-10-4.47-10-10 4.47-10 10-10m3.59 5-3.59 3.59-3.59-3.59-1.41 1.41 3.59 3.59-3.59 3.59 1.41 1.41 3.59-3.59 3.59 3.59 1.41-1.41-3.59-3.59 3.59-3.59z"/></svg></a></div>' +
+                        '</div>');
 
-                    var $contextButton = $("<button type='button' class='context btn btn-icon btn-add-context' title='Embed current url as context'><svg class='i'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#link-context'></use></svg></button>");
+                    var $contextButton = $('<button type="button" class="context btn btn-icon btn-add-context" title="Embed current url as context"><svg class="i i-link-context" height="24" viewBox="0 0 24 24" width="24"><path d="m19 19h-14v-14h5l2-2h-7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7l-2 2zm-6.1-7.9c.3.3.3.8 0 1.1s-.8.3-1.1 0c-1.5-1.5-1.5-3.9 0-5.4l2.7-2.7c1.5-1.5 3.9-1.5 5.4 0s1.5 3.9 0 5.4l-1.1 1.1c0-.6-.1-1.2-.3-1.8l.4-.4c.9-.9.9-2.3 0-3.2s-2.3-.9-3.2 0l-2.7 2.7c-1 .8-1 2.3-.1 3.2zm2.2-3.2c.3-.3.8-.3 1.1 0 1.5 1.5 1.5 3.9 0 5.4l-2.7 2.7c-1.5 1.5-3.9 1.5-5.4 0s-1.5-3.9 0-5.4l1.1-1.1c0 .6.1 1.2.3 1.8l-.4.4c-.9.9-.9 2.3 0 3.2s2.3.9 3.2 0l2.7-2.7c.9-.9.9-2.3 0-3.2-.2-.4-.2-.8.1-1.1z"/></svg></button>');
 
                     // Always hide context initially for comments
                     if ($wrapper.closest(".section-comments").length) {
@@ -461,7 +455,7 @@ weavy.editor = (function ($) {
                         $context.find(".context-data").fadeOut(200);
                         $context.slideUp(200);
                         $wrapper.closest("form").find("#contextUrl").attr("disabled", true);
-                        hook("onContextChange", e, { has_context: false });
+                        hook("onContextChange", e, { hasContext: false });
                     });
 
                     $($contextButton).on("click", function (e) {
@@ -470,13 +464,13 @@ weavy.editor = (function ($) {
                         $wrapper.closest("form").find("#contextUrl").attr("disabled", false);
                         $context.find(".context-data").fadeIn(200);
                         $context.slideDown(200);
-                        hook("onContextChange", e, { has_context: true });
+                        hook("onContextChange", e, { hasContext: true });
                     });
                 }
 
                 // add more button
                 if (options.minimized) {
-                    var $more = $("<button type='button' class='btn btn-icon btn-more' title='More'><svg class='i'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#dots-horizontal-circle'></use></svg></button>")
+                    var $more = $('<button type="button" class="btn btn-icon btn-more" title="More"><svg class="i i-dots-horizontal-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10-10-4.48-10-10 4.48-10 10-10m0 8.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m-5.5 0c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m11 0c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/></svg></button>')
                     $more.appendTo($buttoncontainer);
                     $more.on("click", function (e) {
                         e.preventDefault();
@@ -485,7 +479,7 @@ weavy.editor = (function ($) {
                 }
 
                 // add submit button
-                var $submit = $("<button tabindex='2' type='submit' class='btn-submit btn btn-icon btn-primary' title='Submit'><svg class='i'><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#send'></use></svg></button>");
+                var $submit = $('<button tabindex="2" type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"/></svg></button>');
                 if (options.submitButton) {
                     $submit = options.submitButton;
                 } else {

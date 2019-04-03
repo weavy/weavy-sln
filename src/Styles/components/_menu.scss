@@ -27,15 +27,6 @@
             background-color: $dropdown-bg;
             margin: 0 !important;
         }
-
-        .manage-sidebar-left-open & {
-            .dropdown-menu, .dropdown-menu.open {
-                transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.45s cubic-bezier(0.075, 0.82, 0.165, 1);
-                opacity: 1;
-                transform: none !important;
-                pointer-events: auto;
-            }
-        }
     }
 }
 

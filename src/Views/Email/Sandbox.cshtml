@@ -1,0 +1,164 @@
+﻿@model Weavy.Core.Models.SandboxEmail
+@using Weavy.Core.Services
+@* STANDARD MODULE // *@
+<tr>
+    <td align="center" valign="top">
+        @* CENTERING TABLE // *@
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" valign="top">
+                    @* FLEXIBLE CONTAINER // *@
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" class="flexibleContainer">
+                        <tr>
+                            <td align="center" valign="top" width="600" class="flexibleContainerCell">
+                                @* CONTENT TABLE // *@
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td valign="top" class="textContent">
+                                            <h3>Welcome to @Model.Theme.Name</h3>
+                                            <br />
+                                            We are using @ConfigurationService.ApplicationName to collaborate and an account was just created for you. These are your account details:
+                                        </td>
+                                    </tr>
+                                </table>
+                                @* // CONTENT TABLE *@
+                            </td>
+                        </tr>
+                    </table>
+                    @* // FLEXIBLE CONTAINER *@
+                </td>
+            </tr>
+        </table>
+        @* // CENTERING TABLE *@
+    </td>
+</tr>
+@* // STANDARD MODULE *@
+
+@* NESTED MODULE // *@
+<tr>
+    <td align="center" valign="top">
+        @* CENTERING TABLE // *@
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" valign="top">
+                    @* FLEXIBLE CONTAINER // *@
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" class="flexibleContainer">
+                        <tr>
+                            <td align="center" valign="top" width="600" class="flexibleContainerCell bottomShim">
+                                @* NESTED CONTAINER // *@
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" class="nestedContainer">
+                                    <tr>
+                                        <td align="center" valign="top" class="nestedContainerCell">
+                                            @* CONTENT TABLE // *@
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                <tr>
+                                                    <td valign="top" class="textContent">
+                                                        url: <a href="/">@Weavy.Core.Helpers.UrlHelper.ApplicationUrl(true)</a><br />
+                                                        username: <strong>@Model.User.Username</strong><br />
+                                                        password: <strong>@Model.Password</strong>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            @* // CONTENT TABLE *@
+                                        </td>
+                                    </tr>
+                                </table>
+                                @* // NESTED CONTAINER *@
+                            </td>
+                        </tr>
+                    </table>
+                    @* // FLEXIBLE CONTAINER *@
+                </td>
+            </tr>
+        </table>
+        @* // CENTERING TABLE *@
+    </td>
+</tr>
+@* // NESTED MODULE *@
+
+
+@* STANDARD MODULE // *@
+<tr>
+    <td align="center" valign="top">
+        @* CENTERING TABLE // *@
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" valign="top">
+                    @* FLEXIBLE CONTAINER // *@
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" class="flexibleContainer">
+                        <tr>
+                            <td align="center" valign="top" width="600" class="flexibleContainerCell">
+                                @* CONTENT TABLE // *@
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td valign="top" class="textContent">
+                                            Sign in with your username and password to start collaborating with the rest of your team.
+                                        </td>
+                                    </tr>
+                                </table>
+                                @* // CONTENT TABLE *@
+                            </td>
+                        </tr>
+                    </table>
+                    @* // FLEXIBLE CONTAINER *@
+                </td>
+            </tr>
+        </table>
+        @* // CENTERING TABLE *@
+    </td>
+</tr>
+@* // STANDARD MODULE *@
+
+
+@* BUTTON MODULE // *@
+<tr>
+    <td align="center" valign="top">
+        @* CENTERING TABLE // *@
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" valign="top">
+                    @* FLEXIBLE CONTAINER // *@
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" class="flexibleContainer">
+                        <tr>
+                            <td align="center" valign="top" width="600" class="flexibleContainerCell bottomShim">
+                                @* CONTENT TABLE // *@
+                                <table border="0" cellpadding="0" cellspacing="0" width="260" class="emailButton">
+                                    <tr>
+                                        <td align="center" valign="middle" class="buttonContent">
+                                            <a href="/sign-in" target="_blank">Sign in</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                @* // CONTENT TABLE *@
+                            </td>
+                        </tr>
+                    </table>
+                    @* // FLEXIBLE CONTAINER *@
+                </td>
+            </tr>
+        </table>
+        @* // CENTERING TABLE *@
+    </td>
+</tr>
+@* // BUTTON MODULE *@
+
+
+@* STANDARD MODULE // *@
+<tr>
+    <td align="center" valign="top" class="textContent">
+    </td>
+</tr>
+@* // STANDARD MODULE *@
+
+
+@section footer {
+    @* CONTENT TABLE // *@
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td valign="top" class="footerContent">
+                Psst. After signing in we recommend that you <a href="/password">change your password</a>.
+            </td>
+        </tr>
+    </table>
+    @* // CONTENT TABLE *@
+}

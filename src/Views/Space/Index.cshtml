@@ -1,4 +1,4 @@
-﻿@model SearchResult<Space, SpaceQuery>
+﻿@model SpaceSearchResult
 @{
     Title = "Spaces";
     var tab = ViewContext.RouteData.Values["tab"] as string;
@@ -11,22 +11,22 @@
 @section navbar_secondary {
     <nav class="nav nav-tabs">
         @if (tab == null || tab == "spaces") {
-            @(Html.ActionLink<SpaceController>(c => c.Index(null, null, null), text: "All", htmlAttributes: new { @class = "nav-link active" }, active: LinkActive.Path))
+            @(Html.ActionLink<SpaceController>(c => c.Index(null, null), text: "All", htmlAttributes: new { @class = "nav-link active" }, active: LinkActive.Path))
         } else {
-            @(Html.ActionLink<SpaceController>(c => c.Index(null, null, null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<SpaceController>(c => c.Index(null, null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
         }
-        @(Html.ActionLink<SpaceController>(c => c.Index(null, "joined", null), text: "Joined", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<SpaceController>(c => c.Index(null, "joined"), text: "Joined", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
     </nav>
 
     @if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
         <div class="fab">
-            <a class="btn btn-round btn-primary" href="@(Url.Action<SpaceController>(c => c.New(null)))" title="Add space">@Html.SvgIcon("plus")</a>
+            <a class="btn btn-round btn-primary" href="@(Url.Action<SpaceController>(c => c.New()))" title="Add space">@Svg.Icon("plus")</a>
         </div>
     }
 }
 
 <div class="container-fluid my-3">
-    @(Html.FilterForm<SpaceController>(c => c.Index(null, tab, null), Model.Query))
+    @(Html.FilterForm<SpaceController>(c => c.Index(null, tab), Model.Query))
 
     @if (Model.HasItems()) {
         <table class="table table-hover table-spaces">
@@ -40,7 +40,45 @@
                 </tr>
             </thead>
             <tbody id="infinite-scroll-target">
-                @{ Html.RenderPartial("_SpaceTable", Model); }
+                @if (Model.Any()) {
+                    foreach (var space in Model) {
+                        bool visible = !space.IsTrashed() && space.HasPermission(Permission.View);
+                        <tr class="@(space.IsArchived() ? "table-muted" : "") @(space.IsTrashed() ? "table-trashed" : "")" @Html.Raw(visible ? $@"data-href=""{space.Url()}""" : "")>
+                            <td class="table-icon">@space.AvatarImg(32)</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="text-truncate">
+                                        @if (visible) {
+                                            <a href="@space.Url()">@space.Name</a>
+                                        } else {
+                                            @space.Name
+                                        }
+                                        @if (space.Teamname != null) {<small class="text-muted">@@@space.Teamname</small>}
+                                    </div>
+
+                                    @if (space.IsHQ) {
+                                        <span class="badge badge-info m-1">main</span>
+                                    } else if (space.Privacy != Privacy.Open) {
+                                        @Html.Badge(space.Privacy, htmlAttributes: new { @class = "ml-1" })
+                                    }
+                                    @Html.StarToggle(space, htmlAttributes: new { @class = "ml-auto" })
+                                </div>
+                            </td>
+                            <td>@space.Description</td>
+                            <td class="text-right">
+                                @if (visible) {
+                                    <a href="@(Url.Action<SpaceController>(c => c.Members(space.Id, null, null)))" class="badge @(space.IsMember ? "badge-info" : "badge-secondary")">@space.MemberIds.Count()</a>
+                                } else {
+                                    <span class="badge badge-secondary opacity-muted">@space.MemberIds.Count()</span>
+                                }
+                            </td>
+                            <td class="table-icon">@{ Html.RenderPartial("_SpaceMenu", space);}</td>
+                        </tr>
+                    }
+                    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+                        <td colspan="4"></td>
+                    </tr>
+                }
             </tbody>
         </table>
         @Html.ScrollMore(Model)
@@ -50,11 +88,11 @@
     } else {
         <p class="text-muted text-center">
             @if (tab == "joined") {
-                <text>Nothing to see here. Why don't you join <a href="@(Url.Action<SpaceController>(c => c.Index(null, null, null)))">existing space</a>?</text>
+                <text>Nothing to see here. Why don't you join <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">existing space</a>?</text>
             } else {
                 <text>Nothing to see here.</text>
                 if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
-                    <text>Why don't you <a href="@(Url.Action<SpaceController>(c => c.New(null)))">add a new space</a>?</text>
+                    <text>Why don't you <a href="@(Url.Action<SpaceController>(c => c.New()))">add a new space</a>?</text>
                 }
             }
         </p>

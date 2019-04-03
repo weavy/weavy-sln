@@ -5,7 +5,7 @@
     var limit = 3;
 }
 
-<div class="image-grid">
+<div class="image-grid" data-image-count="@count">
     @foreach (var img in Model.Take(limit)) {
         var attrs = Html.PreviewAttributes(img);
 

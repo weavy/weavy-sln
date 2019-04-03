@@ -10,7 +10,7 @@
                 @Html.IconImg(48)
             </div>
             <h1 class="display-3">Link login</h1>
-            <p>Looks like we already have account for <strong>@Model.Email</strong> on @Theme.Name. Enter your password to avoid duplicate accounts.</p>
+            <p>There is already a local account for <strong>@Model.Login.Email</strong> on @Theme.Name. To verify that you want to link your your <strong>@Model.Login.Type</strong> login to this account we need you to provide your password.</p>
 
             @using (Html.BeginForm(nameof(AccountController.LinkLogin), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
                 @Html.AntiForgeryToken()

@@ -44,7 +44,7 @@ weavy.comments = (function ($) {
             },
             onContextChange: function (e, data) {
                 var $editor = $(this);                
-                $editor.closest("form").find("input[name=hasContext]").val(data.has_context);
+                $editor.closest("form").find("input[name=hasContext]").val(data.hasContext);
             }
         });
     }
@@ -282,7 +282,7 @@ weavy.comments = (function ($) {
     });
 
     // rtm comment
-    weavy.realtime.on("comment", function (e, comment) {
+    weavy.realtime.on("comment-inserted.weavy", function (e, comment) {
 
         // do nothing if already exists
         if ($("div[data-comment-id='" + comment.id + "']").length !== 0) return;
@@ -292,13 +292,17 @@ weavy.comments = (function ($) {
     });
 
     // rtm like comment
-    weavy.realtime.on("likecomment", function (e, comment, user) {        
-        updateCommentFeedback(comment.id)
+    weavy.realtime.on("like.weavy", function (e, liked) {       
+        if (liked.type === 'comment') {
+            updateCommentFeedback(liked.id);
+        }
     });
 
     // rtm unlike comment
-    weavy.realtime.on("unlikecomment", function (e, comment, user) {        
-        updateCommentFeedback(comment.id)
+    weavy.realtime.on("unlike.weavy", function (e, unliked) {        
+        if (unliked.type === 'comment') {
+            updateCommentFeedback(unliked.id);
+        }
     });
 
     // load edit form

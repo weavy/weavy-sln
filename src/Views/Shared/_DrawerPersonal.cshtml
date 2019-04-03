@@ -2,15 +2,17 @@
     <header class="drawer-header">
         <div class="dropdown d-standalone">
             <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                @Html.SvgIcon("dots-vertical")
+                @Svg.Icon("dots-vertical")
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))">@Html.SvgIcon("pencil") Edit profile</a>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditSettings()))">@Html.SvgIcon("format-list-checks") Settings</a>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditAccount()))">@Html.SvgIcon("account-network") Account details</a>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Html.SvgIcon("account-key") Change password</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))">@Svg.Icon("pencil") Edit profile</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditSettings()))">@Svg.Icon("format-list-checks") Settings</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditAccount()))">@Svg.Icon("account-network") Account details</a>
+                @if (!ConfigurationService.WindowsAuthentication) {
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Svg.Icon("account-key") Change password</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut(null)))" data-turbolinks="false">@Html.SvgIcon("logout") Sign out</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut(null)))" data-turbolinks="false">@Svg.Icon("logout") Sign out</a>
+                }
             </div>
         </div>
         <div class="text-center pt-3 pb-2">
@@ -23,33 +25,42 @@
             </p>
         </div>
         <nav class="nav nav-tabs" role="tablist">
-            <a class="nav-link nav-icon nav-badge active" href="#tab-notifications" data-toggle="tab" role="tab" title="Notifications">@Html.SvgIcon("bell")@Html.NotificationsBadge()</a>
-            <a class="nav-link nav-icon" href="#tab-stars" data-toggle="tab" role="tab" title="Stars">@Html.SvgIcon("star")</a>
-            <a class="nav-link nav-icon" href="#tab-drafts" data-toggle="tab" role="tab" title="Drafts">@Html.SvgIcon("file")</a>
+            <a class="nav-link nav-icon active" href="#tab-notifications" data-toggle="tab" role="tab" title="Notifications">@Svg.Icon("bell")@Html.NotificationsBadge()</a>
+            <a class="nav-link nav-icon" href="#tab-stars" data-toggle="tab" role="tab" title="Stars">@Svg.Icon("star")</a>
+            <a class="nav-link nav-icon" href="#tab-drafts" data-toggle="tab" role="tab" title="Drafts">@Svg.Icon("file")</a>
+            <a class="nav-link nav-icon" href="#tab-trash" data-toggle="tab" role="tab" title="Recycle bin">@Svg.Icon("delete")</a>
         </nav>
     </header>
     <div class="drawer-body scroll-y tab-content">
         <div class="tab-pane active" id="tab-notifications" role="tabpanel">
-            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom px-3">
+            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">Notifications</h6>
-                <button type="button" class="btn btn-icon btn-primary" data-read="notifications" title="Mark all as read">@Html.SvgIcon("check-all")</button>
+                <button type="button" class="btn btn-icon btn-primary" data-read="notifications" title="Mark all as read">@Svg.Icon("check-all")</button>
             </header>
             <div class="tab-loading">@Html.SvgSpinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<NotificationController>(c => c.Index()))"></div>
         </div>
         <div class="tab-pane" id="tab-stars" role="tabpanel">
-            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom px-3">
+            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">Stars</h6>
             </header>
             <div class="tab-loading">@Html.SvgSpinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<StarController>(c => c.Index()))"></div>
         </div>
         <div class="tab-pane" id="tab-drafts" role="tabpanel">
-            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom px-3">
+            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">Drafts</h6>
             </header>
             <div class="tab-loading">@Html.SvgSpinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<ContentController>(c => c.Drafts()))"></div>
+        </div>
+        <div class="tab-pane" id="tab-trash" role="tabpanel">
+            <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
+                <h6 class="navbar-title mr-auto">Recycle bin</h6>
+                @*<button type="button" class="btn btn-icon btn-danger" title="Empty recycle bin">@Svg.Icon("delete")</button>*@
+            </header>
+            <div class="tab-loading">@Html.SvgSpinner()</div>
+            <div class="tab-remote" data-url="@(Url.Action<RecycleBinController>(c => c.UserTrash()))"></div>
         </div>
     </div>
 </aside>

@@ -1,8 +1,8 @@
 ﻿@model Content
 
 <tr data-href="@Model.Url()">
-    <td class="table-icon">@Html.SvgIcon(Model)</td>
+    <td class="table-icon">@Svg.Icon(Model)</td>
     <td><a href="@Model.Url()">@Model.Name</a></td>
-    <td class="table-icon"><a class="btn btn-icon" href="@Model.Url()/edit" title="Continue editing">@Html.SvgIcon("pencil")</a></td>
+    <td class="table-icon"><a class="btn btn-icon" href="@Model.Url()/edit" title="Continue editing">@Svg.Icon("pencil")</a></td>
 </tr>
 

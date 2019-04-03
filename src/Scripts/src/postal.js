@@ -7,14 +7,18 @@ weavy.postal = (function ($) {
     var messageQueue = [];
 
     this.windowName = null;
-    this.stripId = null;
+    this.widgetId = null;
+    this.panelId = null;
+    this.weavyUrl = null;
     this.hasContext = false;
 
     window.addEventListener("message", function (e) {
         switch (e.data.name) {
-            case "context-id":
+            case "window-id":                
+                self.weavyUrl = e.data.weavyUrl;
                 self.windowName = e.data.windowName;
-                self.stripId = e.data.stripId;
+                self.panelId = e.data.panelId;
+                self.widgetId = e.data.widgetId;
                 self.hasContext = true;
 
                 if (messageQueue.length) {
@@ -28,16 +32,28 @@ weavy.postal = (function ($) {
         }
     });
 
+    function getContext() {
+        return {
+            widgetId: self.widgetId,
+            windowName: self.windowName,
+            panelId: self.panelId,
+            weavyUrl: self.weavyUrl,
+            hasContext: self.hasContext
+        }
+    }
+
     function post(message, win, force) {
         win = (typeof (win) === "undefined" || win === null ? window.parent || window.opener : win);
         if (self.hasContext || force) {
+            message.sourceWeavyUrl = self.weavyUrl;
             message.sourceWindowName = self.windowName;
-            message.sourceStripId = self.stripId;
+            message.sourcePanelId = self.panelId;
+            message.sourceWidgetId = self.widgetId;
 
             try {
                 if (win && win !== window) {
                     win.postMessage(message, "*");
-                    console.debug("Posted message", self.windowName, message.name);
+                    console.debug("Posted message", self.windowName, self.widgetId, message.name);
                 }
             } catch (e) {
                 console.error("Error posting message", message, e);
@@ -55,15 +71,21 @@ weavy.postal = (function ($) {
 
         post.call(self, { name: name });
 
-        if (name === "signingOut") {
+        if (name === "signing-out") {
             var url = $(this).attr("href");
-            // give the widget a chance to disconnect from the hub            
+            // give the widget a chance to disconnect from the hub
             window.setTimeout(function () { window.location.href = url }, 500);
         }
     });
 
+    $(document).on("submit", "[data-widget-event-notify]", function (e) {
+        var name = $(this).data("widgetEventNotify");
+        post.call(self, { name: name });
+    });
+
     return {
-        post: post
+        post: post,
+        getContext: getContext
     }
 
 })(jQuery)

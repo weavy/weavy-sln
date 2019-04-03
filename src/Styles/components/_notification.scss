@@ -10,6 +10,10 @@
     border-right: none;
     color: $body-color;
 
+    .media {
+        position: relative;
+    }
+
     .tab-pane & {
         &:first-child {
             border-top: 0;
@@ -22,8 +26,8 @@
 
     .btn {
         position: absolute;
-        bottom: .3125rem;
-        right: 2*$spacer/3;
+        bottom: -.375rem;
+        right: 0;
     }
 
     q {
@@ -37,6 +41,16 @@
 
         .btn-primary[data-toggle=notification] {
             color: inherit !important;
+        }
+    }
+}
+
+
+@include media-breakpoint-down(xs) {
+    html:not(.embedded) {
+        .list-group-item.notification {
+            padding-left: $list-group-item-padding-x + $edge-margin;
+            padding-right: $list-group-item-padding-x + $edge-margin;
         }
     }
 }

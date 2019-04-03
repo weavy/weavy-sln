@@ -11,34 +11,4 @@
             display: none !important;
         }
     }
-
-    &.badge-toggle {
-        position: absolute !important;
-        top: auto !important;
-        left: 0 !important;
-        bottom: .125rem !important;
-        right: auto !important;
-
-        .d-none, .d-block {
-            display: block !important;
-        }
-
-        .d-block {
-            position: absolute !important;
-        }
-
-        &:not(.on) {
-            .d-none {
-                color: $body-bg !important;
-            }
-        }
-
-        &.on {
-            .d-block {
-                color: $body-bg !important;
-                width: 1.75rem !important;
-                height: 1.75rem !important;
-            }
-        }
-    }
 }

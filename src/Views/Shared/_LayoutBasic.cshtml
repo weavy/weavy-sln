@@ -8,14 +8,14 @@
     @Html.ThemeHead()
     @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
     @RenderSection("styles", required: false)
+    @Bundler.Scripts("~/scripts/browser.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     @if (WeavyRequestContext.Current.Browser.Browser == "IE") {
         @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     }
-    @Bundler.Scripts("~/scripts/weavy.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @Bundler.Scripts("~/scripts/weavy.bundle", htmlAttributes: new { data_turbolinks_track = "reload", defer = "" })
     @RenderSection("scripts", required: false)
 </head>
 <body class="@BodyClasses("body-dark")" @BodyAttributes>
-    @Html.SvgSprite()
     <div class="alerts">@Html.AlertMessages()</div>
     <main role="main">
         @RenderBody()

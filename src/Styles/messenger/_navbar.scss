@@ -1,0 +1,92 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+
+
+.nav-tabs {
+    padding: 0;
+}
+
+.navbar {
+    height: $navbar-height;
+}
+
+.navbar-middle {
+    [data-toggle], [data-show], [data-hide] {
+        cursor: pointer;
+    }
+}
+
+
+.app > .navbar-theme {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: $navbar-height;
+}
+
+.navbar-primary {
+    background-color: rgba($theme, 0.8);
+    box-shadow: none;
+    color: color-yiq($theme);
+
+    .navbar-middle {
+        color: color-yiq($theme);
+    }
+
+    html.mobile & {
+        background-color: $theme;
+    }
+}
+
+
+.navbar-secondary {
+    background: $gray-100;
+    border-bottom: $border-width solid $messenger-border-color;
+    color: $body-color;
+
+    .navbar-middle {
+        flex: 1 1 100%;
+        padding-left: 2rem;
+    }
+
+    .btn-icon {
+        color: $icon-color;
+    }
+}
+
+.navbar-icons {
+    .badge {
+        font-size: 1rem;
+        line-height: .9rem;
+        border-radius: 1rem;
+        height: 1.4rem;
+        align-self: center;
+        text-align: center;
+    }
+}
+
+
+@media (min-width: 649px) {
+    // show two columns now
+    .app > .navbar-theme {
+        display: block;
+    }
+
+    #main, #side {
+        .navbar-primary {
+            display: none;
+        }
+    }
+
+    .navbar-secondary {
+
+        .navbar-icons {
+            display: flex !important;
+
+            .btn-icon {
+                color: $icon-color;
+            }
+        }
+    }
+}

@@ -7,6 +7,8 @@
         width: 100%;
         border-collapse: initial;
         border-spacing: 0 .5rem;
+        margin-top: -.5rem;
+        margin-bottom: -.5rem;
     }
 
     td {
@@ -52,6 +54,10 @@
         display: none;
         white-space: nowrap;
 
+        &:empty {
+            display: none !important;
+        }
+
         @include media-breakpoint-up(sm) {
             display: flex;
             flex-wrap: nowrap;
@@ -67,6 +73,9 @@
         white-space: nowrap;
         padding: 0 0 0 .5rem;
 
+        &:empty {
+            display: none !important;
+        }
 
         @include media-breakpoint-up(sm) {
             display: none;

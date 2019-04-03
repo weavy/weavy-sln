@@ -1,9 +1,0 @@
-@model Weavy.Web.Areas.Docs.Samples.InvalidSample
-
-@if (HttpContext.Current.IsDebuggingEnabled) {
-  <div class="alert alert-danger">
-    <p>@Model.ErrorMessage</p>
-  </div>
-} else {
-  <p>Sample not available.</p>
-}

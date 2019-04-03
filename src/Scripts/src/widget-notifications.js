@@ -88,7 +88,7 @@
         
         _height = $("html").height() || $("main").outerHeight();
 
-        window.top.postMessage({ "name": "notificationLoaded", "id": _notificationId, "height": _height }, "*");
+        window.top.postMessage({ "name": "notification-loaded", "id": _notificationId, "height": _height }, "*");
 
         window.requestAnimationFrame(reportHeight);
 
@@ -109,7 +109,7 @@
 
         if (tempHeight !== _height) {
             _height = tempHeight;
-            window.top.postMessage({ "name": "notificationLayoutChanged", "id": _notificationId, "height": _height }, "*");
+            window.top.postMessage({ "name": "notification-layout-changed", "id": _notificationId, "height": _height }, "*");
         }
     }
 
@@ -159,10 +159,10 @@
     function close(timespan) {
         if (timespan) {
             return window.setTimeout(function () {
-                window.parent.postMessage({ "name": "notificationClosed", "id": _notificationId }, "*");
+                window.parent.postMessage({ "name": "notification-closed", "id": _notificationId }, "*");
             }, timespan);
         } else {
-            window.parent.postMessage({ "name": "notificationClosed", "id": _notificationId }, "*");
+            window.parent.postMessage({ "name": "notification-closed", "id": _notificationId }, "*");
         }
     }
 })(jQuery);

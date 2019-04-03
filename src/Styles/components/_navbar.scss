@@ -25,18 +25,18 @@
 
 @include media-breakpoint-down(xs) {
     html:not(.embedded) {
-        .navbar-theme {
-            .navbar {
-                padding: $navbar-padding-y .75rem !important;
-            }
+        .navbar {
+            padding: $navbar-padding-y #{$navbar-padding-x + $edge-margin} !important;
         }
     }
 }
 
 .navbar-light {
-    background-color: rgba($body-bg, $opacity-panel);
+    background-color: rgba($panel-bg, $opacity-panel);
     color: $panel-color;
-
+    //box-shadow: 0 1px 4px 0px rgba(0,0,0,0.05), inset 0 -1px 0px 0 $border-color;
+    border-bottom: $border-width solid $border-color;
+    
     .btn-icon {
         color: $panel-color;
     }
@@ -70,23 +70,26 @@
 }
 
 .navbar-content {
+    @extend .navbar-light;
     padding: .5rem;
     display: flex;
     flex-wrap: nowrap;
-    background-color: rgba($body-bg, $opacity-panel);
-    color: $panel-color;
+    //color: $panel-color;
     min-height: $navbar-height;
+}
+
+@include media-breakpoint-down(xs) {
+    html:not(.embedded) {
+        .navbar-content {
+            padding: .5rem #{.5rem + $edge-margin};
+        }
+    }
 }
 
 .navbar-icons {
     display: flex;
     flex: 1 0 2rem;
 
-    .btn-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
     // fix for .dropdown-menu-right in navbar, see https://github.com/twbs/bootstrap/issues/23308
     .dropdown-menu-right {
         left: auto;

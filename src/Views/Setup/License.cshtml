@@ -1,0 +1,24 @@
+﻿@model LicenseModel
+@{
+    Title = Bootstrapper.Status == SystemStatus.Setup ? "Register license" : "Invalid license";
+    Layout = "~/Views/Setup/_Layout.cshtml";
+}
+
+<h1 class="display-3">@Title</h1>
+@if (Bootstrapper.Status == SystemStatus.Setup) {
+    <p>Please enter your license key to continue.</p>
+} else {
+    <p>Invalid license detected. Please enter a valid license key to continue.</p>
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { autocomplete = "off", novalidate = "", data_turboform = "" })) {
+    @Html.EditorsForModel(formLabels: false)
+    <div class="form-buttons">
+        @if (Bootstrapper.Status == SystemStatus.Setup) {
+            <a href="@(Url.Action<SetupController>(c => c.Register()))" class="btn btn-outline-secondary">Back</a>
+            <button type="submit" class="btn btn-primary btn-load">Next</button>
+        } else {
+            <button type="submit" class="btn btn-primary btn-load">Update</button>
+        }
+    </div>
+}

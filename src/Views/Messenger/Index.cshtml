@@ -1,0 +1,169 @@
+﻿@model MessengerModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html class="messenger @HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Messenger | @Theme.Name</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/styles/messenger/messenger.scss")
+    @Bundler.Scripts("~/scripts/browser.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @if (WeavyRequestContext.Current.Browser.Browser == "IE") {
+        @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    }
+    @Bundler.Scripts("~/scripts/messenger.bundle", htmlAttributes: new { data_turbolinks_track = "reload", defer = "" })
+</head>
+<body class="@BodyClasses()" @BodyAttributes>
+    <div class="alerts"></div>
+
+    <div class="app @(ActionName == nameof(MessengerController.Index) || ActionName == nameof(MessengerController.Archived) ? "one" : "two")">
+
+        <header class="navbar-theme">
+            <div class="navbar navbar-primary">
+                <div class="navbar-icons">
+                    <button type="button" class="btn btn-icon" data-toggle="drawer-settings" title="Settings">@User.AvatarImg(24, presence: true)</button>
+                </div>
+                <div class="navbar-middle conversation-title">@(Model.Conversation?.GetTitle() ?? "Messenger")</div>
+                <div class="navbar-icons">
+                    <button type="button" class="btn btn-icon d-embedded visibility-h">@Svg.Icon("expand-window")</button>
+                    <button type="button" class="btn btn-icon d-embedded visibility-h">@Svg.Icon("close")</button>
+                </div>
+            </div>
+        </header>
+
+        <aside id="side" class="pane pane-one">
+
+            <header class="pane-header navbar-theme">
+                <div class="navbar navbar-primary">
+                    <div class="navbar-icons">
+                        <button type="button" class="btn btn-icon" data-toggle="drawer-settings" title="Settings">@User.AvatarImg(24, presence: true)</button>
+                    </div>
+                    <div class="navbar-middle">&nbsp;</div>
+                    <div class="navbar-icons">
+                        <button type="button" class="btn btn-icon d-embedded visibility-h">@Svg.Icon("expand-window")</button>
+                        <button type="button" class="btn btn-icon d-embedded visibility-h">@Svg.Icon("close")</button>
+                    </div>
+                </div>
+            </header>
+
+            <div id="pane-side" class="pane-body scroll-y">
+                <div class="navbar navbar-secondary">
+                    <div class="form-group search search-conversations">
+                        <input type="text" name="q" class="form-control" placeholder="Find conversations..." />
+                        <button type="button" class="btn btn-icon btn-search">@Svg.Icon("magnify")</button>
+                        <button type="button" class="btn btn-icon btn-reset d-none">@Svg.Icon("close")</button>
+                        <input type="hidden" name="archive" value="@Model.Archive.ToString().ToLower()" />
+                    </div>
+                    <div class="dropdown ml-1">
+                        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown">@Svg.Icon("message-plus")</button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <button type="button" class="dropdown-item" data-toggle="drawer-message">New message</button>
+                            <button type="button" class="dropdown-item" data-toggle="drawer-room-name">New room</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-group search-result-list"></div>
+                <div class="list-group list-group-conversations">
+                    @Html.Partial("_Conversations", Model)
+                </div>
+            </div>
+        </aside>
+
+        <main id="main" class="pane pane-two" data-conversation="@(Model.Conversation?.Id)">
+            @{ Html.RenderPartial("_Main"); }
+        </main>
+
+        @*
+            <aside id="right" class="pane pane-three">
+                TODO: Move conversation details, user details etc. here instead of drawer-manager
+            </aside>
+        *@
+
+        <div class="drawer-manager">
+            <div class="pane pane-one">
+
+
+                <div class="drawer drawer-settings">
+                    <header class="drawer-header">
+                        <div class="navbar-icons">
+                            <button type="button" class="btn btn-icon" data-toggle="drawer-settings">@Svg.Icon("arrow-left")<span>Settings</span></button>
+                        </div>
+                    </header>
+                    <div class="drawer-body drawer-body-padded scroll-y">
+                        @{ Html.RenderPartial("_DrawerSettingsBody", Model.Settings); }
+                    </div>
+                </div>
+
+                <div class="drawer drawer-message">
+                    <header class="drawer-header">
+                        <div class="navbar-icons">
+                            <button type="button" class="btn btn-icon" data-toggle="drawer-message">@Svg.Icon("arrow-left")<span>New message</span></button>
+                        </div>
+                    </header>
+                    <div class="drawer-body scroll-y">
+                    </div>
+                </div>
+
+                <form class="room-form" action="@Url.Action(nameof(MessengerController.CreateRoom))" method="post">
+                    <div class="drawer drawer-room-name">
+                        <header class="drawer-header">
+                            <div class="navbar-icons">
+                                <button class="btn btn-icon" type="button" data-toggle="drawer-room-name">@Svg.Icon("arrow-left")<span>New room</span></button>
+                            </div>
+                        </header>
+                        <div class="drawer-body scroll-y">
+                            <div class="form-group search">
+                                <input type="text" name="name" class="form-control" placeholder="Room name..." />
+                                <button type="button" class="btn btn-icon" data-toggle="drawer-select-people">@Svg.Icon("arrow-right")</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drawer drawer-select-people">
+                        <header class="drawer-header">
+                            <div class="navbar-icons">
+                                <button type="button" class="btn btn-icon" data-toggle="drawer-select-people">@Svg.Icon("arrow-left")<span>Add people</span></button>
+                            </div>
+                        </header>
+                        <div class="drawer-body scroll-y">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="pane pane-two"></div>
+            <div class="pane pane-three">
+                <div class="drawer drawer-details">
+                    @{ Html.RenderPartial("_DrawerDetails", Model); }
+                </div>
+
+                <div class="drawer drawer-user">
+                </div>
+
+                <div class="drawer drawer-add-people">
+                    <header class="pane-header">
+                        <div class="navbar navbar-secondary">
+                            <div class="navbar-middle">Add people</div>
+                            <div class="navbar-icons">
+                                <button type="button" class="btn btn-icon" data-toggle="drawer-add-people">@Svg.Icon("close")</button>
+                            </div>
+                        </div>
+                    </header>
+                    <div class="drawer-body scroll-y">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    @{ Html.RenderPartial("_PhotoSwipe"); }
+    @{ Html.RenderPartial("_Preview"); }
+
+    <audio id="message-sound" src="~/media/message.mp3" preload="none"></audio>
+</body>
+</html>

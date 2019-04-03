@@ -1,20 +1,12 @@
 @echo off
+setlocal enabledelayedexpansion
 pushd %~dp0
-
-for /f "usebackq tokens=1* delims=: " %%i in (`tools\vswhere -latest -requires Microsoft.Component.MSBuild`) do (
-  if /i "%%i"=="installationPath" set InstallDir=%%j
+for /f "usebackq tokens=*" %%i in (`tools\vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe`) do (
+  set MSBuildExe="%%i"
 )
-if not exist "%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" goto :MSBuildMissing
+if not exist %MSBuildExe% goto MSBuildMissing
 
-if "%1" == "" goto BuildDefault
-
-:BuildCustom
-"%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" build.proj %*
-if %ERRORLEVEL% neq 0 goto BuildFail
-goto BuildSuccess
-
-:BuildDefault
-"%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" build.proj /v:m
+%MSBuildExe% build.proj /v:m
 if %ERRORLEVEL% neq 0 goto BuildFail
 goto BuildSuccess
 

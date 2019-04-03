@@ -3,7 +3,7 @@
 // Collapsed and minimized widget mode
 
 &.weavy-collapsed:not(.weavy-open):not(.weavy-no-collapse) {
-    .weavy-draggable {
+    .weavy-dock {
         transform: scale(0.8);
         transform-origin: center right;
         min-height: $widget-icon-size + rem(.5);
@@ -18,25 +18,31 @@
         }
     }
 
-    &.weavy-left .weavy-draggable {
+    &.weavy-left .weavy-dock {
         transform-origin: center left;
     }
 
     &:not(.weavy-drag) {
-        &:not(.weavy-before-drag) .weavy-draggable {
+        &:not(.weavy-before-drag) .weavy-dock {
             transition: transform 0.2s ease-out;
         }
 
-        .weavy-bubble-item, .weavy-button, .weavy-bubble-action {
+        .weavy-button-container, .weavy-button, .weavy-bubble-action {
             pointer-events: none !important;
         }
     }
 
-    .weavy-button.weavy-messenger.weavy-dot {
+    .weavy-button.weavy-loading {
+        &::before {
+            display: none;
+        }
+    }
+
+    .weavy-button.weavy-button-messenger.weavy-dot {
         background-color: transparent;
     }
 
-    .weavy-bubble-personal, .weavy-bubble-messenger {
+    .weavy-button-container-personal, .weavy-button-container-messenger {
         height: $widget-icon-size;
     }
 
@@ -51,7 +57,7 @@
             margin: 0 rem(.25);
         }
 
-        .weavy-bubble-item {
+        .weavy-button-container {
             height: rem(1.5);
 
             .weavy-button {
@@ -62,7 +68,7 @@
         }
     }
 
-    .weavy-bubble-add {
+    .weavy-button-container-start {
         svg {
             opacity: 0;
         }
@@ -71,8 +77,8 @@
 
 
     &.weavy-minimized {
-        .weavy-bubble-item {
-            height: rem(0);
+        .weavy-button-container {
+            height: rem(0) !important;
 
             .weavy-button {
                 background: transparent !important;
@@ -80,15 +86,15 @@
             }
         }
 
-        .weavy-icon, .weavy-avatar, .weavy-personal svg {
+        .weavy-icon, .weavy-avatar, .weavy-button-container-personal svg {
             opacity: 0;
         }
 
-        .weavy-bubble-weavy {
+        .weavy-button-container-weavy {
             opacity: 1;
-            height: $widget-icon-size + rem(.75);
+            height: $widget-icon-size + rem(.75) !important;
 
-            .weavy-logo {
+            .weavy-button {
                 margin: rem(.375)
             }
 

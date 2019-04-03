@@ -568,7 +568,7 @@
                 
                 function processItems(items) {
                     var i, item, reader, hadImage = false;
-                    var uploadURL = weavy.url.resolve("/api/files");
+                    var uploadURL = weavy.url.resolve("/api/blobs");
                     var formData;
                     var imageDataOnly = true;
 
@@ -578,7 +578,9 @@
                             rng = null;
                         }
 
-                        pasteHtml('<a href="' + reader.result + '" rel="lightbox"><img src="' + reader.result + '"></a>');
+                        var pswpSize = reader.width && reader.height ? ' data-size="' + reader.width + "x" + reader.height + '"' : '';
+
+                        pasteHtml('<a href="' + reader.result + '" data-photoswipe="document"' + pswpSize + '><img src="' + reader.result + '"></a>');
                     }
 
                     if (items) {
@@ -599,14 +601,14 @@
 
                                     var type = item.type.split("/")[1];
 
-                                    if (type == 'jpg' || type == 'jpeg') {
+                                    if (type === 'jpg' || type === 'jpeg') {
                                         type = ".jpg";
                                     } else {
                                         type = "." + type;
                                     }
 
                                     formData = new FormData();
-                                    formData.append("files", file, "image-" + weavy.guid.get() + type);
+                                    formData.append("blobs", file, "image-" + weavy.guid.get() + type);
 
                                     $.ajax({
                                         url: uploadURL,
@@ -630,10 +632,10 @@
 
                                         success: function (data, textStatus, jqXHR) {
                                             var response = JSON.parse(data).data[0];
-                                            if (response && response.content_url) {
+                                            if (response && response.file_url) {
                                                 var attachmentsRoot = $("#attachments", window.document);
                                                 attachmentsRoot.append($("<input type='hidden' name='attachmentids' value='" + response.id + "' />"));
-                                                pasteImage({ result: response.content_url });
+                                                pasteImage({ result: response.file_url, width: response.width, height: response.height });
                                             }
                                         },
                                         complete: function () {

@@ -5,7 +5,7 @@
         // open widget preview
         if (weavy.browser.embedded) {
             document.documentElement.classList.add("pswp-transparent");
-            weavy.postal.post({ name: "open-preview" });
+            weavy.postal.post({ name: "preview-open" });
         }
 
         e.preventDefault();
@@ -82,7 +82,7 @@
         pswp.listen('unbindEvents', function () {
             // close widget preview
             if (weavy.browser.embedded) {
-                weavy.postal.post({ name: "close-preview" });
+                weavy.postal.post({ name: "preview-close" });
                 $(window).one("resize", function () { requestAnimationFrame(function () { document.documentElement.classList.remove("pswp-transparent"); }) });
             }
         });
@@ -156,7 +156,7 @@
             $(".pswp .navbar-preview").remove();
             var $navbar = $("<nav class='navbar fixed-top navbar-preview' />");
             var $left = $('<div class="navbar-icons" />');
-            var $close = $('<button type="button" class="btn btn-icon" title="Close" ><svg class="i"><use xlink:href="#arrow-left" /></svg></div>').on("click", function () {
+            var $close = $('<button type="button" class="btn btn-icon" title="Close"><svg class="i i-arrow-left" height="24" viewBox="0 0 24 24" width="24"><path d="m20 11v2h-12l5.5 5.5-1.42 1.42-7.92-7.92 7.92-7.92 1.42 1.42-5.5 5.5z"/></svg></div>').on("click", function () {
                 pswp.close();
             });
             $left.append($close);    
@@ -167,7 +167,7 @@
             if (pswp.currItem.name) {
                 $middle.append('<span class="navbar-text">' + pswp.currItem.name + '</span>');
                 if (pswp.currItem.starred !== undefined) {
-                    var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-entity="' + pswp.currItem.type +'" data-id="' + pswp.currItem.id + '"><svg class="i d-block"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#star-outline"></use></svg><svg class="i d-none"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#star"></use></svg></button>');
+                    var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-entity="' + pswp.currItem.type + '" data-id="' + pswp.currItem.id + '"><svg class="i i-star-outline d-block" height="24" viewBox="0 0 24 24" width="24"><path d="m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37 1.71-4.04 1.71 4.04 4.38.37-3.32 2.88.99 4.28m6.24-8.42-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.45 4.73-1.63 7.03 6.18-3.73 6.18 3.73-1.64-7.03z"/></svg><svg class="i i-star d-none" height="24" viewBox="0 0 24 24" width="24"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"/></svg></button>');
                     if (pswp.currItem.starred) {
                         $star.addClass("on");
                     } else {
@@ -180,7 +180,7 @@
 
             var $right = $('<div class="navbar-icons" />');
             if (pswp.currItem.download) {
-                $right.append('<a href="' + pswp.currItem.download + '" class="btn btn-icon" title="Download"><svg class="i"><use xlink:href="#download" /></svg></a>');
+                $right.append('<a href="' + pswp.currItem.download + '" class="btn btn-icon" title="Download"><svg class="i i-download" height="24" viewBox="0 0 24 24" width="24"><path d="m5 20h14v-2h-14m14-9h-4v-6h-6v6h-4l7 7z"/></svg></a>');
             }
             $right.appendTo($navbar);
             $navbar.appendTo(".pswp");
@@ -200,8 +200,8 @@
             var thumb = $item.data("thumb-src") || $item.find("> img").attr("src");
             
             // get type and id from url
-            var match = src.match(/\/(files|attachments)\/([0-9]+)\//);
-            var type = match[1] === "files" ? "content" : "attachment";
+            var match = src.match(/\/(files|blobs|attachments)\/([0-9]+)\//);
+            var type = /files|blobs/.test(match[1]) ? "content" : "attachment";
             var id = match[2];
 
             // get size

@@ -1,8 +1,9 @@
 ﻿tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
-    
+
     // TinyMce adapter for jquery.textcomplete.js
-    function TinyMceAdapter(element, completer, option) {        
-        this.initialize(element, completer, option);    }
+    function TinyMceAdapter(element, completer, option) {
+        this.initialize(element, completer, option);
+    }
 
     var extension = {
         // update the content when an dropdown item is selected
@@ -51,7 +52,7 @@
             }
         },
 
-        getCaretPosition: function () {            
+        getCaretPosition: function () {
             // start with position of timymce
             var caretpos = $(editor.getContentAreaContainer()).offset();
             // then find relative caret position 
@@ -74,7 +75,7 @@
         // Completer will be triggered with the result for start autocompleting.
         // For example, suppose the html is '<b>hello</b> wor|ld' and | is the caret.
         // getTextFromHeadToCaret() should return ' wor'  // not '<b>hello</b> wor'
-        getTextFromHeadToCaret: function () {            
+        getTextFromHeadToCaret: function () {
             var range = editor.selection.getRng(true);
             var selection = range.cloneRange();
             selection.selectNodeContents(range.startContainer);
@@ -83,15 +84,15 @@
             return text;
         }
     }
-    
+
 
     var backupAdapter = $.fn.textcomplete.ContentEditable;
 
     $.extend(TinyMceAdapter.prototype, $.fn.textcomplete.Adapter.prototype, extension);
 
     $.fn.textcomplete.ContentEditable = TinyMceAdapter;
-    
-    editor.on("remove", function () {    
+
+    editor.on("remove", function () {
         $.fn.textcomplete.ContentEditable = backupAdapter;
     })
 
@@ -99,96 +100,86 @@
     editor.on("init", function () {
         var $body = $(editor.getBody());
         $body.textcomplete([
-          {
-              // mention strategy
-              match: /\B@([a-zA-Z0-9_]+)$/,
-              search: function (term, callback) {
-                  console.debug(term);
-                  $.getJSON(weavy.url.resolve("api/autocomplete/mentions"), {
-                      q: term,
-                      top: 5
-                  }).done(function (resp) {
-                      callback(resp);
-                  }).fail(function () {
-                      callback([]);
-                  });
-              },
-              index: 1,
-              template: function (item) {                  
-                  return '<img class="avatar-24" src="' + item.thumb_url.replace('{options}', '24x24-crop,both') + '" alt="" /><span><span>' + (item.name || item.username) + ' <small> @' + item.username + '</small></span>'
-              },
-              replace: function (mention) {
-                  return '<a class="' + mention.type + '" href="' + mention.url + '">@' + mention.username + '</a>';
-              }
-          }, {
-              // emoji strategy
-              match: /\B:([a-zA-Z0-9_]*)$/,
-              search: function (term, callback) {
-                  console.debug(term);
-                  var data = weavy.emoji.icons;
-                  var result = [];
-                  term = term.replace(":", "");
-                  result = _.chain(data)
-                      .filter(function (emoji) {
-                          return emoji.shortname.indexOf(term) != -1;
-                      })
-                      .first(5)
-                      .value();
-
-                  callback(result);
-              },
-              template: function (item) {
-                  // todo: replace with inline html
-                  //return Handlebars.templates["autocomplete-emoji-template"](item);
-                  return '<img class="eo" src="' + weavy.url.resolve('img/eo/' + item.unicode + '.svg') + '" alt="' + item.shortname + '" /> ' + item.shortname;
-              },
-              index: 1,
-              replace: function (emoji) {
-                  return '<img class="eo" src="' + weavy.context.path + 'img/eo/' + emoji.unicode + '.svg" alt="' + emoji.shortname + '" />';
-              }
-          }, {
-              // link strategy
-              match: /\B\[([^\]]+)$/,
-              search: function (term, callback) {
-                  console.debug(term);
-                  $.getJSON(weavy.url.resolve("api/autocomplete"), {
-                      q: term,
-                      top: 5
-                  }).done(function (resp) {
-                      callback(resp);
-                  }).fail(function () {
-                      callback([]);
-                  });
-              },
-              index: 1,
-              template: function (item) {
-                  return '<img class="avatar-24" src="' + weavy.url.thumb(item.thumb_url, "24x24-crop,both") + '" alt="" /><span>' + item.title + '</span><small> - ' + item.type + '</small>'; 
-                  
-              },
-              replace: function (item) {
-                  return '<a href="' + item.url + '">' + item.title + '</a>';
-              }
-          }
-        ], {
-            maxCount: 10, zIndex: 10000, onKeydown :
-                function(e, commands) {
-                    if (e.keyCode == 9) {
-                        e.preventDefault();
-                        return false;
-                    }
+            {
+                // mention strategy
+                match: /\B@([a-zA-Z0-9_]+)$/,
+                search: function (term, callback) {
+                    console.debug(term);
+                    $.getJSON(weavy.url.resolve("api/autocomplete/mentions"), {
+                        q: term,
+                        top: 5
+                    }).done(function (resp) {
+                        callback(resp);
+                    }).fail(function () {
+                        callback([]);
+                    });
+                },
+                index: 1,
+                template: function (item) {
+                    return '<img class="avatar-24" src="' + item.thumb_url.replace('{options}', '24x24-crop,both') + '" alt="" /><span><span>' + (item.name || item.username) + ' <small> @' + item.username + '</small></span>'
+                },
+                replace: function (mention) {
+                    return '<a class="' + mention.type + '" href="' + mention.url + '">@' + mention.username + '</a>';
                 }
-        }).on({
-            'textComplete:show': function (e) {
-                $body.data('autocompleting', true);
-            },
-            'textComplete:hide': function (e) {
-                $body.data('autocompleting', false);
+            }, {
+                // emoji strategy
+                match: /\B:([a-zA-Z0-9_]*)$/,
+                search: function (term, callback) {
+                    callback($.map(weavy.emoji.shortnames, function (shortname) {
+                        return shortname.indexOf(term) !== -1 ? shortname : null;
+                    }));
+                },
+                template: function (shortname) {
+                    return emojione.toImage(shortname).replace('class="emojione"', 'class="eo"') + " " + shortname.replace(/:/g, '')
+                },
+                replace: function (shortname) {
+                    return emojione.toImage(shortname).replace('class="emojione"', 'class="eo"');
+                },
+                cache: true,
+                index: 1
+            }, {
+                // link strategy
+                match: /\B\[([^\]]+)$/,
+                search: function (term, callback) {
+                    console.debug(term);
+                    $.getJSON(weavy.url.resolve("api/autocomplete"), {
+                        q: term,
+                        top: 5
+                    }).done(function (resp) {
+                        callback(resp);
+                    }).fail(function () {
+                        callback([]);
+                    });
+                },
+                template: function (item) {
+                    return '<img class="avatar-24" src="' + weavy.url.thumb(item.thumb_url, "24x24-crop,both") + '" alt="" /><span>' + item.title + '</span><small> - ' + item.type + '</small>';
+
+                },
+                replace: function (item) {
+                    return '<a href="' + item.url + '">' + item.title + '</a>';
+                },
+                index: 1
             }
-        });
+        ], {
+                maxCount: 10, zIndex: 10000, onKeydown:
+                    function (e, commands) {
+                        if (e.keyCode == 9) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+            }).on({
+                'textComplete:show': function (e) {
+                    $body.data('autocompleting', true);
+                },
+                'textComplete:hide': function (e) {
+                    $body.data('autocompleting', false);
+                }
+            });
     });
 
     // prevent tinymce from inserting new line on enter when textcomplete dropdown is open
-    editor.on('keydown', function (e) {        
+    editor.on('keydown', function (e) {
         if (e.keyCode == 13) {
             var body = this.getBody();
             var autocompleting = $(body).data("autocompleting");
@@ -198,5 +189,5 @@
             }
         }
     });
-    
+
 });

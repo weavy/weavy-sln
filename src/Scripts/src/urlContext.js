@@ -11,9 +11,9 @@ weavy.urlContext = (function ($) {
             var weavySpaceId = $(this).data("weavy-context-space");
             var weavyUrl = $(this).data("weavy-context-url");
 
-            localStorage.setItem("weavy-context", JSON.stringify({ space: weavySpaceId, url: weavyUrl, context: contextUrl }));
+            localStorage.setItem("weavy-context", JSON.stringify({ space: weavySpaceId, url: weavyUrl, context: contextUrl, panelId: weavy.postal.getContext().panelId }));
 
-            weavy.postal.post({ name: 'set-context-url', context: contextUrl, weavyUrl: weavyUrl });
+            weavy.postal.post({ name: 'set:context-url', context: contextUrl, weavyUrl: weavyUrl });
         } 
 
     });
@@ -25,7 +25,7 @@ weavy.urlContext = (function ($) {
     var checkForContext = function () {
         var $input = $("input[name=contextUrl]");
         if ($input.length) {
-            weavy.postal.post({ name: 'request-url', space: weavy.context.space });
+            weavy.postal.post({ name: 'request:url', space: weavy.context.space });
         }
     }
 

@@ -1,1262 +1,623 @@
 ﻿(function ($) {
     console.debug("widget.js");
 
-    // POLYFILLS
+    var _widgetIds = [];
 
-    // appends a string after the text if it does not already exist.
-    String.prototype.addTrailing = function (trailing) {
-        return this.endsWith(trailing) ? this : this + trailing;
-    }
-
-    // polyfill for ie
-    if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function (search, this_len) {
-            if (this_len === undefined || this_len > this.length) {
-                this_len = this.length;
-            }
-            return this.substring(this_len - search.length, this_len) === search;
-        };
-    }
-
-    // WEAVY PROTOTYPE
+    /**
+     * Most options are optional except url. You may use multiple WeavyWidget.presets together with options when constructing the widget. Multiple option sets are merged together.
+     * 
+     * These option presets are available for easy configuration
+     * * WeavyWidget.presets.core - All plugins disabled and minimal styles applied
+     * * WeavyWidget.presets.panel - A minimal recommended configuration for making only a panel.
+     * 
+     * @example
+     * var widget = new WeavyWidget({ url: "http://myweavysite.test" });
+     * var coreWidget = new WeavyWidget(WeavyWidget.presets.core, { url: "http://myweavysite.test" });
+     * 
+     * @classdesc The core class for a Weavy Widget.
+     * @constructor WeavyWidget
+     * @param {...WeavyWidget#options} options - One or multiple option sets. Options will be merged together in order.
+     * @typicalname widget
+     */
 
     this.WeavyWidget = function () {
+        /** 
+         *  Reference to this instance
+         *  @lends WeavyWidget#
+         */
         var widget = this;
 
-        var _idleCallbacks = [];
+        var disconnected = false;
+        var loadingTimeout = [];
+
+        /**
+         * Main options for the WeavyWidget. 
+         * When the widget initializes, it connects to the server and processes the options and sends them back to the widget again. The options may then contain additional data. 
+         * The widget triggers a {@link WeavyWidget#event:options} event when options are recieved from the server.
+         * 
+         * @category options
+         * @typedef 
+         * @type {Object}
+         * @member
+         * @property {Element} [container] - Container where the widget should be placed. If no Element is provided, a &lt;section&gt; is created next to the &lt;body&gt;-element.
+         * @property {string} [className] - Additional classNames added to the widget.
+         * @property {string} [https=adaptive] - How to enforce https-links. <br> • **force** -  makes all urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **default** - makes no change.
+         * @property {string} [id] - An id for the instance. A unique id is always generated.
+         * @property {boolean} [init=true] - Should the widget initialize automatically.
+         * @property {boolean} [isMobile] - Indicates if the browser is mobile. Defaults to the RegExp expression <code>/iPhone&#124;iPad&#124;iPod&#124;Android/i.test(navigator.userAgent)</code>
+         * @property {boolean} [includePlugins=true] - Whether all registered plugins should be enabled by default. If false, then each plugin needs to be enabled in plugin-options.
+         * @property {string} [logColor] - Hex color (#bada55) used for logging. A random color is generated as default.
+         * @property {Element} [overlay] - Element to use for overlay purposes. May for instance use the overlay of another WeavyWidget instance.
+         * @property {Object<string, Object>} [plugins] - Properties with the name of the plugins to configure. Each plugin may be enabled or disabled by setting the options to true or false. Providing an Object instead of true will enable the plugin and pass options to the plugin. See the reference for each plugin for available options.
+         * @property {string} url - The URL to the Weavy-installation to connect to.
+         */
+        widget.options = widget.extendDefaults(WeavyWidget.defaults);
+
+        // Extend default options with the passed in arugments
+        for (var arg in arguments) {
+            if (arguments[arg] && typeof arguments[arg] === "object") {
+                widget.options = widget.extendDefaults(widget.options, arguments[arg], true);
+            }
+        }
+
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+
+        function generateId(id) {
+            id = "wy-" + (id ? id.replace(/^wy-/, '') : S4() + S4());
+
+            // Make sure id is unique
+            if (_widgetIds.indexOf(id) !== -1) {
+                id = generateId(id + S4());
+            }
+
+            return id;
+        }
+
+        widget.options.id = generateId(widget.options.id);
+        _widgetIds.push(widget.options.id);
+
+        /**
+         * The unique instance color used by console logging.
+         * 
+         * @category properties
+         * @type {string}
+         */
+        widget.logColor = widget.options.logColor || "#" + (S4() + S4()).substr(-6).replace(/^([8-9a-f].).{2}/, "$100").replace(/^(.{2})[8-9a-f](.).{2}/, "$1a$200").replace(/.{2}([8-9a-f].)$/, "00$1");
+
+        /**
+         * The hardcoded semver version of the widget-script.
+         * @member {string} WeavyWidget.version 
+         */
+        if (WeavyWidget.version) {
+            widget.options.version = widget.options.version || WeavyWidget.version;
+            widget.log(WeavyWidget.version);
+        }
+
+        if (!widget.options.url || widget.options.url === "/") {
+            widget.error("Required url not specified.\nnew WeavyWidget({ url: \"https://mytestsite.weavycloud.com/\" })");
+        }
+
+        /**
+         * Indicating if the browser supports using ShadowDOM
+         * 
+         * @category properties
+         * @type {boolean}
+         */
+        widget.supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
+
+        /**
+         * True when frames are blocked by Content Policy or the browser
+         * 
+         * @category properties
+         * @type {boolean}
+         */
+        widget.isBlocked = false;
+
+        /**
+         * True when the widget has loaded options from the server.
+         * 
+         * @category properties
+         * @type {boolean}
+         */
+        widget.isLoaded = false;
+
+        /**
+         * Common prefix for panel naming
+         * 
+         * @category panels
+         * @type {string}
+         */
+        widget.panelPrefix = "weavy-panel";
+
+        /**
+         * Id of any currently open panel, otherwise null.
+         * 
+         * @category panels
+         * @type {string}
+         */
+        widget.openPanelId = null;
+
+        // DOM Elements
+
+        /**
+         * Placeholder for all DOM node references. Put any created elements or DOM related objects here.
+         * 
+         * @alias WeavyWidget#nodes
+         * @typicalname widget.nodes
+         */
+        widget.nodes = {};
+
+        /**
+         * The root node where the Shadow root is attached. Uses WeavyWidget#options.container if specified.
+         * 
+         * @alias WeavyWidget#nodes#root
+         * @type {Element}
+         */
+        widget.nodes.root = null;
+
+
+        /**
+         * The main container under the root. This is where all widget Elements are placed.
+         * 
+         * @alias WeavyWidget#nodes#container
+         * @type {Element}
+         */
+        widget.nodes.container = null;
+
+        /**
+         * Container for displaying elements that needs to be full viewport and on top of other elements. Uses [options.overlay]{@link WeavyWidget#options} if specified.
+         * 
+         * @alias WeavyWidget#nodes#overlay
+         * @type {Element}
+         */
+        widget.nodes.overlay = null;
+
+        // EVENT HANDLING
+        var _events = [];
+
+        function registerEventHandler(event, handler, context, selector, onceHandler) {
+            _events.push(arguments);
+        }
+
+        function getEventHandler(event, handler, context, selector) {
+            var removeHandler = arguments;
+            var eventHandler = _events.filter(function (eventHandler) {
+                for (var i = 0; i < removeHandler.length; i++) {
+                    if (eventHandler[i] === removeHandler[i]) {
+                        return true;
+                    }
+                }
+                return false;
+            }).pop();
+
+            return eventHandler && (eventHandler[4] || eventHandler[0]);
+        }
+
+        function unregisterEventHandler(event, handler, context, selector) {
+            var removeHandler = arguments;
+            _events = _events.filter(function (eventHandler) {
+                for (var i = 0; i < eventHandler.length; i++) {
+                    if (eventHandler[i] !== removeHandler[i]) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+
+        function clearEventHandlers() {
+            _events.forEach(function (eventHandler) {
+                var events = eventHandler[0];
+                var handler = eventHandler[1];
+                var context = eventHandler[2];
+                var selector = eventHandler[3];
+                var attachedHandler = eventHandler[4];
+
+                if (typeof selector === "string") {
+                    context.off(events, selector, attachedHandler || handler);
+                } else {
+                    context.off(events, attachedHandler || handler);
+                }
+            });
+            _events = [];
+        }
+
+
+        /**
+         * List of internal namespaces for events.
+         * 
+         * @category eventhandling
+         * @type {Object.<string, string>}
+         * @property {string} global=​ - Empty namespace for global events that should not use any specific namespace: "".
+         * @property {string} connection=.connection.weavy - Used by weavy.connection events: ".connection.weavy".
+         * @property {string} realtime=.rtmweavy - Used by weavy.realtime events: ".rtmweavy".
+         * @property {string} widget=.event.weavy - Default namespace used by all widget events: ".event.weavy".
+         */
+        widget.eventNamespaces = {
+            global: "",
+            connection: ".connection.weavy",
+            realtime: ".rtmweavy",
+            widget: ".event.weavy",
+        };
+
+        function getEventArguments(context, events, selector, handler, namespace) {
+            var defaultNamespace = widget.eventNamespaces.global
+
+            if (typeof arguments[0] === "string") {
+                // Widget event
+                namespace = typeof arguments[1] === 'function' ? arguments[2] : arguments[3];
+                handler = typeof arguments[1] === 'function' ? arguments[1] : arguments[2];
+                selector = typeof arguments[1] === 'function' ? null : arguments[1];
+                events = arguments[0];
+                context = null;
+
+                defaultNamespace = widget.eventNamespaces.widget;
+            } else {
+                // Global event
+
+                // Default settings for weavy.connection
+                if (arguments[0] === weavy.connection) {
+                    defaultNamespace = widget.eventNamespaces.connection;
+                    context = $(document);
+                }
+
+                // Default settings for weavy.realtime
+                if (arguments[0] === weavy.realtime) {
+                    defaultNamespace = widget.eventNamespaces.realtime;
+                    context = $(document);
+                }
+
+                namespace = typeof arguments[2] === 'function' ? arguments[3] : arguments[4];
+                handler = typeof arguments[2] === 'function' ? arguments[2] : arguments[3];
+                selector = typeof arguments[2] === 'function' ? null : arguments[2];
+            }
+
+            namespace = typeof namespace === 'string' ? namespace : defaultNamespace;
+            context = context && $(context) || (namespace === widget.eventNamespaces.widget ? $(widget) : $(document));
+
+            // Supports multiple events separated by space
+            events = events.split(" ").map(function (eventName) { return eventName + namespace; }).join(" ");
+
+            return { context: context, events: events, selector: selector, handler: handler, namespace: namespace };
+        }
+
+
+        /**
+         * Registers one or several event listneres. All event listners are managed and automatically unregistered on destroy.
+         * 
+         * When listening to widget events, you may also listen to `before:` and `after:` events by simply adding the prefix to ant widget event.
+         * Eventhandlers listening to widget events may return modified data that is returned to the trigger. The data is passed on to the next event in the trigger event chain. If an event handler calls event.stopPropagation() or returns false, the event chain will be stopped and the value is returned.
+         *
+         * @example <caption>Widget event</caption>
+         * widget.on("before:options", function(e, options) { ... })
+         * widget.on("options", function(e, options) { ... })
+         * widget.on("after:options", function(e, options) { ... })
+         *  
+         * @example <caption>Realtime event</caption>
+         * widget.on(weavy.realtime, "eventname", function(e, message) { ... })
+         *   
+         * @example <caption>Connection event</caption>
+         * widget.on(weavy.connection, "disconnect", function(e) { ... })
+         *   
+         * @example <caption>Button event</caption>
+         * widget.on(myButton, "click", function() { ... })
+         *   
+         * @example <caption>Multiple document listeners with custom namespace</caption>
+         * widget.on(document, ".modal", "show hide", function() { ... }, ".bs.modal")
+         * 
+         * @category eventhandling
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and weavy.realtime may also be used as contexts.
+         * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
+         * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
+         * @param {function} handler - The listener. The first argument is always the event, followed by any data arguments provided by the trigger.
+         * @param {string} [namespace] - Optional namespace applied to all the event names. Namespaces are automatically selected for widget-, realtime- and connection- events. Any {@link WeavyWidget#eventNamespaces} may be used as parameter.
+         * @see The underlying jQuery.on: {@link http://api.jquery.com/on/}
+         */
+        widget.on = function (context, events, selector, handler, namespace) {
+            var args = getEventArguments.apply(this, arguments);
+            var once = arguments[5];
+
+            if (once) {
+                var attachedHandler = function () {
+                    args.handler.apply(this, arguments);
+                    unregisterEventHandler(args.events, args.handler, args.context, args.selector);
+                };
+
+                registerEventHandler(args.events, args.handler, args.context, args.selector, attachedHandler);
+
+                if (typeof args.selector === "string") {
+                    args.context.one(args.events, args.selector, attachedHandler);
+                } else {
+                    args.context.one(args.events, attachedHandler);
+                }
+            } else {
+                registerEventHandler(args.events, args.handler, args.context, args.selector);
+
+                
+                if (typeof args.selector === "string") {
+                    args.context.on(args.events, args.selector, args.handler);
+                } else {
+                    args.context.on(args.events, args.handler);
+                }
+            }
+        };
+
+        /**
+         * Registers one or several event listneres that are executed once. All event listners are managed and automatically unregistered on destroy.
+         * 
+         * Similar to {@link WeavyWidget#on}.
+         * 
+         * @category eventhandling
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and weavy.realtime may also be used as contexts.
+         * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
+         * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
+         * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
+         * @param {string} [namespace] - Optional namespace applied to all the event names. Namespaces are automatically selected for widget-, realtime- and connection- events. Any {@link WeavyWidget#eventNamespaces} may be used as parameter.
+         */
+        widget.one = function (context, events, selector, handler, namespace) {
+            widget.on(context, events, selector, handler, namespace, true);
+        };
+
+        /**
+         * Unregisters event listneres. The arguments must match the arguments provided on registration using .on() or .one().
+         *
+         * @category eventhandling
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and weavy.realtime may also be used as contexts.
+         * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
+         * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
+         * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
+         * @param {string} [namespace] - Optional namespace applied to all the event names. Namespaces are automatically selected for widget-, realtime- and connection- events. Any {@link WeavyWidget#eventNamespaces} may be used as parameter.
+         */
+        widget.off = function (context, events, selector, handler, namespace) {
+            var args = getEventArguments.apply(this, arguments);
+
+            var offHandler = getEventHandler(args.events, args.handler, args.context, args.selector);
+
+            unregisterEventHandler(args.events, args.handler, args.context, args.selector);
+
+            if (offHandler) {
+                if (typeof args.selector === "string") {
+                    args.context.off(args.events, args.selector, offHandler);
+                } else {
+                    args.context.off(args.events, offHandler);
+                }
+            }
+        }
+
+        /**
+         * Trigger a custom event. Events are per default triggered on the widget instance using the widget.eventNamespaces.widget namespace.
+         * 
+         * The trigger has an event chain that adds before: and after: events automatically for all events. 
+         * 
+         * Eventhandlers listening to the event may return modified data that is returned by the trigger event. The data is passed on to the next event in the trigger event chain. If an event handler calls event.stopPropagation() or returns false, the event chain will be stopped and the value is returned.
+         * 
+         * @example
+         * 
+         * widget.triggerEvent("myevent");
+         * 
+         * // Will trigger the following events on the widget instance
+         * // 1. `before:myevent.event.weavy`
+         * // 2. `myevent.event.weavy`
+         * // 3. `after:myevent.event.weavy`
+         * 
+         * @category eventhandling
+         * @param {any} name - The name of the event.
+         * @param {(Array/Object/JSON)} [data] - Data may be an array or plain object with data or a JSON encoded string. Unlike jQuery, an array of data will be passed as an array and _not_ as multiple arguments.
+         * @param {string} [namespace] - The namespace is applied to the name. It defaults to the widget namespace. Any widget.eventNamespaces may also be used as parameter.
+         * @param {Element} [context] - Context Element to trigger the event on. If omitted it defaults to the Widget instance.
+         * @param {Event} [originalEvent] - When relaying another event, you may pass the original Event to access it in handlers.
+         * @returns {data} The data passed to the event trigger including any modifications by event handlers.
+         */
+        widget.triggerEvent = function (name, data, namespace, context, originalEvent) {
+            var hasPrefix = name.indexOf(":") !== -1;
+            namespace = typeof namespace === 'string' ? namespace : widget.eventNamespaces.widget;
+            context = context || (namespace === widget.eventNamespaces.widget ? $(widget) : $(document));
+            name = name + namespace;
+
+            // Triggers additional before:* and after:* events
+            var beforeEvent = $.Event("before:" + name);
+            var event = $.Event(name);
+            var afterEvent = $.Event("after:" + name);
+
+            if (originalEvent) {
+                beforeEvent.originalEvent = originalEvent;
+                event.originalEvent = originalEvent;
+                afterEvent.originalEvent = originalEvent;
+            }
+
+            if (data && !$.isArray(data) && !$.isPlainObject(data)) {
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {
+                    widget.warn("Could not parse event data");
+                }
+            }
+
+            widget.debug("trigger", name);
+
+            // Wrap arrays in an array to avoid arrays converted to multiple arguments by jQuery
+            if (hasPrefix) {
+                data = context.triggerHandler(event, $.isArray(data) ? [data] : data) || data;
+            } else {
+                data = context.triggerHandler(beforeEvent, $.isArray(data) ? [data] : data) || data;
+                if (data === false || beforeEvent.isPropagationStopped()) { return data; }
+
+                data = context.triggerHandler(event, $.isArray(data) ? [data] : data) || data;
+                if (data === false || event.isPropagationStopped()) { return data; }
+
+                data = context.triggerHandler(afterEvent, $.isArray(data) ? [data] : data) || data;
+            }
+
+            return data;
+        };
+
+
+        // TIMEOUT HANDLING 
+
         var _timeouts = [];
 
-        if (WeavyWidget.version) {
-            console.log("WeavyWidget", WeavyWidget.version);
-        }
-
-        // public methods
-        widget.init = function () {
-            connectAndLoad();
-            widget.triggerEvent("init", null);
-        }
-
-        // sign in using external authentication provider
-        widget.signIn = function (username, password) {
-            var dfd = $.Deferred();
-
-            // listen to signedIn message
-            window.addEventListener("message", function (e) {
-                switch (e.data.name) {
-                    case "signedIn":
-                        dfd.resolve(true);
-                        break;
-                    case "authenticationError":
-                        dfd.resolve(false);
-                        break;
-                }
-            }, false);
-
-            // post message to sign in user
-            loadInTarget("personal", widget.options.url + "sign-in?path=/notify", "username=" + username + "&password=" + password, "POST");
-
-            // return promise
-            return dfd.promise();
-
-        }
-
-        // sign out using external authentication provider
-        widget.signOut = function () {
-            var dfd = $.Deferred();
-
-            // sign out user in Weavy
-            loadInTarget("personal", widget.options.url + "sign-out?path=/notify", "", "GET");
-
-            // listen to signedOut message
-            window.addEventListener("message", function (e) {
-                switch (e.data.name) {
-                    case "signedOut":
-                        dfd.resolve(true);
-                        break;
-                }
-            }, false);
-
-            return dfd.promise();
-        }
-
-        // open a conversation
-        widget.openConversation = function (conversationId, event) {
-            event.preventDefault();
-            event.cancelBubble = true;
-            widget.messengerFrame.contentWindow.postMessage({ "name": "openConversation", "id": conversationId }, "*");
-            widget.open("messenger");
-        }
-
-        // close open strip
-        widget.close = function () {
-            var $openFrame = $(".weavy-strip.weavy-open iframe", widget.strips);
-
-            $(widget.container).removeClass("weavy-open");
-            $(".weavy-strip", widget.strips).removeClass("weavy-open");
-            $(".weavy-button", widget.buttons).removeClass("weavy-open");
-            $(".weavy-notification-frame", widget.container).remove();
-            widget.triggerEvent("close", null);
-            try {
-                $openFrame[0].contentWindow.postMessage({ name: 'hide' }, "*");
-            } catch (e) {
-                console.debug("Could not postMessage:hide to frame");
-            }
-        }
-
-        // open specified strip (personal, messenger or bubble)
-        widget.open = function (strip, destination) {
-            // Treat strip numbers as bubbles
-            if (strip === parseInt(strip, 10)) {
-                strip = "bubble-" + strip;
-            }
-            if (widget.isBlocked) {
-                fallback(strip, destination);
-            } else {
-                $(widget.container).addClass("weavy-open");
-
-                var $strip = $("#weavy-strip-" + strip, widget.strips);
-                if (!$strip.hasClass("weavy-open")) {
-                    $(".weavy-strip", widget.strips).removeClass("weavy-open");
-                    $(".weavy-button", widget.buttons).removeClass("weavy-open");
-                    $(".weavy-button.weavy-" + strip, widget.buttons).addClass("weavy-open");
-                    $("#weavy-strip-" + strip, widget.strips).addClass("weavy-open");
-                    $(".weavy-notification-frame", widget.notifications).remove();
-
-                    var $frame = $("iframe", $strip);
-
-                    if (destination) {
-                        // load destination
-                        loadInTarget(strip, destination);
-                        loading.call(widget, "weavy-strip-" + strip, true, true);
-                    } else if (!$frame.attr("src") && $frame[0].dataset && $frame[0].dataset.src) {
-                        // start predefined loading
-                        $frame.attr("src", $frame[0].dataset.src);
-                        loading.call(widget, "weavy-strip-" + strip, true);
-                    } else {
-                        // already loaded
-                        try {
-                            $frame[0].contentWindow.postMessage({ name: 'show' }, "*");
-                        } catch (e) {
-                            console.debug("Could not postMessage:show to frame");
-                        }
-                    }
-
-                    widget.triggerEvent("open", { target: strip });
-                }
-            }
-        }
-
-        widget.openContextFrame = function (weavyContext) {
-            if (weavyContext) {
-                var contextData = JSON.parse(weavyContext);
-                if (contextData.space === -2) {
-                    widget.open("messenger", contextData.url);
-                } else {
-                    widget.open("bubble-" + contextData.space, contextData.url);
-                }
-            }
-        }
-
-        // toggle (open/close) specified strip (personal, messenger or bubble)
-        widget.toggle = function (strip, event, force) {
-            if (widget.isBlocked) {
-                // NOTE: prevent incorrect fallback when result from pong has not yet been recieved. 
-                // If blocked: wait 100ms and call the method again to allow the test to be concluded before opening a fallback window
-                if (force) {
-                    fallback(strip, null);
-                } else {
-                    // call toggle after 100ms with force = true
-                    setTimeout(widget.toggle.bind(this, strip, null, true), 100);
-                }
-            } else {
-                $(".weavy-button.weavy-" + strip, widget.container).hasClass("weavy-open") ? widget.close() : widget.open(strip);
-            }
-        }
-
-        // remove a bubble
-        widget.removeBubble = function (id, event) {
-
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            return $.ajax({
-                url: widget.options.url + "api/bubble/" + id,
-                type: "DELETE",
-                contentType: "application/json",
-                xhrFields: {
-                    withCredentials: true
-                },
-                crossDomain: true
-            });
-        }
-
-        // show bubble modal
-        widget.connectBubble = function (id, type, event) {
-
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            var activeFrame = $(".weavy-strip.weavy-open iframe.weavy-strip-frame", widget.container);
-
-            if (activeFrame.length) {
-                activeFrame[0].contentWindow.postMessage({ "name": "connect", url: document.location.href, id: id, type: type }, "*");
-            }
-        }
-
-        // resize the panel
-        widget.resize = function () {
-            $(this.container).toggleClass("weavy-wide");
-            widget.triggerEvent("resize", null);
-        }
-
-        // maximize the panel
-        widget.maximize = function () {
-            $(this.container).addClass("weavy-wide");
-            widget.triggerEvent("maximize", null);
-        }
-
-        // toggle preview window
-        widget.togglePreview = function () {
-            $(this.container).toggleClass("weavy-preview");
-            widget.triggerEvent("resize", null);
-        }
-
-
-        // reload the page
-        widget.reload = function (options) {
-            this.options = widget.extendDefaults(this.options, options);
-            connectAndLoad();
-
-            widget.triggerEvent("reload", this.options);
-        }
-
-        widget.destroy = function () {
-            widget.triggerEvent("destroyed", null);
-
-            weavy.connection.disconnect();
-
-            $(widget.container).remove();
-            widget.container = null;
-
-            $(widget.root).remove();
-            widget.root = null;
-
-            _timeouts.forEach(function (id) {
-                clearTimeout(id);
-            });
+        function clearTimeouts() {
+            _timeouts.forEach(clearTimeout);
             _timeouts = [];
+        }
 
-            _idleCallbacks.forEach(function (id) {
-                cancelIdleCallback(id);
+        
+        /**
+         * Creates a managed timeout promise. Use this instead of window.setTimeout to get a timeout that is automatically managed and unregistered on destroy.
+         * 
+         * @example
+         * var mytimeout = widget.timeout(200).then(function() { ... });
+         * mytimeout.reject(); // Cancel the timeout
+         * 
+         * @category promises
+         * @param {int} time=0 - Timeout in milliseconds
+         * @returns {external:Promise}
+         */
+        widget.timeout = function (time) {
+            var timeoutId, timeoutResolve, timeoutReject;
+            var timeoutPromise = new Promise(function (resolve, reject) {
+                _timeouts.push(timeoutId = setTimeout(function () { resolve(); }, time));
+                timeoutResolve = resolve;
+                timeoutReject = reject;
+            }).catch(function () {
+                clearTimeout(timeoutId);
+                return Promise.reject();
             });
-            _idleCallbacks = [];
 
-            _clearEventHandlers();
+            /**
+             * Create promise shim with .resolve() and .reject() included
+             * @lends WeavyWidget#timeout
+             */
+            var timeout = {
+                /**
+                 * Register callbacks for when the timout is resolved or rejected (cancelled)
+                 * 
+                 * @ignore
+                 * @param {function} onResolved - Called on timeout
+                 * @param {function} onRejected - Called when timeout is cancelled
+                 * @returns {external:Promise}
+                 */
+                then: function (onResolved, onRejected) {
+                    timeoutPromise = timeoutPromise.then(onResolved, onRejected || function () { });
+                    return timeout;
+                },
 
-            window.removeEventListener("message", onMessageReceived, false);
-        }
+                /**
+                 * Register callbacks for when the timeout is rejected (cancelled).
+                 * 
+                 * @ignore
+                 * @param {function} onRejected - Called when timout is cancelled
+                 * @returns {external:Promise}
+                 */
+                catch: function (onRejected) {
+                    timeoutPromise = timeoutPromise.catch(onRejected);
+                    return timeout;
+                },
 
-        // refresh a panel
-        widget.refresh = function (strip) {
+                /**
+                 * Register a callback that is called on both reject and resolve.
+                 * 
+                 * @ignore
+                 * @param {function} onFinally - Always called
+                 * @returns {external:Promise}
+                 */
+                finally: function (onFinally) {
+                    timeoutPromise = timeoutPromise.finally(onFinally);
+                    return timeout;
+                },
 
-            loading.call(this, strip, true);
+                /**
+                 * Additional {@link external:Promise} method for resolving the timeout before it has finished.
+                 * @method
+                 */
+                resolve: timeoutResolve,
 
-            var $strip = $("#" + strip, this.container);
-
-            var frame = $strip.find("iframe");
-
-            frame[0].contentWindow.postMessage({ "name": "reload" }, "*");
-            widget.triggerEvent("refresh", { 'strip': strip });
-        }
-
-        // resets a panel to its original src
-        widget.reset = function (strip) {
-            loading.call(this, strip, true);
-            var $strip = $("#" + strip, this.container);
-            var frame = $strip.find("iframe");
-            frame[0].src = frame[0].dataset.src || frame[0].src || "about:blank";
-        }
-
-        widget.preloadFrame = function (frameElement, callback) {
-            var strip = $(frameElement).closest(".weavy-strip").get(0);
-            var bubbleTarget = strip && strip.id;
-            var delayedFrameLoad = function () {
-                if (!frameElement.src && frameElement.dataset.src) {
-                    if (bubbleTarget) {
-                        loading(bubbleTarget, true);
-                    }
-                    if (typeof callback === "function") {
-                        $(frameElement).one("load", callback);
-                    }
-                    frameElement.src = frameElement.dataset.src;
-                }
+                /**
+                 * Additional {@link external:Promise} method for cancelling the timout and reject the promise before it has finished.
+                 * @method
+                 */
+                reject: timeoutReject
             };
-            // Wait for idle
-            if (window.requestIdleCallback) {
-                _idleCallbacks.push(window.requestIdleCallback(delayedFrameLoad));
-            } else {
-                if (document.readyState === "complete") {
-                    delayedFrameLoad();
-                } else {
-                    $(document).one("load", delayedFrameLoad);
-                }
-            }
 
-        }
-
-        widget.preloadFrames = function (force) {
-            if (widget.options.is_mobile) {
-                return;
-            }
-
-            if (!preloading) {
-                console.debug("starting frames preloading");
-                var $currentlyLoadingFrames = $(widget.strips).find("iframe[src][data-src]");
-                if ($currentlyLoadingFrames.length) {
-                    // Wait until user loaded frames has loaded
-                    $currentlyLoadingFrames.first().one("load", function () { widget.preloadFrames(force); });
-                    return;
-                }
-            }
-            if (!preloading || force) {
-                preloading = true;
-
-                var $systemFrames = $(widget.strips).find("iframe[data-src]:not([data-type]):not([src])");
-                if ($systemFrames.length) {
-                    $systemFrames.each(function () { widget.preloadFrame(this, function () { widget.preloadFrames(force) }) });
-                } else if (force && !$(widget.strips).find("iframe[src][data-src]:not([data-type])").length) {
-                    // After preloading system frames is done
-                    var $strips = $(widget.strips).find("iframe[data-type]:not([src])");
-                    if ($strips.length) {
-                        widget.preloadFrame($strips[0]);
-                        _timeouts.push(setTimeout(widget.preloadFrames, 1500, "all"));
-                    }
-                }
-            }
-        }
-
-        widget.extendDefaults = function (source, properties) {
-            source = source || {};
-            properties = properties || {};
-
-            var property;
-            var https = properties.https || source.https || widget.options.https || true;
-
-            // Make a copy
-            var copy = {};
-            for (property in source) {
-                if (source.hasOwnProperty(property)) {
-                    copy[property] = source[property];
-                }
-            }
-
-            // Apply properties to copy
-            for (property in properties) {
-                if (properties.hasOwnProperty(property)) {
-                    copy[property] = this.httpsUrl(properties[property], https);
-                }
-            }
-            return copy;
+            return timeout;
         };
 
-        widget.httpsUrl = function (url, https) {
-            https = https || widget.options.https;
-            if (typeof url === "string") {
-                if (https === "force") {
-                    return url.replace(/^http:/, "https:");
-                } else if (https === "adaptive") {
-                    return url.replace(/^http:/, window.location.protocol);
-                }
-            }
-            return url;
-        };
+        // PROMISES
 
-        this.supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
-        this.root = null;
+        /**
+         * Promise that the widget has finished transitions for closing.
+         * If the widget already is closed, the promise is resolved instantly.
+         * 
+         * @example
+         * widget.awaitClosed.then(function() { ... })
+         * 
+         * @category promises
+         * @type {external:Promise}
+         * @resolved when widget is closed
+         */
+        widget.awaitClosed = Promise.resolve();
 
-        var previewingFullscreen = false;
-        var disconnected = false;
-        var preloading = false;
-        var requestOpen = [];
-
-        // dom elements
-        this.container = null;
-        this.strips = null;
-        this.spaces = null;
-        this.buttons = null;
-        this.draggable = null;
-        this.notifications = null;
-
-        this.personalStrip = null;
-        this.personalFrame = null;
-        this.personalButton = null;
-
-        this.bubblesGlobal = null;
-        this.bubblesPersonal = null;
-        this.bubblesCache = null;
-        this.addContainer = null;
-
-        this.addStrip = null;
-        this.addFrame = null;
-        this.addButton = null
-
-        this.messengerStrip = null;
-        this.messengerFrame = null;
-        this.messengerButton = null;
-
-        this.toolTipTimout = null;
-        this.toolTip = null;
-
-        this.notificationSound = null;
-
-        this.buttonCacheList = [];
-        this.stripCacheList = [];
-
-        this.bubbles = [];
-
-        this.unreadConversations = [];
-
-        this.dragData = null;
-
-        this.isBlocked = false;
-
-        this.options = WeavyWidget.defaults;
-
-        // extend default options with the passed in arugments
-        if (arguments[0] && typeof arguments[0] === "object") {
-            this.options = widget.extendDefaults(WeavyWidget.defaults, arguments[0]);
-        }
-
-        // Run plugins
-        // Disable all plugins by setting plugin option to false
-        if (this.options.plugins !== false) {
-            this.options.plugins = this.options.plugins || {};
-
-            for (plugin in WeavyWidget.plugins) {
-                if (typeof WeavyWidget.plugins[plugin] === "function") {
-
-                    // Disable plugins by setting plugin options to false
-                    if (this.options.plugins[plugin] !== false) {
-                        console.debug("Running WeavyWidget plugin:", plugin);
-                        this.options.plugins[plugin] = widget.extendDefaults(WeavyWidget.plugins[plugin].defaults, typeof this.options.plugins[plugin] === "object" && this.options.plugins[plugin] || {});
-                        WeavyWidget.plugins[plugin].call(this, this.options.plugins[plugin]);
-                    }
-                }
-            }
-        }
-
-
-        widget.on("locationchanged", function (objEvent, objData) {
-            $("iframe.weavy-strip-frame", widget.container).each(function () {
-                if ($(this)[0].contentWindow !== null) {
-                    $(this)[0].contentWindow.postMessage({ "name": "context-url", "value": objData.currentHref, 'title': document.title, 'origin': document.location.origin }, "*");
-                }
+        /**
+         * Promise that the blocking check has finished. Resolves when {@link WeavyWidget#event:frame-check} is triggered.
+         *
+         * @example
+         * widget.awaitBlocked.then(function() { ... })
+         *
+         * @category promises
+         * @type {external:Promise}
+         * @resolved when frames are not blocked.
+         * @rejected when frames are blocked
+         * */
+        widget.awaitBlocked = new Promise(function (resolve, reject) {
+            widget.on("frame-check", function (e, framecheck) {
+                framecheck.blocked ? reject() : resolve();
             });
-            connectAndLoad();
         });
 
-        function connectAndLoad() {
-            connect.call(widget).then(function () {
-                widget.options.conversations = null;
-                widget.options.is_loaded = false;
-                widget.options.href = window.location.href;
-                weavy.realtime.invoke("widget", "load", widget.options);
-            });
-        }
-
-        function showAlert(message, sticky) {
-            var alertMessage = document.createElement("div");
-            alertMessage.className = "weavy-alert-message fade in";
-            alertMessage.innerHTML = message;
-            if (!sticky) {
-                setTimeout(function () {
-                    alertMessage.classList.remove("in");
-                }, 5000);
-                setTimeout(function () {
-                    $(alertMessage).remove();
-                }, 5200);
-            }
-            widget.container.appendChild(alertMessage);
-        }
-
-        function removeBubbleItems(bubbleId, noCache, keepOpen) {
-            var strip = widget.container.querySelector("#weavy-strip-bubble-" + bubbleId);
-            if (strip) {
-                var frame = strip.querySelector(".weavy-strip-frame");
-                var buttonContainer = widget.container.querySelector("#weavy-bubble-" + bubbleId);
-
-                var duplicateButton = function (buttonContainer) {
-                    var buttonContainerCopy = buttonContainer.cloneNode(true);
-                    buttonContainerCopy.id = buttonContainer.id + "duplicate";
-
-                    var button = buttonContainerCopy.querySelector(".weavy-button");
-                    buttonContainerCopy.classList.add("weavy-bubble-item-duplicate", "weavy-disabled");
-
-                    if (!keepOpen && button.classList.contains("weavy-open")) {
-                        requestAnimationFrame(function () {
-                            button.classList.remove("weavy-open");
-                            setTimeout(function () { buttonContainerCopy.classList.add("weavy-removed"); }, 250);
-                            setTimeout(function () { $(buttonContainerCopy).remove() }, 450);
-                        });
-                    } else {
-                        requestAnimationFrame(function () {
-                            buttonContainerCopy.classList.add("weavy-removed");
-                            setTimeout(function () { $(buttonContainerCopy).remove() }, 200);
-                        });
-                    }
-
-                    buttonContainer.parentNode.insertBefore(buttonContainerCopy, buttonContainer);
-
-                    return buttonContainerCopy;
-                };
-
-                var removeBubbleElements = function () {
-                    if (noCache) {
-                        // remove from signalR connections
-                        weavy.connection.removeWindow(frame.contentWindow);
-                        removeBubbleCache(bubbleId);
-                    } else {
-                        strip.classList.add("weavy-cache-hidden");
-                    }
-                };
-
-                if (buttonContainer.parentNode && buttonContainer.parentNode.classList.contains("weavy-cache")) {
-                    removeBubbleElements();
-                    return;
-                }
-
-                duplicateButton(buttonContainer);
-                widget.bubblesCache.appendChild(buttonContainer);
-                buttonContainer.classList.add("weavy-disabled", "weavy-removed");
-
-                if (!keepOpen) {
-                    buttonContainer.querySelector(".weavy-button").classList.remove("weavy-open");
-
-                    if (strip.classList.contains("weavy-open")) {
-                        widget.container.classList.remove("weavy-open");
-                        strip.classList.remove("weavy-open");
-                        setTimeout(removeBubbleElements, 250);
-                    } else {
-                        setTimeout(removeBubbleElements, 0);
-                    }
-                }
-
-            }
-        }
-
-        function removeBubbleCache(bubbleId) {
-            var $strip = $("#weavy-strip-bubble-" + bubbleId, widget.container);
-            var $button = $("#weavy-bubble-" + bubbleId, widget.container);
-            if ($strip.length) {
-                widget.stripCacheList.splice(widget.stripCacheList.indexOf($strip[0]), 1);
-                $strip.remove();
-            }
-            if ($button.length) {
-                widget.buttonCacheList.splice(widget.buttonCacheList.indexOf($button[0]), 1);
-                $button.remove();
-            }
-        }
-
-        function truncateCache(limit) {
-            var overload = Math.max(widget.buttonCacheList.length, limit) - limit;
-            var unusedStrips = widget.buttonCacheList.filter(function (button, index) {
-                return !button.parentNode || button.parentNode.classList.contains("weavy-cache");
-            });
-            for (var i = unusedStrips.length; i > unusedStrips.length - overload; i--) {
-                removeBubbleCache(unusedStrips[i].id.replace(/^weavy-bubble-/, ''), true);
-            }
-        }
-
-
-        function buildOutput() {
-            // add container
-            if (!this.container) {
-                this.container = document.createElement("div");
-                this.strips = document.createElement("div");
-                this.spaces = document.createElement("div");
-                this.draggable = document.createElement("div");
-                this.statusFrame = document.createElement("iframe");
-                this.weavyButtonContainer = document.createElement("div");
-                this.weavyButton = document.createElement("div");
-                this.personalStrip = document.createElement("div");
-                this.personalFrame = document.createElement("iframe");
-                this.personalButtonContainer = document.createElement("div");
-                this.personalButton = document.createElement("div");
-                this.personalTooltip = document.createElement("div");
-                this.personalTooltipText = document.createElement("span");
-                this.buttons = document.createElement("div");
-                this.notifications = document.createElement("div");
-
-                this.weavyButton.innerHTML = '<img draggable="false" class="weavy-avatar" src="' + this.options.logo + '" />';
-                this.personalButton.innerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"></path></svg>'
-                this.personalTooltipText.innerHTML = this.options.personal_title;
-
-                this.statusFrame.addEventListener("load", function (a, b, c) {
-                    // start testing for blocked iframe             
-                    widget.isBlocked = true;
-                    try {
-                        this.contentWindow.postMessage({ "name": "ping" }, "*");
-                    } catch (e) { console.warn("Frame postMessage is blocked", e); }
-
-                }, false);
-
-                this.container.appendChild(this.statusFrame);
-                this.strips.appendChild(this.spaces);
-                this.draggable.appendChild(this.weavyButtonContainer);
-                this.weavyButtonContainer.appendChild(this.weavyButton);
-                this.personalStrip.appendChild(renderControls.call(this, "weavy-strip-personal"));
-                this.strips.appendChild(this.personalStrip);
-                this.personalStrip.appendChild(this.personalFrame);
-                this.draggable.appendChild(this.personalButtonContainer);
-                this.personalButtonContainer.appendChild(this.personalButton);
-                this.personalTooltip.appendChild(this.personalTooltipText);
-                this.personalButtonContainer.appendChild(this.personalTooltip);
-                this.buttons.appendChild(this.draggable);
-                this.container.appendChild(this.buttons);
-                this.container.appendChild(this.strips);
-                this.container.appendChild(this.notifications);
-
-                this.personalButton.addEventListener("click", this.toggle.bind(this, "personal"));
-
-                if (this.options.user_id) {
-                    this.messengerStrip = document.createElement("div");
-                    this.messengerFrame = document.createElement("iframe");
-                    this.messengerButtonContainer = document.createElement("div");
-                    this.messengerButton = document.createElement("div");
-                    this.conversations = document.createElement("div");
-                    this.messengerTooltip = document.createElement("div");
-                    this.messengerTooltipText = document.createElement("span");
-                    this.bubblesCache = document.createElement("div");
-                    this.bubblesGlobal = document.createElement("div");
-                    this.bubblesPersonal = document.createElement("div");
-                    this.addContainer = document.createElement("div");
-                    this.addStrip = document.createElement("div");
-                    this.addFrame = document.createElement("iframe");
-                    this.addButtonContainer = document.createElement("div");
-                    this.addButton = document.createElement("div");
-                    this.addTooltip = document.createElement("div");
-                    this.addTooltipText = document.createElement("span");
-                    this.notificationSound = document.createElement("audio");
-
-                    this.messengerButton.innerHTML = '<div class="weavy-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M6 9h12v2H6m8 3H6v-2h8m4-4H6V6h12"></path></svg></div>';
-                    this.messengerTooltipText.innerHTML = this.options.messenger_title;
-                    this.addButton.innerHTML = '<div class="weavy-icon"><svg style="transform: rotate(45deg);" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></div>';
-                    this.addTooltipText.innerHTML = this.options.add_title;
-
-                    this.strips.appendChild(this.messengerStrip);
-                    this.messengerStrip.appendChild(renderControls.call(this, "weavy-strip-messenger"));
-                    this.messengerStrip.appendChild(this.messengerFrame);
-                    this.draggable.appendChild(this.messengerButtonContainer);
-                    this.messengerButtonContainer.appendChild(this.messengerButton);
-                    this.messengerButton.appendChild(this.conversations);
-                    this.messengerTooltip.appendChild(this.messengerTooltipText);
-                    this.messengerButtonContainer.appendChild(this.messengerTooltip);
-                    this.draggable.appendChild(this.bubblesCache);
-                    this.draggable.appendChild(this.bubblesGlobal);
-                    this.draggable.appendChild(this.bubblesPersonal);
-                    this.strips.appendChild(this.addStrip);
-                    this.draggable.appendChild(this.addContainer);
-                    this.addStrip.appendChild(renderControls.call(this, "weavy-strip-add"));
-                    this.addStrip.appendChild(this.addFrame);
-                    this.addContainer.appendChild(this.addButtonContainer);
-                    this.addButtonContainer.appendChild(this.addButton);
-                    this.addTooltip.appendChild(this.addTooltipText);
-                    this.addButtonContainer.appendChild(this.addTooltip);
-                    this.container.appendChild(this.notificationSound);
-
-
-                    this.messengerButton.addEventListener("click", this.toggle.bind(this, "messenger"));
-                    this.addButton.addEventListener("click", this.toggle.bind(this, "add"));
-
-
-                    // personal button
-                    this.personalButton.className = "weavy-button weavy-personal weavy-button-transparent" + (this.options.notifications_count === 0 ? "" : " weavy-dot");
-                    this.personalButton.setAttribute("data-count", this.options.notifications_count);
-
-                    // messenger strip
-                    this.messengerStrip.className = "weavy-strip" + (this.options.is_open ? " weavy-open" : "");
-                    this.messengerStrip.id = "weavy-strip-messenger";
-
-                    // messenger frame
-                    this.messengerFrame.className = "weavy-strip-frame";
-                    this.messengerFrame.id = "weavy-strip-frame-messenger";
-                    this.messengerFrame.name = "weavy-strip-frame-messenger";
-                    this.messengerFrame.allowFullscreen = 1;
-                    this.messengerFrame.dataset.src = this.options.messenger_url;
-
-                    // Messenger button container
-                    this.messengerButtonContainer.className = "weavy-bubble-item weavy-bubble-messenger";
-                    this.messengerButtonContainer.id = "weavy-bubble-messenger";
-
-                    // messenger button
-                    this.messengerButton.className = "weavy-button weavy-messenger weavy-button-transparent" + (this.options.conversations_count === 0 ? "" : " weavy-dot");
-                    this.messengerButton.setAttribute("data-count", this.options.conversations_count);
-
-                    this.conversations.className = "weavy-conversations";
-                    this.conversations.setAttribute("draggable", "false");
-
-                    // tooltip
-                    this.messengerTooltip.id = "weavy-bubble-tooltip-messenger";
-                    this.messengerTooltip.className = "weavy-bubble-tooltip";
-
-                    this.messengerTooltipText.className = "weavy-bubble-tooltip-text";
-
-                    // global bubbles container
-                    this.bubblesGlobal.id = "weavy-bubbles-global";
-                    this.bubblesGlobal.className = "weavy-bubbles-global weavy-bubbles";
-
-                    // personal bubbles container
-                    this.bubblesPersonal.id = "weavy-bubbles-personal";
-                    this.bubblesPersonal.className = "weavy-bubbles-personal weavy-bubbles";
-
-                    // bubbles cache container
-                    this.bubblesCache.id = "weavy-bubbles-cache";
-                    this.bubblesCache.className = "weavy-cache weavy-bubbles-cache weavy-bubbles";
-
-                    // add bubble container
-                    this.addContainer.id = "weavy-add-container";
-
-                    // add strip
-                    this.addStrip.className = "weavy-strip" + (this.options.is_open ? " weavy-open" : "");
-                    this.addStrip.id = "weavy-strip-add";
-
-                    // add frame
-                    this.addFrame.className = "weavy-strip-frame";
-                    this.addFrame.id = "weavy-strip-frame-add";
-                    this.addFrame.name = "weavy-strip-frame-add";
-                    this.addFrame.allowFullscreen = 1;
-                    this.addFrame.dataset.src = this.options.add_url;
-
-                    // add button container
-                    this.addButtonContainer.className = "weavy-bubble-item weavy-bubble-add";
-                    this.addButtonContainer.id = "weavy-bubble-add";
-
-                    // add button
-                    this.addButton.className = "weavy-button weavy-add weavy-button-transparent";
-
-                    // tooltip
-                    this.addTooltip.id = "weavy-bubble-tooltip-personal";
-                    this.addTooltip.className = "weavy-bubble-tooltip";
-
-                    this.addTooltipText.className = "weavy-bubble-tooltip-text";
-
-                    // notification sound                
-                    this.notificationSound.className = "weavy-notification-sound";
-                    this.notificationSound.preload = "none";
-                    this.notificationSound.src = this.options.url + "/media/notification.mp3";
-
-                }
-
-                // append strips
-                this.container.className = "weavy-widget " + this.options.class_name + ' ' + (this.options.el ? 'weavy-custom' : 'weavy-default');
-                this.container.id = "weavy-widget";
-                this.container.setAttribute("data-version", this.options.version);
-
-                //Set Classes
-
-                // strips
-                this.strips.className = "weavy-strips";
-                this.spaces.className = "weavy-spaces";
-
-                // draggable
-                this.draggable.className = "weavy-draggable" + (this.options.is_open ? " weavy-open" : "");
-
-                // frame status checking
-                this.statusFrame.className = "weavy-status-check";
-                this.statusFrame.id = "weavy-status-check";
-                this.statusFrame.src = this.options.status_url;
-
-                // weavy button container
-                this.weavyButtonContainer.className = "weavy-bubble-item weavy-bubble-weavy";
-                this.weavyButtonContainer.id = "weavy-bubble-weavy";
-
-                // weavy button
-                this.weavyButton.className = "weavy-button weavy-logo weavy-button-transparent";
-
-                // personal strip
-                this.personalStrip.className = "weavy-strip" + (this.options.is_open ? " weavy-open" : "");
-                this.personalStrip.id = "weavy-strip-personal";
-
-                // personal frame
-                this.personalFrame.className = "weavy-strip-frame";
-                this.personalFrame.id = "weavy-strip-frame-personal";
-                this.personalFrame.name = "weavy-strip-frame-personal";
-                this.personalFrame.allowFullscreen = 1;
-                this.personalFrame.dataset.src = this.options.personal_url;
-
-
-                // personal button container
-                this.personalButtonContainer.className = "weavy-bubble-item weavy-bubble-personal";
-                this.personalButtonContainer.id = "weavy-bubble-personal";
-
-                // tooltip
-                this.personalTooltip.id = "weavy-bubble-tooltip-personal";
-                this.personalTooltip.className = "weavy-bubble-tooltip";
-
-                this.personalTooltipText.className = "weavy-bubble-tooltip-text";
-
-                // append buttons
-                this.buttons.className = "weavy-buttons";
-
-                // append notifications
-                this.notifications.className = "weavy-notifications";
-
-                // add styles
-                var style = document.getElementById("weavy-styles");
-                if (style) {
-                    if (style.styleSheet) {
-                        style.styleSheet.cssText = this.options.widget_css;
-                    } else {
-                        style.removeChild(style.firstChild);
-                        style.appendChild(document.createTextNode(this.options.widget_css));
-                    }
-                } else {
-                    style = document.createElement("style");
-                    style.type = "text/css";
-                    style.id = "weavy-styles";
-                    style.styleSheet ? style.styleSheet.cssText = this.options.widget_css : style.appendChild(document.createTextNode(this.options.widget_css));
-
-                    if (this.supportsShadowDOM) {
-                        this.container.appendChild(style);
-                    } else {
-                        document.getElementsByTagName("head")[0].appendChild(style);
-                    }
-                }
-
-                // append container to target element || html
-                if (!this.root) {
-                    var target = this.options.el || document.documentElement.appendChild(document.createElement("section"));
-                    target.classList.add("weavy-root");
-
-                    if (this.supportsShadowDOM) {
-                        target.classList.add("weavy-shadow");
-                        target = target.attachShadow({ mode: "open" });
-                    }
-                    this.root = target;
-                }
-
-                this.root.appendChild(this.container);
-            }
-
-            if (this.options.user_id) {
-                // Update messenger conversations
-                this.unreadConversations = this.options.conversations || [];
-                if (this.unreadConversations) {
-                    updateConversations.call(this, this.unreadConversations);
-                }
-
-                // bubbles, global and user added
-                // Check if current open bubble is global and make sure it's not removed
-                widget.options.bubbles = widget.options.bubbles || [];
-                var preservedBubble = [];
-                var currentOpenGlobal = $(widget.spaces).children("[data-type='global'].weavy-open");
-
-
-                if (currentOpenGlobal.length) {
-                    preservedBubble = widget.bubbles.filter(function (bubble) {
-                        var isMatch = currentOpenGlobal[0].id === "weavy-strip-bubble-" + bubble.space_id;
-                        if (isMatch) {
-                            bubble.type = "personal";
-                            isMatch = widget.options.bubbles.filter(function (newBubble) { return newBubble.space_id === bubble.space_id }).length === 0;
-                            $(widget.draggable).find("#weavy-bubble-" + bubble.space_id).addClass("weavy-bubble-detached");
-                        }
-                        return isMatch;
-                    }).pop();
-
-                    if (preservedBubble) {
-                        widget.options.bubbles.unshift(preservedBubble);
-                    }
-                }
-
-                widget.bubbles = widget.options.bubbles;
-
-                // Truncate the array; only 16 spaces allowed
-                if (widget.bubbles.length >= widget.options.bubble_limit) {
-                    widget.bubbles.length = Math.min(widget.bubbles.length, widget.options.bubble_limit);
-                    showAlert.call(widget, "<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
-                }
-
-                addAndRemoveBubbles();
-
-            } else {
-
-                // personal button
-                this.personalButton.className = "weavy-button weavy-personal weavy-button-transparent";
-                this.personalButton.innerHTML = '<img draggable="false" class="weavy-avatar" src="' + this.options.personal_avatar + '" />';
-            }
-
-            // version mismatch
-            if (widget.options.should_update) {
-                try {
-                    if (typeof (browser) !== "undefined" && browser.runtime) {
-                        browser.runtime.sendMessage({ name: 'sync' });
-                    } else if (typeof (chrome) !== "undefined" && chrome.runtime) {
-                        chrome.runtime.sendMessage({ name: 'sync' });
-                    }
-                } catch (ex) {
-                    console.error(ex);
-                }
-                showAlert.call(this, "<strong>" + widget.options.installation_name + " has been upgraded</strong><br/>Reload page to get the latest version.", true);
-            }
-        }
-
-        function cleanBubblesList(bubblesList) {
-            if (!bubblesList && !Array.isArray(bubblesList)) {
-                return [];
-            }
-
-            var cleanedList = [];
-            bubblesList.forEach(function (bubble) {
-                var previousIndex;
-                var previous = cleanedList.filter(function (b, i) {
-                    var isMatch = b.space_id == bubble.space_id;
-                    if (isMatch) { previousIndex = i; }
-                    return isMatch;
-                }).pop();
-
-                bubble.url = widget.httpsUrl(bubble.url);
-
-                if (previous && previous.type !== "global") {
-                    cleanedList[previousIndex] = bubble;
-                } else if (!previous) {
-                    cleanedList.push(bubble);
-                }
-            });
-            return cleanedList;
-        }
-
-        function addAndRemoveBubbles(newBubbles) {
-            if (newBubbles) {
-                newBubbles = Array.isArray(newBubbles) ? newBubbles : [newBubbles];
-
-                newBubbles.forEach(function (newBubble) {
-                    newBubble.url = widget.httpsUrl(newBubble.url);
-  
-                    if ([].some.call(widget.bubbles, function (b) { return b.space_id == newBubble.space_id })) {
-                        widget.bubbles = widget.bubbles.map(function (bubble) {
-                            if (bubble.space_id === newBubble.space_id) {
-                                return newBubble;
-                            } else {
-                                return bubble;
-                            }
-                        });
-                    } else {
-                        if (widget.bubbles.length >= widget.options.bubble_limit) {
-                            showAlert.call(widget, "<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
-                            return;
-                        } else {
-                            widget.bubbles.push(newBubble);
-                        }
-                    }
+        var loadPromise = function () {
+            return new Promise(function (resolve) {
+                widget.one("await:load", function () {
+                    resolve();
                 });
-            }
+            })
+        };
 
-            $(widget.spaces).children().addClass("weavy-cache-hidden");
+        /**
+         * Promise that the widget has recieved the after:load event
+         *
+         * @example
+         * widget.awaitLoaded.then(function() { ... })
+         *
+         * @category promises
+         * @type {external:Promise}
+         * @resolves when init is called, the websocket has connected, data is received from the server and the widget is built and the load event has finished.
+         */
+        widget.awaitLoaded = loadPromise();
 
-            [].forEach.call(widget.bubbles, function (bubble) {
-
-                var strip = widget.stripCacheList.filter(function (item) { return item.id === "weavy-strip-bubble-" + bubble.space_id; }).pop();
-                var buttonContainer = widget.buttonCacheList.filter(function (item) { return item.id === "weavy-bubble-" + bubble.space_id; }).pop();
-
-                // add new bubble if not already added
-                if (!strip) {
-
-                    // strip
-                    strip = document.createElement("div");
-                    strip.setAttribute("data-type", bubble.type);
-                    strip.className = "weavy-strip";
-                    strip.id = "weavy-strip-bubble-" + bubble.space_id;
-
-                    widget.spaces.appendChild(strip);
-
-                    // frame
-                    var frame = document.createElement("iframe");
-                    frame.className = "weavy-strip-frame";
-                    frame.id = "weavy-strip-bubble-frame-" + bubble.space_id
-                    frame.name = "weavy-strip-bubble-frame-" + bubble.space_id
-                    frame.allowFullscreen = 1;
-                    frame.dataset.src = bubble.url;
-                    frame.setAttribute('data-type', bubble.type);
-
-                    strip.appendChild(renderControls.call(widget, "weavy-strip-bubble-" + bubble.space_id));
-                    strip.appendChild(frame);
-
-                    // button container
-                    buttonContainer = document.createElement("div");
-                    buttonContainer.className = "weavy-bubble-item weavy-removed weavy-bubble-" + bubble.space_id;
-                    buttonContainer.id = "weavy-bubble-" + bubble.space_id;
-                    buttonContainer.setAttribute('data-bubble-id', bubble.bubble_id);
-                    buttonContainer.setAttribute('data-type', bubble.type);
-                    buttonContainer.setAttribute('data-id', bubble.space_id);
-
-                    // button
-                    var button = document.createElement("div");
-                    button.setAttribute('data-name', bubble.name);
-                    button.className = "weavy-button weavy-bubble-" + bubble.space_id;
-
-                    button.style.backgroundImage = "url(" + trimUrl(widget.options.url) + bubble.icon + ")";
-                    //button.innerHTML = '<img draggable="false" class="weavy-avatar" src="' + widget.options.url + bubble.icon + '" />';
-                    buttonContainer.appendChild(button);
-
-                    // tooltip
-                    var tooltip = document.createElement("div");
-                    tooltip.id = "weavy-bubble-tooltip-" + bubble.space_id;
-                    tooltip.className = "weavy-bubble-tooltip";
-
-                    var text = document.createElement("span");
-                    text.className = "weavy-bubble-tooltip-text";
-                    text.innerHTML = bubble.name;
-
-                    tooltip.appendChild(text);
-
-                    if (bubble.is_admin) {
-                        var disconnect = document.createElement("a");
-                        disconnect.className = "weavy-bubble-action weavy-bubble-disconnect";
-                        disconnect.title = "Disconnect from url";
-                        //link: disconnect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2,5.27L3.28,4L20,20.72L18.73,22L14.73,18H13V16.27L9.73,13H8V11.27L5.5,8.76C4.5,9.5 3.9,10.68 3.9,12C3.9,14.26 5.74,16.1 8,16.1H11V18H8A6,6 0 0,1 2,12C2,10.16 2.83,8.5 4.14,7.41L2,5.27M16,6A6,6 0 0,1 22,12C22,14.21 20.8,16.15 19,17.19L17.6,15.77C19.07,15.15 20.1,13.7 20.1,12C20.1,9.73 18.26,7.9 16,7.9H13V6H16M8,6H11V7.9H9.72L7.82,6H8M16,11V13H14.82L12.82,11H16Z" /></svg>'
-                        disconnect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2 5.27L3.28 4 20 20.72 18.73 22l-4.83-4.83-2.61 2.61a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.982 2.982 0 0 0 0 4.24 2.982 2.982 0 0 0 4.24 0l2.62-2.6-1.62-1.61c-.01.24-.11.49-.29.68-.39.39-1.03.39-1.42 0A4.973 4.973 0 0 1 7.72 11L2 5.27m10.71-1.05a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.982 2.982 0 0 0 0-4.24 2.982 2.982 0 0 0-4.24 0l-3.33 3.33-1.41-1.42 3.33-3.33m.7 4.95c.39-.39 1.03-.39 1.42 0a4.999 4.999 0 0 1 1.23 5.06l-1.78-1.77c-.05-.68-.34-1.35-.87-1.87a.973.973 0 0 1 0-1.42z"></path></svg>';
-                        disconnect.addEventListener("click", function (e) { widget.removeBubble.call(widget, buttonContainer.dataset["bubbleId"], e); });
-                        buttonContainer.appendChild(disconnect);
-
-                        var connect = document.createElement("a");
-                        connect.className = "weavy-bubble-action weavy-bubble-connect";
-                        connect.title = "Connect to url";
-                        connect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0a5.003 5.003 0 0 1 0-7.07l3.54-3.54a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.982 2.982 0 0 0 0-4.24 2.982 2.982 0 0 0-4.24 0l-3.53 3.53a2.982 2.982 0 0 0 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0a5.003 5.003 0 0 1 0 7.07l-3.54 3.54a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.982 2.982 0 0 0 0 4.24 2.982 2.982 0 0 0 4.24 0l3.53-3.53a2.982 2.982 0 0 0 0-4.24.973.973 0 0 1 0-1.42z"></path></svg>';
-                        //link: connect.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16,6H13V7.9H16C18.26,7.9 20.1,9.73 20.1,12A4.1,4.1 0 0,1 16,16.1H13V18H16A6,6 0 0,0 22,12C22,8.68 19.31,6 16,6M3.9,12C3.9,9.73 5.74,7.9 8,7.9H11V6H8A6,6 0 0,0 2,12A6,6 0 0,0 8,18H11V16.1H8C5.74,16.1 3.9,14.26 3.9,12M8,13H16V11H8V13Z" /></svg>';
-                        connect.addEventListener("click", function (e) {
-                            if (buttonContainer.classList.contains("weavy-bubble-detached")) {
-                                widget.connectBubble.call(widget, bubble.space_id, "space", e);
-                            } else {
-                                widget.connectBubble.call(widget, buttonContainer.dataset["bubbleId"], "bubble", e);
-                            }
-                        });
-                        buttonContainer.appendChild(connect);
-                    }
-
-                    var close = document.createElement("a");
-                    close.className = "weavy-bubble-action weavy-bubble-close";
-                    close.title = "Close";
-                    close.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" /></svg>';
-
-                    close.addEventListener("click", function (e) {
-                        if (buttonContainer.classList.contains("weavy-bubble-detached")) {
-                            removeBubbleItems.call(widget, bubble.space_id);
-                        } else {
-                            widget.removeBubble.call(widget, buttonContainer.dataset["bubbleId"], e);
-                        }
-                    });
-
-                    buttonContainer.appendChild(close);
-
-                    buttonContainer.appendChild(tooltip);
-
-                    button.addEventListener("click", widget.toggle.bind(widget, "bubble-" + bubble.space_id));
-                    //button.addEventListener("mouseenter", showTooltip);
-
-                    widget.stripCacheList.unshift(strip);
-                    widget.buttonCacheList.unshift(buttonContainer);
-                } else {
-                    var frame = strip.querySelector("iframe");
-                    if (frame.src) {
-                        frame.contentWindow.postMessage({ name: 'context-url', 'value': window.location.href, 'title': document.title, 'origin': document.location.origin, 'type': bubble.type }, "*");
-                    }
-                }
-
-                strip.setAttribute("data-type", bubble.type);
-                strip.querySelector(".weavy-strip-frame").setAttribute('data-type', bubble.type);
-                strip.classList.remove("weavy-cache-hidden");
-
-                buttonContainer.setAttribute('data-type', bubble.type);
-                buttonContainer.querySelector(".weavy-button").setAttribute('data-type', bubble.type);
-
-                if (parseInt(buttonContainer.getAttribute("data-bubble-id")) !== bubble.bubble_id) {
-                    buttonContainer.setAttribute("data-bubble-id", bubble.bubble_id);
-                    buttonContainer.classList.remove("weavy-bubble-detached");
-                }
-
-                try {
-                    if (bubble.type === "personal") {
-                        if (buttonContainer.parentNode === widget.bubblesGlobal) {
-                            // Bubble is moved from global to personal
-                            removeBubbleItems(bubble.space_id, false, true);
-                            buttonContainer.classList.add("weavy-disable-transition", "weavy-removed", "weavy-disabled");
-                            widget.bubblesPersonal.appendChild(buttonContainer);
-                        } else if (buttonContainer.parentNode !== widget.bubblesPersonal) {
-                            widget.bubblesPersonal.appendChild(buttonContainer);
-                        }
-                    } else {
-                        if (buttonContainer.parentNode === widget.bubblesPersonal) {
-                            // Bubble is moved from personal to global
-                            removeBubbleItems(bubble.space_id, false, true);
-                            buttonContainer.classList.add("weavy-disable-transition", "weavy-removed", "weavy-disabled");
-                            widget.bubblesGlobal.appendChild(buttonContainer);
-                        } else if (buttonContainer.parentNode !== widget.bubblesGlobal) {
-                            widget.bubblesGlobal.appendChild(buttonContainer);
-                        }
-                    }
-                } catch (e) { console.warn("Could not attach bubble", bubble.space_id); }
-
-                _timeouts.push(setTimeout(function () {
-                    requestAnimationFrame(function () {
-                        buttonContainer.classList.remove("weavy-disable-transition", "weavy-removed", "weavy-disabled");
-
-                        // if the bubble should be opened up
-                        if (bubble.force_open) {
-                            _timeouts.push(setTimeout(function () {
-                                bubble.force_open = false;
-                                widget.open("bubble-" + bubble.space_id, bubble.destination || bubble.url);
-                            }, 100));
-                        }
-                    });
-                }, 0));
-
-            });
-
-
-            // Close remaining spaces
-            $(widget.spaces).children(".weavy-cache-hidden").each(function (index, strip) {
-                if (widget.bubbles.filter(function (bubble) {
-                    return strip.id === "weavy-bubble-" + bubble.space_id;
-                }).length === 0) {
-                    if (strip.classList.contains("weavy-open")) {
-                        strip.classList.remove("weavy-cache-hidden");
-                    } else {
-                        removeBubbleItems(strip.id.replace(/^weavy-strip-bubble-/, ''));
-                    }
-                }
-            });
-
-            _timeouts.push(setTimeout(function () { truncateCache(widget.options.bubble_limit); }, 450));
+        /**
+         * Initializes the widget. This is done automatically unless you specify `init: false` in {@link WeavyWidget#options}.
+         * @emits WeavyWidget#init
+         */
+        widget.init = function () {
+            /**
+             * Event that is triggered when the widget instance is initiated. This is done automatically unless you specify `init: false` in {@link WeavyWidget#options}.
+             * You may use the `before:init` event together with `event.stopPropagation()` if you want to intercept the initialization.
+             * 
+             * @category events
+             * @event WeavyWidget#init
+             * @returns {Promise}
+             */
+            return widget.triggerEvent("init");
         }
 
-        function renderControls(strip) {
-            var controls = document.createElement("div");
-            controls.className = "weavy-controls";
-
-            var expand = document.createElement("div");
-            expand.className = "weavy-icon weavy-expand";
-            expand.title = "Expand";
-            expand.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.199 4.8008v2h3.5898l-4.4883 4.4883-0.01172 0.01172-4.4883 4.4883v-3.5898h-2v7h7v-2h-3.5898l4.4883-4.4883 0.01172-0.01172 4.4883-4.4883v3.5898h2v-7h-7z"/></svg>';
-            expand.addEventListener("click", this.resize.bind(this));
-            controls.appendChild(expand);
-
-            var collapse = document.createElement("div");
-            collapse.className = "weavy-icon weavy-collapse";
-            collapse.title = "Collapse";
-            collapse.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m18.5 4.0898l-4.5 4.5v-3.5898h-2v7h7v-2h-3.59l4.5-4.5-1.41-1.4102zm-6.5 7.9102h-7v2h3.5898l-4.5 4.5 1.4102 1.41 4.5-4.5v3.59h2v-7z"/></svg>';
-            collapse.addEventListener("click", this.resize.bind(this));
-            controls.appendChild(collapse);
-
-            var close = document.createElement("div");
-            close.className = "weavy-icon";
-            close.title = "Close";
-            close.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>';
-            close.addEventListener("click", this.close.bind(this));
-            controls.appendChild(close);
-
-            return controls;
-        }
-
-        var lastStrip;
-
-        // open in a normal window when iframes are not allowed
-        function fallback(strip, destination) {
-            // fallback to windows via extension
-            widget.close();
-
-            var url = destination;
-
-            if (!url) {
-                if (strip.startsWith("bubble-")) {
-                    // get url for bubble
-                    var bubbleFrame = $(widget.strips).find("#weavy-strip-" + strip).find("iframe")[0];
-                    url = bubbleFrame.src ? bubbleFrame.src : bubbleFrame.dataset.src;
-                } else {
-                    // NOTE: remove strip param to trigger standalone bahaviour
-                    url = removeParameter(widget.options[strip + "_url"], "strip");
-                }
-
-                // fix for referrer not being set
-                if (url.endsWith("/widget/connect")) {
-                    url += "?referrer=" + encodeURIComponent(window.location.origin);
-                }
-            }
-
-            // use the button container to get measurments
-            var measure = $(widget.buttons);
-
-            // NOTE: update if width of strip changes
-            var stripWidth = 384;
-            var nudge = $(widget.container).hasClass("weavy-left") ? -65 : (stripWidth);
-            var offset = measure.offset();
-
-            message = {
-                "name": "fallback",
-                "url": url,
-                "key": "fallback", //strip,
-                "left": Math.round(offset.left + (window.screenLeft || window.screenX) - nudge),
-                "height": Math.round(measure.height() - 20),
-                "top": Math.round((window.screenTop || window.screenY) + 96 - 8), // NOTE: adding 96 to account for chrome address bar
-                "width": Math.round(stripWidth),
-                "force": destination || strip !== lastStrip ? true : false
-            };
-
-            var windowFeatures = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=no";
-            var windowPosition = "left=" + message.left + ",top=" + (message.top - 96 + 24) + ",height=" + message.height + ",width=" + message.width;
-
-
-            // Todo: Add some window handling
-            try {
-                if (chrome !== undefined && chrome.runtime !== undefined) {
-                    chrome.runtime.sendMessage(null, message, function (response) { });
-                } else {
-                    window.open(message.url, "weavy-" + message.name + "-" + message.key, windowFeatures + "," + windowPosition);
-                }
-            } catch (e) {
-                window.open(message.url, "weavy-" + message.name + "-" + message.key, windowFeatures + "," + windowPosition);
-            }
-
-            lastStrip = strip;
-        }
-
-        function connectedUrl(url) {
-            if (!url) {
-                return false;
-            }
-            if (document.location.href === url) { return true; }
-            if (url.lastIndexOf("/") === url.length && document.location.href.addTrailing("/") === url) { return true; }
-            if (url.substr(-1) === "*") {
-                if (document.location.href.indexOf(url.substr(0, url.length - 1)) !== -1) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function trimUrl(url) {
-            return url.replace(/\/$/, "");
-        }
-
-        function removeParameter(url, parameter) {
-            var urlparts = url.split("?");
-            if (urlparts.length >= 2) {
-
-                var prefix = encodeURIComponent(parameter) + "=";
-                var pars = urlparts[1].split(/[&;]/g);
-
-                for (var i = pars.length; i-- > 0;) {
-                    if (pars[i].lastIndexOf(prefix, 0) !== -1) {
-                        pars.splice(i, 1);
-                    }
-                }
-                url = urlparts[0] + (pars.length > 0 ? "?" + pars.join("&") : "");
-                return url;
-            } else {
-                return url;
+        // INTERNAL FUNCTIONS
+        function resetContainer() {
+            if (widget.nodes.container) {
+                $(widget.nodes.container).remove();
+                widget.nodes.container = null;
+                widget.isLoaded = false;
             }
         }
 
@@ -1264,333 +625,486 @@
             return weavy.connection.init(widget.options.url, null, true);
         }
 
-        function updateConversations(conversations) {
-            $(".weavy-conversations", this.container).empty();
-
-            for (var i = 0; i < conversations.length; i++) {
-                var conversation = document.createElement("a");
-                conversation.className = "weavy-conversation";
-                conversation.href = "javascript:;";
-                conversation.setAttribute("draggable", "false");
-                conversation.title = conversations[i].is_room ? conversations[i].name : conversations[i].created_by.name;
-                conversation.setAttribute("data-id", conversations[i].id);
-                conversation.addEventListener("click", this.openConversation.bind(this, conversations[i].id));
-
-                var avatar = document.createElement("img");
-                avatar.className = "weavy-avatar";
-                avatar.setAttribute("draggable", "false");
-
-                avatar.src = trimUrl(widget.options.url) + conversations[i].thumb_url.replace("{options}", "96x96-crop");
-                conversation.appendChild(avatar);
-                this.conversations.appendChild(conversation);
-
-                if (i === 2 && conversations.length > 3) {
-                    var more = document.createElement("a");
-                    more.className = "weavy-icon";
-                    more.href = "javascript:;";
-                    more.title = "More...";
-                    more.addEventListener("click", this.openConversation.bind(this, null));
-                    more.innerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z"/></svg>';
-                    this.conversations.appendChild(more);
-                    break;
-                }
-            }
-        }
-
-        function conversationRead(id) {
-            this.unreadConversations = this.unreadConversations.filter(function (unreadConversation) { return unreadConversation.id !== id });
-            updateConversations.call(this, this.unreadConversations);
-        }
-
-        function appendConversation(conversation) {
-            // remove if already in list - will be added again
-            this.unreadConversations = this.unreadConversations.filter(function (unreadConversation) { return unreadConversation.id !== conversation.id });
-            this.unreadConversations.unshift(conversation);
-            updateConversations.call(this, this.unreadConversations);
-        }
-
-        function showNotification(notification) {
-            if (!$(".weavy-strip.weavy-open", widget.container).length) {
-                var notificationFrame = document.createElement("iframe");
-                notificationFrame = document.createElement("iframe");
-                notificationFrame.className = "weavy-notification-frame";
-                notificationFrame.id = "weavy-notification-frame-" + notification.id;
-
-                if ($(this.notifications).children().length > 0) {
-                    notificationFrame.setAttribute("style", "display:none");
-                    notificationFrame.setAttribute("data-src", trimUrl(widget.options.url) + "/notifications/" + notification.id + "/preview");
-                } else {
-                    notificationFrame.src = trimUrl(widget.options.url) + "/notifications/" + notification.id + "/preview";
-                }
-
-                this.notifications.appendChild(notificationFrame);
-            }
-
-            try {
-                $(".weavy-notification-sound", widget.container)[0].play();;
-            } catch (e) { }
-        }
-
-        function closeNotification(id) {
-
-            var $notification = $("#weavy-notification-frame-" + id, widget.container);
-
-            if ($notification.length) {
-                $notification.fadeOut("normal", function () {
-                    var $next = $notification.next();
-                    $(this).remove();
-
-                    if ($next.length) {
-                        $next.attr("src", $next.data("src"));
-                        $next.addEventListener("load", function () {
-                            $notification.fadeIn("normal");
-                        }, false);
-                    }
+        function disconnect(async, notify) {
+            widget.log("disconnecting widget");
+            if (widget.nodes.container) {
+                $(widget.nodes.container).find("iframe").each(function (index, frame) {
+                    //weavy.connection.removeWindow(frame.contentWindow);
                 });
             }
+
+            // NOTE: stop/disconnect directly if we are not authenticated 
+            // signalr does not allow the user identity to change in an active connection
+            return weavy.connection.disconnect(async, notify);
         }
 
-        function registerLoading(stripId) {
-            var frame = $("#" + stripId, widget.container).find("iframe").get(0);
+        function connectAndLoad(fullReload, notify) {
+            if (widget.isLoaded) {
+                widget.awaitLoaded = loadPromise();
+            }
+            if (fullReload === true) {
+                widget.isLoaded = false;
+            }
+            connect.call(widget).then(function () {
+                widget.options.href = window.location.href;
+                if (notify !== false) {
+
+                    weavy.realtime.invoke("widget", "load", widget.options);
+                }
+            });
+
+            return widget.awaitLoaded;
+        }
+
+
+        function registerLoading(panelId) {
+            var frame = $(widget.getId("#weavy-panel-" + panelId), widget.nodes.container).find("iframe").get(0);
             if (frame && !frame.registered) {
                 var onload = function () {
-                    sendWindowId(frame.contentWindow, frame.id, stripId);
-                    loading.call(widget, stripId, false);
+                    widget.sendWindowId(frame.contentWindow, frame.id, panelId);
+                    widget.panelLoading.call(widget, panelId, false);
                     delete frame.dataset.src;
                     // add window to connections
-                    weavy.connection.addWindow(frame.contentWindow)
+                    weavy.connection.addWindow(frame.contentWindow);
+                    frame.loaded = true;
                 };
-                frame.addEventListener("load", onload, false);
+                widget.on(frame, "load", onload);
                 frame.registered = true;
             }
         }
 
-        function loading(stripId, isLoading, fill) {
+        function buildOutput() {
+            // add container
+            if (!widget.nodes.container) {
+                widget.nodes.container = document.createElement("div");
 
-            var $strip = $("#" + stripId, widget.container);
-            var $bubble = $("#" + stripId.replace(/-strip(-bubble)*-/, '-bubble-'), widget.container);
+                widget.nodes.container.className = "weavy-widget " + widget.options.className + ' ' + (widget.options.container ? 'weavy-custom' : 'weavy-default');
+                widget.nodes.container.id = widget.getId("weavy-widget");
+                widget.nodes.container.setAttribute("data-version", widget.options.version);
 
-            if (isLoading) {
-                registerLoading(stripId);
-                $strip.addClass(fill ? "weavy-loading weavy-loading-fill" : "weavy-loading");
-                $bubble.addClass(fill ? "weavy-loading weavy-loading-fill" : "weavy-loading");
-                _timeouts.push($strip.loadingTimeout = setTimeout(loading.bind(widget, stripId, false), 15000));
+                if (widget.options.overlay) {
+                    widget.nodes.overlay = $(widget.options.overlay)[0];
+                } else {
+                    widget.nodes.overlay = document.createElement("div");
+                    widget.nodes.overlay.id = widget.getId("weavy-overlay");
+                    widget.nodes.container.appendChild(widget.nodes.overlay);
+                }
+
+                widget.nodes.overlay.classList.add("weavy-overlay");
+
+                // frame status checking
+                widget.statusFrame = document.createElement("iframe");
+                widget.statusFrame.className = "weavy-status-check weavy-hidden-frame";
+                widget.statusFrame.style.display = "none";
+                widget.statusFrame.id = widget.getId("weavy-status-check");
+
+                /**
+                 * Event triggered when frame blocking check has finished. You may also use the {@link WeavyWidget#awaitBlocked} promise to make sure the blocked check has finished.
+                 *
+                 * @category events
+                 * @event WeavyWidget#frame-check
+                 * @returns {object}
+                 * @property {boolean} blocked - Indicates if frames are blocked.
+                 */
+
+                widget.on(widget.statusFrame, "load", function () {
+                    // start testing for blocked iframe             
+                    widget.isBlocked = true;
+                    try {
+                        this.contentWindow.postMessage({ "name": "ping" }, "*");
+                    } catch (e) {
+                        widget.warn("Frame postMessage is blocked", e);
+                        widget.triggerEvent("frame-check", { blocked: true });
+                    }
+
+                });
+
+                var onFrameReady = function (e) {
+                    e = e.originalEvent || e;
+                    switch (e.data.name) {
+                        case "ready":
+                            widget.triggerEvent("frame-check", { blocked: false });
+                            widget.off(window, "message", onFrameReady);
+                            break;
+                    }
+                };
+
+                widget.on(window, "message", onFrameReady);
+
+                widget.nodes.container.appendChild(widget.statusFrame);
+                widget.timeout(1).then(function () {
+                    widget.statusFrame.src = widget.options.statusUrl;
+                });
+
+                // append container to target element || html
+                if (!widget.nodes.root) {
+                    var target = $(widget.options.container)[0] || document.documentElement.appendChild(document.createElement("section"));
+                    target.classList.add("weavy-root");
+
+                    if (widget.supportsShadowDOM) {
+                        target.classList.add("weavy-shadow");
+                        target = target.attachShadow({ mode: "closed" });
+                    }
+                    widget.nodes.root = target;
+                }
+
+                widget.nodes.root.appendChild(widget.nodes.container);
+
+            }
+
+            /**
+             * Event triggered when widget is building up the DOM elements.
+             * 
+             * Use this event to build all your elements and attach them to the widget.
+             * At this point you may safely assume that widget.nodes.container is built.
+             * 
+             * Good practice is to build all elements in the build event and store them as properties on the widget.
+             * Then you can attach them to other Elements in the after:build event.
+             * This ensures that all Elements are built before they are attached to each other.
+             *
+             * If you have dependencies to Elements built by plugins you should also check that they actually exist before attaching to them.
+             *
+             * Often it's a good idea to check if the user is signed-in using {@link WeavyWidget#isAuthenticated} unless you're building something that doesn't require a signed in user.
+             *
+             * @example
+             * widget.on("build", function() {
+             *     if (widget.isAuthenticated()) {
+             *         widget.myElement = document.createElement("DIV");
+             *     }
+             * });
+             * 
+             * widget.on("after:build", function() {
+             *     if (widget.isAuthenticated()) {
+             *         if (widget.nodes.dock) {
+             *             widget.nodes.dock.appendChild(widget.myElement);
+             *         }
+             *     }
+             * })
+             *
+             * @category events
+             * @event WeavyWidget#build
+             */
+
+            widget.triggerEvent("build");
+        }
+
+
+        // PUBLIC METHODS
+
+        /**
+         * Appends the widget-id to an id. This makes the id unique per widget instance. You may define a specific widget-idfor the instance in the {@link WeavyWidget#options}. If no id is provided it only returns the widget id. The widget id will not be appended more than once.
+         * 
+         * @param {string} [id] - Any id that should be completed with the widget id.
+         * @returns {string} Id completed with widget-id. If no id was provided it returns the widget-id only.
+         */
+        widget.getId = function (id) {
+            return id ? widget.removeId(id) + "-" + widget.options.id : widget.options.id;
+        }
+
+        /**
+         * Removes the widget id from an id created with {@link WeavyWidget#getId}
+         * 
+         * @param {string} id - The id from which the widget id will be removed.
+         * @returns {string} Id without widget id.
+         */
+        widget.removeId = function (id) {
+            return id ? id.replace(new RegExp("-" + widget.getId() + "$"), '') : id;
+        };
+
+        /**
+         * Checks if the user is signed in. May chack against any optional provided data.
+         * 
+         * @category authentication
+         * @param {Object} [optionalData] - Data that contains userId to verify against current user `{ userId: id }`, such as {@link WeavyWidget#options}.
+         * @returns {boolean} True if the user is signed in
+         */
+        widget.isAuthenticated = function (optionalData) {
+            if (optionalData) {
+                return optionalData.userId && optionalData.userId === widget.options.userId ? true : false;
+            }
+            return widget.options.userId ? true : false;
+        }
+
+        /**
+         * Sends the id of a frame to the frame content scripts, so that the frame gets aware of which id it has.
+         * The frame needs to have a unique name attribute.
+         * 
+         * @category panels
+         * @param {Window} contentWindow - The frame window to send the data to.
+         * @param {string} windowName - The frame name attribute.
+         * @param {string} [panelId] - If the frame is a panel, the panelId may also be provided.
+         */
+        widget.sendWindowId = function (contentWindow, windowName, panelId) {
+            try {
+                contentWindow.postMessage({
+                    name: "window-id",
+                    panelId: panelId,
+                    widgetId: widget.getId(),
+                    windowName: windowName,
+                    weavyUrl: widget.options.url
+                }, "*");
+            } catch (e) {
+                widget.error("Could not send window id", windowName, e);
+            }
+        };
+
+        /**
+         * Maximizes or restores the size of current panel.
+         * 
+         * @category panels
+         * @emits WeavyWidget#resize
+         */
+        widget.resize = function () {
+            $(widget.nodes.container).toggleClass("weavy-wide");
+
+            /**
+             * Triggered when the panel is resized due to a state change.
+             * 
+             * @category events
+             * @event WeavyWidget#resize
+             */
+            widget.triggerEvent("resize", null);
+        }
+
+        /**
+         * Maximize the size of current panel. 
+         * 
+         * @category panels
+         * @emits WeavyWidget#maximize
+         */
+        widget.maximize = function () {
+            $(widget.nodes.container).addClass("weavy-wide");
+
+            /**
+             * Triggered when the panel is maximized to full broser window size
+             * 
+             * @category events
+             * @event WeavyWidget#maximize
+             */
+            widget.triggerEvent("maximize", null);
+        }
+
+        /**
+         * Reload the widget data.
+         * 
+         * @category options
+         * @param {WeavyWidget#options} [options] Any new or additional options.
+         * @emits WeavyWidget#reload
+         * @returns {Promise}
+         */
+        widget.reload = function (options) {
+            widget.options = widget.extendDefaults(widget.options, options);
+            connectAndLoad();
+
+            /**
+             * Triggered when the widget is reloaded with any new data. Current options are provided as event data.
+             * 
+             * @category events
+             * @event WeavyWidget#reload
+             * @returns {WeavyWidget#options}
+             */
+            widget.triggerEvent("reload", widget.options);
+            return widget.awaitLoaded;
+        }
+
+        /**
+         * Check if a panel is currently loading.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel to check.
+         * @returns {boolean} True if the panel curerently is loading
+         */
+        widget.panelIsLoading = function (panelId) {
+            var frame = $(widget.getId("#weavy-panel-" + panelId), widget.nodes.container).find("iframe").get(0);
+            return frame.getAttribute("src") && !frame.loaded ? true : false;
+        };
+
+        /**
+         * Check if a panel has finished loading.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel to check.
+         * @returns {boolean} True if the panel has finished loading.
+         */
+        widget.panelIsLoaded = function (panelId) {
+            var frame = $(widget.getId("#weavy-panel-" + panelId), widget.nodes.container).find("iframe").get(0);
+            return frame.loaded ? true : false;
+        };
+
+        /**
+         * Tells a panel that it need to reload it's content.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel to refresh.
+         * @emits WeavyWidget#refresh
+         */
+        widget.refresh = function (panelId) {
+
+            widget.panelLoading.call(widget, panelId, true);
+
+            var $target = $(widget.getId("#weavy-panel-" + panelId), widget.nodes.container);
+            var frame = $target.find("iframe");
+
+            frame[0].contentWindow.postMessage({ "name": "reload" }, "*");
+
+            /**
+             * Event triggered when a panel is resfreshed and needs to reload it's content.
+             * 
+             * @category events
+             * @event WeavyWidget#refresh
+             * @returns {Object}
+             * @property {string} panelId - The id of the panel being refreshed.
+             */
+            widget.triggerEvent("refresh", { panelId: panelId });
+        }
+
+        /** 
+         * Resets a panel to its original url. This can be used if the panel has ended up in an incorrect state.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel to reset.
+         */
+        widget.reset = function (panelId) {
+            widget.panelLoading.call(widget, panelId, true);
+            var $target = $(widget.getId("#weavy-panel-" + panelId), widget.nodes.container);
+            var frame = $target.find("iframe");
+            frame[0].src = frame[0].dataset.src || frame[0].src || "about:blank";
+        }
+
+        /**
+         * Open a specific panel. The open waits for the [block check]{@link WeavyWidget#awaitBlocked} to complete, then opens the panel.
+         * Adds the `weavy-open` class to the {@link WeavyWidget#nodes#container}.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel to open.
+         * @param {string} [destination] - Tells the panel to navigate to a specified url.
+         * @emits WeavyWidget#open
+         */
+        widget.open = function (panelId, destination) {
+            widget.awaitBlocked.then(function () {
+                $(widget.nodes.container).addClass("weavy-open");
+                widget.openPanelId = panelId;
+
+                /**
+                 * Event triggered when a panel is opened.
+                 * 
+                 * @category events
+                 * @event WeavyWidget#open
+                 * @returns {Object}
+                 * @property {string} panelId - The id of the panel being openened.
+                 * @property {string} [destination] - Any url being requested to open in the panel.
+                 */
+                widget.triggerEvent("open", { panelId: panelId, destination: destination });
+            });
+        }
+
+        /**
+         * Closes all panels and removes the `weavy-open` class from the {@link WeavyWidget#nodes#container}. Sets the {@link WeavyWidget#awaitClosed} Promise if not already closing.
+         * 
+         * @category panels
+         * @returns {external:Promise} {@link WeavyWidget#awaitClosed}
+         * @emits WeavyWidget#close
+         */
+        widget.close = function () {
+            if ($(widget.nodes.container).hasClass("weavy-open")) {
+                $(widget.nodes.container).removeClass("weavy-open");
+
+                /**
+                 * Event triggered when the widget closes all panels. Wait for the {@link WeavyWidget#awaitClosed} Promise to do additional things when the widget has finished closing.
+                 * 
+                 * @category events
+                 * @event WeavyWidget#close
+                 */
+                widget.triggerEvent("close");
+
+                // Return timeout promise
+                return widget.awaitClosed = widget.timeout(250);
             } else {
-                $strip.removeClass("weavy-loading weavy-loading-fill");
-                $bubble.removeClass("weavy-loading weavy-loading-fill");
-                if ($strip.loadingTimeout) {
-                    clearTimeout($strip.loadingTimeout);
-                    delete $strip.loadingTimeout;
+                return widget.awaitClosed || Promise.resolve();
+            }
+        }
+
+        /**
+         * [Open]{@link WeavyWidget#open} or [close]{@link WeavyWidget#close} a specific panel.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel toggled.
+         * @param {string} [destination] - Tells the panel to navigate to a specified url when opened.
+         * @emits WeavyWidget#toggle
+         */
+        widget.toggle = function (panelId, destination) {
+            if (!widget.isBlocked) {
+                var closed = false;
+                if ($(widget.nodes.container).hasClass("weavy-open") && widget.openPanelId === panelId) {
+                    widget.log("toggle: widget closed");
+                    widget.close();
+                    closed = true;
+                } else {
+                    widget.log("toggle open:", panelId);
+                    widget.open(panelId, typeof (destination) === "string" ? destination : null);
+                }
+
+                /**
+                 * Event triggered when a panel is toggled open or closed.
+                 * 
+                 * @category events
+                 * @event WeavyWidget#toggle
+                 * @returns {Object}
+                 * @property {string} panelId - The id of the panel toggled.
+                 * @property {boolean} closed - True if the panel is closed.
+                 */
+                widget.triggerEvent("toggle", { panelId: panelId, closed: closed });
+            }
+        }
+
+        /**
+         * Set the loading indicator on the specified panel. The loading indicatior is automatically removed on loading. It also makes sure the panel is registered and [sends frame id]{@link WeavyWidget#sendWindowId} when loaded.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel that is loading.
+         * @param {boolean} isLoading - Sets whether the panel is loading or not.
+         * @param {boolean} [fill] - Sets an opaque background that hides any panel content during loading.
+         * @emits WeavyWidget#panel-loading
+         */
+        widget.panelLoading = function (panelId, isLoading, fill) {
+            if (isLoading) {
+                registerLoading(panelId);
+                loadingTimeout[panelId] = widget.timeout(15000).then(widget.panelLoading.bind(widget, panelId, false));
+            } else {
+                if (loadingTimeout[panelId]) {
+                    loadingTimeout[panelId].reject();
+                    delete loadingTimeout[panelId];
                 }
             }
 
+            /**
+             * Event triggered when panel is starting to load or stops loading.
+             * 
+             * @category events
+             * @event WeavyWidget#panel-loading
+             * @returns {Object}
+             * @property {string} panelId - The id of the panel loading.
+             * @property {boolean} isLoading - Indicating wheter the panel is loading or not.
+             * @property {boolean} fill - True if the panel has an opaque background during loading.
+             */
+            widget.triggerEvent("panel-loading", { panelId: panelId, isLoading: isLoading, fill: fill });
         }
 
-        function sendWindowId(contentWindow, windowName, stripId) {
-            try {
-                contentWindow.postMessage({
-                    name: "context-id",
-                    windowName: windowName,
-                    stripId: stripId
-                }, "*");
-            } catch (e) {
-                console.error("could not send window id", windowName, e);
-            }
-        }
-
-        function badgeChanged(badge) {
-            var prev = $(widget.personalButton).attr("data-count");
-            $(widget.personalButton).attr("data-count", badge.notifications);
-            if (badge.notifications === 0) {
-                // no notifications, remove dot and animation class
-                $(widget.personalButton).removeClass("weavy-dot");
-            } else if (badge.notifications > prev) {
-                // new notifications, animate dot
-                $(widget.personalButton).removeClass("weavy-pulse");
-                setTimeout(function () {
-                    // we need a small delay here for the browser to notice that the weavy-pulse class was toggled
-                    $(widget.personalButton).addClass("weavy-dot weavy-pulse");
-                }, 100);
-            }
-
-            prev = $(widget.messengerButton).attr("data-count");
-            $(widget.messengerButton).attr("data-count", badge.conversations);
-            if (badge.conversations === 0) {
-                // no conversations, remove dot and animation class
-                $(widget.messengerButton).removeClass("weavy-dot");
-            } else if (badge.conversations > prev) {
-                // new conversations, animate dot
-                $(widget.messengerButton).removeClass("weavy-pulse");
-                setTimeout(function () {
-                    // we need a small delay here for the browser to notice that the weavy-pulse class was toggled
-                    $(widget.messengerButton).addClass("weavy-dot weavy-pulse");
-                }, 100);
-            }
-
-        }
-
-        function onMessageReceived(e) {
-            if (typeof (e.data.name) === "undefined") {
-                return;
-            }
-
-            switch (e.data.name) {
-                case "requestOrigin":
-                    if (e.source !== undefined) {
-                        e.source.postMessage({ name: 'origin', url: window.location.origin }, "*");
-                    }
-                    break;
-                case "request-connect":
-                    if (e.source !== undefined) {
-                        widget.connectBubble.call(widget, e.data.space, "space");
-                    }
-                    break;
-                case "request-disconnect":
-                    if (e.source !== undefined) {
-                        // get the requesting space
-                        var spaceId = e.data.space;
-                        var bubble = [].filter.call(widget.bubbles, function (b) { return b.space_id == spaceId }).pop();
-
-                        var type = bubble ? bubble.type : "personal";
-
-                        if (type === "global") {
-                            widget.removeBubble.call(widget, bubble.bubble_id);
-                        }
-                    }
-                    break;
-                case "request-open":
-                    if (e.source !== undefined) {
-                        var spaceId = e.data.spaceId;
-                        var destination = e.data.destination;
-                        var bubble = widget.bubbles.filter(function (b) { return b.space_id == spaceId });
-                        if (bubble.length) {
-                            widget.open("bubble-" + spaceId, destination);
-                        } else {
-                            requestOpen.push(spaceId);
-                        }
-                    }
-                    break;
-                case "request-close":
-                    if (e.source !== undefined) {
-                        // get the requesting space
-                        var spaceId = e.data.space;
-                        var bubble = [].filter.call(widget.bubbles, function (b) { return b.space_id == spaceId }).pop();
-                        var buttonContainer = widget.buttonCacheList.filter(function (item) { return item.id === "weavy-bubble-" + bubble.space_id; }).pop();
-
-                        if (buttonContainer.classList.contains("weavy-bubble-detached")) {
-                            removeBubbleItems.call(widget, bubble.space_id);
-                        } else {
-                            widget.removeBubble.call(widget, bubble.bubble_id);
-                        }
-                    }
-                    break;
-                case "request-url":
-                    if (e.source !== undefined) {
-                        // get the requesting space
-                        var spaceId = e.data.space;
-                        var bubble = [].filter.call(widget.bubbles, function (b) { return b.space_id == spaceId }).pop();
-
-                        var type = bubble ? bubble.type : "personal";
-
-                        e.source.postMessage({ name: 'context-url', 'value': window.location.href, 'title': document.title, 'origin': document.location.origin, 'type': type }, "*");
-                    }
-                    break;
-                case "set-context-url":
-                    window.location.href = e.data.context;
-                    break;
-                case "pong":
-                    widget.isBlocked = false;
-                    widget.openContextFrame(e.data.context);
-                    break;
-                case "invoke":
-                    if (weavy.connection.connection.state === $.signalR.connectionState.connected) {
-                        var proxy = weavy.connection.proxies[e.data.hub];
-                        proxy.invoke.apply(proxy, e.data.args).fail(function (error) {
-                            console.error(error)
-                        });
-                    }
-                    break;
-                case "ready":
-                    // page loaded
-                    if (e.data.sourceStripId) {
-                        loading.call(widget, e.data.sourceStripId, false);
-                    }
-                    break;
-                case "reload":
-                    // reload and re-init all widgets
-                    connectAndLoad();
-                    break;
-                case "reset":
-                    var active = $(".weavy-strip.weavy-open", widget.container);
-                    if (active.length) {
-                        widget.reset(active.attr("id"));
-                    }
-                    break;
-                case "signingOut":
-                    // disconnect from signalr
-                    widget.options.user_id = null;
-                    weavy.connection.disconnect();
-                    widget.close();
-                    break;
-                case "signedIn":
-                case "signedOut":
-                    // force gui refresh                    
-                    widget.options.user_id = null;
-                    connectAndLoad();
-                    break;
-                case "close":
-                    widget.close();
-                    break;
-                case "maximize":
-                    widget.maximize();
-                    break;
-                case "close-preview":
-                    if (previewingFullscreen && $(widget.container).hasClass("weavy-preview")) {
-                        previewingFullscreen = false;
-                        widget.togglePreview();
-                    }
-                    break;
-                case "open-preview":
-                    if (!$(widget.container).hasClass("weavy-preview")) {
-                        previewingFullscreen = true;
-                        widget.togglePreview();
-                    }
-                    break;
-                case "personal":
-                    widget.personalFrame.src = widget.options.url + e.data.url;
-                    loading.call(widget, "weavy-strip-personal", true);
-                    widget.open("personal");
-                    break;
-                case "messenger":
-                    widget.messengerFrame.src = widget.options.url + e.data.url;
-                    loading.call(widget, "weavy-strip-messenger", true);
-                    widget.open("messenger");
-                    break;
-                case "send":
-                    loadInTarget(e.data.bubbleTarget, e.data.url, e.data.data, e.data.method);
-                    loading.call(widget, "weavy-strip-" + e.data.bubbleTarget, true, true);
-                    widget.open(e.data.bubbleTarget);
-                    break;
-                case "notificationLoaded":
-                case "notificationLayoutChanged":
-                    var notification = $("#weavy-notification-frame-" + e.data.id, widget.container);
-
-                    notification.show();
-                    notification.css("height", e.data.height + "px");
-                    // show set height
-                    break;
-                case "notificationClosed":
-                    closeNotification.call(widget, e.data.id);
-                    break;
-            }
-        }
-
-        function loadInTarget(target, url, data, method, fill) {
-            var frameTarget = $(widget.strips).find("#weavy-strip-" + target + " .weavy-strip-frame").get(0);
+        /**
+         * Load an url with data directly in a specific panel. Uses turbolinks forms if the panel is loaded and a form post to the frame if the panel isn't loaded.
+         * 
+         * @category panels
+         * @param {string} panelId - The id of the panel to load in.
+         * @param {string} url - The url to load in the panel.
+         * @param {any} [data] -  URL/form-encoded data to send
+         * @param {any} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
+         */
+        widget.loadInTarget = function (panelId, url, data, method) {
+            var frameTarget = $(widget.nodes.container).find(widget.getId("#" + widget.panelPrefix + "-" + panelId) + " ." + widget.panelPrefix + "-frame").get(0);
             if (frameTarget) {
-                if (frameTarget.dataset && frameTarget.dataset.src) {
+                if (frameTarget.dataset && frameTarget.dataset.src || !frameTarget.getAttribute("src")) {
                     // Not yet fully loaded
-                    sendToFrame(frameTarget.name, widget.httpsUrl(url), data, method);
+                    widget.sendToFrame(widget.getId(frameTarget.name), widget.httpsUrl(url), data, method);
                 } else {
                     // Fully loaded, send using turbolinks
                     frameTarget.contentWindow.postMessage({ name: 'send', url: widget.httpsUrl(url), data: data, method: method }, "*");
@@ -1598,11 +1112,20 @@
             }
         }
 
-        function sendToFrame(frameName, url, data, method) {
+        /**
+         * Loads an url in a frame or sends data into a specific frame. Will replace anything in the frame.
+         * 
+         * @category panels
+         * @param {string} frameName - The name attribute identifier of the frame
+         * @param {any} url - URL to load.
+         * @param {any} [data] - URL/form encoded data.
+         * @param {any} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
+         */
+        widget.sendToFrame = function (frameName, url, data, method) {
             method = String(method || "get").toLowerCase();
 
             // Ensure target exists
-            var frame = $("iframe[name='" + frameName + "']", widget.container).get(0);
+            var frame = $("iframe[name='" + frameName + "']", widget.nodes.container).get(0);
 
             if (frame) {
                 var frameUrl = url;
@@ -1633,7 +1156,9 @@
                     target: frameName
                 });
 
-                data = data.replace(/\+/g, '%20');
+                if (data) {
+                    data = data.replace(/\+/g, '%20');
+                }
                 var dataArray = data.split("&");
 
                 // Add all data as hidden fields
@@ -1650,17 +1175,174 @@
                 }));
 
                 // Send the form and forget it
-                $form.appendTo(widget.container).submit().remove();
+                $form.appendTo(widget.nodes.container).submit().remove();
             }
         }
 
+        /**
+         * Destroys the inctance of WeavyWidget. You should also remove any references to the widget after you have destroyed it. The [destroy event]{@link WeavyWidget#event:destroy} will be triggered before anything else is removed so that plugins etc may unregister and clean up, before the instance is gone.
+         * @param {boolean} [keepConnection=false] - Set to true if you want the realtime-connection to remain connected.
+         * @emits WeavyWidget#destroy
+         */
+        widget.destroy = function (keepConnection) {
+            /**
+             * Event triggered when the WeavyWidget instance is about to be destroyed. Use this event for clean up. 
+             * - Any events registered using {@link WeavyWidget#on} and {@link WeavyWidget#one} will be unregistered automatically. 
+             * - Timers using {@link WeavyWidget#timeout} will be cleared automatically.
+             * - All elements under the {@link WeavyWidget#nodes#root} will be removed.
+             * 
+             * @category events
+             * @event WeavyWidget#destroy
+             */
+            widget.triggerEvent("destroy", null);
+
+            resetContainer();
+
+            clearEventHandlers();
+            clearTimeouts();
+
+            _widgetIds.splice(_widgetIds.indexOf(widget.getId()), 1);
+
+            if (!keepConnection && _widgetIds.length === 0) {
+                disconnect();
+            }
+
+            $(widget.nodes.root).remove();
+            widget.nodes.root = null;
+        }
+
+        // WIDGET EVENTS
+
+        // Register init before any plugins do
+        widget.on("init", function () {
+            return connectAndLoad(true);
+        });
+
+
+        // MESSAGE EVENTS
+
         // listen for dispatched messages from weavy (close/resize etc.)
-        window.addEventListener("message", onMessageReceived, false);
+        widget.on(window, "message", function (e, message) {
+            e = e.originalEvent || e;
+            message = message || e.data;
+
+            switch (message.name) {
+                case "signing-in":
+                    /**
+                     * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link WeavyWidget#event:signed-in} or {@link WeavyWidget#event:authentication-error}.
+                     * This event may be triggered from anywhere, not only the WeavyWidget instance.
+                     * 
+                     * @category events
+                     * @event WeavyWidget#signing-in
+                     * @returns {Object}
+                     * @property {boolean} isLocal - Is the origin ov the event from this widget instance
+                     */
+                    widget.timeout(0).then(widget.triggerEvent.bind(widget, "signing-in", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId()) }));
+                    break;
+                case "signing-out":
+                    widget.close();
+                    /**
+                     * Event triggered when signing out process has begun. Use this event to do signing out animations and eventually clean up your elements. It will be followed by {@link WeavyWidget#event:signed-out}
+                     * This event may be triggered from anywhere, not only the WeavyWidget instance.
+                     * 
+                     * @category events
+                     * @event WeavyWidget#signing-out
+                     * @returns {Object}
+                     * @property {boolean} isLocal - Is the origin ov the event from this widget instance
+                     */
+                    widget.timeout(0).then(widget.triggerEvent.bind(widget, "signing-out", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId()) }));
+                    break;
+                case "signed-out":
+                    widget.options.userId = null;
+                    break;
+                case "authentication-error":
+                    /**
+                     * Event triggered when a sign-in attempt was unsuccessful.
+                     * This event may be triggered from anywhere, not only the WeavyWidget instance.
+                     * 
+                     * @category events
+                     * @event WeavyWidget#authentication-error
+                     */
+                    widget.timeout(0).then(widget.triggerEvent.bind(widget, "authentication-error"));
+                    break;
+            }
+
+            if (typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId())) {
+                /**
+                 * Event for window messages directed to the current widget instance, such as messages sent from panels belonging to the widget instance.
+                 * The original message event is attached as event.originalEvent.
+                 * 
+                 * Use data.name to determine which type of message theat was receivied.
+                 * 
+                 * @category events
+                 * @event WeavyWidget#message
+                 * @returns {Object.<string, data>}
+                 * @property {string} name - The name of the message
+                 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
+                 */
+                widget.triggerEvent("message", message, null, null, e);
+            }
+        });
+
+        widget.on("message", function (e, message) {
+            widget.debug("window message:", message.name);
+
+            switch (message.name) {
+                case "invoke":
+                    if (weavy.connection.connection.state === weavy.connection.state.connected) {
+                        var proxy = weavy.connection.proxies[message.hub];
+                        proxy.invoke.apply(proxy, message.args).fail(function (error) {
+                            widget.error(error)
+                        });
+                    }
+                    break;
+                case "ready":
+                    widget.isBlocked = false;
+                    // page loaded
+                    if (message.sourcePanelId) {
+                        widget.panelLoading.call(widget, message.sourcePanelId, false);
+                    }
+
+                    /**
+                     * Event triggered when a panel sends a ready message. Check the sourcePanelId or sourceWindowName to see which panel that sent the ready message.
+                     * 
+                     * @category events
+                     * @event WeavyWidget#ready
+                     * @returns {Object}
+                     * @property {string} sourceWindowName - The name of the frame (or window) for the panel.
+                     * @property {string} sourcePanelId - The panelId of the panel
+                     */
+                    widget.triggerEvent("ready", message);
+                    break;
+                case "reload":
+                    // reload and re-init all widgets
+                    connectAndLoad(true);
+                    break;
+                case "reset":
+                    var active = $(".weavy-panel.weavy-open", widget.nodes.container);
+                    if (active.length) {
+                        widget.reset(active.attr("data-id"));
+                    }
+                    break;
+                case "close":
+                    widget.close();
+                    break;
+                case "maximize":
+                    widget.maximize();
+                    break;
+                case "send":
+                    widget.loadInTarget(message.bubbleTarget, message.url, message.data, message.method);
+                    widget.open(message.bubbleTarget);
+                    break;
+            }
+
+        });
+
+        // REALTIME EVENTS
 
         // signalR connection state has changed
-        connectionOn("statechanged", function (e, data) {
-
-            if (disconnected && data.state.newState === 1 && widget.options.user_id) {
+        widget.on(weavy.connection, "state-changed", function (e, data) {
+            if (disconnected && data.state.newState === weavy.connection.state.connected && widget.isAuthenticated()) {
                 disconnected = false;
 
                 // reload widget                
@@ -1669,219 +1351,374 @@
         });
 
         // signalR connection disconnected
-        connectionOn("disconnected", function (e, data) {
-            disconnected = true;
+        widget.on(weavy.connection, "disconnected", function (e, data) {
+            if (!data.explicitlyDisconnected) {
+                disconnected = true;
+            }
         });
 
-        // real-time events
-        realtimeOn("bubbleopened", function (e, data) {
+        widget.on(weavy.connection, "user-change", function (e, data) {
+            widget.log("user-change", data.eventName);
 
-            if (data.isMessenger) {
-                widget.messengerFrame.src = widget.httpsUrl(data.url);
-                loading.call(widget, "weavy-strip-messenger", true);
-                widget.open("messenger");
-            } else if (data.type === "personal" || data.type === "global" && connectedUrl(data.connected_to_url)) {
-                if (data.type === "personal" && [].some.call(widget.bubbles, function (b) { return b.space_id == data.space_id && b.type === "global"; })) {
-                    data.type = "global";
+            /**
+             * Event triggered when the user is successfully signed in using any authentication method. The realtime connection gets automatically reconnected before this event occurs.
+             * This event is triggered when the server has recieved a sucessful sign-in using any method.
+             * 
+             * @category events
+             * @event WeavyWidget#signed-in
+             */
+
+            /**
+             * Event triggered when the user has been signed out. The realtime connection gets automatically reset when this event occurs.
+             * This event is triggered when the user is signed out from the server for any reason.
+             * 
+             * @category events
+             * @event WeavyWidget#signed-out
+             */
+
+            if (data.eventName === "signed-out") {
+                widget.options.userId = null;
+            }
+            // Connnect then trigger signed-in or signed-out
+            connectAndLoad(true, true).then(widget.triggerEvent.bind(widget, data.eventName));
+        });
+
+        widget.on(weavy.realtime, "loaded.weavy", function (e, data) {
+            if (data.id && data.id === widget.getId()) {
+
+                // Merge options
+                widget.options = widget.extendDefaults(widget.options, data, true);
+
+                /**
+                 * Event triggered when options are processed and recieved from the server. Use this event to react to option changes from the server. 
+                 * You may modify the data using the `before:options` event. This event is mostly followed by {@link WeavyWidget#event:build}.
+                 * If you want to prevent the build event from triggering, you may set `widget.isLoaded = true`.
+                 * 
+                 * @category events
+                 * @event WeavyWidget#options
+                 * @returns {WeavyWidget#options}
+                 */
+                var processedOptions = widget.triggerEvent("options", data);
+
+                // Merge options
+                if (processedOptions) {
+                    widget.options = widget.extendDefaults(widget.options, processedOptions, true);
                 }
 
-                // Is the space requested to open?
-                var shouldOpen = data.space_id && requestOpen.indexOf(data.space_id) !== -1;
-                if (shouldOpen) {
-                    requestOpen.splice(requestOpen.indexOf(data.space_id), 1);
-                    data.force_open = shouldOpen;
+                if (widget.isLoaded === false) {
+                    buildOutput.call(widget);
+                    widget.isLoaded = true;
+
+                    /**
+                     * Event triggered when the widget has initialized, connected to the server and recieved and processed options, and built all components.
+                     * Use this event to do stuff when everything is loaded.
+                     * 
+                     * Often it's a good idea to check if the user is signed-in using {@link WeavyWidget#isAuthenticated} unless you're building something that doesn't require a signed in user.
+                     * 
+                     * @example
+                     * widget.on("load", function() {
+                     *     if (widget.isAuthenticated()) {
+                     *         widget.alert("Widget successfully loaded");
+                     *     }
+                     * });
+                     * 
+                     * @category events
+                     * @event WeavyWidget#load
+                     */
+                    widget.triggerEvent("load");
                 }
-
-                // update ui
-                addAndRemoveBubbles(data);
+                widget.triggerEvent("await:load");
             }
+
         });
 
-        realtimeOn("bubbleremoved", function (e, data) {
-            // remove from array of added bubbles
-            widget.bubbles = [].filter.call(widget.bubbles, function (bubble) {
-                if (data.space_id === bubble.space_id && data.bubble_id === bubble.bubble_id && bubble.type === data.type) {
-                    removeBubbleItems(data.space_id);
-                    return false;
+
+        // RUN PLUGINS
+
+        /**
+         * All enabled plugins are available in the plugin list. Anything exposed by the plugin is accessible here. 
+         * You may use this to check if a plugin is enabled and active.
+         * 
+         * Set plugin options and enable/disable plugins using {@link WeavyWidget#options}.
+         * 
+         * @example
+         * if (widget.plugins.alert) {
+         *   widget.plugins.alert.alert("Alert plugin is enabled");
+         * }
+         * 
+         * @category plugins
+         * @type {Object.<string, WeavyWidgetPlugin>}
+         */
+        widget.plugins = {};
+
+        var _unsortedDependencies = {};
+        var _sortedDependencies = [];
+        var _checkedDependencies = [];
+
+        function sortByDependencies(pluginName) {
+            if (!pluginName) {
+                for (plugin in _unsortedDependencies) {
+                    sortByDependencies(plugin);
                 }
-                return true;
-            });
-        })
+            } else {
+                if (_unsortedDependencies.hasOwnProperty(pluginName)) {
+                    var plugin = _unsortedDependencies[pluginName];
+                    if (plugin.dependencies.length) {
+                        plugin.dependencies.forEach(function (dep) {
+                            // Check if plugin is enabled
+                            if (typeof WeavyWidget.plugins[dep] !== "function") {
+                                widget.error("plugin dependency needed by " + pluginName + " is not loaded/registered:", dep);
+                            } else if (!(widget.options.includePlugins && widget.options.plugins[dep] !== false || !widget.options.includePlugins && widget.options.plugins[dep])) {
+                                widget.error("plugin dependency needed by " + pluginName + " is disabled:", dep);
+                            }
 
-        realtimeOn("trashedspace", function (e, data) {
-            // remove from array of added bubbles
-            widget.bubbles = _.filter(widget.bubbles, function (bubble) {
-                if (data.id === bubble.space_id) {
-                    removeBubbleItems(data.id, true);
-                    return false;
-                }
-                return true;
-            });
-        })
+                            if (_checkedDependencies.indexOf(dep) === -1) {
+                                _checkedDependencies.push(dep);
+                                sortByDependencies(dep);
+                            } else {
+                                widget.error("You have circular WeavyWidget plugin dependencies:", pluginName, dep);
+                            }
+                        });
+                    }
 
-        realtimeOn("conversationread", function (e, data) {
-            if (data.user.id === widget.options.user_id) {
-                conversationRead.call(widget, data.conversation.id);
-                widget.triggerEvent("conversationread", data);
-            }
-        });
-
-        realtimeOn("message", function (e, data) {
-            var message = data;
-            if (message.created_by.id !== widget.options.user_id && message.created_by.id > 0) {
-                weavy.realtime.invoke("widget", "getConversation", message.conversation);
-                widget.triggerEvent("message", data);
-            }
-        });
-
-        realtimeOn("badge", function (e, data) {
-            badgeChanged.call(widget, data);
-            widget.triggerEvent("badge", data);
-        });
-
-        realtimeOn("notification", function (e, data) {
-            showNotification.call(widget, data);
-        });
-
-        realtimeOn("notificationupdated", function (e, data) {
-            widget.triggerEvent("notificationupdated", data);
-        });
-
-        realtimeOn("notificationreadall", function (e, data) {
-            widget.triggerEvent("notificationreadall", data);
-        });
-
-        realtimeOn("loaded", function (e, data) {
-            if (!data.user_id) {
-                // NOTE: stop/disconnect directly if we are not authenticated 
-                // signalr does not allow the user identity to change in an active connection
-                setTimeout(weavy.connection.disconnect, 0);
-            }
-
-            data.bubbles = cleanBubblesList(data.bubbles);
-
-            if (!data.user_id || data.user_id !== widget.options.user_id) {
-                if (widget.container) {
-                    widget.buttonCacheList = [];
-                    widget.stripCacheList = [];
-                    $(widget.container).remove();
-                    widget.container = null;
+                    if (_unsortedDependencies.hasOwnProperty(pluginName)) {
+                        _sortedDependencies.push(_unsortedDependencies[pluginName]);
+                        delete _unsortedDependencies[pluginName];
+                        _checkedDependencies = [];
+                        return true;
+                    }
                 }
             }
 
-            widget.options = widget.extendDefaults(widget.options, data);
+            return false;
+        }
 
-            if (widget.options.is_loaded === false) {
-                buildOutput.call(widget);
-                widget.options.is_loaded = true;
+        // Disable all plugins by setting plugin option to false
+        if (widget.options.plugins !== false) {
+            widget.options.plugins = widget.options.plugins || {};
 
-                widget.triggerEvent("load", null);
 
+            for (plugin in WeavyWidget.plugins) {
+                if (typeof WeavyWidget.plugins[plugin] === "function") {
+
+                    // Disable individual plugins by setting plugin options to false
+                    if (widget.options.includePlugins && widget.options.plugins[plugin] !== false || !widget.options.includePlugins && widget.options.plugins[plugin]) {
+                        _unsortedDependencies[plugin] = { name: plugin, dependencies: $.isArray(WeavyWidget.plugins[plugin].dependencies) ? WeavyWidget.plugins[plugin].dependencies : [] };
+                    }
+                }
             }
 
-        }, "rtmwidget");
+            // Sort by dependencies
+            sortByDependencies();
 
-        realtimeOn("conversationReceived", function (e, data) {
-            appendConversation.call(widget, data);
-        }, "rtmwidget");
+            for (var sortedPlugin in _sortedDependencies) {
+                var plugin = _sortedDependencies[sortedPlugin].name;
 
+                widget.debug("Running WeavyWidget plugin:", plugin);
 
-        widget.one("restore", function () {
-            _timeouts.push(setTimeout(widget.preloadFrames, 2000, "all"));
-        });
+                // Extend plugin options
+                widget.options.plugins[plugin] = widget.extendDefaults(WeavyWidget.plugins[plugin].defaults, $.isPlainObject(widget.options.plugins[plugin]) ? widget.options.plugins[plugin] : {}, true);
 
-        // init component
-        if (this.options.init === true) {
+                // Run the plugin
+                widget.plugins[plugin] = WeavyWidget.plugins[plugin].call(widget, widget.options.plugins[plugin]) || true;
+            }
 
-            this.init();
+        }
+
+        // INIT
+        if (widget.options.init === true) {
+            widget.init();
         }
     }
 
+    // PROTOTYPE EXTENDING
+
+    /**
+     * Default options. These options are general for all WeavyWidget instances and may be overridden in {@link WeavyWidget#options}. You may add any general options you like here.
+     * 
+     * @example
+     * // Defaults
+     * WeavyWidget.defaults = {
+     *     container: null,
+     *     className: "",
+     *     https: "adaptive",
+     *     init: true,
+     *     isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
+     *     includePlugins: true,
+     *     overlay: null,
+     *     url: "/"
+     * };
+     * 
+     * // Set a general url to connect all widget instances to
+     * WeavyWidget.defaults.url = "https://myweavysite.com";
+     * var widget = new WeavyWidget();
+     *
+     * @category options
+     * @type {Object}
+     * @property {Element} [container] - Container where the widget should be placed. If no Element is provided, a &lt;section&gt; is created next to the &lt;body&gt;-element.
+     * @property {string} [className] - Additional classNames added to the widget.
+     * @property {string} [https=adaptive] - How to enforce https-links. <br>• **force** -  makes all urls https.<br>• **adaptive** -  enforces https if the calling site uses https.<br>• **default** - makes no change.
+     * @property {boolean} [init=true] - Should the widget initialize automatically.
+     * @property {boolean} [isMobile] - Indicates if the browser is mobile. Defaults to the RegExp expression <code>/iPhone&#124;iPad&#124;iPod&#124;Android/i.test(navigator.userAgent)</code>
+     * @property {boolean} [includePlugins=true] - Whether all registered plugins should be enabled by default. If false, then each plugin needs to be enabled in plugin-options.
+     * @property {Element} [overlay] - Element to use for overlay purposes. May for instance use the overlay of another WeavyWidget instance.
+     * @property {string} url - The URL to the Weavy-installation to connect to.
+     */
     WeavyWidget.defaults = {
-        init: true,
-        button: true,
-        close_button: true,
-        resize_button: true,
-        el: null,
-        is_loaded: false,
+        container: null,
+        className: "",
         https: "adaptive", // force, adaptive or default 
-        add_title: 'Open',
-        class_name: "weavy-middle",
-        bubble_limit: 16,
-        ext_auth_provider: false,
-        is_mobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+        init: true,
+        isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent), // Review?
+        includePlugins: true,
+        overlay: null,
+        url: "/"
     };
 
+
+    /**
+     * Option preset configurations. Use these for simple configurations of common options. You may add your own presets also. 
+     * The presets may be merged with custom options when you create a new WeavyWidget, since the contructor accepts multiple option sets. 
+     * 
+     * @example
+     * // Load the minimal widget core without any panels.
+     * var widget = new WeavyWidget(WeavyWidget.presets.core, { url: "https://myweavysite.com" });
+     * 
+     * @category options
+     * @type {Object}
+     * @property {WeavyWidget#options} WeavyWidget.presets.core - Disable all plugins.
+     * @property {WeavyWidget#options} WeavyWidget.presets.panel - Minimal plugin set to only have one or more panels instead of the full widget dock.
+     */
+    WeavyWidget.presets = {
+        core: {
+            includePlugins: false
+        },
+        panel: {
+            className: "weavy-default",
+            plugins: {
+                alert: false,
+                dock: false,
+                fallback: false,
+                messenger: false,
+                notifications: false,
+                panels: {
+                    controls: false
+                },
+                personal: false,
+                position: false,
+                start: false,
+                upgrade: false
+            }
+        }
+    };
+
+    /**
+     * Placeholder for registering plugins. Plugins must be registered and available here to be accessible and initialized in the Widget. Register any plugins after you have loaded widget.js and before you create a new WeavyWidget instance.
+     * @type {Object.<string, WeavyWidgetPlugin>}
+     * @see {@link ../plugins|plugins}
+     */
     WeavyWidget.plugins = {};
 
-    // Event handling
-    var _events = [];
+    // Logging functions
+    var isIE = /; MSIE|Trident\//.test(navigator.userAgent);
 
-    function _addEventHandler(event, cb) {
-        _events.push(arguments);
-    }
+    function colorLog(logMethod, id, color, logArguments) {
+        // Binding needed for console.log.apply to work in IE
+        var log = Function.prototype.bind.call(logMethod, console);
 
-    function _removeEventHandler(event, cb) {
-        var removeHandler = arguments;
-        _events = _events.filter(function (eventHandler) {
-            for (var i = 0; i < eventHandler.length; i++) {
-                if (eventHandler[i] !== removeHandler[i]) {
-                    return true;
-                }
+        if (isIE) {
+            if (id) {
+                log.apply(this, ["WeavyWidget " + id].concat($.makeArray(logArguments)));
+            } else {
+                log.apply(this, $.makeArray(logArguments));
             }
-            return false;
-        });
+        } else {
+            if (id) {
+                log.apply(this, ["%cWeavyWidget %s", "color: " + color, id].concat($.makeArray(logArguments)));
+            } else {
+                log.apply(this, ["%cWeavyWidget", "color: gray"].concat($.makeArray(logArguments)));
+            }
+        }
     }
 
-    function _clearEventHandlers() {
-        _events.forEach(function (eventHandler) {
-            var event = eventHandler[0];
-            var cb = eventHandler[1];
-            $(document).off(event, null, cb);
-        });
-        _events = [];
-    }
+    // PROTOTYPE METHODS
 
-    function connectionOn(event, handler) {
-        _addEventHandler(event + ".connection.weavy", handler);
-        $(document).on(event + ".connection.weavy", null, null, handler);
-    }
-
-    function realtimeOn(event, handler, proxy) {
-        proxy = proxy || "rtm";
-        _addEventHandler(event + "." + proxy + ".weavy", handler);
-        $(document).on(event + "." + proxy + ".weavy", null, null, handler);
-    }
-
-    WeavyWidget.prototype.on = function (event, cb) {
-        _addEventHandler(event + ".event.weavy", cb);
-        $(document).on(event + ".event.weavy", null, null, cb);
+    /**
+     * Wrapper for `console.debug()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
+     * @category logging
+     * @name WeavyWidget.debug
+     * @type {console.debug}
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/debug}
+     */
+    WeavyWidget.prototype.debug = function () {
+        colorLog(console.debug, this.options.id, this.logColor, arguments);
     };
 
-    WeavyWidget.prototype.one = function (event, cb) {
-        _addEventHandler(event + ".event.weavy", cb);
-        $(document).one(event + ".event.weavy", null, null, function () { cb.apply(this, arguments); _removeEventHandler(event + ".event.weavy", cb); });
+    /**
+     * Wrapper for `console.error()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
+     * @category logging
+     * @name WeavyWidget.error
+     * @type {console.error}
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/error}
+     */
+    WeavyWidget.prototype.error = function () {
+        colorLog(console.error, this.options.id, this.logColor, arguments);
     };
 
-    WeavyWidget.prototype.off = function (event, cb) {
-        $(document).off(event + ".event.weavy", null, cb);
-        _removeEventHandler(event + ".event.weavy", cb);
-    }
-
-    WeavyWidget.prototype.triggerEvent = function (name, json) {
-        name = name + ".event.weavy";
-        var event = $.Event(name);
-        var isObject = json && typeof json === "object";
-        var data = isObject ? json : JSON.parse(json);
-
-        console.debug("widget.js triggering:", name);
-        $(document).triggerHandler(event, data);
+    /**
+     * Wrapper for `console.info()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
+     * @category logging
+     * @name WeavyWidget.info
+     * @type {console.info}
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/info}
+     */
+    WeavyWidget.prototype.info = function () {
+        colorLog(console.info, this.options.id, this.logColor, arguments);
     };
 
-    WeavyWidget.prototype.storeItem = function (key, value, isJson) {
-        localStorage.setItem('weavy_' + window.location.hostname + "_" + key, isJson ? JSON.stringify(value) : value);
+    /**
+     * Wrapper for `console.log()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
+     * @category logging
+     * @name WeavyWidget.log
+     * @type {console.log}
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/log}
+     */
+    WeavyWidget.prototype.log = function () {
+        colorLog(console.log, this.options.id, this.logColor, arguments);
     };
 
+    /**
+     * Wrapper for `console.warn()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
+     * @category logging
+     * @name WeavyWidget.warn
+     * @type {console.warn}
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/warn}
+     */
+    WeavyWidget.prototype.warn = function () {
+        colorLog(console.warn, this.options.id, this.logColor, arguments);
+    };
+
+    /**
+     * Stores data for the current domain in the weavy namespace.
+     * 
+     * @category options
+     * @name WeavyWidget.storeItem
+     * @param {string} key - The name of the data
+     * @param {data} value - Data to store
+     * @param {boolean} [asJson=false] - True if the data in value should be stored as JSON
+     */
+    WeavyWidget.prototype.storeItem = function (key, value, asJson) {
+        localStorage.setItem('weavy_' + window.location.hostname + "_" + key, asJson ? JSON.stringify(value) : value);
+    };
+
+    /**
+     * Retrieves data for the current domain from the weavy namespace.
+     * 
+     * @category options
+     * @name WeavyWidget.retrieveItem
+     * @param {string} key - The name of the data to retrevie
+     * @param {boolean} [isJson=false] - True if the data shoul be decoded from JSON
+     */
     WeavyWidget.prototype.retrieveItem = function (key, isJson) {
         var value = localStorage.getItem('weavy_' + window.location.hostname + "_" + key);
         if (value && isJson) {
@@ -1891,25 +1728,94 @@
         return value;
     };
 
-    // Shim deprecated name, remove this in next version
+    /**
+     * Method for extending options. It merges together options. If the recursive setting is applied it will merge any plain object children. Note that Arrays are treated as data and not as tree structure when merging. 
+     * 
+     * The original options passed are left untouched. {@link WeavyWidget.httpsUrl} settings is applied to all url options.
+     * 
+     * @category options
+     * @name WeavyWidget.extendDefaults
+     * @param {Object} source - Original options.
+     * @param {Object} properties - Merged options that will replace options from the source.
+     * @param {boolean} [recursive=false] True will merge any sub-objects of the options recursively. Otherwise sub-objects are treated as data.
+     * @returns {Object} A new object containing the merged options.
+     */
+    WeavyWidget.prototype.extendDefaults = function (source, properties, recursive) {
+        source = source || {};
+        properties = properties || {};
+
+        var property;
+        var https = properties.https || source.https || this.options.https || WeavyWidget.defaults.https || "default";
+
+        // Make a copy
+        var copy = {};
+        for (property in source) {
+            if (source.hasOwnProperty(property)) {
+                copy[property] = source[property];
+            }
+        }
+
+        // Apply properties to copy
+        for (property in properties) {
+            if (properties.hasOwnProperty(property)) {
+                if (recursive && copy[property] && $.isPlainObject(copy[property]) && $.isPlainObject(properties[property])) {
+                    copy[property] = this.extendDefaults(copy[property], properties[property], recursive);
+                } else {
+                    copy[property] = this.httpsUrl(properties[property], https);
+                }
+            }
+        }
+        return copy;
+    };
+
+
+    /**
+     * Applies https enforcement to an url.
+     * 
+     * @category options
+     * @name WeavyWidget.httpsUrl
+     * @param {string} url - The url to process
+     * @param {string} [https] How to treat http enforcement for the url. Default to settings from {@link WeavyWidget#options}. <br> • **force** - makes all urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **default** - makes no change.
+     * @returns {string} url
+     */
+    WeavyWidget.prototype.httpsUrl = function (url, https) {
+        https = https || this.options.https || WeavyWidget.defaults.https || "default";
+        if (typeof url === "string") {
+            if (https === "force") {
+                return url.replace(/^http:/, "https:");
+            } else if (https === "adaptive") {
+                return url.replace(/^http:/, window.location.protocol);
+            }
+        }
+        return url;
+    };
+
+
+    // SHIM
+    // Deprecated name, remove this in next version
     this.Weavy = function () {
         console.warn("Using new Weavy() is deprecated. Use new WeavyWidget() instead.");
 
-        for (var p in Weavy) {
-            if (p && Weavy.hasOwnProperty(p)) {
-                WeavyWidget[p] = Weavy[p];
+        for (var p in this.Weavy) {
+            if (p && this.Weavy.hasOwnProperty(p)) {
+                WeavyWidget[p] = this.Weavy[p];
             }
         }
 
         return WeavyWidget.apply(this, arguments);
     };
 
-    Weavy.prototype = Object.create(WeavyWidget.prototype);
+    this.Weavy.prototype = Object.create(WeavyWidget.prototype);
 
     for (var p in WeavyWidget) {
         if (p && WeavyWidget.hasOwnProperty(p)) {
-            Weavy[p] = WeavyWidget[p];
+            this.Weavy[p] = WeavyWidget[p];
         }
     }
 
 })(jQuery);
+
+/**
+ * @external Promise
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
+ */

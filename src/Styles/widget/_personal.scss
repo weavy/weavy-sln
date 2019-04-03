@@ -1,6 +1,6 @@
 /// <reference path="../widget.scss" />
 
-// Personal strip and logo button
+// Personal panel and logo button
 
 .weavy-bubbles-personal {
     &::before {
@@ -20,7 +20,7 @@
 }
 
 .weavy-button {
-    &.weavy-personal, &.weavy-logo {
+    &.weavy-button-personal, &.weavy-button-weavy {
         svg {
             width: rem(1.75);
             height: rem(1.75);

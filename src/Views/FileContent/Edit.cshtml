@@ -1,0 +1,30 @@
+﻿@model Weavy.Core.Models.File
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Title = "Edit " + Model.MetaData().Name;
+    Back = Url.Back(Model.Url());
+    ViewData["turboform"] = true;
+}
+
+@section navbar_middle {
+    <div class="navbar-middle"><span class="navbar-text">@Title</span></div>
+}
+
+@if (Html.HasHtmlEditor()) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
+
+    <div class="container mt-3">
+        @using (Html.BeginForm(nameof(ContentController.Update), typeof(ContentController).ControllerName(), new { id = Model.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+            @Html.HttpMethodOverride(HttpVerbs.Put)
+            @Html.EditorsForModel()
+            @Html.EditorFor(x => Model.Blob, additionalViewData: new { DisplayName = "Replace file", DisplayDescription = "Select new file, or leave as is to keep existing.", Plain = true, Required = false, Remove = false })
+            <div class="form-buttons">
+                <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
+                <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel">Cancel</button>
+            </div>
+        }
+    </div>

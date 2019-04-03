@@ -17,7 +17,7 @@ weavy.discuss = (function ($) {
                 $(this).closest("form").find("#contextUrl").attr("disabled", true);
             },
             onContextChange: function (e, data) {
-                $(".post-form").find("input[name=hasContext]").val(data.has_context);
+                $(".post-form").find("input[name=hasContext]").val(data.hasContext);
             }
         });
     });

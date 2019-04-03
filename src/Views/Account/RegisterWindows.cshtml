@@ -15,7 +15,7 @@
             @using (Html.BeginForm(nameof(AccountController.RegisterWindows), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
                 @Html.AntiForgeryToken()
                 <div class="form-buttons">
-                    <a href="@Url.Action(nameof(AccountController.AddWindows), typeof(AccountController).ControllerName())" class="btn btn-primary btn-load">Yes, I have an account</a>
+                    <a href="@(Url.Action<AccountController>(x => x.AddWindows(null)))" class="btn btn-primary btn-load">Yes, I have an account</a>
                     <button type="submit" class="btn btn-secondary btn-load">No, I am a new user</button>
                 </div>
             }

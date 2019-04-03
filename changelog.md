@@ -1,5 +1,32 @@
 # Changelog for Weavy
 
+## Weavy 3.0
+
+Weavy 3.0 improves the Weavy SDK and Widget API.
+
+### 3.0.0 (2019-04-03)
+
+* Added support for custom Content controllers.
+* Added support for custom icons.
+* Added support for multi-colored icons.
+* Added setting for specifying if app/folder should allow multiple items with same names.
+* Added PushService for sending realtime updates to connected clients.
+* Added SSO to the Widget
+* Updated the Widget UI and API with many new features
+* Refactored configuration settings
+* Refactored search methods to allow strongly typed search results.
+
+#### Breaking changes
+
+* All Search methods in the Service layer have new return types. If you have used any of these 
+  methods in your custom code you will need to update your code. As an example, 
+  UserService.Search(UserQuery query) previously returned SearchResult<User, UserQuery> and now 
+  returns an instance of the UserSearchResult class.
+* Removed abstract base class ItemBase. Content types should now inherit from the Content class.
+* Replaced abstract base classes FileBase and FolderBase with IFile and IFolder interfaces.
+* Replaced the Html.SvgIcon extension method with Svg.Icon
+* Custom authentication endpoints should return JWT token instead of claims.
+
 ## Weavy 2.0
 
 Weavy 2.0 introduces the Weavy SDK, allowing developers to extend Weavy with additional 
@@ -62,16 +89,6 @@ links. This gives the reader of the post, comment or message a link to where it 
 * Introduced a new collapsed mode for the widget bubbles.
 * Fixed widget layout issues in IE.
 * Fixed an issue in the setup wizard not storing the submitted details correctly.
-
-### Upgrade instructions
-
-1. Perform a full backup of your Weavy database and the files in your Weavy web site before applying the upgrade.
-2. Verify that your server meets the [system requirements](http://docs.weavy.com/installation/on-prem#system-requirements).
-3. Download and unzip the [upgrade package](http://files.weavy.com/releases/weavy-latest.zip).
-4. Update the `web.config` file in the upgrade package with your custom settings, e.g. [database connection string](http://docs.weavy.com/developers/connection-string) and [authentication settings](http://docs.weavy.com/manual/manage/authentication-settings).
-5. Delete all files and folders from your site except `App_Data`.
-6. Copy all files from `wwwroot` in the upgrade package into the root folder of your site.
-7. Run the `weavy.exe` command line tool to update the database. The `weavy.exe` program is located in the `bin` directory of your Weavy installation.
 
 ## Weavy 1.0
 

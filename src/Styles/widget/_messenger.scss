@@ -26,25 +26,19 @@
     height: rem(1.5 + .25);
 }
 
-
-.weavy-bubble-item {
-    &.weavy-bubble-messenger {
+.weavy-dock-container .weavy-dock {
+    .weavy-button-container-messenger {
         height: auto;
     }
 }
 
+.weavy-button-messenger {
+    height: auto;
 
-.weavy-button {
-    &.weavy-messenger {
-        height: auto;
-
-        &.weavy-dot {
-            background-color: $white;
-        }
+    &.weavy-dot {
+        background-color: $white;
     }
-}
 
-.weavy-messenger {
     .weavy-icon {
         margin: $widget-icon-size / 2 - rem(1);
 

@@ -9,14 +9,17 @@
     display: flex;
     flex-wrap: nowrap;
     flex: 0 10 auto;
-    min-width: 3rem; // make room for 2 icons
+    min-width: 4.75rem; // Use 3rem to only make room for 2 icons
     max-width: 10rem;
 
     a {
         display: flex;
-        min-width: 0; // needed for text-truncate
+        min-width: 1.625rem; // needed for text-truncate
+        color: $panel-color;
+
         .i {
-            margin-right: .25rem;
+            margin-left: .25rem;
+            margin-right: .5rem;
         }
 
         span {

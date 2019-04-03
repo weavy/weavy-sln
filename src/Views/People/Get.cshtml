@@ -1,7 +1,7 @@
 ﻿@model User
 @{
     Title = Model.GetTitle();
-    Back = Url.Back<PeopleController>(c => c.Index(null, null, null));
+    Back = Url.Back<PeopleController>(c => c.Index(null, null));
     var profiledata = Html.DisplayGroups(Model.Profile, exclude: new[] { "Avatar", "Name" })?.ToHtmlString();
 }
 
@@ -22,7 +22,7 @@
 <div class="container my-3">
     @if (profiledata.IsNullOrWhiteSpace() && Model.Email == null) {
         if (Model.Id == User.Id) {
-            <p class="text-muted text-center py-3 empty">You should <a href="@Url.Action(nameof(AccountController.EditProfile), typeof(AccountController).ControllerName())">edit your profile</a> and add some information to this page...</p>
+            <p class="text-muted text-center py-3 empty">You should <a href="@(Url.Action<AccountController>(c => c.EditProfile()))">edit your profile</a> and add some information to this page...</p>
         } else {
             <p class="text-muted text-center py-3 empty">You should let @Title know that their profile page is empty...</p>
         }

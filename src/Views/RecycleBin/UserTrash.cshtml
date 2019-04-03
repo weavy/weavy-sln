@@ -1,0 +1,14 @@
+﻿@model TrashSearchResult
+@{
+    Layout = "~/Views/Shared/_PersonalLayout.cshtml";
+}
+
+<header class="navbar navbar-light sticky-top">
+    <h6 class="navbar-title mr-auto px-1">Recycle bin</h6>
+    @*<button type="button" class="btn btn-icon btn-danger" title="Empty recycle bin">@Svg.Icon("delete")</button>*@
+</header>
+
+<div id="tab-trash">
+    <div class="tab-loading d-none">@Html.SvgSpinner()</div>
+    <div class="tab-remote loaded" data-url="@(Url.Action<RecycleBinController>(c => c.UserTrash()))"> @{ Html.RenderPartial("_UserTrash"); }</div>
+</div>

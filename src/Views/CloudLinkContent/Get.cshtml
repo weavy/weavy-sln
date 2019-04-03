@@ -1,0 +1,28 @@
+﻿@model CloudLink
+@{
+    Title = Model.Name ?? "Untitled";
+}
+
+@section navbar_content {
+    <nav class="navbar navbar-content">
+        @Html.Breadcrumbs(Model)
+        @if (Model is IStarrable starrable) {
+            @Html.StarToggle(starrable)
+        }
+        <div class="navbar-icons">
+            <a class="btn btn-icon" href="@Model.Uri" target="_blank" title="Open in @Model.Provider">@Svg.Icon(Model)</a>
+            @{ Html.RenderPartial("_ContentMenu", Model); }
+        </div>
+    </nav>
+}
+
+@if (Model.Embedded) {
+    <iframe class="content-iframe" src="@Model.Uri"></iframe>
+} else {
+    <div class="container">
+        <p class="text-center my-5">
+            <a href="@Model.Uri" target="_blank">@Svg.Icon(Model) @Model.Uri</a>
+        </p>
+    </div>
+
+}

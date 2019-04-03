@@ -1,4 +1,4 @@
-﻿@model ActivityAppModel
+﻿@model ActivityViewModel
 @{
     Title = "Activity";
 }
@@ -6,7 +6,7 @@
 <div class="container-fluid my-3">
     @if (Model.Activities.Any()) {
         <div class="list-group mb-4" id="infinite-scroll-target">
-            @{ Html.RenderPartial("~/Views/Content/_ListItems.cshtml", Model.Activities); }
+            @{ Html.RenderPartial(Model.Activities); }
         </div>
         @Html.ScrollMore(Model.Activities)
     } else {

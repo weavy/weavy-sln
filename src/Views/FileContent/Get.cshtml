@@ -1,0 +1,94 @@
+﻿@model Weavy.Core.Models.File
+@{
+    Title = Model.Name ?? "Untitled";
+    var current = Model is IVersionable versionable ? versionable.IsCurrent() : true;
+    if (!current) {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+        Back = Url.Action<ContentController>(c => c.Versions(Model.Id));
+    }
+
+    var fmt = FileHelper.GetPreviewFormat(Model.Blob.Name);
+}
+
+<article class="container" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+
+    <section class="content-section preview">
+
+        @if (fmt == PreviewFormat.Text) {
+            var lang = FileHelper.SyntaxHighlight(Model.Name);
+            if (lang != null) {
+                <pre class="language-@lang"><code class="language-@lang">@System.IO.File.ReadAllText(BlobService.GetData(Model.Blob).FullName)</code></pre>
+            } else {
+                <pre class="document">@System.IO.File.ReadAllText(BlobService.GetData(Model.Blob).FullName)</pre>
+            }
+
+        } else if (fmt == PreviewFormat.Image || fmt == PreviewFormat.Document) {
+            var attrs = Html.PreviewAttributes(Model);
+            <div class="text-center">
+                <figure class="figure">
+                    <a href="@Model.FileUrl()" @Html.Raw(attrs.AsHtmlAttributes())><img src="@Model.ThumbUrl(480, 480)" class="figure-img img-fluid d-block mx-auto" alt="@Model.Name" /></a>
+                </figure>
+            </div>
+        }
+    </section>
+
+    <section class="content-section">
+        <h4 class="display-4"><span>Details</span></h4>
+        <table class="table table-bordered mx-auto">
+            <tr>
+                <th>Name</th>
+                <td><a href="@Model.FileUrl(download:true)" title="Download">@Model.Name</a></td>
+            </tr>
+
+            @if (Model.GetExcerpt() != null) {
+                <tr>
+                    <th>Description</th>
+                    <td>@Model.GetExcerpt()</td>
+                </tr>
+            }
+
+            @if (Model is ITaggable taggable && taggable.Tags.Any()) {
+                <tr>
+                    <th>Tags</th>
+                    <td>@Html.Raw(taggable.Tags.Join(" ", tag => $@"<span class=""badge badge-primary"">{tag}</span>"))</td>
+                </tr>
+            }
+
+            <tr>
+                <th>Type</th>
+                <td>@Model.Kind()</td>
+            </tr>
+
+            <tr>
+                <th>Size</th>
+                <td>@FileHelper.FileSizeAsString(Model.Blob.Size)</td>
+            </tr>
+
+            @if (FileHelper.IsImage(Model.Blob.Name)) {
+                <tr>
+                    <th>Dimensions</th>
+                    <td>@(Model.Blob.Width)x@(Model.Blob.Height)</td>
+                </tr>
+            }
+
+            <tr>
+                <th>Modified</th>
+                <td>@Html.Time(Model.ModifiedAt, format: "g") by @Model.ModifiedBy().Link()</td>
+            </tr>
+
+        </table>
+    </section>
+
+    @{
+        if (current) {
+            Html.RenderPartial("~/Views/Content/_ContentAttachments.cshtml");
+            Html.RenderPartial("_Comments");
+            Html.RenderPartial("_Subscribers");
+        } else {
+            @Html.Partial("_Meta")
+        }
+    }
+
+</article>
+
+

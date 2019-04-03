@@ -20,7 +20,7 @@
     </nav>
     @if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
         <div class="fab">
-            <button type="button" class="btn btn-round btn-primary" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Html.SvgIcon("plus")</button>
+            <button type="button" class="btn btn-round btn-primary" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Svg.Icon("plus")</button>
         </div>
     }
 }
@@ -55,12 +55,12 @@
                             @if (WeavyContext.Space.IsMember && WeavyContext.Space.HasPermission(Permission.Admin)) {
                                 <div class="dropdown d-inline-block d-flex justify-content-end">
                                     <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                        @Html.SvgIcon("dots-vertical")
+                                        @Svg.Icon("dots-vertical")
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right">
                                         <form method="post" action="@(Url.Action<SpaceController>(c => c.RemoveInvite(WeavyContext.Space.Id, invite.Id)))" data-turboform>
                                             @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                            <button type="submit" class="dropdown-item">@Html.SvgIcon("close") Remove invite</button>
+                                            <button type="submit" class="dropdown-item">@Svg.Icon("close") Remove invite</button>
                                         </form>
                                     </div>
                                 </div>
@@ -70,7 +70,7 @@
                 }
 
                 @foreach (var member in Model.Members) {
-                    <tr class="@(member.IsPending ? "table-warning" : "") @(member.IsSuspended ? "table-suspended": "")">
+                    <tr class="@(member.IsPending ? "table-warning" : "") @(member.IsSuspended ? "table-muted": "")">
                         <td class="table-icon">@(member.AvatarImg(32, presence: true))</td>
                         <td class="text-truncate">
                             @if (member.Username == member.GetTitle()) {
@@ -84,11 +84,11 @@
                             <div class="d-flex justify-content-end">
                                 @if (member.IsPending && WeavyContext.Space.HasPermission(Permission.ApproveMembers)) {
                                     using (Html.BeginForm(nameof(SpaceController.ApproveMember), null, new { id = WeavyContext.Space.Id, userid = member.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                                        <button type="submit" class="btn btn-icon" title="Approve">@Html.SvgIcon("check")</button>
+                                        <button type="submit" class="btn btn-icon" title="Approve">@Svg.Icon("check")</button>
                                     }
                                     using (Html.BeginForm(nameof(SpaceController.DenyMember), null, new { id = WeavyContext.Space.Id, userid = member.Id }, FormMethod.Post, new { data_turboform = "" })) {
                                         @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                        <button type="submit" class="btn btn-icon" title="Deny">@Html.SvgIcon("close")</button>
+                                        <button type="submit" class="btn btn-icon" title="Deny">@Svg.Icon("close")</button>
                                     }
                                 }
 

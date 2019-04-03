@@ -6,7 +6,7 @@ weavy.attach = (function ($) {
             $("#filebrowser").attr("src", "https://filebrowser.weavycloud.com?origin=" + window.location.origin);
         } else {
             // request current origin from weavy widget
-            window.parent.postMessage({ name: 'requestOrigin' }, "*")
+            window.parent.postMessage({ name: 'request:origin' }, "*")
         }
     });
 
@@ -126,25 +126,25 @@ weavy.attach = (function ($) {
                     weavy.alert.warning('There is already an item named ' + response.skipped[0].name + '.' +
                         '<div>' +
                         '<button type="button" class="btn btn-icon insert-content-keep"><svg class="i">' +
-                        '<use xmlns: xlink="http://www.w3.org/1999/xlink" xlink: href="#check-all"></use></svg> Keep both' +
+                        '<svg class="i i-check-all" height="24" viewBox="0 0 24 24" width="24"><path d="m.41 13.41 5.59 5.59 1.41-1.42-5.58-5.58m20.41-6.42-10.58 10.59-4.16-4.17-1.43 1.41 5.59 5.59 12-12m-5.66 0-1.41-1.42-6.35 6.35 1.42 1.41z"/></svg> Keep both' +
                         '</button > ' +                        
                         '<button type="button" class="btn btn-icon insert-content-replace"><svg class="i">' +
-                        '<use xmlns: xlink="http://www.w3.org/1999/xlink" xlink: href="#check"></use></svg> Replace the item' +
+                        '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the item' +
                         '</button > ' +                        
                         '<button type="button" class="btn btn-icon insert-content-skip">' +
-                        '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg> Skip this item' +
+                        '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this item' +
                         '</button></div>');
                 } else {
                     weavy.alert.warning('There are ' + response.skipped.length + ' items with the same names.' +
                         '<div>' +
                         '<button type="button" class="btn btn-icon insert-content-keep">' +
-                        '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-all"></use></svg> Keep all the items' +
+                        '<svg class="i i-check-all" height="24" viewBox="0 0 24 24" width="24"><path d="m.41 13.41 5.59 5.59 1.41-1.42-5.58-5.58m20.41-6.42-10.58 10.59-4.16-4.17-1.43 1.41 5.59 5.59 12-12m-5.66 0-1.41-1.42-6.35 6.35 1.42 1.41z"/></svg> Keep all the items' +
                         '</button>' +
                         '<button type="button" class="btn btn-icon insert-content-replace">' +
-                        '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check"></use></svg> Replace the items' +
+                        '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the items' +
                         '</button>' +                        
                         '<button type="button" class="btn btn-icon insert-content-skip">' +
-                        '<svg class="i"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg> Skip these items' +
+                        '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip these items' +
                         '</button></div>');
                 }
 

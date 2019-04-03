@@ -44,7 +44,8 @@
     @if (!Model.Html.IsNullOrEmpty() || Model.Poll != null) {
         <div class="card-body">
             <p class="card-text">@Html.Raw(Model.Html)</p>
-            @if (Model.Poll != null) {
+            
+            @if (Model.Poll != null && Model.Poll.Options.HasItems()) {
                 Html.RenderPartial("_Poll", Model);
             }
         </div>

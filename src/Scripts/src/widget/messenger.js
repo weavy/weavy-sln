@@ -19,28 +19,29 @@
      *     widget.open("messenger");
      * }
      * 
-     * @module messenger
+     * @mixin messenger
      * @returns {WeavyWidget.plugins.messenger}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof messenger
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:messenger#
+         *  @lends messenger#
          */
         var widget = this;
 
         /**
          * @typedef User
-         * @memberof module:messenger~
+         * @memberof messenger~
          * @type {Object}
          * @property {int} id - The id of the user
          * @property {string} name - The name of the user
@@ -52,10 +53,10 @@
 
         /** 
          * @typedef Conversation
-         * @memberof module:messenger~
+         * @memberof messenger~
          * @type {Object}
          * @property {external:ISODateTime} createdAt - The time the conversation started
-         * @property {module:messenger~User} createdBy - The user that created the conversation
+         * @property {messenger~User} createdBy - The user that created the conversation
          * @property {external:ISODateTime} deliveredAt - When the last message was delivered
          * @property {string} description - Snippet of the most recent message in the conversation
          * @property {int[]} followedBy - List of ids of the users that follow the conversation.
@@ -68,8 +69,8 @@
          * @property {boolean} isRoom - Is the conversation a room
          * @property {string} kind - `"conversation"`
          * @property {external:ISODateTime} lastMessageAt - The time the last message was sent
-         * @property {module:messenger~User} lastMessageBy - The user that sent the last message
-         * @property {module:messenger~User[]} members - All the uesers that is part of the conversation.
+         * @property {messenger~User} lastMessageBy - The user that sent the last message
+         * @property {messenger~User[]} members - All the uesers that is part of the conversation.
          * @property {string[]} permissions - List of permissions on the conversation for the current user.
          * @property {external:ISODateTime} readAt - The time the current user viewed the conversation.
          * @property {url} thumbUrl - The url to the avatar for the conversation.
@@ -79,7 +80,7 @@
 
         /**
          * @typedef Message
-         * @memberof module:messenger~
+         * @memberof messenger~
          * @type {Object}
          * @property {int} id - The id of the message
          * @property {string} type - `"message"`
@@ -87,7 +88,7 @@
          * @property {string} text - The message text.
          * @property {html} html - The message text as HTML.
          * @property {external:ISODateTime} createdAt - The time the message was created.
-         * @property {module:messenger~User} createdBy - The user that created the message
+         * @property {messenger~User} createdBy - The user that created the message
          * @property {Object} icon - A {@link https://materialdesignicons.com/|Material Design Icon} that is suitable for display of the message.
          * @property {string} icon.name - The name of the icon.
          * @property {string} icon.color - The icon color name.
@@ -100,15 +101,15 @@
         /**
          * The panel for messenger
          * 
-         * @alias module:messenger#nodes#messengerPanel
+         * @alias messenger#nodes#messengerPanel
          * @type {?Element}
          */
         widget.nodes.messengerPanel = null;
 
         /**
-         * The frame used by {@link module:messenger#nodes#messengerPanel}
+         * The frame used by {@link messenger#nodes#messengerPanel}
          * 
-         * @alias module:messenger#nodes#messengerFrame
+         * @alias messenger#nodes#messengerFrame
          * @type {?Element}
          */
         widget.nodes.messengerFrame = null;
@@ -116,23 +117,23 @@
         /**
          * The dock button container for messenger 
          * 
-         * @alias module:messenger#nodes#messengerButtonContainer
+         * @alias messenger#nodes#messengerButtonContainer
          * @type {?Element}
          */
         widget.nodes.messengerButtonContainer = null;
 
         /**
-         * The actual button in the {@link module:messenger#nodes#messengerButtonContainer} 
+         * The actual button in the {@link messenger#nodes#messengerButtonContainer} 
          * 
-         * @alias module:messenger#nodes#messengerButton
+         * @alias messenger#nodes#messengerButton
          * @type {?Element}
          */
         widget.nodes.messengerButton = null;
 
         /**
-         * Container for unread conversations. Appended to the {@link module:messenger#nodes#messengerButton} 
+         * Container for unread conversations. Appended to the {@link messenger#nodes#messengerButton} 
          * 
-         * @alias module:messenger#nodes#conversations
+         * @alias messenger#nodes#conversations
          * @type {?Element}
          */
         widget.nodes.conversations = null;
@@ -141,14 +142,14 @@
          * List of unread conversations
          *
          * @catergory properties
-         * @type {module:messenger~Conversation[]}
+         * @type {messenger~Conversation[]}
          */
         widget.unreadConversations = [];
 
         /**
          * Open a conversation
          * 
-         * @param {int} conversationId - The id of the {@link module:messenger~Conversation} to open.
+         * @param {int} conversationId - The id of the {@link messenger~Conversation} to open.
          * @param {Event} [event] - Optional event that will be prevented and propagation stopped
          */
         widget.openConversation = function (conversationId, event) {
@@ -167,7 +168,7 @@
         };
 
         /**
-         * Extends {@link ./context#module_context+openContextFrame} with messenger handling.
+         * Extends {@link context#openContextFrame} with messenger handling.
          * @param {Object} weavyContext
          * @param {int} weavyContext.spaceId - Should be -2 to open messenger
          * @param {url} weavyContext.url - The url in messenger
@@ -240,11 +241,11 @@
                 /**
                  * Triggered when conversation read data is received from the server.
                  * 
-                 * @event module:messenger#conversation-read
+                 * @event messenger#conversation-read
                  * @category events
                  * @returns {Object}
-                 * @property {module:messenger~User} user
-                 * @property {module:messenger~Conversation} conversation
+                 * @property {messenger~User} user
+                 * @property {messenger~Conversation} conversation
                  */
                 widget.triggerEvent("conversation-read", data);
             }
@@ -258,9 +259,9 @@
                 /**
                  * Triggered when a message is appended in a conversation.
                  * 
-                 * @event module:messenger#message-inserted
+                 * @event messenger#message-inserted
                  * @category events
-                 * @returns {module:messenger~Message}
+                 * @returns {messenger~Message}
                  */
                 widget.triggerEvent("message-inserted", data);
             }
@@ -364,7 +365,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:messenger
+     * @memberof messenger
      * @type {Object}
      * @property {html} icon - Icon for the messenger button
      * @property {bool} iconTransparent=true - Transparency setting for the messenger button
@@ -378,21 +379,16 @@
 
     /**
      * Non-optional dependencies.
-     * - {@link ./context|context}
-     * - {@link ./panels|panels}
+     * - {@link context}
+     * - {@link panels}
      * 
      * @name dependencies
-     * @memberof module:messenger
+     * @memberof messenger
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = ["context", "panels"];
 
 })(jQuery);
-
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */
 
 /**
  * @external ISODateTime

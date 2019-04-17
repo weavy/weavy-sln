@@ -18,22 +18,23 @@
      *     }
      * });
      * 
-     * @module panels
+     * @mixin panels
      * @returns {WeavyWidget.plugins.panels}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof panels
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:panels#
+         *  @lends panels#
          */
         var widget = this;
 
@@ -43,7 +44,7 @@
         /**
          * Container for all panels
          * 
-         * @alias module:panels#nodes#panels
+         * @alias panels#nodes#panels
          * @type {?Element}
          */
         widget.nodes.panels = null;
@@ -55,9 +56,9 @@
          * @param {Object} [attributes] - All panel attributes are optional
          * @param {url} attributes.url - The url for the frame.
          * @param {string} attributes.type - Type added as data-type attribute.
-         * @param {boolean} attributes.persistent - Should the panel remain when {@link module:panels#removePanel} or {@link module:panels#clearPanels} are called?
+         * @param {boolean} attributes.persistent - Should the panel remain when {@link panels#removePanel} or {@link panels#clearPanels} are called?
          * @returns {Element}
-         * @emits module:panels#event:panel-added
+         * @emits panels#event:panel-added
          */
         widget.addPanel = function (panelId, attributes) {
             if (!panelId) {
@@ -78,7 +79,7 @@
             }
 
             // panel
-            panel = document.createElement("div");
+            var panel = document.createElement("div");
             panel.className = "weavy-panel";
             panel.id = panelElementId;
             panel.dataset.id = panelId;
@@ -115,7 +116,7 @@
             /**
              * Triggered when a panel is added
              * 
-             * @event module:panels#panel-added
+             * @event panels#panel-added
              * @category events
              * @returns {Object}
              * @property {Element} panel - The created panel
@@ -123,7 +124,7 @@
              * @property {Object} attributes - Panel attributes
              * @property {url} attributes.url - The url for the frame.
              * @property {string} attributes.type - Type of the panel.
-             * @property {boolean} attributes.persistent - Will the panel remain when {@link module:panels#removePanel} or {@link module:panels#clearPanels} are called?
+             * @property {boolean} attributes.persistent - Will the panel remain when {@link panels#removePanel} or {@link panels#clearPanels} are called?
              */
             widget.triggerEvent("panel-added", { panel: panel, panelId: panelId, attributes: attributes });
 
@@ -135,7 +136,7 @@
          * 
          * @param {string} panelId - The id of the panel to remove
          * @param {boolean} [force] - True will remove the panel even if it's persistent
-         * @emits module:panels#panel-removed
+         * @emits panels#panel-removed
          */
         widget.removePanel = function (panelId, force) {
             var $panel = $(widget.nodes.panels).children(widget.getId("#weavy-panel-removed-" + panelId) + ", " + widget.getId("#weavy-panel-" + panelId)).first();
@@ -156,7 +157,7 @@
                     /**
                      * Triggered when a panel has been removed.
                      * 
-                     * @event module:panels#panel-removed
+                     * @event panels#panel-removed
                      * @category events
                      * @returns {Object}
                      * @property {string} panelId - Id of the removed panel
@@ -176,7 +177,7 @@
         };
 
         /**
-         * Create panel controls for expand/collapse and close. Set control settings in {@link module:panels.defaults|options}
+         * Create panel controls for expand/collapse and close. Set control settings in {@link panels.defaults|options}
          * 
          * @returns {Element} 
          */
@@ -218,7 +219,7 @@
 
         /**
          * Preload a frame. The frame needs to have data-src attribute set instead of src attribute. 
-         * Panels created using {@link module:panels#addPanel} have the appropriate settings for preload.
+         * Panels created using {@link panels#addPanel} have the appropriate settings for preload.
          * If the frame belongs to a panel it will triggger loading animations.
          * 
          * @param {FrameElement} frameElement - The frame that should be preloaded.
@@ -382,7 +383,7 @@
      * };
      *
      * @name defaults
-     * @memberof module:panels
+     * @memberof panels
      * @type {Object}
      * @property {Object} controls - Set to `false` to disable control buttons
      * @property {boolean} controls.expand - Render a expand/collapse panel control button
@@ -397,7 +398,3 @@
 
 })(jQuery);
 
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */

@@ -10,32 +10,33 @@
     /**
      * Plugin for signing in and out
      * 
-     * @module authentication
+     * @mixin authentication
      * @returns {WeavyWidget.plugins.authentication}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof authentication
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:authentication#
+         *  @lends authentication#
          */
         var widget = this;
 
         /**
          * Current authentication state of the user
          * 
-         * - **"signing-in"** - The user is trying to sign in. See Widget event: {@link external:signing-in}
-         * - **"signed-in"** - The user is signed in. See Widget event: {@link external:signed-in}
-         * - **"signing-out"** - The user has started the sign-out process. See Widget event: {@link external:signing-out}
-         * - **"signed-out"** - The user is not authenticated. See Widget event: {@link external:signed-out} and {@link external:authentication-error}
+         * - **"signing-in"** - The user is trying to sign in. See Widget event: {@link WeavyWidget#event:signing-in}
+         * - **"signed-in"** - The user is signed in. See Widget event: {@link WeavyWidget#event:signed-in}
+         * - **"signing-out"** - The user has started the sign-out process. See Widget event: {@link WeavyWidget#event:signing-out}
+         * - **"signed-out"** - The user is not authenticated. See Widget event: {@link WeavyWidget#event:signed-out} and {@link WeavyWidget#event:authentication-error}
          * 
          * @category properties
          * @type {string}
@@ -62,18 +63,18 @@
         /**
          * Panel displaying the authentication page
          * 
-         * @alias module:authentication#nodes#authenticationPanel
+         * @alias authentication#nodes#authenticationPanel
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.authenticationPanel = null;
 
         /**
-         * Frame for the {@link module:authentication#nodes#authenticationPanel}
+         * Frame for the {@link authentication#nodes#authenticationPanel}
          * 
-         * @alias module:authentication#nodes#authenticationFrame
+         * @alias authentication#nodes#authenticationFrame
          * @type {?FrameElement}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.authenticationFrame = null;
 
@@ -94,8 +95,8 @@
          * @returns {external:Promise}
          * @resolves {true} - On successful sign-in
          * @resolves {false} - On authentication error
-         * @fires external:signed-in
-         * @fires external:authentication-error
+         * @fires WeavyWidget#signed-in
+         * @fires WeavyWidget#authentication-error
          */
         widget.signIn = function (username, password) {
             var options = widget.options.plugins[PLUGIN_NAME];
@@ -148,7 +149,7 @@
          * 
          * @returns {external:Promise}
          * @resolves When sign-out is completed
-         * @fires external:signed-out
+         * @fires WeavyWidget#signed-out
          */
         widget.signOut = function () {
             var options = widget.options.plugins[PLUGIN_NAME];
@@ -307,10 +308,10 @@
      * };
      * 
      * @name defaults
-     * @memberof module:authentication
+     * @memberof authentication
      * @type {Object}
      * @property {string} redirect=/notify - URL to redirect to after signing in or out
-     * @property {string} frameClassName - Classes added to the class-property of {@link module:authentication#nodes#authenticationFrame}
+     * @property {string} frameClassName - Classes added to the class-property of {@link authentication#nodes#authenticationFrame}
      * @property {string} frameName=authentication - Name used for the authentication panel
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
@@ -320,36 +321,6 @@
     };
 
 })(jQuery);
-
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */
-
-/**
- * @external signing-in
- * @see ./widget#WeavyWidget+event_signing-in
- */
-
-/**
- * @external signed-in
- * @see ./widget#WeavyWidget+event_signed-in
- */
-
-/**
- * @external signing-out
- * @see ./widget#WeavyWidget+event_signing-out
- */
-
-/**
- * @external signed-out
- * @see ./widget#WeavyWidget+event_signed-out
- */
-
-/**
- * @external authentication-error
- * @see ./widget#WeavyWidget+event_authentication-error
- */
 
 /**
  * @external Promise

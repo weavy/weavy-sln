@@ -13,14 +13,14 @@
      * 
      * _This plugin has no exposed properties or options._
      * 
-     * @module attach
+     * @mixin attach
      * @returns {WeavyWidget.plugins.attach}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:attach#
+         *  @lends attach#
          */
         var widget = this;
 
@@ -49,7 +49,7 @@
      * 
      * @ignore
      * @name defaults
-     * @memberof module:attach
+     * @memberof attach
      * @type {Object}
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {

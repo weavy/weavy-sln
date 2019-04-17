@@ -8,9 +8,9 @@
     }
 
     /**
-     * Checks if widget needs to be upgraded on {@link ./widget#WeavyWidget+event_options|options} event.
+     * Checks if widget needs to be upgraded on {@link WeavyWidget#event:options} event.
      * 
-     * @module upgrade
+     * @mixin upgrade
      * @returns {WeavyWidget.plugins.upgrade}
      * @property {function} .check() - Trigger an upgrade check
      * @typicalname widget
@@ -18,7 +18,7 @@
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:upgrade#
+         *  @lends upgrade#
          */
         var widget = this;
 
@@ -53,7 +53,7 @@
                  * });
                  * 
                  * @category events
-                 * @event module:upgrade#upgrade
+                 * @event upgrade#upgrade
                  * @returns {Object}
                  * @property {string} current - The currently running script semver version
                  * @property {string} available - The semver version on the server
@@ -77,7 +77,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:upgrade
+     * @memberof upgrade
      * @type {Object}
      * @property {boolean} showAlert=true - Show an elert when the widget has been upgraded.
      */

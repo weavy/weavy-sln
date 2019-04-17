@@ -10,33 +10,34 @@
     /**
      * The main dock containing bubble buttons and panel managment.
      * 
-     * @module dock
+     * @mixin dock
      * @returns {WeavyWidget.plugins.dock}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof dock
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:dock#
+         *  @lends dock#
          */
         var widget = this;
 
         var _addButtons = [];
 
         /**
-         * Main element containing the {@link module:dock#nodes#dock}
+         * Main element containing the {@link dock#nodes#dock}
          * 
-         * @alias module:dock#nodes#dockContainer
+         * @alias dock#nodes#dockContainer
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.dockContainer = null;
 
@@ -51,29 +52,29 @@
          *     }
          * })
          * 
-         * @alias module:dock#nodes#dock
+         * @alias dock#nodes#dock
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.dock = null;
 
         /**
          * Subcontainer for global bubbles
          * 
-         * @alias module:dock#nodes#bubblesGlobal
+         * @alias dock#nodes#bubblesGlobal
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
-         * @see {@link ./bubbles|Bubbles}
+         * @created Widget event: {@link WeavyWidget#event:build}
+         * @see {@link bubbles}
          */
         widget.nodes.bubblesGlobal = null;
 
         /**
          * Subcontainer for personal bubbles
          * 
-         * @alias module:dock#nodes#bubblesPersonal
+         * @alias dock#nodes#bubblesPersonal
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
-         * @see {@link ./bubbles|Bubbles}
+         * @created Widget event: {@link WeavyWidget#event:build}
+         * @see {@link bubbles}
          */
         widget.nodes.bubblesPersonal = null;
 
@@ -81,19 +82,19 @@
          * Container for the weavy general button. 
          * This button is used for opening the authentication panel och as a simple placeholder when no other buttons have been added 
          * 
-         * @alias module:dock#nodes#weavyButtonContainer
+         * @alias dock#nodes#weavyButtonContainer
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
-         * @see {@link ./authentication|authentication}
+         * @created Widget event: {@link WeavyWidget#event:build}
+         * @see {@link authentication}
          */
         widget.nodes.weavyButtonContainer = null;
 
         /**
-         * The actual button element inside the {@link module:dock#nodes#weavyButtonContainer} 
+         * The actual button element inside the {@link dock#nodes#weavyButtonContainer} 
          * 
-         * @alias module:dock#nodes#weavyButton
+         * @alias dock#nodes#weavyButton
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.weavyButton = null;
 
@@ -147,11 +148,11 @@
                 /**
                  * Triggered when a bubble button is added to the dock. It can be used for adding additional functionality to bubble buttons.
                  * 
-                 * @event module:dock#bubble-init
+                 * @event dock#bubble-init
                  * @category events
                  * @returns {Object}
                  * @property {boolean} isAdded - True if the bubble was created, false if it already existed
-                 * @property {external:Bubble} bubble - Bubble data
+                 * @property {bubbles~Bubble} bubble - Bubble data
                  * @property {Element} container - The outer button container.
                  * @property {Element} panel - The panel for the bubble
                  */
@@ -552,11 +553,11 @@
      * };
      * 
      * @name defaults
-     * @memberof module:dock
+     * @memberof dock
      * @type {Object}
-     * @property {string} className - Classes added to the {@link module:dock#nodes#dockContainer}
+     * @property {string} className - Classes added to the {@link dock#nodes#dockContainer}
      * @property {string} positionClassName=weavy-middle - Classes added to `widget.nodes.container` to set the default position of the dock. <br> • **weavy-left**<br> • **weavy-right**<br> • **weavy-top**<br> • **weavy-middle**<br> • **weavy-bottom**
-     * @property {string} panelsClassName=weavy-dock-panels - Classes added to the {@link ./panels|panels} container.
+     * @property {string} panelsClassName=weavy-dock-panels - Classes added to the {@link panels} container.
      * @property {string} themeClassName=weavy-extended - Default theme class used by the dock. <br> • **weavy-default** - only basic styles<br> • **weavy-extended** - all styles for the dock<br> • **weavy-custom** - only core styles
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
@@ -568,12 +569,12 @@
 
     /**
      * Non-optional dependencies.
-     * - {@link ./bubbles|bubbles}
-     * - {@link ./panels|panels}
-     * - {@link ./theme|theme}
+     * - {@link bubbles}
+     * - {@link panels}
+     * - {@link theme}
      * 
      * @name dependencies
-     * @memberof module:dock
+     * @memberof dock
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = [
@@ -583,13 +584,3 @@
     ];
 
 })(jQuery);
-
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */
-
-/**
- * @external Bubble
- * @see ./bubbles#module_bubbles..bubble
- */

@@ -4,6 +4,10 @@
 
 Weavy 3.0 improves the Weavy SDK and Widget API.
 
+### 3.0.1 (2019-04-17)
+
+* Added some missing icons
+
 ### 3.0.0 (2019-04-03)
 
 * Added support for custom Content controllers.

@@ -8,7 +8,7 @@
     }
 
     /**
-     * Inject additional styles into the sealed widget shadow dom. You may define styles by either setting widget plugin options or by injecting them via {@link module:theme#addStyles}
+     * Inject additional styles into the sealed widget shadow dom. You may define styles by either setting widget plugin options or by injecting them via {@link theme#addStyles}
      * 
      * @example
      * ```html
@@ -30,24 +30,24 @@
      * </script>
      * ```
      * 
-     * @module theme
+     * @mixin theme
      * @returns {WeavyWidget.plugins.theme}
-     * @property {function} .createStyleSheet() - {@link module:theme#createStyleSheet}
-     * @property {function} .addStyles() - {@link module:theme#addStyles}
+     * @property {function} .createStyleSheet() - {@link theme#createStyleSheet}
+     * @property {function} .addStyles() - {@link theme#addStyles}
      * @property {string} styles - The current styles.
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
          /** 
          *  Reference to this instance
-         *  @lends module:theme#
+         *  @lends theme#
          */
         var widget = this;
 
         /**
          * Creates a style sheet for the widget and adds any styles
-         * together with styles provided in options or by using {@link module:theme#addStyles}.
-         * This function is automatically called on {@link ./widget#WeavyWidget+event_build|before:build}
+         * together with styles provided in options or by using {@link theme#addStyles}.
+         * This function is automatically called on [before:build]{@link WeavyWidget#event:build}
          * 
          * @param {string} [css] - Optional additional css that will be appended to the previously provided styles.
          */
@@ -123,7 +123,7 @@
      *     styles: ""
      * };
      * @name defaults
-     * @memberof module:theme
+     * @memberof theme
      * @type {Object}
      * @property {string} styles - Styles applied when the widget is created
      */

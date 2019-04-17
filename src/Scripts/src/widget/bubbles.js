@@ -10,13 +10,15 @@
     /**
      * State machine for bubbles.
      * 
-     * @module bubbles
+     * @mixin bubbles
      * @returns {WeavyWidget.plugins.bubbles}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
          * @typedef Bubble
+         * @inner
+         * @memberof bubbles
          * @type {Object}
          * @property {int} bubbleId - Bubble ID
          * @property {int} spaceId - The id of space which the bubble is representing
@@ -32,7 +34,7 @@
 
         /**
          *  Reference to this instance
-         *  @lends module:bubbles#
+         *  @lends bubbles#
          */
         var widget = this;
 
@@ -42,7 +44,7 @@
          * List of all bubbles for the current context.
          * 
          * @category properties
-         * @type module:bubbles~Bubble[]
+         * @type bubbles~Bubble[]
          */
         widget.bubbles = [];
 
@@ -50,7 +52,7 @@
          * The currently open bubble if any, otherwise `null`.
          * 
          * @category properties
-         * @type {?module:bubbles~Bubble}
+         * @type {?bubbles~Bubble}
          */
         widget.currentBubble = null;
 
@@ -61,7 +63,7 @@
          * @param {int} data.bubbleId - Match bubble against bubble
          * @param {int} data.spaceId - Match bubble against spaceId
          * @param {string} [data.type] - Match bubble against bubble type
-         * @returns {module:bubbles~Bubble}
+         * @returns {bubbles~Bubble}
          */
         widget.getBubble = function (data) {
             if (data) {
@@ -144,7 +146,7 @@
         /**
          * Add one or several bubbles. Checks for duplicates and replaces existing bubbles with new.
          * 
-         * @param {module:bubbles~Bubble[]} newBubbles
+         * @param {bubbles~Bubble[]} newBubbles
          */
         widget.addBubble = function(newBubbles) {
             var options = widget.options.plugins[PLUGIN_NAME];
@@ -241,7 +243,7 @@
                 /**
                  * Triggered when a new bubble is received from the server. The new bubble is available as event data. 
                  * 
-                 * @event module:bubbles#bubble-added
+                 * @event bubbles#bubble-added
                  * @category events
                  * @returns {Bubble}
                  */
@@ -274,7 +276,7 @@
                /**
                  * Triggered when a bubble is removed from the server. The removed bubble is available as event data. 
                  * 
-                 * @event module:bubbles#bubble-removed
+                 * @event bubbles#bubble-removed
                  * @category events
                  * @returns {Bubble}
                  */
@@ -289,7 +291,7 @@
                     /**
                      * Triggered when a space is trashed on the server. The new bubble is available as event data. 
                      * 
-                     * @event module:bubbles#space-trashed
+                     * @event bubbles#space-trashed
                      * @category events
                      * @returns {Object}
                      * @property {int} id - The id of the trashed space
@@ -369,7 +371,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:bubbles
+     * @memberof bubbles
      * @type {Object}
      * @property {int} [bubbleLimit=16] - Maximum number of bubbles. Any bubbles exceeding this number will be truncated.
      */

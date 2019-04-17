@@ -11,15 +11,15 @@
     /**
      * Plugin for displaying alert messages.
      * 
-     * @module alert
+     * @mixin alert
      * @returns {WeavyWidget.plugins.alert}
+     * @property {alert#alert} .alert()
      * @typicalname widget
-     * @property {module:alert#alert} .alert()
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
-         *  Reference to this instance
-         *  @lends module:alert#
+         * Reference to this instance
+         * @lends alert#
          */
         var widget = this;
         var _addMessages = [];
@@ -78,7 +78,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:alert
+     * @memberof alert
      * @type {Object}
      * @property {string} [className=weavy-alert-message fade in] - Default classes for the alerts
      */

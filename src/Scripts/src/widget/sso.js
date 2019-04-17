@@ -10,7 +10,7 @@
     /**
      * Single sign on authentication. 
      * Configure weavy for single sign on then provide your {@link external:jwt} via this plugin to sign in automatically.
-     * The {@link ./widget#WeavyWidget+event_load|widget.load} event waits for sso to complete before it is fired. 
+     * The [widget.load]{@link WeavyWidget#event:load} event waits for sso to complete before it is fired.
      * 
      * @example
      * var widget = new WeavyWidget({
@@ -21,24 +21,24 @@
      *     }
      * });
      * 
-     * @module sso
+     * @mixin sso
      * @returns {WeavyWidget.plugins.sso}
-     * @property {module:sso#ssoState} ssoState
-     * @property {module:sso~states} states
+     * @property {sso#ssoState} ssoState
+     * @property {sso~states} states
      * @typicalname widget
      * @see {@link https://jwt.io/}
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:sso#
+         *  @lends sso#
          */
         var widget = this;
 
         /**
          * The authentication states. Available via plugin exports in `widget.plugins.sso.states`
          *
-         * @memberof module:sso~
+         * @memberof sso~
          * @enum {int}
          */
         var states = {
@@ -55,7 +55,7 @@
         /**
          * The current state of authentication.
          *
-         * @type module:sso~states
+         * @type sso~states
          */
         widget.ssoState = states.uninitialized;
 
@@ -111,7 +111,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:sso
+     * @memberof sso
      * @type {Object}
      * @property {external:jwt} jwt - JSON web token for authentication
      */
@@ -124,7 +124,7 @@
      * 
      * @ignore
      * @name dependencies
-     * @memberof module:sso
+     * @memberof sso
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = [

@@ -14,8 +14,8 @@
      * var widget = new WeavyWidget({ url: "http://myweavysite.test" });
      * var coreWidget = new WeavyWidget(WeavyWidget.presets.core, { url: "http://myweavysite.test" });
      * 
+     * @class WeavyWidget
      * @classdesc The core class for a Weavy Widget.
-     * @constructor WeavyWidget
      * @param {...WeavyWidget#options} options - One or multiple option sets. Options will be merged together in order.
      * @typicalname widget
      */
@@ -389,18 +389,24 @@
         /**
          * Trigger a custom event. Events are per default triggered on the widget instance using the widget.eventNamespaces.widget namespace.
          * 
-         * The trigger has an event chain that adds before: and after: events automatically for all events. 
+         * The trigger has an event chain that adds `before:` and `after:` events automatically for all events except when any custom `prefix:` is specified. This way you may customize the eventchain by specifying `before:`, `on:` and `after:` in your event name to fire them one at the time. The `on:` prefix will then be removed from the name when the event is fired.
          * 
-         * Eventhandlers listening to the event may return modified data that is returned by the trigger event. The data is passed on to the next event in the trigger event chain. If an event handler calls event.stopPropagation() or returns false, the event chain will be stopped and the value is returned.
+         * Eventhandlers listening to the event may return modified data that is returned by the trigger event. The data is passed on to the next event in the trigger event chain. If an event handler calls `event.stopPropagation()` or `return false`, the event chain will be stopped and the value is returned.
          * 
          * @example
          * 
+         * // Normal triggering
          * widget.triggerEvent("myevent");
          * 
          * // Will trigger the following events on the widget instance
          * // 1. `before:myevent.event.weavy`
          * // 2. `myevent.event.weavy`
          * // 3. `after:myevent.event.weavy`
+         * 
+         * // Custom triggering, one at the time
+         * widget.triggerEvent("before:myevent");
+         * widget.triggerEvent("on:myevent");
+         * widget.triggerEvent("after:myevent");
          * 
          * @category eventhandling
          * @param {any} name - The name of the event.
@@ -414,7 +420,7 @@
             var hasPrefix = name.indexOf(":") !== -1;
             namespace = typeof namespace === 'string' ? namespace : widget.eventNamespaces.widget;
             context = context || (namespace === widget.eventNamespaces.widget ? $(widget) : $(document));
-            name = name + namespace;
+            name = name.replace("on:", "") + namespace;
 
             // Triggers additional before:* and after:* events
             var beforeEvent = $.Event("before:" + name);
@@ -607,7 +613,7 @@
              * 
              * @category events
              * @event WeavyWidget#init
-             * @returns {Promise}
+             * @returns {external:Promise}
              */
             return widget.triggerEvent("init");
         }
@@ -849,6 +855,28 @@
         };
 
         /**
+         * Sends a postMessage to a panel iframe
+         * 
+         * @category panels
+         * @param {string} panelId - If the frame is a panel, the panelId may also be provided.
+         * @param {object} message - The Message to send
+         * @param {Transferable[]} [transfer] - A sequence of Transferable objects that are transferred with the message.
+         * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
+         */
+        widget.postMessage = function (panelId, message, transfer) {
+            if (widget.panelIsLoaded(panelId)) {
+                var frame = $(widget.getId("#weavy-panel-" + panelId), widget.nodes.container).find("iframe").get(0);
+                if (frame) {
+                    try {
+                        frame.contentWindow.postMessage(message, "*", transfer);
+                    } catch (e) {
+                        widget.error("Could not post panel message", e);
+                    }
+                }
+            }
+        }
+
+        /**
          * Maximizes or restores the size of current panel.
          * 
          * @category panels
@@ -890,7 +918,7 @@
          * @category options
          * @param {WeavyWidget#options} [options] Any new or additional options.
          * @emits WeavyWidget#reload
-         * @returns {Promise}
+         * @returns {external:Promise} {@link WeavyWidget#awaitLoaded}
          */
         widget.reload = function (options) {
             widget.options = widget.extendDefaults(widget.options, options);
@@ -979,9 +1007,10 @@
          * @param {string} panelId - The id of the panel to open.
          * @param {string} [destination] - Tells the panel to navigate to a specified url.
          * @emits WeavyWidget#open
+         * @returns {external:Promise}
          */
         widget.open = function (panelId, destination) {
-            widget.awaitBlocked.then(function () {
+            return widget.awaitBlocked.then(function () {
                 $(widget.nodes.container).addClass("weavy-open");
                 widget.openPanelId = panelId;
 
@@ -994,7 +1023,13 @@
                  * @property {string} panelId - The id of the panel being openened.
                  * @property {string} [destination] - Any url being requested to open in the panel.
                  */
-                widget.triggerEvent("open", { panelId: panelId, destination: destination });
+                var openResult = widget.triggerEvent("open", { panelId: panelId, destination: destination });
+
+                if (openResult !== false) {
+                    return Promise.resolve(openResult);
+                } else {
+                    return Promise.reject({ panelId: panelId, destination: destination });
+                }
             });
         }
 
@@ -1226,61 +1261,63 @@
             e = e.originalEvent || e;
             message = message || e.data;
 
-            switch (message.name) {
-                case "signing-in":
-                    /**
-                     * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link WeavyWidget#event:signed-in} or {@link WeavyWidget#event:authentication-error}.
-                     * This event may be triggered from anywhere, not only the WeavyWidget instance.
-                     * 
-                     * @category events
-                     * @event WeavyWidget#signing-in
-                     * @returns {Object}
-                     * @property {boolean} isLocal - Is the origin ov the event from this widget instance
-                     */
-                    widget.timeout(0).then(widget.triggerEvent.bind(widget, "signing-in", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId()) }));
-                    break;
-                case "signing-out":
-                    widget.close();
-                    /**
-                     * Event triggered when signing out process has begun. Use this event to do signing out animations and eventually clean up your elements. It will be followed by {@link WeavyWidget#event:signed-out}
-                     * This event may be triggered from anywhere, not only the WeavyWidget instance.
-                     * 
-                     * @category events
-                     * @event WeavyWidget#signing-out
-                     * @returns {Object}
-                     * @property {boolean} isLocal - Is the origin ov the event from this widget instance
-                     */
-                    widget.timeout(0).then(widget.triggerEvent.bind(widget, "signing-out", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId()) }));
-                    break;
-                case "signed-out":
-                    widget.options.userId = null;
-                    break;
-                case "authentication-error":
-                    /**
-                     * Event triggered when a sign-in attempt was unsuccessful.
-                     * This event may be triggered from anywhere, not only the WeavyWidget instance.
-                     * 
-                     * @category events
-                     * @event WeavyWidget#authentication-error
-                     */
-                    widget.timeout(0).then(widget.triggerEvent.bind(widget, "authentication-error"));
-                    break;
-            }
+            if (message) {
+                switch (message.name) {
+                    case "signing-in":
+                        /**
+                         * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link WeavyWidget#event:signed-in} or {@link WeavyWidget#event:authentication-error}.
+                         * This event may be triggered from anywhere, not only the WeavyWidget instance.
+                         * 
+                         * @category events
+                         * @event WeavyWidget#signing-in
+                         * @returns {Object}
+                         * @property {boolean} isLocal - Is the origin ov the event from this widget instance
+                         */
+                        widget.timeout(0).then(widget.triggerEvent.bind(widget, "signing-in", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId()) }));
+                        break;
+                    case "signing-out":
+                        widget.close();
+                        /**
+                         * Event triggered when signing out process has begun. Use this event to do signing out animations and eventually clean up your elements. It will be followed by {@link WeavyWidget#event:signed-out}
+                         * This event may be triggered from anywhere, not only the WeavyWidget instance.
+                         * 
+                         * @category events
+                         * @event WeavyWidget#signing-out
+                         * @returns {Object}
+                         * @property {boolean} isLocal - Is the origin ov the event from this widget instance
+                         */
+                        widget.timeout(0).then(widget.triggerEvent.bind(widget, "signing-out", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId()) }));
+                        break;
+                    case "signed-out":
+                        widget.options.userId = null;
+                        break;
+                    case "authentication-error":
+                        /**
+                         * Event triggered when a sign-in attempt was unsuccessful.
+                         * This event may be triggered from anywhere, not only the WeavyWidget instance.
+                         * 
+                         * @category events
+                         * @event WeavyWidget#authentication-error
+                         */
+                        widget.timeout(0).then(widget.triggerEvent.bind(widget, "authentication-error"));
+                        break;
+                }
 
-            if (typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId())) {
-                /**
-                 * Event for window messages directed to the current widget instance, such as messages sent from panels belonging to the widget instance.
-                 * The original message event is attached as event.originalEvent.
-                 * 
-                 * Use data.name to determine which type of message theat was receivied.
-                 * 
-                 * @category events
-                 * @event WeavyWidget#message
-                 * @returns {Object.<string, data>}
-                 * @property {string} name - The name of the message
-                 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
-                 */
-                widget.triggerEvent("message", message, null, null, e);
+                if (typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === widget.getId())) {
+                    /**
+                     * Event for window messages directed to the current widget instance, such as messages sent from panels belonging to the widget instance.
+                     * The original message event is attached as event.originalEvent.
+                     * 
+                     * Use data.name to determine which type of message theat was receivied.
+                     * 
+                     * @category events
+                     * @event WeavyWidget#message
+                     * @returns {Object.<string, data>}
+                     * @property {string} name - The name of the message
+                     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
+                     */
+                    widget.triggerEvent("message", message, null, null, e);
+                }
             }
         });
 
@@ -1615,7 +1652,6 @@
     /**
      * Placeholder for registering plugins. Plugins must be registered and available here to be accessible and initialized in the Widget. Register any plugins after you have loaded widget.js and before you create a new WeavyWidget instance.
      * @type {Object.<string, WeavyWidgetPlugin>}
-     * @see {@link ../plugins|plugins}
      */
     WeavyWidget.plugins = {};
 
@@ -1646,7 +1682,6 @@
     /**
      * Wrapper for `console.debug()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
      * @category logging
-     * @name WeavyWidget.debug
      * @type {console.debug}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/debug}
      */
@@ -1657,7 +1692,6 @@
     /**
      * Wrapper for `console.error()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
      * @category logging
-     * @name WeavyWidget.error
      * @type {console.error}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/error}
      */
@@ -1668,7 +1702,6 @@
     /**
      * Wrapper for `console.info()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
      * @category logging
-     * @name WeavyWidget.info
      * @type {console.info}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/info}
      */
@@ -1679,7 +1712,6 @@
     /**
      * Wrapper for `console.log()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
      * @category logging
-     * @name WeavyWidget.log
      * @type {console.log}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/log}
      */
@@ -1690,7 +1722,6 @@
     /**
      * Wrapper for `console.warn()` that adds the [instance id]{@link WeavyWidget#getId} of the widget as prefix using the {@link WeavyWidget#logColor}. 
      * @category logging
-     * @name WeavyWidget.warn
      * @type {console.warn}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/warn}
      */
@@ -1702,7 +1733,6 @@
      * Stores data for the current domain in the weavy namespace.
      * 
      * @category options
-     * @name WeavyWidget.storeItem
      * @param {string} key - The name of the data
      * @param {data} value - Data to store
      * @param {boolean} [asJson=false] - True if the data in value should be stored as JSON
@@ -1715,7 +1745,6 @@
      * Retrieves data for the current domain from the weavy namespace.
      * 
      * @category options
-     * @name WeavyWidget.retrieveItem
      * @param {string} key - The name of the data to retrevie
      * @param {boolean} [isJson=false] - True if the data shoul be decoded from JSON
      */
@@ -1734,7 +1763,6 @@
      * The original options passed are left untouched. {@link WeavyWidget.httpsUrl} settings is applied to all url options.
      * 
      * @category options
-     * @name WeavyWidget.extendDefaults
      * @param {Object} source - Original options.
      * @param {Object} properties - Merged options that will replace options from the source.
      * @param {boolean} [recursive=false] True will merge any sub-objects of the options recursively. Otherwise sub-objects are treated as data.
@@ -1773,7 +1801,6 @@
      * Applies https enforcement to an url.
      * 
      * @category options
-     * @name WeavyWidget.httpsUrl
      * @param {string} url - The url to process
      * @param {string} [https] How to treat http enforcement for the url. Default to settings from {@link WeavyWidget#options}. <br> • **force** - makes all urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **default** - makes no change.
      * @returns {string} url

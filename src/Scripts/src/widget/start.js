@@ -15,40 +15,41 @@
      *     widget.open("start");
      * }
      * 
-     * @module start
+     * @mixin start
      * @returns {WeavyWidget.plugins.start}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof start
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:start#
+         *  @lends start#
          */
         var widget = this;
 
         /**
          * The panel for start.
          * 
-         * @alias module:start#nodes#startPanel
+         * @alias start#nodes#startPanel
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.startPanel = null;
 
         /**
-         * The dock {@link ./dock#module_dock+addButton|button} for start 
+         * The dock [button]{@link dock#addButton} for start
          * 
-         * @alias module:start#nodes#startButtonContainer
+         * @alias start#nodes#startButtonContainer
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.startButtonContainer = null;
 
@@ -101,7 +102,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:start
+     * @memberof start
      * @type {Object}
      * @property {html} icon - Icon for the start button
      * @property {boolean} iconTransparent - Transparency setting for the button
@@ -119,18 +120,14 @@
 
     /**
      * Non-optional dependencies.
-     * - {@link ./panels|panels}
+     * - {@link panels}
      * 
      * @name dependencies
-     * @memberof module:start
+     * @memberof start
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = ["panels"];
 
 })(jQuery);
 
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */
 

@@ -10,16 +10,16 @@
     /**
      * Plugin for displaying badges/dots
      * 
-     * @module badge
+     * @mixin badge
      * @returns {WeavyWidget.plugins.badge}
      * @typicalname widget
      * @emits badge
-     * @property {module:badge#setBadge} .setBadge()
+     * @property {badge#setBadge} .setBadge()
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:badge#
+         *  @lends badge#
          */
         var widget = this;
 
@@ -62,7 +62,7 @@
              *     widget.log("Unread conversations count", data.conversations);
              * });
              * 
-             * @event module:badge#badge
+             * @event badge#badge
              * @category events
              * @returns {Object}
              * @property {int} conversations - Number of unread conversations
@@ -89,7 +89,7 @@
      *
      * @ignore
      * @name defaults
-     * @memberof module:badge
+     * @memberof badge
      * @type {Object}
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {

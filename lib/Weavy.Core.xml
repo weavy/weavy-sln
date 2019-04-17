@@ -16524,34 +16524,34 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryDomain">
             <summary>
-            Gets the name of the Active Directory domain or server to authenticate against.
+            Gets the name of the Active Directory domain or server to authenticate against (<code>weavy.active-directory-domain</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryUsername">
             <summary>
-            Gets the username to use when reading from the active directory (for authentication).
+            Gets the username to use when authenticating users against the active directory (<code>weavy.active-directory-username</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryPassword">
             <summary>
-            Gets the password to use when reading from active directory (for authentication).
+            Gets the password to use when authenticating users against the active directory (<code>weavy.active-directory-password</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ApplicationName">
             <summary>
-            Gets the name of the application, e.g. Weavy. 
+            Gets the name of the application, e.g. Weavy (<code>weavy.application-name</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ApplicationUrl">
             <summary>
             Gets the absolute url to the installation, e.g. http://intranet.weavy.com or https://www.weavy.com/intranet. 
-            Used for links in outgoing emails etc.
+            Used for links in outgoing emails etc. (<code>weavy.application-url</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.DomainWhitelist">
             <summary>
-             Gets the whitelisted domains for invites and sign ups from the <code>weavy.domain-whitelist</code> setting.
-             Sign-ups and invites with these email domains are automatically approved (leaving this field blank will require an admin to approve all sign-ups and invites). 
+             Gets the whitelisted domains for invites and sign ups.
+             Sign-ups and invites with these email domains are automatically approved (leaving this field blank will require an admin to approve all sign-ups and invites) (<code>weavy.domain-whitelist</code>). 
             </summary>
             <remarks>
               Separate multiple entries with comma, e.g. example.com, example.org
@@ -16559,37 +16559,37 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.CustomAuthenticationEndpoint">
             <summary>
-            Gets the full url to a custom authentication endpoint (must start with https://).
+            Gets the full url to a custom authentication endpoint. Must start with https://. (<code>weavy.custom-authentication-endpoint</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Https">
             <summary>
-            Gets a value indicating if HTTPS is required.
+            Gets a value indicating if HTTPS is required (<code>weavy.https</code>)..
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Hsts">
             <summary>
-            Gets a value indicating whether HTTP Strict Transport Security (HSTS) is enabled.
+            Gets a value indicating whether HTTP Strict Transport Security (HSTS) is enabled (<code>weavy.hsts</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Invites">
             <summary>
-            Gets a value indicating whether users can invite people.
+            Gets a value indicating whether users can invite people (<code>weavy.invites</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.JwtSecret">
             <summary>
-            Gets the shared secret to use for Widget SSO. 
+            Gets the shared secret to use for Widget SSO (<code>weavy.jwt-secret</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.LicenseUrl">
             <summary>
-            Gets the url to the licensing server.
+            Gets the url to the licensing server (<code>weavy.license-url</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.LicensePublicKey">
             <summary>
-            Gets the (base64 encoded) public key used to verify that the license signature is valid.
+            Gets the (base64 encoded) public key used to verify that the license signature is valid (<code>weavy.license-public-key</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.MaxUploadSize">
@@ -16599,93 +16599,93 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.MessengerNotificationHubConnectionString">
             <summary>
-            Gets the connection string for the Messenger notification hub.
+            Gets the connection string for the Messenger notification hub (<code>weavy.messenger-notification-hub-connection-string</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.MessengerNotificationHubPath">
             <summary>
-            Gets the Messenger notification hub path.
+            Gets the Messenger notification hub path (<code>weavy.messenger-notification-hub-path</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.NotificationHubConnectionString">
             <summary>
-            Gets the connection string for the notification hub.
+            Gets the connection string for the notification hub (<code>weavy.notification-hub-connection-string</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.NotificationHubPath">
             <summary>
-            Gets the notification hub path.
+            Gets the notification hub path (<code>weavy.notification-hub-path</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordLength">
             <summary>
-            Gets the minimum required password length.
+            Gets the minimum required password length (<code>weavy.password-length</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresDigit">
             <summary>
-            Gets a value indicating whether passwords must contain at least one digit (0-9).
+            Gets a value indicating whether passwords must contain at least one digit (0-9) (<code>weavy.password-requires-digit</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresLower">
             <summary>
-            Gets a value indicating whether passwords must contain at least one lower case letter (a-z).
+            Gets a value indicating whether passwords must contain at least one lower case letter (a-z) (<code>weavy.password-requires-lower</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresUpper">
             <summary>
-            Gets a value indicating whether passwords must contain at least one upper case letter (A-Z).
+            Gets a value indicating whether passwords must contain at least one upper case letter (A-Z) (<code>weavy.password-requires-upper</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresSpecial">
             <summary>
-            Gets a value indicating whether passwords must at least one special character (non letter or digit).
+            Gets a value indicating whether passwords must at least one special character (non letter or digit) (<code>weavy.password-requires-special</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Signups">
             <summary>
-            Gets a value indicating whether users can sign up for an account.
+            Gets a value indicating whether users can sign up for an account (<code>weavy.signups</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpFrom">
             <summary>
-            Gets the email address from which outgoing emails should be sent.
+            Gets the email address from which outgoing emails should be sent (<code>weavy.smtp-from</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpPassword">
             <summary>
-            Gets the password to use for authentication against the SMTP server.
+            Gets the password to use for authentication against the SMTP server (<code>weavy.smtp-password</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpPort">
             <summary>
-             Gets the port used for SMTP transactions, default value is 25.
+             Gets the port used for SMTP transactions, default value is 25 (<code>weavy.smtp-port</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpServer">
             <summary>
-            Gets the name or IP address of the host used for SMTP transactions.  
+            Gets the name or IP address of the host used for SMTP transactions (<code>weavy.smtp-server</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpUsername">
             <summary>
-            Gets the username to use for authentication against the SMTP server.
+            Gets the username to use for authentication against the SMTP server (<code>weavy.smtp-username</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpDefaultCredentials">
             <summary>
             Gets a value indicating whether default user credentials should be used to access the SMTP server.
-            When this property is set, username and password will be ignored.
+            When this property is set, username and password will be ignored (<code>weavy.smtp-default-credentials</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpSsl">
             <summary>
-            Gets a value indicating whether to use Secure Sockets Layer (SSL) to encrypt the connection with the SMTP server.
+            Gets a value indicating whether to use Secure Sockets Layer (SSL) to encrypt the connection with the SMTP server (<code>weavy.smtp-ssl</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Source">
             <summary>
-            Gets the source of the deployment package.
+            Gets the source of the deployment package (<code>weavy.source</code>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.WindowsAuthentication">

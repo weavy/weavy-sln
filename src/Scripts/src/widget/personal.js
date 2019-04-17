@@ -15,58 +15,59 @@
      *     widget.open("personal");
      * }
      * 
-     * @module personal
+     * @mixin personal
      * @returns {WeavyWidget.plugins.personal}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof personal
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:personal#
+         *  @lends personal#
          */
         var widget = this;
 
         /**
-         * The personal {@link ./panels|panel}
+         * The personal [panel]{@link panels}
          * 
-         * @alias module:personal#nodes#personalPanel
+         * @alias personal#nodes#personalPanel
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.personalPanel = null;
 
         /**
-         * The frame for the {@link module:personal#nodes#personalPanel}
+         * The frame for the {@link personal#nodes#personalPanel}
          * 
-         * @alias module:personal#nodes#personalFrame
+         * @alias personal#nodes#personalFrame
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.personalFrame = null;
 
         /**
-         * The personal dock {@link ./dock#module_dock+addButton|button}
+         * The personal dock [button]{@link dock#addButton}
          * 
-         * @alias module:personal#nodes#personalButtonContainer
+         * @alias personal#nodes#personalButtonContainer
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.personalButtonConainer = null;
 
         /**
-         * The actual button in the {@link module:personal#nodes#personalButtonContainer}
+         * The actual button in the {@link personal#nodes#personalButtonContainer}
          * 
-         * @alias module:personal#nodes#personalButton
+         * @alias personal#nodes#personalButton
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_build|build}
+         * @created Widget event: {@link WeavyWidget#event:build}
          */
         widget.nodes.personalButton = null;
 
@@ -144,10 +145,10 @@
      * };
      * 
      * @name defaults
-     * @memberof module:personal
+     * @memberof personal
      * @type {Object}
-     * @property {html} icon - Icon for the {@link module:personal#nodes#personalButton}
-     * @property {bool} iconTransparent=true - Transparency setting for the {@link module:personal#nodes#personalButton}
+     * @property {html} icon - Icon for the {@link personal#nodes#personalButton}
+     * @property {bool} iconTransparent=true - Transparency setting for the {@link personal#nodes#personalButton}
      * @property {string} panelId=personal - Default name of the personal panel
      * @property {sting} title - Title for the button
      * @property {string} type - Type for the panel and button
@@ -162,17 +163,13 @@
 
     /**
      * Non-optional dependencies.
-     * - {@link ./panels|panels}
+     * - {@link panels}
      * 
      * @name dependencies
-     * @memberof module:personal
+     * @memberof personal
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = ["panels"];
 
 })(jQuery);
 
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */

@@ -14,22 +14,23 @@
     /**
      * Describe your plugin.
      * 
-     * @module myplugin
+     * @mixin myplugin
      * @returns {WeavyWidget.plugins.myplugin}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof myplugin
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:myplugin#
+         *  @lends myplugin#
          */
         var widget = this;
 
@@ -48,7 +49,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:myplugin
+     * @memberof myplugin
      * @type {Object}
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
@@ -58,14 +59,9 @@
      * Non-optional dependencies.
      * 
      * @name dependencies
-     * @memberof module:myplugin
+     * @memberof myplugin
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = [];
 
 })(jQuery);
-
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */

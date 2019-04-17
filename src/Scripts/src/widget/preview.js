@@ -8,16 +8,16 @@
     }
 
     /**
-     * Displaying photoswipe and image in the full browser window.
+     * Displaying photoswipe and pdfs in the full browser window.
      * 
-     * @module preview
+     * @mixin preview
      * @returns {WeavyWidget.plugins.preview}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:preview#
+         *  @lends preview#
          */
         var widget = this;
 
@@ -26,7 +26,7 @@
         /**
          * Toggle preview window mode.
          * 
-         * @fires external:resize
+         * @fires WeavyWidget#event:resize
          */
         widget.togglePreview = function () {
             var options = widget.options.plugins[PLUGIN_NAME];
@@ -66,17 +66,12 @@
      * };
      * 
      * @name defaults
-     * @memberof module:preview
+     * @memberof preview
      * @type {Object}
-     * @property {string} className=weavy-preview - The class name used on {@link module:preview#togglePreview}
+     * @property {string} className=weavy-preview - The class name used on {@link preview#togglePreview}
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
         className: "weavy-preview"
     };
 
 })(jQuery);
-
-/**
- * @external resize
- * @see ./widget#WeavyWidget+event_resize
- */

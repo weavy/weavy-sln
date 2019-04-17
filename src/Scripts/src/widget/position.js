@@ -8,24 +8,25 @@
     }
 
     /**
-     * Collapsing {@link ./dock|dock} and drag'n'drop positioning
+     * Collapsing {@link dock} and drag'n'drop positioning
      * 
-     * @module position
+     * @mixin position
      * @returns {WeavyWidget.plugins.position}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof position
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:position#
+         *  @lends position#
          */
         var widget = this;
 
@@ -35,16 +36,16 @@
         /**
          * The element used for hiding default visual representation when dragging.
          * 
-         * @alias module:position#nodes#hiddenDragImage
+         * @alias position#nodes#hiddenDragImage
          * @type {?Element}
-         * @created Widget event: {@link ./widget#WeavyWidget+event_load|load}
+         * @created Widget event: {@link WeavyWidget#event:load}
          */
         widget.nodes.hiddenDragImage = null
 
         /**
-         * Set collapsed widget, which is a compact visual representation of the full {@link ./dock|dock}.
+         * Set collapsed widget, which is a compact visual representation of the full {@link dock}.
          * 
-         * @emits module:position#collapse
+         * @emits position#collapse
          */
         widget.collapse = function () {
             if (!$(widget.nodes.container).is(".weavy-no-collapse, .weavy-open, .weavy-before-drag, .weavy-drag, .weavy-snap")) {
@@ -52,9 +53,9 @@
                 minimizeTimeout.apply(widget);
 
                 /**
-                 * Triggered when the {@link ./dock|dock} is collapsed.
+                 * Triggered when the {@link dock} is collapsed.
                  * 
-                 * @event module:position#collapse
+                 * @event position#collapse
                  * @category events
                  */
                 widget.triggerEvent("collapse", null);
@@ -62,11 +63,11 @@
         };
 
         /**
-         * Set minimized widget, which is a mimial visual representation of the {@link ./dock|dock} only containing a small floating button.
-         * If the dock is in normal state it will also trigger {@link module:position#collapse}.
+         * Set minimized widget, which is a mimial visual representation of the {@link dock} only containing a small floating button.
+         * If the dock is in normal state it will also trigger {@link position#collapse}.
          * 
-         * @emits module:position#collapse
-         * @emits module:position#minimize
+         * @emits position#collapse
+         * @emits position#minimize
          */
         widget.minimize = function () {
             if (!$(widget.nodes.container).is(".weavy-no-collapse, .weavy-open, .weavy-before-drag, .weavy-drag, .weavy-snap")) {
@@ -78,9 +79,9 @@
                 }
 
                 /**
-                 * Triggered when the {@link ./dock|dock} is minimized.
+                 * Triggered when the {@link dock} is minimized.
                  * 
-                 * @event module:position#minimize
+                 * @event position#minimize
                  * @category events
                  */
                 widget.triggerEvent("minimize", null);
@@ -93,7 +94,7 @@
         };
 
         /**
-         * Unset {@link module:position#collapse}/{@link module:position#minimize} states and return to normal {@link ./dock|dock} mode.
+         * Unset {@link position#collapse}/{@link position#minimize} states and return to normal {@link dock} mode.
          */
         widget.restore = function () {
             var $container = $(widget.nodes.container);
@@ -101,9 +102,9 @@
                 $container.removeClass("weavy-collapsed weavy-minimized");
 
                 /**
-                 * Triggered when the {@link ./dock|dock} leaves {@link module:position#collapse}/{@link module:position#minimize} states and returns to normal state.
+                 * Triggered when the {@link moduel:dock} leaves {@link position#collapse}/{@link position#minimize} states and returns to normal state.
                  * 
-                 * @event module:position#restore
+                 * @event position#restore
                  * @category events
                  */
                 widget.triggerEvent("restore", null);
@@ -438,9 +439,9 @@
      * };
      * 
      * @name defaults
-     * @memberof module:position
+     * @memberof position
      * @type {Object}
-     * @property {string} positionClassName=weavy-collapsed - Classname added to {@link ./widget#WeavyWidget+nodes+container|widget.nodes.container} at load.
+     * @property {string} positionClassName=weavy-collapsed - Classname added to [widget.nodes.container]{@link WeavyWidget#nodes#container} at load.
      * @property {int} snappingX=4 - Horizontal snapping in {@link external:rem} when dragging
      * @property {int} snappingY=4 - Vertical snapping in {@link external:rem} when dragging
      * @property {int} minimizeDelay=15000 - Time before the widget is automatically minimized
@@ -454,20 +455,15 @@
 
     /**
      * Non-optional dependencies.
-     * - {@link ./dock|dock}
+     * - {@link dock}
      * 
      * @name dependencies
-     * @memberof module:position
+     * @memberof position
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = ["dock"];
 
 })(jQuery);
-
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */
 
 /**
  * @external rem

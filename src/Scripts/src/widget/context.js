@@ -9,17 +9,17 @@
 
     /**
      * Handles location changes and context features.
-     * Adds connect and disconnect buttons to bubble icons in the {@link ./dock|dock}.
+     * Adds connect and disconnect buttons to bubble icons in the {@link dock}.
      * 
-     * @module context
+     * @mixin context
      * @returns {WeavyWidget.plugins.context}
      * @typicalname widget
-     * @property {module:context~connectedUrl} .connectedUrl()
+     * @property {context~connectedUrl} .connectedUrl()
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:context#
+         *  @lends context#
          */
         var widget = this;
 
@@ -36,7 +36,7 @@
          * var isWildcardConnected = widget.plugins.context.connectedUrl("http://www.weavy.com/*");
          * 
          * @inner
-         * @memberof module:context
+         * @memberof context
          * @param {url} url - The url to match against current location. The url may end with a wildcard `*`.
          */
         function connectedUrl(url) {
@@ -247,7 +247,7 @@
      * };
      * 
      * @name defaults
-     * @memberof module:context
+     * @memberof context
      * @type {Object}
      * @property {Object} connect
      * @property {html} connect.icon - `<svg/>` Icon for the connect button. Provided as HTML string.
@@ -272,7 +272,7 @@
      * 
      * @ignore
      * @name dependencies
-     * @memberof module:context
+     * @memberof context
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = [];

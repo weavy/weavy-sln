@@ -8,30 +8,31 @@
     }
 
     /**
-     * Displays notifications in the context window. The notifications are placed in the {@link ./widget#WeavyWidget+nodes+overlay|widget.nodes.overlay}.
+     * Displays notifications in the context window. The notifications are placed in the [widget.nodes.overlay]{@link WeavyWidget#nodes#overlay}.
      * 
-     * @module notifications
+     * @mixin notifications
      * @returns {WeavyWidget.plugins.notifications}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /**
-         * The nodes placeholder in {@link external:widget.nodes|WeavyWidget}
+         * The nodes placeholder in [WeavyWidget]{@link WeavyWidget#nodes}
          * @instance
          * @member nodes
-         * @extends external:widget.nodes
+         * @memberof notifications
+         * @extends WeavyWidget#nodes
          * @typicalname widget.nodes
          */
 
         /**
          *  Reference to this instance
-         *  @lends module:notifications#
+         *  @lends notifications#
          */
         var widget = this;
 
         /**
          * @typedef User
-         * @memberof module:notifications~
+         * @memberof notifications~
          * @type {Object}
          * @property {int} id - The id of the user
          * @property {string} name - The name of the user
@@ -43,7 +44,7 @@
 
         /**
          * @typedef Notification
-         * @memberof module:notifications~
+         * @memberof notifications~
          * @type {Object}
          * @property {int} id - The id of the notification
          * @property {string} type - `"notification"`
@@ -51,7 +52,7 @@
          * @property {html} html - The notification text as HTML
          * @property {boolean} isRead - Has the notification been read?
          * @property {external:ISODateTime} createdAt - The time the notification was created.
-         * @property {module:notifications~User} createdBy - The user that created the notification, may be a system user.
+         * @property {notifications~User} createdBy - The user that created the notification, may be a system user.
          * @property {Object} icon - A {@link https://materialdesignicons.com/|Material Design Icon} that is suitable for display of the notification.
          * @property {string} icon.name - The name of the icon.
          * @property {string} icon.color - The icon color name.
@@ -64,7 +65,7 @@
         /**
          * Container for notifications
          * 
-         * @alias module:notifications#nodes#notifications
+         * @alias notifications#nodes#notifications
          * @type {?Element}
          */
         widget.nodes.notifications = null;
@@ -72,7 +73,7 @@
         /**
          * The sound for notifications.
          * 
-         * @alias module:notifications#nodes#notificationSound
+         * @alias notifications#nodes#notificationSound
          * @type {?external:HTMLAudioElement} 
          */
         widget.nodes.notificationSound = null;
@@ -133,9 +134,9 @@
             /**
              * Triggered when a new notification is received from the server.
              * 
-             * @event module:notifications#notification-inserted
+             * @event notifications#notification-inserted
              * @category events
-             * @returns {module:notifications~Notification}
+             * @returns {notifications~Notification}
              */
             widget.triggerEvent("notification-inserted", data);
         });
@@ -144,9 +145,9 @@
             /**
              * Triggered when a notification update is received from the server.
              * 
-             * @event module:notifications#notification-updated
+             * @event notifications#notification-updated
              * @category events
-             * @returns {module:notifications~Notification}
+             * @returns {notifications~Notification}
              */
             widget.triggerEvent("notification-updated", data);
         });
@@ -155,7 +156,7 @@
             /**
              * Triggered when all notifications have been read.
              * 
-             * @event module:notifications#notifications-all-read
+             * @event notifications#notifications-all-read
              * @category events
              * @returns {Object}
              * @property {int} userId - The id of the user
@@ -223,9 +224,9 @@
      * };
      * 
      * @name defaults
-     * @memberof module:notifications
+     * @memberof notifications
      * @type {Object}
-     * @property {string} sound.preload=none - Preload setting for the {@link module:notifications#nodes#notificationSound}
+     * @property {string} sound.preload=none - Preload setting for the {@link notifications#nodes#notificationSound}
      * @property {url} src - Url to the notification sound
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
@@ -236,11 +237,6 @@
     };
 
 })(jQuery);
-
-/**
- * @external "widget.nodes"
- * @see {@link ./widget#WeavyWidget+nodes|WeavyWidget.nodes}
- */
 
 /**
  * @external HTMLAudioElement

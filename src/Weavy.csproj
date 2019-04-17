@@ -310,17 +310,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -3172,6 +3172,7 @@
     <Content Include="img\icons\account-network.svg" />
     <Content Include="img\icons\account-plus.svg" />
     <Content Include="img\icons\alert.svg" />
+    <Content Include="img\icons\android.svg" />
     <Content Include="img\icons\application.svg" />
     <Content Include="img\icons\archive.svg" />
     <Content Include="img\icons\arrow-left.svg" />
@@ -3182,6 +3183,7 @@
     <Content Include="img\icons\bell.svg" />
     <Content Include="img\icons\bell-off.svg" />
     <Content Include="img\icons\box.svg" />
+    <Content Include="img\icons\calendar.svg" />
     <Content Include="img\icons\camera.svg" />
     <Content Include="img\icons\cash-usd.svg" />
     <Content Include="img\icons\cellphone-android.svg" />
@@ -3209,6 +3211,9 @@
     <Content Include="img\icons\comment.svg" />
     <Content Include="img\icons\comment-check.svg" />
     <Content Include="img\icons\comment-outline.svg" />
+    <Content Include="img\icons\content-copy.svg" />
+    <Content Include="img\icons\content-cut.svg" />
+    <Content Include="img\icons\content-paste.svg" />
     <Content Include="img\icons\content-save.svg" />
     <Content Include="img\icons\delete.svg" />
     <Content Include="img\icons\delete-forever.svg" />
@@ -3273,6 +3278,7 @@
     <Content Include="img\icons\message.svg" />
     <Content Include="img\icons\message-plus.svg" />
     <Content Include="img\icons\message-text.svg" />
+    <Content Include="img\icons\message-video.svg" />
     <Content Include="img\icons\microsoft.svg" />
     <Content Include="img\icons\minus.svg" />
     <Content Include="img\icons\minus-box-outline.svg" />
@@ -3311,6 +3317,7 @@
     <Content Include="img\icons\undo.svg" />
     <Content Include="img\icons\upload.svg" />
     <Content Include="img\icons\upload-network.svg" />
+    <Content Include="img\icons\video.svg" />
     <Content Include="img\icons\view-grid.svg" />
     <Content Include="img\icons\view-module.svg" />
     <Content Include="img\icons\weavy.svg" />
@@ -4315,6 +4322,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Hooks\SandboxHook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,17 +9,17 @@
 
     /**
      * Displaying panels in a popup window when frames are blocked. 
-     * It handles {@link ./widget#WeavyWidget+open|widget.open()} when {@link ./widget#WeavyWidget+isBlocked|widget.isBlocked} is `true`.
+     * It handles [widget.open()]{@link WeavyWidget#open} when [widget.isBlocked]{@link WeavyWidget#isBlocked} is `true`.
      * If a weavy browser extenstion is active it will try to use it for managing the popup window.
      * 
-     * @module fallback
+     * @mixin fallback
      * @returns {WeavyWidget.plugins.fallback}
      * @typicalname widget
      */
     WeavyWidget.plugins[PLUGIN_NAME] = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends module:fallback#
+         *  @lends fallback#
          */
         var widget = this;
 
@@ -172,7 +172,7 @@
      * 
      * @ignore
      * @name defaults
-     * @memberof module:fallback
+     * @memberof fallback
      * @type {Object}
      */
     WeavyWidget.plugins[PLUGIN_NAME].defaults = {
@@ -180,10 +180,10 @@
 
     /**
      * Non-optional dependencies.
-     * - {@link ./panels|panels}
+     * - {@link panels}
      * 
      * @name dependencies
-     * @memberof module:fallback
+     * @memberof fallback
      * @type {string[]}
      */
     WeavyWidget.plugins[PLUGIN_NAME].dependencies = ["panels"];

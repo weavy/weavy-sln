@@ -11,7 +11,7 @@
         commentable = comment.Parent;
     }
 
-    var url = commentable != null ? Url.Content($"~/api/{(commentable.Type == EntityType.Content ? "content" : commentable.Type.ToString().ToLower() + "s")}/{commentable.Id}/comments") : "";
+    var url = commentable != null ? Url.Content($"~/a/{(commentable.Type == EntityType.Content ? "content" : commentable.Type.ToString().ToLower() + "s")}/{commentable.Id}/comments") : "";
     int? spaceId = Model.Link is ISpaceEntity se ? se.SpaceId : null;      
 }
 <!DOCTYPE html>

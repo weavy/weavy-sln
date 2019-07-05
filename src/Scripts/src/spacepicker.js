@@ -1,9 +1,9 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.spacepicker = (function ($) {
+wvy.spacepicker = (function ($) {
     function formatSpace(space) {
         if (space.loading) return space.text;
-        return "<img class='avatar-32' src='" + weavy.url.thumb(space.thumb_url, "32x32-crop,both") + "'/> " + space.title;
+        return "<img class='avatar-32' src='" + wvy.url.thumb(space.thumb_url, "32x32-crop,both") + "'/> " + space.title;
     }
 
     function formatSpaceSelection(space) {
@@ -15,7 +15,7 @@ weavy.spacepicker = (function ($) {
         $("select[data-role=space]").each(function () {
             $(this).select2({
                 ajax: {
-                    url: weavy.url.resolve("api/spaces/search"),
+                    url: wvy.url.resolve("a/spaces/search"),
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {

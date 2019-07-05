@@ -1,4 +1,7 @@
-﻿tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
+﻿/*global tinymce, emojione */
+var wvy = wvy || {};
+
+tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
 
     // TinyMce adapter for jquery.textcomplete.js
     function TinyMceAdapter(element, completer, option) {
@@ -105,7 +108,7 @@
                 match: /\B@([a-zA-Z0-9_]+)$/,
                 search: function (term, callback) {
                     console.debug(term);
-                    $.getJSON(weavy.url.resolve("api/autocomplete/mentions"), {
+                    $.getJSON(wvy.url.resolve("a/autocomplete/mentions"), {
                         q: term,
                         top: 5
                     }).done(function (resp) {
@@ -125,7 +128,7 @@
                 // emoji strategy
                 match: /\B:([a-zA-Z0-9_]*)$/,
                 search: function (term, callback) {
-                    callback($.map(weavy.emoji.shortnames, function (shortname) {
+                    callback($.map(wvy.emoji.shortnames, function (shortname) {
                         return shortname.indexOf(term) !== -1 ? shortname : null;
                     }));
                 },
@@ -142,7 +145,7 @@
                 match: /\B\[([^\]]+)$/,
                 search: function (term, callback) {
                     console.debug(term);
-                    $.getJSON(weavy.url.resolve("api/autocomplete"), {
+                    $.getJSON(wvy.url.resolve("a/autocomplete"), {
                         q: term,
                         top: 5
                     }).done(function (resp) {
@@ -152,7 +155,7 @@
                     });
                 },
                 template: function (item) {
-                    return '<img class="avatar-24" src="' + weavy.url.thumb(item.thumb_url, "24x24-crop,both") + '" alt="" /><span>' + item.title + '</span><small> - ' + item.type + '</small>';
+                    return '<img class="avatar-24" src="' + wvy.url.thumb(item.thumb_url, "24x24-crop,both") + '" alt="" /><span>' + item.title + '</span><small> - ' + item.type + '</small>';
 
                 },
                 replace: function (item) {
@@ -163,7 +166,7 @@
         ], {
                 maxCount: 10, zIndex: 10000, onKeydown:
                     function (e, commands) {
-                        if (e.keyCode == 9) {
+                        if (e.keyCode === 9) {
                             e.preventDefault();
                             return false;
                         }
@@ -180,7 +183,7 @@
 
     // prevent tinymce from inserting new line on enter when textcomplete dropdown is open
     editor.on('keydown', function (e) {
-        if (e.keyCode == 13) {
+        if (e.keyCode === 13) {
             var body = this.getBody();
             var autocompleting = $(body).data("autocompleting");
             if (autocompleting) {

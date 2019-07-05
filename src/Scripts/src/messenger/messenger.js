@@ -1,5 +1,8 @@
-﻿var weavy = weavy || {};
-weavy.messenger = (function ($) {
+﻿/*eslint eqeqeq:1 */
+/*global Handlebars, _ */
+var wvy = wvy || {};
+
+wvy.messenger = (function ($) {
     // NOTE: IE seems to cache ajax get requests so we need to disable the jquery ajax cache
     $.ajaxSetup({ cache: false });
 
@@ -72,7 +75,7 @@ weavy.messenger = (function ($) {
         $.ajax({
             contentType: "application/json",
             method: "POST",
-            url: weavy.url.resolve("/api/conversations/" + id + "/archive")
+            url: wvy.url.resolve("/a/conversations/" + id + "/archive")
         }).done(function (data, status, xhr) {
             refreshConversation(true);
         });
@@ -83,7 +86,7 @@ weavy.messenger = (function ($) {
         $.ajax({
             contentType: "application/json",
             method: "DELETE",
-            url: weavy.url.resolve("/api/conversations/" + id + "/archive")
+            url: wvy.url.resolve("/a/conversations/" + id + "/archive")
         }).done(function (data, status, xhr) {
             refreshConversation(true);
         });
@@ -94,7 +97,7 @@ weavy.messenger = (function ($) {
         $.ajax({
             contentType: "application/json",
             method: "DELETE",
-            url: weavy.url.resolve("/api/conversations/" + id + "/leave")
+            url: wvy.url.resolve("/a/conversations/" + id + "/leave")
         }).done(function (data, status, xhr) {
             refreshConversation(true);
         });
@@ -106,7 +109,7 @@ weavy.messenger = (function ($) {
         uiRead(id);
 
         // then call server to mark as read
-        $.post(weavy.url.resolve("/api/messenger/" + id + "/read"));
+        $.post(wvy.url.resolve("/a/messenger/" + id + "/read"));
     }
 
     // mark conversation as unread
@@ -118,7 +121,7 @@ weavy.messenger = (function ($) {
         $.ajax({
             contentType: "application/json",
             method: "DELETE",
-            url: weavy.url.resolve("/api/conversations/" + id + "/read")
+            url: wvy.url.resolve("/a/conversations/" + id + "/read")
         });
     }
 
@@ -135,10 +138,10 @@ weavy.messenger = (function ($) {
             contentType: "application/json",
             method: "POST",
             data: JSON.stringify(postData),
-            url: weavy.url.resolve("/api/messenger/settings")
+            url: wvy.url.resolve("/a/messenger/settings")
         }).done(function (data, status, xhr) {
-            weavy.context.notify = data.desktop_notifications;
-            weavy.context.enter = data.enter_to_send;
+            wvy.context.notify = data.desktop_notifications;
+            wvy.context.enter = data.enter_to_send;
 
             if (refresh) {
                 refreshConversation(false);
@@ -172,7 +175,7 @@ weavy.messenger = (function ($) {
 
     // add page to pushState
     function pushState(page, id) {
-        var url = weavy.url.resolve("/messenger/" + id);
+        var url = wvy.url.resolve("/messenger/" + id);
 
         if (typeof history.pushState !== "undefined") {
             var obj = { Page: page, Url: url, Id: id };
@@ -217,7 +220,7 @@ weavy.messenger = (function ($) {
 
     // set focus
     function setTextAreaFocus() {
-        if (_emojiarea && !weavy.browser.mobile) {
+        if (_emojiarea && !wvy.browser.mobile) {
             _emojiarea.setFocus();
         }
     }
@@ -242,7 +245,7 @@ weavy.messenger = (function ($) {
 
         // make ajax request to server to get pre-rendered html for the message
         var d1 = $.ajax({
-            url: weavy.url.resolve("/messenger/m/" + message.id),
+            url: wvy.url.resolve("/messenger/m/" + message.id),
             cache: false
         });
 
@@ -250,7 +253,7 @@ weavy.messenger = (function ($) {
         var d2 = $.Deferred();
         if (insert) {
             d2 = $.ajax({
-                url: weavy.url.resolve("/messenger/c/" + message.conversation),
+                url: wvy.url.resolve("/messenger/c/" + message.conversation),
                 cache: false
             });
         } else {
@@ -273,7 +276,7 @@ weavy.messenger = (function ($) {
                         $msg.replaceWith(mhtml);
                     } else {
                         // add new messages banner (if there isn't one already)
-                        if (message.createdBy.id !== weavy.context.user && !(weavy.presence.isActive() && document.hasFocus()) && $(".new-separator").length == 0) {
+                        if (message.createdBy.id !== wvy.context.user && !(wvy.presence.isActive() && document.hasFocus()) && $(".new-separator").length == 0) {
                             $("<div class='new-separator'>New messages</div>").appendTo(".messages");
                         }
 
@@ -285,7 +288,7 @@ weavy.messenger = (function ($) {
                     $(".message[data-message=" + message.id + "] a").attr("target", "_blank");
 
                     // remove old status icons
-                    if (message.createdBy.id === weavy.context.user) {
+                    if (message.createdBy.id === wvy.context.user) {
                         $(".message.me:not([data-message=" + message.id + "]) .status:not(.status-read)").remove();
                     }
 
@@ -315,7 +318,7 @@ weavy.messenger = (function ($) {
                     $cachedHeaderAndMessages.find(".message[data-message=" + message.id + "] a").attr("target", "_blank");
 
                     // remove old status icons
-                    if (message.createdBy.id === weavy.context.user) {
+                    if (message.createdBy.id === wvy.context.user) {
                         $cachedHeaderAndMessages.find(".message.me:not([data-message=" + message.id + "]) .status:not(.status-read)").remove();
                     }
 
@@ -356,7 +359,7 @@ weavy.messenger = (function ($) {
                 refreshBadge();
             }
 
-            if (insert && message.createdBy.id !== weavy.context.user) {
+            if (insert && message.createdBy.id !== wvy.context.user) {
                 // show browser notification
                 notify(message);
             }
@@ -366,11 +369,11 @@ weavy.messenger = (function ($) {
     // display desktop notification for specified message
     function notify(message) {
 
-        weavy.audio.play("#message-sound");
+        wvy.audio.play("#message-sound");
 
         if (window.Notification) {
 
-            if (Notification.permission === "granted" && weavy.context.notify) {
+            if (Notification.permission === "granted" && wvy.context.notify) {
                 var notification = new Notification("Message from " + (message.createdBy.name || message.createdBy.username), {
                     body: message.text,
                     tag: message.id,
@@ -383,7 +386,7 @@ weavy.messenger = (function ($) {
                     var event = $.Event("browsernotification.clicked");
                     $(document).triggerHandler(event, null);
 
-                    location.href = weavy.url.resolve("/messenger/" + message.conversation);
+                    location.href = wvy.url.resolve("/messenger/" + message.conversation);
                     window.focus();
                     this.close();
                 });
@@ -397,7 +400,7 @@ weavy.messenger = (function ($) {
 
     // send typing indicator to server
     function sendTyping() {
-        weavy.realtime.invoke("messenger", "typing", _conversation);
+        wvy.realtime.invoke("messenger", "typing", _conversation);
     }
 
     // called to update gui with typing indicators
@@ -427,7 +430,7 @@ weavy.messenger = (function ($) {
             // loop over all typing events and update the gui
             for (var key in grouped) {
                 var text = "";
-                var names = _.map(grouped[key], function (item) {
+                var names = grouped[key].map(function (item) {
                     //console.debug("user is typing in conversation " + key);
                     return item.user.username;
                 });
@@ -462,7 +465,7 @@ weavy.messenger = (function ($) {
     function refreshConversation(refreshToRoot) {
         if (typeof (refreshToRoot) !== "undefined" && refreshToRoot) {
             // load start page
-            document.location.href = weavy.url.resolve("/messenger");
+            document.location.href = wvy.url.resolve("/messenger");
         } else {
             getConversation(_conversation, true, true, true);
         }
@@ -510,7 +513,7 @@ weavy.messenger = (function ($) {
             }
 
             _listXhr = $.ajax({
-                url: weavy.url.resolve("/messenger/list/" + id),
+                url: wvy.url.resolve("/messenger/list/" + id),
                 cache: false,
                 success: function (html) {
                     $(".list-group-conversations").html(html);
@@ -542,7 +545,7 @@ weavy.messenger = (function ($) {
 
             // get current html markup for conversation
             _messagesXhr = $.ajax({
-                url: weavy.url.resolve("/messenger/" + id),
+                url: wvy.url.resolve("/messenger/" + id),
                 cache: false,
                 success: function (html) {
                     // update ui with html
@@ -587,7 +590,7 @@ weavy.messenger = (function ($) {
         }
 
         _detailsXhr = $.ajax({
-            url: weavy.url.resolve("/messenger/d/" + id),
+            url: wvy.url.resolve("/messenger/d/" + id),
             cache: false,
             success: function (html) {
                 $drawer.html(html);
@@ -597,7 +600,7 @@ weavy.messenger = (function ($) {
     }
 
     function validateEmail(email) {
-        var re = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        var re = /^([a-zA-Z0-9_\-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
         return re.test(email);
     }
 
@@ -610,7 +613,7 @@ weavy.messenger = (function ($) {
         //////////////////////////////////
 
         // called by server to let client know the active/away status of a user
-        weavy.realtime.on("presence.weavy", function (event, data) {
+        wvy.realtime.on("presence.weavy", function (event, data) {
             if (data.status === "away") {
                 $(".presence[data-user=" + data.user + "]").removeClass("active");
                 $(".seen[data-user=" + data.user + "]").text("Away");
@@ -621,7 +624,7 @@ weavy.messenger = (function ($) {
         });
 
         // called by server to let client know about typing events
-        weavy.realtime.on("typing.weavy", function (event, data) {
+        wvy.realtime.on("typing.weavy", function (event, data) {
             // track time when we received this event
             data.time = Date.now();
 
@@ -640,19 +643,19 @@ weavy.messenger = (function ($) {
         });
 
         // called by server to let client know about new messages
-        weavy.realtime.on("message-inserted.weavy", function (event, message) {
+        wvy.realtime.on("message-inserted.weavy", function (event, message) {
 
             console.debug("received message " + message.id);
 
-            if (message.createdBy.id !== weavy.context.user) {
-                if (_conversation === message.conversation && weavy.presence.isActive() && document.hasFocus()) {
+            if (message.createdBy.id !== wvy.context.user) {
+                if (_conversation === message.conversation && wvy.presence.isActive() && document.hasFocus()) {
                     // mark conversation as read (also tells server that message was delivered)
                     console.debug("marking conversation " + message.conversation + " as read");
-                    $.post(weavy.url.resolve("/api/messenger/" + message.conversation + "/read"));
+                    $.post(wvy.url.resolve("/a/messenger/" + message.conversation + "/read"));
                 } else {
                     // let server know that we received the message
                     console.debug("marking message " + message.id + " as delivered");
-                    $.post(weavy.url.resolve("/api/messenger/" + message.id + "/delivered"));
+                    $.post(wvy.url.resolve("/a/messenger/" + message.id + "/delivered"));
                 }
             }
 
@@ -670,15 +673,15 @@ weavy.messenger = (function ($) {
         });
 
         // called by server to let client know that a message was delivered
-        weavy.realtime.on("message-delivered.weavy", function (event, data) {
+        wvy.realtime.on("message-delivered.weavy", function (event, data) {
             console.debug("message " + data.message.id + " in conversation " + data.message.conversation + " was delivered");
             messageUpserted(data.message, false);
         });
 
         // called by server to let client know that a conversation was marked as read/unread
-        weavy.realtime.on("conversation-read.weavy", function (event, data) {
+        wvy.realtime.on("conversation-read.weavy", function (event, data) {
             console.debug("conversation " + data.conversation.id + " was " + (data.conversation.isRead ? "read" : "unread"));
-            if (data.user.id === weavy.context.user) {
+            if (data.user.id === wvy.context.user) {
                 if (data.conversation.isRead) {
                     uiRead(data.conversation.id);
                 } else {
@@ -701,7 +704,7 @@ weavy.messenger = (function ($) {
                 var id = $last.data("message");
 
                 if (!isNaN(id)) {
-                    $.get(weavy.url.resolve("/messenger/m/" + id), function (html) {
+                    $.get(wvy.url.resolve("/messenger/m/" + id), function (html) {
                         // update last message
                         $last.replaceWith(html);
                         // remove previous read marker
@@ -719,7 +722,7 @@ weavy.messenger = (function ($) {
 
         // handle the back and forward buttons
         $(window).bind('popstate', function (event) {
-            if (weavy.browser.mobile) {
+            if (wvy.browser.mobile) {
                 return;
             }
 
@@ -770,13 +773,13 @@ weavy.messenger = (function ($) {
 
         // toggle drawers
         $(document).on("click", "[data-toggle=drawer-invite]", function (evt) {
-            if (!weavy.browser.embedded) {
+            if (!wvy.browser.embedded) {
                 evt.preventDefault();
                 var drawer = "." + $(this).data("toggle");
                 $(drawer).toggleClass("drawer-visible");
             } else {
                 evt.preventDefault();
-                var url = weavy.url.resolve($(this).attr("href"));
+                var url = wvy.url.resolve($(this).attr("href"));
                 window.parent.postMessage({ "name": "personal", "url": url }, "*");
             }
         });
@@ -815,7 +818,7 @@ weavy.messenger = (function ($) {
                     $input.removeClass("is-invalid");
                     $drawer.toggleClass("drawer-visible");
                     if ($drawer.hasClass("drawer-visible")) {
-                        $.get(weavy.url.resolve("/messenger/drawer/room/members"), function (html) {
+                        $.get(wvy.url.resolve("/messenger/drawer/room/members"), function (html) {
                             $(".drawer-body", $drawer).html(html);
                         });
                     }
@@ -830,7 +833,7 @@ weavy.messenger = (function ($) {
             var drawer = "." + $(this).data("toggle");
             var $drawer = $(drawer).toggleClass("drawer-visible");
             if ($drawer.hasClass("drawer-visible")) {
-                $.get(weavy.url.resolve("/messenger/drawer/message"), function (html) {
+                $.get(wvy.url.resolve("/messenger/drawer/message"), function (html) {
                     $(drawer + " .drawer-body").html(html);
                 });
             }
@@ -848,7 +851,7 @@ weavy.messenger = (function ($) {
                 $(".btn-search", $context).addClass("d-none");
 
                 // get search result
-                $.get(weavy.url.resolve("/messenger/search/?q=" + query + "&search_archived=" + archive), function (html) {
+                $.get(wvy.url.resolve("/messenger/search/?q=" + query + "&search_archived=" + archive), function (html) {
                     $(".list-group-conversations").hide();
                     $(".search-result-list").html(html).show();
                 });
@@ -888,8 +891,8 @@ weavy.messenger = (function ($) {
             }
 
             // get search result
-            var $context = $(this).closest(".drawer-body");
-            $.get(weavy.url.resolve("/messenger/drawer/message?q=" + query), function (html) {
+            $context = $(this).closest(".drawer-body");
+            $.get(wvy.url.resolve("/messenger/drawer/message?q=" + query), function (html) {
                 $(".list-group", $context).html(html);
             });
         });
@@ -923,8 +926,8 @@ weavy.messenger = (function ($) {
             }
 
             // get search result
-            var $context = $(this).closest(".drawer-body");
-            $.get(weavy.url.resolve("/messenger/drawer/room/members?" + data), function (html) {
+            $context = $(this).closest(".drawer-body");
+            $.get(wvy.url.resolve("/messenger/drawer/room/members?" + data), function (html) {
                 $(".list-group", $context).html(html);
             });
 
@@ -961,7 +964,7 @@ weavy.messenger = (function ($) {
                 $(this).addClass("selected");
             }
 
-            var $selected = $("input[name=users]", $form);
+            $selected = $("input[name=users]", $form);
             if ($selected.length) {
                 $form.find(":submit").removeAttr("disabled");
             } else {
@@ -981,7 +984,7 @@ weavy.messenger = (function ($) {
             $.ajax({
                 contentType: "application/json",
                 method: "POST",
-                url: weavy.url.resolve("/api/conversations/members"),
+                url: wvy.url.resolve("/a/conversations/members"),
                 data: JSON.stringify(data)
             }).done(function (data, status, xhr) {
                 // refresh details pane
@@ -1001,7 +1004,7 @@ weavy.messenger = (function ($) {
             $.ajax({
                 contentType: "application/json",
                 method: "DELETE",
-                url: weavy.url.resolve("/api/conversations/" + _conversation + "/member/" + id)
+                url: wvy.url.resolve("/a/conversations/" + _conversation + "/member/" + id)
             }).fail(function (xhr, status, error) {
                 console.error(error);
             });
@@ -1012,7 +1015,7 @@ weavy.messenger = (function ($) {
             var drawer = "." + $(this).data("toggle");
             var $drawer = $(drawer).toggleClass("drawer-visible");
             if ($drawer.hasClass("drawer-visible")) {
-                $.get(weavy.url.resolve("/messenger/drawer/archive"), function (html) {
+                $.get(wvy.url.resolve("/messenger/drawer/archive"), function (html) {
                     $(drawer + " .drawer-body").html(html);
                 });
             }
@@ -1042,7 +1045,7 @@ weavy.messenger = (function ($) {
             evt.preventDefault();
             var id = $(this).data("profile");
 
-            $app = $(".app");
+            var $app = $(".app");
             _activePane = $app.attr("class").replace("app ", "").trim();
 
             // hide details panel if visible
@@ -1059,7 +1062,7 @@ weavy.messenger = (function ($) {
             }
 
             _detailsXhr = $.ajax({
-                url: weavy.url.resolve("/messenger/u/" + id),
+                url: wvy.url.resolve("/messenger/u/" + id),
                 cache: false,
                 success: function (html) {
                     $drawer.html(html);
@@ -1112,7 +1115,7 @@ weavy.messenger = (function ($) {
             var $drawer = $(drawer).toggleClass("drawer-visible");
 
             if ($drawer.hasClass("drawer-visible")) {
-                $.get(weavy.url.resolve("/messenger/drawer/room/members"), function (html) {
+                $.get(wvy.url.resolve("/messenger/drawer/room/members"), function (html) {
                     $(drawer + " .drawer-body").html(html);
                 });
             }
@@ -1223,7 +1226,7 @@ weavy.messenger = (function ($) {
             $.ajax({
                 contentType: "application/json",
                 type: "POST",
-                url: weavy.url.resolve("/api/messenger/" + _conversation),
+                url: wvy.url.resolve("/a/messenger/" + _conversation),
                 data: JSON.stringify(data),
                 beforeSend: function (xhr, settings) {
 
@@ -1320,7 +1323,7 @@ weavy.messenger = (function ($) {
             $context.slideDown(200);                        
         })
 
-        // load conversation from widget
+        // load conversation from weavy client
         window.addEventListener("message", onMessageReceived, false);
 
         // responds to messages sent from outer frame
@@ -1379,7 +1382,7 @@ weavy.messenger = (function ($) {
                 });
             });
 
-        } else if (weavy.browser.mobile) {
+        } else if (wvy.browser.mobile) {
             // hide checkbox if on mobile
             $(".notification-setting").remove();
             $(".notification-alerts").hide();
@@ -1417,7 +1420,7 @@ weavy.messenger = (function ($) {
                 },
                 keypress: function (editor, evt) {
                     var key = evt.which || evt.keyCode;
-                    if ((evt.ctrlKey && (key === 10 || key === 13)) || (weavy.context.enter && (key === 10 || key === 13) && !evt.shiftKey && !weavy.browser.mobile)) {
+                    if ((evt.ctrlKey && (key === 10 || key === 13)) || (wvy.context.enter && (key === 10 || key === 13) && !evt.shiftKey && !wvy.browser.mobile)) {
                         evt.preventDefault();
                         editor.blur();
                         var $form = $(editor).closest("form");
@@ -1484,7 +1487,7 @@ weavy.messenger = (function ($) {
                     match: noPrefix ? /((@[a-zA-Z0-9_]+)|([a-zA-Z0-9_]+))$/ : /\B@([a-zA-Z0-9_]+)$/,
                     search: function (term, callback) {
 
-                        $.getJSON(weavy.url.resolve("/api/autocomplete/mentions"), {
+                        $.getJSON(wvy.url.resolve("/a/autocomplete/mentions"), {
                             q: term,
                             top: 5
                         }).done(function (resp) {
@@ -1496,7 +1499,7 @@ weavy.messenger = (function ($) {
                     },
                     index: 1,
                     template: function (item) {
-                        var html = '<img class="img-24 avatar mr-1" src="' + weavy.url.thumb(item.thumb_url, "48x48-crop,both") + '" alt="" /><span>' + (item.name || item.username);
+                        var html = '<img class="img-24 avatar mr-1" src="' + wvy.url.thumb(item.thumb_url, "48x48-crop,both") + '" alt="" /><span>' + (item.name || item.username);
                         if (item.username) {
                             html += ' <small>@' + item.username + '</small>';
                         }
@@ -1520,7 +1523,7 @@ weavy.messenger = (function ($) {
                     match: /\[([^\]]+)$/,
 
                     search: function (term, callback) {
-                        $.getJSON(weavy.url.resolve("/api/autocomplete"), { q: term, top: top }).done(function (resp) {
+                        $.getJSON(wvy.url.resolve("/a/autocomplete"), { q: term, top: top }).done(function (resp) {
                             callback(resp);
                         }).fail(function () {
                             callback([]);
@@ -1559,7 +1562,7 @@ weavy.messenger = (function ($) {
 
         // configure file uploads
         $("#main").fileupload({
-            url: weavy.url.resolve("/api/blobs"),
+            url: wvy.url.resolve("/a/blobs"),
             dataType: "json",
             paramName: "blobs",
             singleFileUploads: false,

@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.guid = (function($){
+wvy.guid = (function($){
     var get = function () {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)

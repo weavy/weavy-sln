@@ -1,4 +1,4 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
 (function ($) {
     // disable button when clicked

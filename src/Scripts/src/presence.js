@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.presence = (function ($) {
+wvy.presence = (function ($) {
     // variable for keeping track of current presence status
     var _active = true;
 
@@ -23,14 +23,14 @@ weavy.presence = (function ($) {
             _active = true;
 
             // tell server that connection is active
-            weavy.realtime.invoke("rtm", "setActive");
+            wvy.realtime.invoke("rtm", "setActive");
         }
     }
 
     function ping() {
         if (_active) {
             // ping the server to indicate that user is still active on this connection
-            weavy.realtime.invoke("rtm", "setActive");
+            wvy.realtime.invoke("rtm", "setActive");
         }
     }
 
@@ -40,10 +40,10 @@ weavy.presence = (function ($) {
     }
 
     // register callback for server presence event
-    weavy.realtime.on("presence.weavy", function (event, data) {
+    wvy.realtime.on("presence.weavy", function (event, data) {
         // update presence indicator
         if (data.status === "away") {
-            if (data.user === weavy.context.user) {
+            if (data.user === wvy.context.user) {
                 console.debug("I'm away");
             }
             $(".presence[data-active=" + data.user + "]").removeAttr("data-active").attr("data-away", data.user);

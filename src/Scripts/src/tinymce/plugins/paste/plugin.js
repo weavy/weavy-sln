@@ -4,6 +4,7 @@
 
 /*jshint smarttabs:true, undef:true, latedef:true, curly:true, bitwise:true, camelcase:true */
 /*globals $code */
+var wvy = wvy || {};
 
 (function (exports, undefined) {
     "use strict";
@@ -49,7 +50,7 @@
 
     function resolve(id) {
         var target = exports;
-        var fragments = id.split(/[.\/]/);
+        var fragments = id.split(/[./]/);
 
         for (var fi = 0; fi < fragments.length; ++fi) {
             if (!target[fragments[fi]]) {
@@ -68,7 +69,7 @@
         for (i = 0; i < ids.length; i++) {
             target = exports;
             id = ids[i];
-            fragments = id.split(/[.\/]/);
+            fragments = id.split(/[./]/);
 
             for (var fi = 0; fi < fragments.length - 1; ++fi) {
                 if (target[fragments[fi]] === undefined) {
@@ -121,7 +122,7 @@
     ], function (Tools, DomParser, Schema) {
         function filter(content, items) {
             Tools.each(items, function (v) {
-                if (v.constructor == RegExp) {
+                if (v.constructor === RegExp) {
                     content = content.replace(v, '');
                 } else {
                     content = content.replace(v[0], v[1]);
@@ -163,7 +164,7 @@
                     return;
                 }
 
-                if (node.type == 3) {
+                if (node.type === 3) {
                     text += node.value;
                 }
 
@@ -180,7 +181,7 @@
                 if (blockElements[name] && currentNode.next) {
                     text += '\n';
 
-                    if (name == 'p') {
+                    if (name === 'p') {
                         text += '\n';
                     }
                 }
@@ -334,7 +335,7 @@
                         [/\n/g, "<br />"]
                     ]);
 
-                    if (text.indexOf('<p>') != -1) {
+                    if (text.indexOf('<p>') !== -1) {
                         text = forcedRootBlockStartHtml + text;
                     }
                 }
@@ -378,14 +379,14 @@
                         return rects[0];
                     }
 
-                    if (!rng.collapsed || container.nodeType != 1) {
+                    if (!rng.collapsed || container.nodeType !== 1) {
                         return;
                     }
 
                     node = container.childNodes[lastRng.startOffset];
 
                     // Skip empty whitespace nodes
-                    while (node && node.nodeType == 3 && !node.data.length) {
+                    while (node && node.nodeType === 3 && !node.data.length) {
                         node = node.nextSibling;
                     }
 
@@ -395,7 +396,7 @@
 
                     // Check if the location is |<br>
                     // TODO: Might need to expand this to say |<table>
-                    if (node.tagName == 'BR') {
+                    if (node.tagName === 'BR') {
                         textNode = dom.doc.createTextNode('\uFEFF');
                         node.parentNode.insertBefore(textNode, node);
 
@@ -427,11 +428,11 @@
                         // Check if we can find a closer location by checking the range element
                         var container = lastRng.startContainer;
                         if (container) {
-                            if (container.nodeType == 3 && container.parentNode != body) {
+                            if (container.nodeType === 3 && container.parentNode !== body) {
                                 container = container.parentNode;
                             }
 
-                            if (container.nodeType == 1) {
+                            if (container.nodeType === 1) {
                                 top = dom.getPos(container, scrollContainer || body).y;
                             }
                         }
@@ -449,7 +450,7 @@
 
                 // Move paste bin out of sight since the controlSelection rect gets displayed otherwise on IE and Gecko
                 if (Env.ie || Env.gecko) {
-                    dom.setStyle(pasteBinElm, 'left', dom.getStyle(body, 'direction', true) == 'rtl' ? 0xFFFF : -0xFFFF);
+                    dom.setStyle(pasteBinElm, 'left', dom.getStyle(body, 'direction', true) === 'rtl' ? 0xFFFF : -0xFFFF);
                 }
 
                 // Prevent focus events from bubbeling fixed FocusManager issues
@@ -500,12 +501,12 @@
                     clone = pasteBinClones[i];
 
                     // Pasting plain text produces pastebins in pastebinds makes sence right!?
-                    if (clone.firstChild && clone.firstChild.id == 'mcepastebin') {
+                    if (clone.firstChild && clone.firstChild.id === 'mcepastebin') {
                         clone = clone.firstChild;
                     }
 
                     cloneHtml = clone.innerHTML;
-                    if (html != pasteBinDefaultContent) {
+                    if (html !== pasteBinDefaultContent) {
                         html += cloneHtml;
                     }
                 }
@@ -527,7 +528,7 @@
                     if (dataTransfer.getData) {
                         var legacyText = dataTransfer.getData('Text');
                         if (legacyText && legacyText.length > 0) {
-                            if (legacyText.indexOf(mceInternalUrlPrefix) == -1) {
+                            if (legacyText.indexOf(mceInternalUrlPrefix) === -1) {
                                 data['text/plain'] = legacyText;
                             }
                         }
@@ -568,7 +569,7 @@
                 
                 function processItems(items) {
                     var i, item, reader, hadImage = false;
-                    var uploadURL = weavy.url.resolve("/api/blobs");
+                    var uploadURL = wvy.url.resolve("/a/blobs");
                     var formData;
                     var imageDataOnly = true;
 
@@ -608,7 +609,7 @@
                                     }
 
                                     formData = new FormData();
-                                    formData.append("blobs", file, "image-" + weavy.guid.get() + type);
+                                    formData.append("blobs", file, "image-" + wvy.guid.get() + type);
 
                                     $.ajax({
                                         url: uploadURL,
@@ -676,7 +677,7 @@
             function isBrokenAndroidClipboardEvent(e) {
                 var clipboardData = e.clipboardData;
 
-                return navigator.userAgent.indexOf('Android') != -1 && clipboardData && clipboardData.items && clipboardData.items.length === 0;
+                return navigator.userAgent.indexOf('Android') !== -1 && clipboardData && clipboardData.items && clipboardData.items.length === 0;
             }
 
             function getCaretRangeFromEvent(e) {
@@ -688,7 +689,7 @@
             }
 
             function isKeyboardPasteEvent(e) {
-                return (VK.metaKeyPressed(e) && e.keyCode == 86) || (e.shiftKey && e.keyCode == 45);
+                return (VK.metaKeyPressed(e) && e.keyCode === 86) || (e.shiftKey && e.keyCode === 45);
             }
 
             function registerEventHandlers() {
@@ -702,11 +703,11 @@
 
                     // Ctrl+V or Shift+Insert
                     if (isKeyboardPasteEvent(e) && !e.isDefaultPrevented()) {
-                        keyboardPastePlainTextState = e.shiftKey && e.keyCode == 86;
+                        keyboardPastePlainTextState = e.shiftKey && e.keyCode === 86;
 
                         // Edge case on Safari on Mac where it doesn't handle Cmd+Shift+V correctly
                         // it fires the keydown but no paste or keyup so we are left with a paste bin
-                        if (keyboardPastePlainTextState && Env.webkit && navigator.userAgent.indexOf('Version/') != -1) {
+                        if (keyboardPastePlainTextState && Env.webkit && navigator.userAgent.indexOf('Version/') !== -1) {
                             return;
                         }
 
@@ -742,7 +743,7 @@
                     var clipboardDelay = new Date().getTime() - clipboardTimer;
 
                     var isKeyBoardPaste = (new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay) < 1000;
-                    var plainTextMode = self.pasteFormat == "text" || keyboardPastePlainTextState;
+                    var plainTextMode = self.pasteFormat === "text" || keyboardPastePlainTextState;
 
                     keyboardPastePlainTextState = false;
 
@@ -784,7 +785,7 @@
 
                             // If paste bin is empty try using plain text mode
                             // since that is better than nothing right
-                            if (content == pasteBinDefaultContent) {
+                            if (content === pasteBinDefaultContent) {
                                 plainTextMode = true;
                             }
                         }
@@ -808,7 +809,7 @@
                         if (plainTextMode) {
                             // Use plain text contents from Clipboard API unless the HTML contains paragraphs then
                             // we should convert the HTML to plain text since works better when pasting HTML/Word contents as plain text
-                            if (hasContentType(clipboardContent, 'text/plain') && content.indexOf('</p>') == -1) {
+                            if (hasContentType(clipboardContent, 'text/plain') && content.indexOf('</p>') === -1) {
                                 content = clipboardContent['text/plain'];
                             } else {
                                 content = Utils.innerText(content);
@@ -817,7 +818,7 @@
 
                         // If the content is the paste bin default HTML then it was
                         // impossible to get the cliboard data out.
-                        if (content == pasteBinDefaultContent) {
+                        if (content === pasteBinDefaultContent) {
                             if (!isKeyBoardPaste) {
                                 editor.windowManager.alert('Please use Ctrl+V/Cmd+V keyboard shortcuts to paste contents.');
                             }
@@ -834,7 +835,7 @@
                 });
 
                 editor.on('dragstart dragend', function (e) {
-                    draggingInternally = e.type == 'dragstart';
+                    draggingInternally = e.type === 'dragstart';
                 });
 
                 editor.on('drop', function (e) {
@@ -964,7 +965,7 @@
             return (
                 (/<font face="Times New Roman"|class="?Mso|style="[^"]*\bmso-|style='[^'']*\bmso-|w:WordDocument/i).test(content) ||
                 (/class="OutlineElement/).test(content) ||
-                (/id="?docs\-internal\-guid\-/.test(content))
+                (/id="?docs-internal-guid-/.test(content))
             );
         }
 
@@ -977,8 +978,8 @@
             patterns = [
                 /^[IVXLMCD]{1,2}\.[ \u00a0]/,  // Roman upper case
                 /^[ivxlmcd]{1,2}\.[ \u00a0]/,  // Roman lower case
-                /^[a-z]{1,2}[\.\)][ \u00a0]/,  // Alphabetical a-z
-                /^[A-Z]{1,2}[\.\)][ \u00a0]/,  // Alphabetical A-Z
+                /^[a-z]{1,2}[.)][ \u00a0]/,  // Alphabetical a-z
+                /^[A-Z]{1,2}[.)][ \u00a0]/,  // Alphabetical A-Z
                 /^[0-9]+\.[ \u00a0]/,          // Numeric lists
                 /^[\u3007\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d]+\.[ \u00a0]/, // Japanese
                 /^[\u58f1\u5f10\u53c2\u56db\u4f0d\u516d\u4e03\u516b\u4e5d\u62fe]+\.[ \u00a0]/  // Chinese
@@ -1075,7 +1076,7 @@
                         var level = paragraphNode._listLevel || lastLevel;
 
                         // Handle list nesting
-                        if (level != lastLevel) {
+                        if (level !== lastLevel) {
                             if (level < lastLevel) {
                                 // Move to parent list
                                 if (currentListNode) {
@@ -1088,7 +1089,7 @@
                             }
                         }
 
-                        if (!currentListNode || currentListNode.name != listName) {
+                        if (!currentListNode || currentListNode.name !== listName) {
                             prevListNode = prevListNode || currentListNode;
                             currentListNode = new Node(listName, 1);
 
@@ -1134,7 +1135,7 @@
                     for (var i = 0; i < elements.length; i++) {
                         node = elements[i];
 
-                        if (node.name == 'p' && node.firstChild) {
+                        if (node.name === 'p' && node.firstChild) {
                             // Find first text node in paragraph
                             var nodeText = getText(node);
 
@@ -1217,7 +1218,7 @@
 
                             case "font-weight":
                             case "font-style":
-                                if (value != "normal") {
+                                if (value !== "normal") {
                                     outputStyles[name] = value;
                                 }
                                 return;
@@ -1243,7 +1244,7 @@
                         }
 
                         // Output only valid styles
-                        if (retainStyleProperties == "all" || (validStyles && validStyles[name])) {
+                        if (retainStyleProperties === "all" || (validStyles && validStyles[name])) {
                             outputStyles[name] = value;
                         }
                     });
@@ -1284,7 +1285,7 @@
 
                         // Remove comments, scripts (e.g., msoShowComment), XML tag, VML content,
                         // MS Office namespaced tags, and a few other tags
-                        /<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|img|meta|link|style|\w:\w+)(?=[\s\/>]))[^>]*>/gi,
+                        /<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|img|meta|link|style|\w:\w+)(?=[\s/>]))[^>]*>/gi,
 
                         // Convert <s> into <strike> for line-though
                         [/<(\/?)s>/gi, "<$1strike>"],
@@ -1344,7 +1345,7 @@
                             node.attr('style', filterStyles(node, node.attr('style')));
 
                             // Remove pointess spans
-                            if (node.name == 'span' && node.parent && !node.attributes.length) {
+                            if (node.name === 'span' && node.parent && !node.attributes.length) {
                                 node.unwrap();
                             }
                         }
@@ -1384,7 +1385,7 @@
                             href = node.attr('href');
                             name = node.attr('name');
 
-                            if (href && href.indexOf('#_msocom_') != -1) {
+                            if (href && href.indexOf('#_msocom_') !== -1) {
                                 node.remove();
                                 continue;
                             }
@@ -1531,7 +1532,7 @@
                 // Filter away styles that isn't matching the target node
                 var webKitStyles = editor.settings.paste_webkit_styles;
 
-                if (editor.settings.paste_remove_styles_if_webkit === false || webKitStyles == "all") {
+                if (editor.settings.paste_remove_styles_if_webkit === false || webKitStyles === "all") {
                     return content;
                 }
 
@@ -1558,7 +1559,7 @@
                                 currentValue = dom.toHex(currentValue);
                             }
 
-                            if (currentValue != inputValue) {
+                            if (currentValue !== inputValue) {
                                 outputStyles[webKitStyles[i]] = inputValue;
                             }
                         }
@@ -1624,7 +1625,7 @@
             var self = this, clipboard, settings = editor.settings;
 
             function togglePlainTextPaste() {
-                if (clipboard.pasteFormat == "text") {
+                if (clipboard.pasteFormat === "text") {
                     this.active(false);
                     clipboard.pasteFormat = "html";
                 } else {
@@ -1699,7 +1700,7 @@
                 icon: 'pastetext',
                 tooltip: 'Paste as text',
                 onclick: togglePlainTextPaste,
-                active: self.clipboard.pasteFormat == "text"
+                active: self.clipboard.pasteFormat === "text"
             });
 
             editor.addMenuItem('pastetext', {

@@ -1,0 +1,48 @@
+﻿@{
+    Layout = null;
+    var loader = new WeavyLoaderOptions { Minified = true, Bundle = true, Extended = true, Global = "weavy" };
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Widget Test</title>
+</head>
+<body>
+    <style id="weavyStyleOverrides" media="not all">
+        .weavy-dock {
+            border-radius: .5rem !important;
+            background-color: rgba(33,33,33,0.85) !important;
+        }
+
+        .weavy-button:not(.weavy-open) svg {
+            fill: #fafafa !important;
+        }
+
+        .weavy-button-messenger.weavy-dot {
+            background: #666 !important;
+        }
+
+        /*#weavy-panel-authentication-wy-full, #weavy-panel-authentication-wy-full{
+            display:none;
+        }*/
+
+    </style>
+
+    <div>
+        <button class="btn btn-primary" onclick="window.pstate = window.pstate || 0; history.pushState(null, 'Test 1', 'dock?' + ++window.pstate);">History Push</button>
+        <button class="btn btn-primary" onclick="window.hstate = window.hstate || 0; window.location.hash = '#' + ++window.hstate;">Hash Push</button>
+        <button class="btn btn secondary" onclick="weavy.addStyles(document.getElementById('weavyStyleOverrides').textContent);">Change style</button>
+    </div>
+    <div>
+        @Html.Partial("_LoremIpsum")
+    </div>
+
+    @*<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-1.12.4.min.js" crossorigin="anonymous"></script>*@
+
+    @Html.Raw(loader.ToString())
+</body>
+</html>

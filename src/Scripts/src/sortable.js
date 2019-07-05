@@ -1,4 +1,4 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
 // See https://github.com/psfpro/bootstrap-html5sortable
 

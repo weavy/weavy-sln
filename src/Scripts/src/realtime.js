@@ -1,9 +1,9 @@
-var weavy = weavy || {};
-if (weavy.realtime && weavy.realtime.destroy) {
-    console.log("recreating weavy.realtime");
-    weavy.realtime.destroy();
+var wvy = wvy || {};
+if (wvy.realtime && wvy.realtime.destroy) {
+    console.log("recreating wvy.realtime");
+    wvy.realtime.destroy();
 }
-weavy.realtime = (function ($) {
+wvy.realtime = (function ($) {
     var _events = [];
 
     // attach an event handler for the specified server event, e.g. "presence", "typing" etc (see PushService for a list of built-in events)
@@ -16,12 +16,12 @@ weavy.realtime = (function ($) {
     // invoke a method on a server hub, e.g. "SetActive" on the RealTimeHub (rtm) or "Typing" on the MessengerHub (messenger).
     function invoke(hub, method, data) {
         var args = data ? [method, data] : [method];
-        if (weavy.connection.connection.state === $.signalR.connectionState.connected) {
-            var proxy = weavy.connection.proxies[hub];
+        if (wvy.connection.connection.state === $.signalR.connectionState.connected) {
+            var proxy = wvy.connection.proxies[hub];
             proxy.invoke.apply(proxy, args).fail(function (error) {
                 console.error(error);
             });
-        } else if (weavy.browser && weavy.browser.embedded) {
+        } else if (wvy.browser && wvy.browser.embedded) {
             // if embedded then execute invoke message from host page
             window.parent.postMessage({ name: "invoke", hub: hub, args: args }, "*")
         }
@@ -39,9 +39,9 @@ weavy.realtime = (function ($) {
                 break;
             case "alert":
                 if (e.data.eventName === "show") {
-                    weavy.alert.alert(e.data.data.type, e.data.data.title, null, e.data.data.id);
+                    wvy.alert.alert(e.data.data.type, e.data.data.title, null, e.data.data.id);
                 } else {
-                    weavy.alert.close(e.data.data);
+                    wvy.alert.close(e.data.data);
                 }
                 break;
             default:
@@ -60,8 +60,8 @@ weavy.realtime = (function ($) {
         });
         _events = [];
 
-        weavy.realtime = null;
-        delete weavy.realtime;
+        wvy.realtime = null;
+        delete wvy.realtime;
     }
 
     return {

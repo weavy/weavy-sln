@@ -39,5 +39,5 @@ ehthumbs.db
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
 
-# Include our libs
+# Include Weavy libs
 !/lib/

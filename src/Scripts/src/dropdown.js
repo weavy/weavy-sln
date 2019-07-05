@@ -1,4 +1,4 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
 (function ($) {
     document.addEventListener("turbolinks:before-cache", function (e) {

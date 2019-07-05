@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.space = (function ($) {
+wvy.space = (function ($) {
 
     // attach click event handler to [data-toggle=join]
     $(document).on("click", "[data-toggle=join]", function (e) {
@@ -18,7 +18,7 @@ weavy.space = (function ($) {
         $("[data-toggle=join][data-id=" + id + "]").removeClass("btn-outline-success").addClass("btn-success").text("Joined");
 
         // call api to join space
-        weavy.api.join(id);
+        wvy.api.join(id);
     }
 
     // leave specified space
@@ -27,7 +27,7 @@ weavy.space = (function ($) {
         $("[data-toggle=join][data-id=" + id + "]").removeClass("btn-success").addClass("btn-outline-success").text("Join");
 
         // call api to leave space
-        weavy.api.leave(id);
+        wvy.api.leave(id);
     }
 
     return {

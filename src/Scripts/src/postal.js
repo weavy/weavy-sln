@@ -1,13 +1,13 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-// post messages between widget and weavy
-weavy.postal = (function ($) {
+// post messages between wvy and Weavy()
+wvy.postal = (function ($) {
 
     var self = this;
     var messageQueue = [];
 
     this.windowName = null;
-    this.widgetId = null;
+    this.weavyId = null;
     this.panelId = null;
     this.weavyUrl = null;
     this.hasContext = false;
@@ -18,7 +18,7 @@ weavy.postal = (function ($) {
                 self.weavyUrl = e.data.weavyUrl;
                 self.windowName = e.data.windowName;
                 self.panelId = e.data.panelId;
-                self.widgetId = e.data.widgetId;
+                self.weavyId = e.data.weavyId;
                 self.hasContext = true;
 
                 if (messageQueue.length) {
@@ -34,7 +34,7 @@ weavy.postal = (function ($) {
 
     function getContext() {
         return {
-            widgetId: self.widgetId,
+            weavyId: self.weavyId,
             windowName: self.windowName,
             panelId: self.panelId,
             weavyUrl: self.weavyUrl,
@@ -48,12 +48,12 @@ weavy.postal = (function ($) {
             message.sourceWeavyUrl = self.weavyUrl;
             message.sourceWindowName = self.windowName;
             message.sourcePanelId = self.panelId;
-            message.sourceWidgetId = self.widgetId;
+            message.sourceWeavyId = self.weavyId;
 
             try {
                 if (win && win !== window) {
                     win.postMessage(message, "*");
-                    console.debug("Posted message", self.windowName, self.widgetId, message.name);
+                    console.debug("Posted message", self.windowName, self.weavyId, message.name);
                 }
             } catch (e) {
                 console.error("Error posting message", message, e);
@@ -64,22 +64,22 @@ weavy.postal = (function ($) {
 
     }
 
-    $(document).on("click", "[data-widget-event]", function (e) {
+    $(document).on("click", "[data-weavy-event]", function (e) {
         e.preventDefault();
 
-        var name = $(this).data("widget-name");
+        var name = $(this).data("weavy-name");
 
         post.call(self, { name: name });
 
         if (name === "signing-out") {
             var url = $(this).attr("href");
-            // give the widget a chance to disconnect from the hub
+            // give weavy client a chance to disconnect from the hub
             window.setTimeout(function () { window.location.href = url }, 500);
         }
     });
 
-    $(document).on("submit", "[data-widget-event-notify]", function (e) {
-        var name = $(this).data("widgetEventNotify");
+    $(document).on("submit", "[data-weavy-event-notify]", function (e) {
+        var name = $(this).data("weavyEventNotify");
         post.call(self, { name: name });
     });
 

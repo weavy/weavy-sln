@@ -1,6 +1,7 @@
-﻿var weavy = weavy || {};
+﻿/*global tinymce, editorType */
+var wvy = wvy || {};
 
-weavy.tiny = (function ($) {
+wvy.tiny = (function ($) {
 
     document.addEventListener("turbolinks:load", init);
     document.addEventListener("turbolinks:before-cache", destroy);
@@ -61,7 +62,7 @@ weavy.tiny = (function ($) {
                 var url = field.val();
                 if (url.length > 0) {
                     var external = true;
-                    if (url.indexOf("/") == 0) {
+                    if (url.indexOf("/") === 0) {
                         external = false;
                     }
                     parent.tinymce.activeEditor.windowManager.getParams().insertLink(url, url, external);
@@ -114,10 +115,10 @@ weavy.tiny = (function ($) {
                 group.removeClass("has-error");
 
                 // basic check for duplicate filenames
-                var existing = _.map($(".result [data-filename]"), function (f) { return $(f).data("filename") });
+                var existing = $(".result [data-filename]").map(function (f) { return $(f).data("filename") });
 
-                _.each(data.files, function (file) {
-                    if (_.contains(existing, file.name)) {
+                data.files.forEach(function (file) {
+                    if (existing.indexOf(file.name) !== -1) {
                         uploadErrors.push("There is already a file named " + file.name);
                     }
                 });
@@ -146,7 +147,7 @@ weavy.tiny = (function ($) {
                 });
 
                 var html = "";
-                _.each(data.result.data, function (f) {
+                data.result.data.forEach(function (f) {
                     html += '<div class="card mr-1" style="width: 96px;">' +
                         '<a href="javascript:;" class="thumbnail" data-name="' + f.name + '" data-file-url="' + f.file_url + '" data-thumb-url="' + f.thumb_url + '" data-width="' + f.width + '" data-height="' + f.height + '" title="' + f.name + '">' +
                         '<img src="' + f.thumb_url.replace("{options}", "96x96-crop,both") + '" alt="" />' +
@@ -178,13 +179,13 @@ weavy.tiny = (function ($) {
             var sizer = $("#size button");
             sizer.removeClass("active");
 
-            if (url.indexOf("/1024x0/") != -1) {
+            if (url.indexOf("/1024x0/") !== -1) {
                 sizer.eq(3).addClass("active");
-            } else if (url.indexOf("/640x0/") != -1) {
+            } else if (url.indexOf("/640x0/") !== -1) {
                 sizer.eq(2).addClass("active");
-            } else if (url.indexOf("/240x0/") != -1) {
+            } else if (url.indexOf("/240x0/") !== -1) {
                 sizer.eq(1).addClass("active");
-            } else if (url.indexOf("/" + width + "x" + height + "/") != -1) {
+            } else if (url.indexOf("/" + width + "x" + height + "/") !== -1) {
                 sizer.eq(4).addClass("active");
             }
         }
@@ -286,8 +287,8 @@ weavy.tiny = (function ($) {
 
         function convertToRelativeUrl(url) {
             if (url && url.length) {
-                var rootPath = location.protocol + "//" + location.hostname + weavy.context.path;
-                return url.replace(rootPath, weavy.context.path);
+                var rootPath = location.protocol + "//" + location.hostname + wvy.context.path;
+                return url.replace(rootPath, wvy.context.path);
             } else {
                 return null;
             }

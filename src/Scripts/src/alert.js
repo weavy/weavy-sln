@@ -1,5 +1,5 @@
-var weavy = weavy || {};
-weavy.alert = (function ($) {
+var wvy = wvy || {};
+wvy.alert = (function ($) {
 
     var _enabled = true;
 

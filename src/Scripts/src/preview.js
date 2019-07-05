@@ -1,13 +1,13 @@
 ﻿// preview files in fullscreen overlay
-var weavy = weavy || {};
+var wvy = wvy || {};
 
-weavy.preview = (function ($) {
+wvy.preview = (function ($) {
 
     // default options
     var options = {
         locale: 'en-US',
-        workerSrc: weavy.url.resolve("/scripts/vendor/pdfjs-dist/pdf.worker.min.js"),
-        cMapUrl: weavy.url.resolve("/scripts/vendor/pdfjs-dist/cmaps/"),
+        workerSrc: wvy.url.resolve("/scripts/vendor/pdfjs-dist/pdf.worker.min.js"),
+        cMapUrl: wvy.url.resolve("/scripts/vendor/pdfjs-dist/cmaps/"),
         cMapPacked: true,
         pdfThumbnailViewer: null,
         isThumbnailViewEnabled: false,
@@ -44,7 +44,7 @@ weavy.preview = (function ($) {
     });
 
     // init/destroy pdf viewer
-    if (weavy.turbolinks.enabled) {
+    if (wvy.turbolinks.enabled) {
         document.addEventListener("turbolinks:load", init);
         // REVIEW: we should probably do more to cleanup the pdf viewer here, do some research and figure out what...
         document.addEventListener("turbolinks:before-cache", close);
@@ -58,7 +58,7 @@ weavy.preview = (function ($) {
             // exit if no preview container
             return;
         }
-        weavy.pdf.pdfjsWebApp.PDFViewerApplication.initialize(options);
+        wvy.pdf.pdfjsWebApp.PDFViewerApplication.initialize(options);
     }
 
     // open file preview for the specified file
@@ -67,12 +67,12 @@ weavy.preview = (function ($) {
         $(document).on("keyup", keyup);
 
         // open up the document with pdf.js
-        weavy.pdf.pdfjsWebApp.PDFViewerApplication.open(opts.preview);
+        wvy.pdf.pdfjsWebApp.PDFViewerApplication.open(opts.preview);
 
         // add navbar
         var $container = $(".preview-container");
         $container.find(".navbar-preview").remove();
-        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-widget-event data-widget-name="close-preview"><svg class="i i-arrow-left" height="24" viewBox="0 0 24 24" width="24"><path d="m20 11v2h-12l5.5 5.5-1.42 1.42-7.92-7.92 7.92-7.92 1.42 1.42-5.5 5.5z"/></svg></button></div></nav>');
+        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-weavy-event data-weavy-name="close-preview"><svg class="i i-arrow-left" height="24" viewBox="0 0 24 24" width="24"><path d="m20 11v2h-12l5.5 5.5-1.42 1.42-7.92-7.92 7.92-7.92 1.42 1.42-5.5 5.5z"/></svg></button></div></nav>');
         var $middle = $('<div class="navbar-middle" />');
         $middle.append('<span class="navbar-text">' + opts.name + '</span>');
         $navbar.append($middle);
@@ -105,9 +105,9 @@ weavy.preview = (function ($) {
         // show preview container
         $container.show();
 
-        if (weavy.browser.embedded) {
-            // maximize widget window
-            weavy.postal.post({ name: "preview-open" });
+        if (wvy.browser.embedded) {
+            // maximize weavy client window
+            wvy.postal.post({ name: "preview-open" });
         }
     }
 
@@ -118,9 +118,9 @@ weavy.preview = (function ($) {
             return;
         }
 
-        if (weavy.browser.embedded) {
-            // close widget preview
-            weavy.postal.post({ name: "preview-close" });
+        if (wvy.browser.embedded) {
+            // close weavy client preview
+            wvy.postal.post({ name: "preview-close" });
         }
 
         // remove event handler for ESC
@@ -135,9 +135,9 @@ weavy.preview = (function ($) {
         } catch (e) { }
 
         // REVIEW: is this the correct way to close the viewer?
-        weavy.pdf.pdfjsWebApp.PDFViewerApplication.cleanup();
-        weavy.pdf.pdfjsWebApp.PDFViewerApplication.close();
-        $(weavy.pdf.pdfjsWebApp.PDFViewerApplication.pdfViewer.viewer).find(".page:not(.loading)").remove();
+        wvy.pdf.pdfjsWebApp.PDFViewerApplication.cleanup();
+        wvy.pdf.pdfjsWebApp.PDFViewerApplication.close();
+        $(wvy.pdf.pdfjsWebApp.PDFViewerApplication.pdfViewer.viewer).find(".page:not(.loading)").remove();
     }
 
     // close preview on ESC

@@ -8,7 +8,7 @@
 @section scripts {
     <script>
         document.addEventListener("turbolinks:load", function () {
-            $("#new-space #widget").val(weavy.browser.embedded ? true : false);
+            $("#new-space #client").val(wvy.browser.embedded ? true : false);
         });
     </script>
 }
@@ -23,7 +23,7 @@
 <div class="container my-3">
     @using (Html.BeginForm(nameof(SpaceController.Insert), typeof(SpaceController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "", id = "new-space" })) {
         @Html.AntiForgeryToken()
-        @Html.Hidden("widget", false)
+        @Html.Hidden("client", false)
 
         <div class="text-center">
             @Html.EditorFor(x => Model.Avatar, additionalViewData: new { Avatar = Model })

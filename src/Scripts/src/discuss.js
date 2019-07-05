@@ -1,11 +1,11 @@
-﻿var weavy = weavy || {};
-weavy.discuss = (function ($) {
+﻿var wvy = wvy || {};
+wvy.discuss = (function ($) {
 
     // init post editor
     document.addEventListener("turbolinks:load", function () {
         $("[data-editor-location='discuss']").weavyEditor({
             minimized: true,
-            context: weavy.browser.embedded,
+            context: wvy.browser.embedded,
             onClick: function (e, wrapper) {
                 $(".post-form").addClass("focused");
                 wrapper.addClass("active");
@@ -13,7 +13,7 @@ weavy.discuss = (function ($) {
             onSubmit: function (e, data) {
                 $(".post-form").removeClass("focused");
                 data.wrapper.removeClass("active");
-                weavy.posts.insert(e, data, this);
+                wvy.posts.insert(e, data, this);
                 $(this).closest("form").find("#contextUrl").attr("disabled", true);
             },
             onContextChange: function (e, data) {

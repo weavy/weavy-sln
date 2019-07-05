@@ -1323,7 +1323,7 @@
             </summary>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>Returns the current user's conversations.</returns>
-            <example>GET api/conversations?top=5</example>
+            <example>GET a/conversations?top=5</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.MessagesController.GetRooms(Weavy.Core.Models.QueryOptions)">
             <summary>
@@ -1331,7 +1331,7 @@
             </summary>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>Returns the current user's chat rooms.</returns>
-            <example>GET api/conversations/rooms?top=5</example>
+            <example>GET a/conversations/rooms?top=5</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.MessagesController.GetPeople(Weavy.Core.Models.QueryOptions)">
             <summary>
@@ -1339,7 +1339,7 @@
             </summary>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>Returns the current user's archived conversations.</returns>
-            <example>GET api/conversations/people?top=5</example>
+            <example>GET a/conversations/people?top=5</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.MessagesController.GetUnread(System.Boolean,Weavy.Core.Models.QueryOptions)">
             <summary>
@@ -1348,7 +1348,7 @@
             <param name="followed">When <c>false</c> returns all conversations with unread messages, otherwise returns only followed conversations with unread messages.</param>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>Returns the most recent unread conversations for the current user.</returns>
-            <example>GET api/conversations/unread?top=5</example>
+            <example>GET a/conversations/unread?top=5</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.MessagesController.GetConversation(System.Int32)">
             <summary>
@@ -1599,14 +1599,14 @@
             </summary>
             <param name="query">Query options for paging, sorting etc.</param>
             <returns>Returns the most recent unread notifications for the current user.</returns>
-            <example>GET api/notifications/unread?top=5</example>
+            <example>GET a/notifications/unread?top=5</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.NotificationsController.GetNotificationBadge">
             <summary>
             Get the badges for the current user.
             </summary>        
             <returns>Returns the badges for notifications and conversations for the current user.</returns>
-            <example>GET api/notifications/badges</example>
+            <example>GET a/notifications/badges</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.NotificationsController.GetNotifications(Weavy.Core.Models.NotificationQuery)">
             <summary>
@@ -1614,7 +1614,7 @@
             </summary>
             <param name="query">Query options for paging, sorting etc.</param>
             <returns>Returns notifications for the current user.</returns>
-            <example>GET api/notifications?top=5</example>
+            <example>GET a/notifications?top=5</example>
         </member>
         <member name="T:Weavy.Web.Api.Controllers.OAuthController">
             <summary>
@@ -1639,7 +1639,7 @@
             <param name="id">The app id.</param>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>A list of posts.</returns>
-            <example>GET api/spaces/1/posts?top=20</example>
+            <example>GET a/spaces/1/posts?top=20</example>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.PostsController.Insert(System.Int32,Weavy.Web.Api.Models.PostIn)">
             <summary>
@@ -2202,18 +2202,18 @@
             </summary>
             <param name="model"></param>
         </member>
-        <member name="T:Weavy.Web.Api.Controllers.WidgetsController">
+        <member name="T:Weavy.Web.Api.Controllers.WeavyClientApiController">
             <summary>
             api for adding and removing user specific bubbles 
             </summary>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.WidgetsController.OpenBubble(Weavy.Core.Models.SpaceBubble)">
+        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.OpenBubble(Weavy.Core.Models.SpaceBubble)">
             <summary>
             Open a bubble. Adds it to the bubbles repo as personal or global if it does not exist.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.WidgetsController.ConnectBubble(System.Int32,Weavy.Web.Api.Models.ConnectBubbleIn)">
+        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.ConnectBubble(System.Int32,Weavy.Web.Api.Models.ConnectBubbleIn)">
             <summary>
             Connects a bubble with a specific url.
             </summary>
@@ -2221,7 +2221,7 @@
             <param name="model">Contains the url to connect the bubble to.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.WidgetsController.ConnectSpace(System.Int32,Weavy.Web.Api.Models.ConnectBubbleIn)">
+        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.ConnectSpace(System.Int32,Weavy.Web.Api.Models.ConnectBubbleIn)">
             <summary>
             Creates and connects a bubble to a space.
             </summary>
@@ -2229,19 +2229,19 @@
             <param name="model">Contains the url to connect with.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.WidgetsController.RemoveBubble(System.Int32)">
+        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.RemoveBubble(System.Int32)">
             <summary>
             Removes a bubble.
             </summary>
             <param name="id">Id of bubble to remove.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.WidgetsController.GetConfiguration">
+        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.GetConfiguration">
             <summary>
-            Returns the panel configuration with script to load the widget from the Weavy browser extension.
+            Returns the panel configuration with script to load the weavy client from the Weavy browser extension.
             </summary>
             <remarks>Anonymous access is allowed.</remarks>
-            <returns>The widget configuration.</returns>
+            <returns>The weavy client configuration.</returns>
         </member>
         <member name="T:Weavy.Web.ApiConfig">
             <summary>
@@ -2661,6 +2661,12 @@
             Sign in with JSON Web Token.
             </summary>
             <param name="model"></param>        
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.AccountController.SignInEmbedded">
+            <summary>
+            Redirects to this action after provider based sign in from iframe
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignIn(Weavy.Web.Models.SignInModel,System.String)">
@@ -5016,52 +5022,52 @@
             <param name="filter"></param>
             <returns>An item</returns>
         </member>
-        <member name="T:Weavy.Web.Controllers.WidgetController">
+        <member name="T:Weavy.Web.Controllers.WeavyClientController">
             <summary>
-            Controller for widget actions.
+            Controller for weavy client actions.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.Index(Weavy.Web.Models.WeavyLoaderOptions)">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.Index(Weavy.Web.Models.WeavyLoaderOptions)">
             <summary>
-            Display page for configuring the widget loader script.
+            Display page for configuring the weavy client loader script.
             </summary>
             <param name="options"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.FileBrowser">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.FileBrowser">
             <summary>
             Display filebrowser.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.ConnectModal(System.String)">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.ConnectModal(System.String)">
             <summary>
             Get partial for connecting bubble to url modal.
             </summary>
             <param name="url">The url to connect the bubble with.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.Ping">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.Ping">
             <summary>
-            Ping view for widget script.
+            Ping view for weavy client script.
             </summary>        
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.WidgetScript(System.String,System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.WeavyScript(System.String,System.Boolean)">
             <summary>
-            Returns the widget script.
+            Returns the weavy client script.
             </summary>
             <param name="options"></param>
             <param name="download">Trigger file download</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.GetWidgetVersionFile">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.GetWidgetVersionFile">
             <summary>
             
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WidgetController.GetWidgetLocationFile">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.GetWidgetLocationFile">
             <summary>
             
             </summary>
@@ -6052,80 +6058,24 @@
             </summary>
             <param name="id">Id of conversation</param>
         </member>
-        <member name="T:Weavy.Web.Hubs.WidgetHub">
+        <member name="T:Weavy.Web.Hubs.ClientHub">
             <summary>
             </summary>
         </member>
-        <member name="M:Weavy.Web.Hubs.WidgetHub.Load(Weavy.Web.Hubs.WidgetHub.WidgetSettings)">
+        <member name="M:Weavy.Web.Hubs.ClientHub.Load(Weavy.Web.Models.WeavyClientOptions)">
             <summary>
-            
+            Called by client to get weavy options.
             </summary>
-            <param name="settings"></param>
+            <param name="options">Input options set by client.</param>
         </member>
-        <member name="M:Weavy.Web.Hubs.WidgetHub.GetConversation(System.Int32)">
+        <member name="M:Weavy.Web.Hubs.ClientHub.GetConversation(System.Int32)">
             <summary>
             Gets a conversation by id from the datastore.
             </summary>
             <param name="id">Id of the conversation to get.</param>
             <returns></returns>
         </member>
-        <member name="T:Weavy.Web.Hubs.WidgetHub.WidgetSettings">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.Href">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.Url">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.InstallationName">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.WidgetId">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.Jwt">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.UserId">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.Version">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.ShouldUpdate">
-            <summary>
-            Gets or sets a value indicating if the client should update its resources due to a version mismatch between client and server. 
-            Needs to be snake_case for legacy reasons
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.StatusUrl">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Hubs.WidgetHub.WidgetSettings.Plugins">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Hubs.WidgetHub.GetUrlHelper(System.String)">
+        <member name="M:Weavy.Web.Hubs.ClientHub.GetUrlHelper(System.String)">
             <summary>
             Get a dummy url helper for generating urls.
             </summary>
@@ -7949,6 +7899,61 @@
             Gets or sets the the list of versions for a content item.
             </summary>
         </member>
+        <member name="T:Weavy.Web.Models.WeavyClientOptions">
+            <summary>
+            Options for the Weavy client script.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.WeavyClientOptions.#ctor">
+            <summary>
+            Initializes a new instace of the <see cref="T:Weavy.Web.Models.WeavyClientOptions"/> class.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.Id">
+            <summary>
+            Gets or sets a unique id for the weavy client instance.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.Url">
+            <summary>
+            Gets or sets the URL to the Weavy-installation to connect to.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.InstallationName">
+            <summary>
+            Gets the name of the installation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.UserId">
+            <summary>
+            Gets the id of the currently signed in user, <c>null</c> if not signed in.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.Version">
+            <summary>
+            Gets or sets the client version (used to detect if client needs to be upgraded to match server version).
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.Href">
+            <summary>
+            Url for finding connected "bubbles"?
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.Status">
+            <summary>
+            Gets system status.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.StatusUrl">
+            <summary>
+            Gets url for detecting if client can access the server.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyClientOptions.Plugins">
+            <summary>
+            Gets or sets plugin settings.
+            </summary>
+        </member>
         <member name="T:Weavy.Web.Models.WeavyLoaderOptions">
             <summary>
             Configuration options for the Weavy loader script.
@@ -7965,19 +7970,24 @@
             </summary>
             <param name="options"></param>
         </member>
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Bundle">
+            <summary>
+            Gets or sets a value indicating whether the script should exclude required libs jquery.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Extended">
+            <summary>
+            Include all plugins to use the dock.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Minified">
             <summary>
             Gets or sets a value indicating whether the script should be minified or not.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Slim">
-            <summary>
-            Gets or sets a value indicating whether the script should exclude required libs jquery.
-            </summary>
-        </member>
         <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Global">
             <summary>
-            Gets or sets a value for the name of the widget outside the loading scope.
+            Gets or sets a value for the name of the weavy client outside the loading scope.
             </summary>
         </member>
         <member name="M:Weavy.Web.Models.WeavyLoaderOptions.ScriptUrl(System.Boolean)">
@@ -7986,13 +7996,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WidgetScript(System.Boolean)">
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WeavyScript(System.Boolean)">
             <summary>
             Returns the script url.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WidgetLoader(System.Boolean)">
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WeavyLoader(System.Boolean)">
             <summary>
             Returns the loader script.
             </summary>
@@ -8004,27 +8014,27 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:Weavy.Web.Models.WidgetConfiguration">
+        <member name="T:Weavy.Web.Models.WeavyClientConfiguration">
             <summary>
             Configuration for the Widget.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.WidgetConfiguration.InitScript">
+        <member name="P:Weavy.Web.Models.WeavyClientConfiguration.InitScript">
             <summary>
             Gets the generic script to trigger Weavy.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.WidgetConfiguration.IsAuthenticated">
+        <member name="P:Weavy.Web.Models.WeavyClientConfiguration.IsAuthenticated">
             <summary>
             Gets or sets a value indicating if the user is authenticated.
             </summary>
         </member>
-        <member name="T:Weavy.Web.Models.WidgetError">
+        <member name="T:Weavy.Web.Models.WeavyClientError">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.WidgetError.Message">
+        <member name="P:Weavy.Web.Models.WeavyClientError.Message">
             <summary>
             
             </summary>

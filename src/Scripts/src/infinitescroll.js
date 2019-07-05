@@ -1,13 +1,14 @@
-var weavy = weavy || {};
+/*global twttr, _ */
+var wvy = wvy || {};
 
-weavy.infinitescroll = (function ($) {
+wvy.infinitescroll = (function ($) {
 
     var buffer = window.innerHeight / 2 || 0; // arbitrary value (set to whatever you think is a good distance before triggering automatic click)
     var hasnext = true;
     var loading = false;
     var throttle = null;
 
-    if (weavy.turbolinks.enabled) {
+    if (wvy.turbolinks.enabled) {
         document.addEventListener("turbolinks:load", init);
         document.addEventListener("turbolinks:before-cache", destroy);
     } else {

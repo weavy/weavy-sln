@@ -2106,7 +2106,7 @@
         </member>
         <member name="T:Weavy.Core.Models.SpaceBubble">
             <summary>
-            An object representing a space in the widget context.
+            An object representing a space in the weavy client context.
             </summary>
         </member>
         <member name="M:Weavy.Core.Models.SpaceBubble.#ctor">
@@ -4340,24 +4340,6 @@
             <param name="password">The (generated) password.</param>
         </member>
         <member name="P:Weavy.Core.Models.WelcomeEmail.Password">
-            <summary>
-            Gets the password to display in the email.
-            </summary>
-        </member>
-        <member name="T:Weavy.Core.Models.SandboxEmail">
-            <summary>
-            An model for welcome emails from sandbox.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Models.SandboxEmail.#ctor(System.String,Weavy.Core.Models.User,System.String)">
-            <summary>
-            
-            </summary>
-            <param name="subject"></param>
-            <param name="to"></param>
-            <param name="password">The (generated) password.</param>
-        </member>
-        <member name="P:Weavy.Core.Models.SandboxEmail.Password">
             <summary>
             Gets the password to display in the email.
             </summary>
@@ -9860,6 +9842,39 @@
             Gets the user that was created during setup.
             </summary>
         </member>
+        <member name="T:Weavy.Core.Helpers.AsyncHelper">
+            <summary>
+            Provides helper method to call awaitable methods from a synchronous environment.
+            <see href="https://stackoverflow.com/a/40120697"/>
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Helpers.AsyncHelper.MyTaskFactory">
+            <summary>
+            The task factory.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Helpers.AsyncHelper.RunSync``1(System.Func{System.Threading.Tasks.Task{``0}})">
+            <summary>
+            Executes an async <see cref="T:System.Threading.Tasks.Task`1"/> method which has a TResult return type synchronously
+            </summary>
+            <param name="func">
+            The <see cref="T:System.Func`1"/> delegate to run.
+            </param>
+            <typeparam name="TResult">
+            <see cref="T:System.Type"/> that is the result of the task.
+            </typeparam>
+            <returns>
+            The result.
+            </returns>
+        </member>
+        <member name="M:Weavy.Core.Helpers.AsyncHelper.RunSync(System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            Executes an async <see cref="T:System.Threading.Tasks.Task`1"/> method which has a void return value synchronously.
+            </summary>
+            <param name="func">
+            The <see cref="T:System.Func`1"/> delegate to run.
+            </param>
+        </member>
         <member name="T:Weavy.Core.Helpers.CollectionExtensions">
             <summary>
             Helper and extension methods for collections.
@@ -10710,6 +10725,14 @@
             <summary>
             Helper and extension methods for dates and times.
             </summary>
+        </member>
+        <member name="M:Weavy.Core.Helpers.DateTimeExtensions.ToStringRelative(System.TimeSpan,System.Boolean)">
+            <summary>
+            Returns a textual representation of a time span.
+            </summary>
+            <param name="duration">The time span to return as text.</param>
+            <param name="abbrev"></param>
+            <returns>Returns the time as readable text, e.g. "3 hours".</returns>
         </member>
         <member name="M:Weavy.Core.Helpers.DateTimeExtensions.From(System.DateTime,System.DateTime,System.Boolean)">
             <summary>
@@ -15190,7 +15213,7 @@
         </member>
         <member name="T:Weavy.Core.Services.PushService">
             <summary>
-              Service class for pushing realtime events to connected clients. They can subscribe to these events with weavy.realtime.on("event.weavy")
+              Service class for pushing realtime events to connected clients. They can subscribe to these events with wvy.realtime.on("event.weavy")
             </summary>
         </member>
         <member name="F:Weavy.Core.Services.PushService.CLIENT_CALLBACK">
@@ -16518,9 +16541,6 @@
             <summary>
               Service class for getting configuration settings.
             </summary>
-            <remarks>
-              We need this class so that Weavy.exe can get configuration settings from the same web.config file as Weavy.Web.
-            </remarks>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryDomain">
             <summary>
@@ -17760,6 +17780,11 @@
               Service layer for managing licenses.
             </summary>
         </member>
+        <member name="M:Weavy.Core.Services.LicenseService.#cctor">
+            <summary>
+            Defualt constructor.
+            </summary>
+        </member>
         <member name="M:Weavy.Core.Services.LicenseService.Get">
             <summary>
             Gets the currently configured <see cref="T:Weavy.Core.Models.License"/>.
@@ -17939,12 +17964,13 @@
             </summary>
             <param name="message"></param>
         </member>
-        <member name="M:Weavy.Core.Services.MailService.Send(System.Net.Mail.MailMessage,System.Net.Mail.SmtpClient)">
+        <member name="M:Weavy.Core.Services.MailService.Send(System.Net.Mail.MailMessage,System.Net.Mail.SmtpClient,System.Boolean)">
             <summary>
             Sends the specified <see cref="T:System.Net.Mail.MailMessage"/>.
             </summary>
             <param name="message">The <see cref="T:System.Net.Mail.MailMessage"/> to send.</param>
             <param name="smtp">The <see cref="T:System.Net.Mail.SmtpClient"/> settings to use or <c>null</c> to use default settings.</param>
+            <param name="linkResources"><c>true</c> to convert image urls in the message to linked resources, otherwise <c>false</c>.</param>
         </member>
         <member name="M:Weavy.Core.Services.MailService.Send(Weavy.Core.Models.EmailModel,System.Net.Mail.SmtpClient)">
             <summary>
@@ -17953,7 +17979,7 @@
             <param name="model"></param>
             <param name="smtp">The <see cref="T:System.Net.Mail.SmtpClient"/> settings to use or <c>null</c> to use default settings.</param>
         </member>
-        <member name="M:Weavy.Core.Services.MailService.Send(System.Net.Mail.MailMessage,System.Net.Mail.SmtpClient,System.Boolean)">
+        <member name="M:Weavy.Core.Services.MailService.SendMail(System.Net.Mail.MailMessage,System.Net.Mail.SmtpClient,System.Boolean)">
             <summary>
             Sends a <see cref="T:System.Net.Mail.MailMessage"/> using the specified smtp settings. 
             </summary>

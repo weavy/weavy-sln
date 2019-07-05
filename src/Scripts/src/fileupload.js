@@ -1,6 +1,7 @@
-﻿var weavy = weavy || {};
+﻿/*global Turbolinks, twttr */
+var wvy = wvy || {};
 
-weavy.fileupload = (function ($) {
+wvy.fileupload = (function ($) {
 
     // event handler for removing existing file from input field
     $(document).on("click", ".file-upload .clear", function (evt) {
@@ -25,7 +26,7 @@ weavy.fileupload = (function ($) {
         e.preventDefault();
         var $alert = $(this).closest(".alert");
         var action = $(this).attr("action");
-        ids = $(this).find("input[name=blobs]").val().split(',').map(function (val) { return Number(val); });
+        var ids = $(this).find("input[name=blobs]").val().split(',').map(function (val) { return Number(val); });
         $.ajax({
             url: action,
             type: "PUT",
@@ -36,7 +37,7 @@ weavy.fileupload = (function ($) {
             Turbolinks.visit(location.toString(), { action: "replace" })
         }).fail(function (xhr, status, error) {
             var json = JSON.parse(xhr.responseText);
-            weavy.alert.warning(json.message);
+            wvy.alert.warning(json.message);
         }).always(function () {
             $alert.alert('close');
         });
@@ -138,11 +139,11 @@ weavy.fileupload = (function ($) {
             },
             done: function (e, data) {
                 if (data.result.skipped) {
-                    var action = weavy.url.resolve($(this).data("url"));
+                    var action = wvy.url.resolve($(this).data("url"));
                     var ids = $.map(data.result.skipped, function (val) { return val.id; }).join(",");
                     var uploaded = data.result.uploaded ? data.result.uploaded.length : 0;
                     if (data.result.skipped.length === 1) {
-                        weavy.alert.warning('There is already a file named ' + data.result.skipped[0].name + '.' +
+                        wvy.alert.warning('There is already a file named ' + data.result.skipped[0].name + '.' +
                             '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +
@@ -153,7 +154,7 @@ weavy.fileupload = (function ($) {
                             '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this file' +
                             '</button>');
                     } else {
-                        weavy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
+                        wvy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
                             '<form action="' + action +'" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +
@@ -194,11 +195,11 @@ weavy.fileupload = (function ($) {
             },
             done: function (e, data) {
                 if (data.result.skipped) {
-                    var action = weavy.url.resolve($(this).data("url"));
+                    var action = wvy.url.resolve($(this).data("url"));
                     var ids = $.map(data.result.skipped, function (val) { return val.id; }).join(",");
                     var uploaded = data.result.uploaded ? data.result.uploaded.length : 0;
                     if (data.result.skipped.length === 1) {
-                        weavy.alert.warning('There is already a file named ' + data.result.skipped[0].name + '.' +
+                        wvy.alert.warning('There is already a file named ' + data.result.skipped[0].name + '.' +
                             '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +
@@ -209,7 +210,7 @@ weavy.fileupload = (function ($) {
                             '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this file' +
                             '</button>');
                     } else {
-                        weavy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
+                        wvy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
                             '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +

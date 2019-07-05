@@ -27,9 +27,9 @@
             }
             @if (hasEdit) {
                 if (isSelf) {
-                    <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))" data-bubble-target="personal">@Svg.Icon("pencil", "primary") Edit</a>
+                    <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))" data-target-panel="personal">@Svg.Icon("pencil", "primary") Edit</a>
                 } else {
-                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.EditProfile(Model.Id)))" data-bubble-target="start">@Svg.Icon("pencil", "primary") Edit</a>
+                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.EditProfile(Model.Id)))" data-target-panel="start">@Svg.Icon("pencil", "primary") Edit</a>
                 }
             }
             @if (hasDeleteAndTrash) {

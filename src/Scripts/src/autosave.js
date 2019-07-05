@@ -1,5 +1,6 @@
-var weavy = weavy || {};
-weavy.autosave = (function ($) {
+/*global tinyMCE **/
+var wvy = wvy || {};
+wvy.autosave = (function ($) {
 
     var _typing = false;
     var _started = false;
@@ -69,7 +70,7 @@ weavy.autosave = (function ($) {
 
     // triggered from tiny when all editors are loaded
     function registerEditor() {
-        for (ed in tinyMCE.editors) {
+        for (var ed in tinyMCE.editors) {
             tinyMCE.editors[ed].on("keydown", function (e) {
                 change();
             });
@@ -114,11 +115,11 @@ weavy.autosave = (function ($) {
         // remove unwanted properties
         delete properties.x_http_method_override;
 
-        var url = "/api/content/" + _id + "/draft?force=" + _force;
+        var url = "/a/content/" + _id + "/draft?force=" + _force;
 
         if (!_cancel) {
             $.ajax({
-                url: weavy.url.resolve(url),
+                url: wvy.url.resolve(url),
                 data: JSON.stringify(properties),
                 type: "PATCH",
                 dataType: "json",
@@ -134,10 +135,10 @@ weavy.autosave = (function ($) {
                     // conflict - item has been taken over by someone else
                     if (xhr.status === 409) {
                         $form.removeClass("dirty");
-                        document.location.href = weavy.url.resolve("~/content/" + _id + "/edit");
+                        document.location.href = wvy.url.resolve("~/content/" + _id + "/edit");
                     } else {
                         var json = JSON.parse(xhr.responseText);
-                        weavy.alert.warning(json.message);
+                        wvy.alert.warning(json.message);
                     }
                 },
                 complete: function (xhr, status) {

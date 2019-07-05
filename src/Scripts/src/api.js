@@ -1,10 +1,10 @@
-﻿var weavy = weavy || {};
-weavy.api = (function ($) {
+﻿var wvy = wvy || {};
+wvy.api = (function ($) {
 
     // get entity
     function get(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId,
+            url: wvy.url.api(entityType) + entityId,
             type: "GET",
             cache: false
         });
@@ -13,7 +13,7 @@ weavy.api = (function ($) {
     // trash entity
     function trash(entityType, entityId, method) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/trash",
+            url: wvy.url.api(entityType) + entityId + "/trash",
             method: method || "POST",
             contentType: "application/json"
         });
@@ -22,7 +22,7 @@ weavy.api = (function ($) {
     // restore entity
     function restore(entityType, entityId, method) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/restore",
+            url: wvy.url.api(entityType) + entityId + "/restore",
             method: method || "POST",
             contentType: "application/json"
         });
@@ -31,7 +31,7 @@ weavy.api = (function ($) {
     // like entity
     function like(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/like",
+            url: wvy.url.api(entityType) + entityId + "/like",
             method: "POST",
             contentType: "application/json"
         });
@@ -40,7 +40,7 @@ weavy.api = (function ($) {
     // unlike entity
     function unlike(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/like",
+            url: wvy.url.api(entityType) + entityId + "/like",
             method: "DELETE",
             contentType: "application/json"
         });
@@ -49,7 +49,7 @@ weavy.api = (function ($) {
     // star entity
     function star(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/star",
+            url: wvy.url.api(entityType) + entityId + "/star",
             method: "POST",
             contentType: "application/json"
         });
@@ -58,7 +58,7 @@ weavy.api = (function ($) {
     // unstar entity
     function unstar(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/star",
+            url: wvy.url.api(entityType) + entityId + "/star",
             method: "DELETE",
             contentType: "application/json"
         });
@@ -67,7 +67,7 @@ weavy.api = (function ($) {
     // follow entity
     function follow(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/follow",
+            url: wvy.url.api(entityType) + entityId + "/follow",
             method: "POST",
             contentType: "application/json"
         });
@@ -76,7 +76,7 @@ weavy.api = (function ($) {
     // unfollow entity
     function unfollow(entityType, entityId) {
         return $.ajax({
-            url: weavy.url.api(entityType) + entityId + "/follow",
+            url: wvy.url.api(entityType) + entityId + "/follow",
             method: "DELETE",
             contentType: "application/json"
         });
@@ -85,7 +85,7 @@ weavy.api = (function ($) {
     // join space
     function join(spaceId) {
         return $.ajax({
-            url: weavy.url.api("space") + spaceId + "/members",
+            url: wvy.url.api("space") + spaceId + "/members",
             method: "POST",
             contentType: "application/json"
         });
@@ -94,7 +94,7 @@ weavy.api = (function ($) {
     // leave space
     function leave(spaceId) {
         return $.ajax({
-            url: weavy.url.api("space") + spaceId + "/members",
+            url: wvy.url.api("space") + spaceId + "/members",
             method: "DELETE",
             contentType: "application/json"
         });
@@ -103,7 +103,7 @@ weavy.api = (function ($) {
     // get badges for the current user
     function badges() {        
         return $.ajax({
-            url: weavy.url.api("notification") + "badges",
+            url: wvy.url.api("notification") + "badges",
             method: "GET",
             contentType: "application/json"
         });
@@ -112,7 +112,7 @@ weavy.api = (function ($) {
     // marks notification as read
     function read(notificationId) {
         return $.ajax({
-            url: weavy.url.api("notification") + notificationId + "/read",
+            url: wvy.url.api("notification") + notificationId + "/read",
             method: "POST",
             contentType: "application/json"
         });
@@ -121,7 +121,7 @@ weavy.api = (function ($) {
     // marks all notifications as read
     function readAll() {
         return $.ajax({
-            url: weavy.url.api("notification") + "read",
+            url: wvy.url.api("notification") + "read",
             method: "POST",
             ContentType: "application/json"
         });
@@ -130,7 +130,7 @@ weavy.api = (function ($) {
     // marks notification as unread
     function unread(notificationId) {
         return $.ajax({
-            url: weavy.url.api("notification") + notificationId + "/read",
+            url: wvy.url.api("notification") + notificationId + "/read",
             method: "DELETE",
             contentType: "application/json"
         });
@@ -139,7 +139,7 @@ weavy.api = (function ($) {
     // pin a post
     function pin(postId) {
         return $.ajax({
-            url: weavy.url.api("post") + postId + "/pin",
+            url: wvy.url.api("post") + postId + "/pin",
             method: "POST",
             ContentType: "application/json"
         });
@@ -148,7 +148,7 @@ weavy.api = (function ($) {
     // unpin a post
     function unpin(postId) {
         return $.ajax({
-            url: weavy.url.api("post") + postId + "/pin",
+            url: wvy.url.api("post") + postId + "/pin",
             method: "DELETE",
             ContentType: "application/json"
         });

@@ -1,11 +1,11 @@
-﻿var weavy = weavy || {};
-weavy.desktopNotifications = (function ($) {
+﻿var wvy = wvy || {};
+wvy.desktopNotifications = (function ($) {
     // callbacks for realtime events
-    weavy.realtime.on("notification-inserted.weavy", function (event, data) {
+    wvy.realtime.on("notification-inserted.weavy", function (event, data) {
         
         // get notification data
         $.ajax({
-            url: weavy.url.resolve("/api/notifications/" + data.id),
+            url: wvy.url.resolve("/a/notifications/" + data.id),
             method: "GET",
             contentType: "application/json"
         }).then(function (response) {
@@ -18,13 +18,13 @@ weavy.desktopNotifications = (function ($) {
     // display desktop notification for specified notification
     function notify(notification) {
 
-        if (!weavy.browser.embedded) {
-            weavy.audio.play("#notification-sound");
+        if (!wvy.browser.embedded) {
+            wvy.audio.play("#notification-sound");
         }
         // only in standalone mode for now
-        if (window.Notification && !weavy.browser.embedded) {
-            console.debug("notification permission is " + Notification.permission + " and context.notify is " + weavy.context.notify);
-            if (Notification.permission === "granted" && weavy.context.notify) {
+        if (window.Notification && !wvy.browser.embedded) {
+            console.debug("notification permission is " + Notification.permission + " and context.notify is " + wvy.context.notify);
+            if (Notification.permission === "granted" && wvy.context.notify) {
                 var n = new Notification("You have a new notification", {
                     body: notification.text,
                     tag: notification.url,
@@ -33,7 +33,7 @@ weavy.desktopNotifications = (function ($) {
                 });
 
                 n.addEventListener("click", function () {
-                    location.href = weavy.url.resolve(notification.url);
+                    location.href = wvy.url.resolve(notification.url);
                     window.focus();
                     this.close();
                 });

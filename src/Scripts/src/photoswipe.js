@@ -1,16 +1,18 @@
-﻿(function ($) {
+﻿var wvy = wvy || {};
+
+(function ($) {
 
     // open photoswipe on click
     $(document).on("click", "[data-photoswipe]", function (e) {
-        // open widget preview
-        if (weavy.browser.embedded) {
+        // open weavy client preview
+        if (wvy.browser.embedded) {
             document.documentElement.classList.add("pswp-transparent");
-            weavy.postal.post({ name: "preview-open" });
+            wvy.postal.post({ name: "preview-open" });
         }
 
         e.preventDefault();
-        if (weavy.browser.embedded) {
-            // embedded: let widget apply styles before photoswipe init
+        if (wvy.browser.embedded) {
+            // embedded: let weavy client apply styles before photoswipe init
             var $that = $(this);
             $(window).one("resize", function () { photoswipe($that, true); });
 
@@ -80,9 +82,9 @@
 
         // Gallery unbinds events (triggers before closing animation)
         pswp.listen('unbindEvents', function () {
-            // close widget preview
-            if (weavy.browser.embedded) {
-                weavy.postal.post({ name: "preview-close" });
+            // close weavy client preview
+            if (wvy.browser.embedded) {
+                wvy.postal.post({ name: "preview-close" });
                 $(window).one("resize", function () { requestAnimationFrame(function () { document.documentElement.classList.remove("pswp-transparent"); }) });
             }
         });

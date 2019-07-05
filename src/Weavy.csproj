@@ -281,6 +281,7 @@
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
@@ -310,17 +311,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -328,9 +329,7 @@
     <Content Include="Areas\Apps\Scripts\apps.bundle" />
     <Content Include="Areas\Apps\Styles\apps.scss" />
     <Content Include="Areas\Apps\Views\_ViewStart.cshtml" />
-    <Content Include="Areas\Apps\Views\Web.config">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="Areas\Apps\Views\Web.config" />
     <Content Include="Global.asax" />
     <Content Include="img\bot.svg" />
     <Content Include="img\eo\0023-20e3.svg" />
@@ -3184,6 +3183,7 @@
     <Content Include="img\icons\bell-off.svg" />
     <Content Include="img\icons\box.svg" />
     <Content Include="img\icons\calendar.svg" />
+    <Content Include="img\icons\calendar-check.svg" />
     <Content Include="img\icons\camera.svg" />
     <Content Include="img\icons\cash-usd.svg" />
     <Content Include="img\icons\cellphone-android.svg" />
@@ -3317,12 +3317,12 @@
     <Content Include="img\icons\undo.svg" />
     <Content Include="img\icons\upload.svg" />
     <Content Include="img\icons\upload-network.svg" />
-    <Content Include="img\icons\video.svg" />
-    <Content Include="img\icons\view-grid.svg" />
-    <Content Include="img\icons\view-module.svg" />
     <Content Include="img\icons\weavy.svg" />
     <Content Include="img\icons\weavy-messenger.svg" />
     <Content Include="img\icons\webhook.svg" />
+    <Content Include="img\icons\video.svg" />
+    <Content Include="img\icons\view-grid.svg" />
+    <Content Include="img\icons\view-module.svg" />
     <Content Include="img\icons\windows.svg" />
     <Content Include="img\icons\wrench.svg" />
     <Content Include="img\icons\zip-box.svg" />
@@ -3357,7 +3357,9 @@
     <Content Include="Scripts\src\attach.js" />
     <Content Include="Scripts\src\attachment.js" />
     <Content Include="Scripts\src\audio.js" />
+    <Content Include="Scripts\src\auth.js" />
     <Content Include="Scripts\src\autosave.js" />
+    <Content Include="Scripts\src\badges.js" />
     <Content Include="Scripts\src\blocklink.js" />
     <Content Include="Scripts\src\bootstrap\modal.js" />
     <Content Include="Scripts\src\browser.js" />
@@ -3418,34 +3420,36 @@
     <Content Include="Scripts\src\tinymce\plugins\toolbar\plugin.js" />
     <Content Include="Scripts\src\tinymce\tiny.js" />
     <Content Include="Scripts\src\turbolinks.js" />
-    <Content Include="Scripts\src\ui.js" />
     <Content Include="Scripts\src\url.js" />
-    <Content Include="Scripts\src\urlContext.js" />
+    <Content Include="Scripts\src\url-context.js" />
     <Content Include="Scripts\src\user.js" />
     <Content Include="Scripts\src\userspicker.js" />
-    <Content Include="Scripts\src\widget\_widget-plugin-helloworld.js" />
-    <Content Include="Scripts\src\widget\_widget-plugin-template.js" />
-    <Content Include="Scripts\src\widget\alert.js" />
-    <Content Include="Scripts\src\widget\attach.js" />
-    <Content Include="Scripts\src\widget\authentication.js" />
-    <Content Include="Scripts\src\widget\badge.js" />
-    <Content Include="Scripts\src\widget\bubbles.js" />
-    <Content Include="Scripts\src\widget\context.js" />
-    <Content Include="Scripts\src\widget\dock.js" />
-    <Content Include="Scripts\src\widget\fallback.js" />
-    <Content Include="Scripts\src\widget\messenger.js" />
-    <Content Include="Scripts\src\widget\notifications.js" />
-    <Content Include="Scripts\src\widget\panels.js" />
-    <Content Include="Scripts\src\widget\personal.js" />
-    <Content Include="Scripts\src\widget\position.js" />
-    <Content Include="Scripts\src\widget\preview.js" />
-    <Content Include="Scripts\src\widget\sso.js" />
-    <Content Include="Scripts\src\widget\start.js" />
-    <Content Include="Scripts\src\widget\theme.js" />
-    <Content Include="Scripts\src\widget\upgrade.js" />
-    <Content Include="Scripts\src\widget\widget.js" />
-    <Content Include="Scripts\src\widget-notifications.js" />
-    <Content Include="Scripts\src\widget-personal.js" />
+    <Content Include="Scripts\src\weavy\_weavy-plugin-helloworld.js" />
+    <Content Include="Scripts\src\weavy\_weavy-plugin-template.js" />
+    <Content Include="Scripts\src\weavy\alert.js" />
+    <Content Include="Scripts\src\weavy\attach.js" />
+    <Content Include="Scripts\src\weavy\authentication.js" />
+    <Content Include="Scripts\src\weavy\extended\badge.js" />
+    <Content Include="Scripts\src\weavy\extended\bubbles.js" />
+    <Content Include="Scripts\src\weavy\extended\context.js" />
+    <Content Include="Scripts\src\weavy\extended\dock.js" />
+    <Content Include="Scripts\src\weavy\extended\fallback.js" />
+    <Content Include="Scripts\src\weavy\extended\messenger.js" />
+    <Content Include="Scripts\src\weavy\extended\notifications.js" />
+    <Content Include="Scripts\src\weavy\extended\personal.js" />
+    <Content Include="Scripts\src\weavy\extended\position.js" />
+    <Content Include="Scripts\src\weavy\extended\start.js" />
+    <Content Include="Scripts\src\weavy\extended\upgrade.js" />
+    <Content Include="Scripts\src\weavy\panels.js" />
+    <Content Include="Scripts\src\weavy\preview.js" />
+    <Content Include="Scripts\src\weavy\sso.js" />
+    <Content Include="Scripts\src\weavy\theme.js" />
+    <Content Include="Scripts\src\weavy\weavy.js" />
+    <Content Include="Scripts\src\weavy-notifications.js" />
+    <Content Include="Scripts\src\weavy-personal.js" />
+    <Content Include="Scripts\weavy.bundle" />
+    <Content Include="Scripts\weavy-extended.bundle" />
+    <Content Include="Scripts\weavy-libs.bundle" />
     <Content Include="Scripts\vendor\bluebird\bluebird.core.min.js" />
     <Content Include="Scripts\vendor\blueimp-file-upload\jquery.fileupload.js" />
     <Content Include="Scripts\vendor\blueimp-file-upload\jquery.ui.widget.js" />
@@ -3688,9 +3692,7 @@
     <Content Include="Scripts\vendor\twitter-text\punycode.js" />
     <Content Include="Scripts\vendor\twitter-text\twitter-text.js" />
     <Content Include="Scripts\vendor\underscore\underscore-min.js" />
-    <Content Include="Scripts\weavy.bundle" />
-    <Content Include="Scripts\widget.bundle" />
-    <Content Include="Scripts\widgetlibs.bundle" />
+    <Content Include="Scripts\wvy.bundle" />
     <Content Include="Styles\_bootstrap.scss" />
     <Content Include="Styles\_core.scss" />
     <Content Include="Styles\_functions.scss" />
@@ -3848,6 +3850,7 @@
     <Content Include="Styles\utilities\_position.scss" />
     <Content Include="Styles\utilities\_scroll.scss" />
     <Content Include="Styles\utilities\_text.scss" />
+    <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\vendor\bootstrap\bootstrap-grid.scss" />
     <Content Include="Styles\vendor\bootstrap\bootstrap-reboot.scss" />
     <Content Include="Styles\vendor\bootstrap\bootstrap.scss" />
@@ -4045,7 +4048,6 @@
     <Content Include="Styles\vendor\select2\theme\default\layout.scss" />
     <Content Include="Styles\vendor\select2\theme\default\_multiple.scss" />
     <Content Include="Styles\vendor\select2\theme\default\_single.scss" />
-    <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\widget.scss" />
     <Content Include="Styles\widget\_alert.scss" />
     <Content Include="Styles\widget\_avatars.scss" />
@@ -4063,6 +4065,7 @@
     <Content Include="Styles\widget\_preview.scss" />
     <Content Include="Styles\widget\_variables.scss" />
     <Content Include="Styles\widget\_wide.scss" />
+    <Content Include="Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\_Navbar.cshtml" />
     <Content Include="Views\Account\AddWindows.cshtml" />
@@ -4080,6 +4083,7 @@
     <Content Include="Views\Account\RegisterWindows.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\SignIn.cshtml" />
+    <Content Include="Views\Account\SignInEmbedded.cshtml" />
     <Content Include="Views\Account\SignUp.cshtml" />
     <Content Include="Views\ActivityApp\Get.cshtml" />
     <Content Include="Views\App\_Add.cshtml" />
@@ -4127,7 +4131,6 @@
     <Content Include="Views\Email\Invite.cshtml" />
     <Content Include="Views\Email\Notification.cshtml" />
     <Content Include="Views\Email\PasswordReset.cshtml" />
-    <Content Include="Views\Email\Sandbox.cshtml" />
     <Content Include="Views\Email\SignupApproval.cshtml" />
     <Content Include="Views\Email\SignupConfirmation.cshtml" />
     <Content Include="Views\Email\Test.cshtml" />
@@ -4294,35 +4297,31 @@
     <Content Include="Views\Star\_Index.cshtml" />
     <Content Include="Views\Star\_Star.cshtml" />
     <Content Include="Views\Star\Index.cshtml" />
+    <Content Include="Views\Test\_LoremIpsum.cshtml" />
+    <Content Include="Views\Test\Dock.cshtml" />
     <Content Include="Views\Test\Email.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Panels.cshtml" />
     <Content Include="Views\Test\Pickers.cshtml" />
     <Content Include="Views\Test\Redirected.cshtml" />
-    <Content Include="Views\Test\Widget.cshtml" />
     <Content Include="Views\Tools\Get.cshtml" />
     <Content Include="Views\Tools\Index.cshtml" />
     <Content Include="Views\UI\_Layout.cshtml" />
     <Content Include="Views\UI\_SearchResult.cshtml" />
     <Content Include="Views\UI\InsertImage.cshtml" />
     <Content Include="Views\UI\InsertLink.cshtml" />
-    <Content Include="Views\Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Views\Widget\FileBrowser.cshtml" />
-    <Content Include="Views\Widget\Index.cshtml" />
-    <Content Include="Views\Widget\Ping.cshtml" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="Views\WeavyClient\FileBrowser.cshtml" />
+    <Content Include="Views\WeavyClient\Index.cshtml" />
+    <Content Include="Views\WeavyClient\Ping.cshtml" />
+    <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Areas\Apps\AppsAreaRegistration.cs" />
+    <Compile Include="Controllers\ApiController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Hooks\SandboxHook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

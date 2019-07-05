@@ -1,6 +1,7 @@
-﻿var weavy = weavy || {};
+﻿/*global Prism */
+var wvy = wvy || {};
 
-weavy.codesample = (function ($) {
+wvy.codesample = (function ($) {
 
     document.addEventListener("turbolinks:load", function () {
         // highlight code

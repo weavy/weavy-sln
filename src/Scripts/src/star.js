@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.stars = (function ($) {
+wvy.stars = (function ($) {
 
     // star specified entity
     function star(entity, id) {
@@ -8,7 +8,7 @@ weavy.stars = (function ($) {
         $("[data-toggle=star][data-entity=" + entity + "][data-id=" + id + "]").addClass("on").removeClass("d-none").attr("title", "Unstar");
 
         // call api to star entity
-        weavy.api.star(entity, id);
+        wvy.api.star(entity, id);
     }
 
     // unstar specified entity
@@ -17,7 +17,7 @@ weavy.stars = (function ($) {
         $("[data-toggle=star][data-entity=" + entity + "][data-id=" + id + "]").removeClass("on").attr("title", "Star");
 
         // call api to unstar entity
-        weavy.api.unstar(entity, id);
+        wvy.api.unstar(entity, id);
     }
 
     function removeUnstarredInTab() {
@@ -41,9 +41,9 @@ weavy.stars = (function ($) {
         $(this).parents(".show").children("[data-toggle=dropdown]").dropdown("toggle");
     });
 
-    if (weavy.realtime) {
+    if (wvy.realtime) {
         // respond to realtime star event
-        weavy.realtime.on("star.weavy", function (e, data) {
+        wvy.realtime.on("star.weavy", function (e, data) {
             
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").addClass("on").removeClass("d-none").attr("title", "Unstar");
 
@@ -65,7 +65,7 @@ weavy.stars = (function ($) {
         });
 
         // respond to realtime unstar event
-        weavy.realtime.on("unstar.weavy", function (e, data) {            
+        wvy.realtime.on("unstar.weavy", function (e, data) {            
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").removeClass("on").attr("title", "Star");
         });
     }

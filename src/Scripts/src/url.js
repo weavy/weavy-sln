@@ -1,10 +1,10 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.url = (function ($) {
+wvy.url = (function ($) {
 
-    // helper function for resolving url to api controller for entity type, e.g. "comment" -> "/api/comments/"
+    // helper function for resolving url to api controller for entity type, e.g. "comment" -> "/a/comments/"
     function api(entityType) {
-        return resolve("/api/" + (entityType === "content" ? entityType : entityType + "s") + "/");
+        return resolve("/a/" + (entityType === "content" ? entityType : entityType + "s") + "/");
     }
 
     // helper function for resolving url to mvc controller for entity type, e.g. "comment" -> "/comments/"
@@ -15,7 +15,7 @@ weavy.url = (function ($) {
     // converts a URL into one that is usable on the requesting client
     function resolve(url) {
         if (url.length > 0) {
-            if (url.indexOf("http") === 0 || url.indexOf(weavy.context.path) === 0) {
+            if (url.indexOf("http") === 0 || url.indexOf(wvy.context.path) === 0) {
                 // return unmodified
             } else {
                 // remove ~ and leading / 
@@ -26,7 +26,7 @@ weavy.url = (function ($) {
                     url = url.substr(1);
                 }
                 // prepend app path
-                url = weavy.context.path + url;
+                url = wvy.context.path + url;
             }
         }
         return url;

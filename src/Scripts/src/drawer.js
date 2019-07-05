@@ -1,5 +1,5 @@
-var weavy = weavy || {};
-weavy.drawer = (function ($) {
+var wvy = wvy || {};
+wvy.drawer = (function ($) {
 
     function open(drawer) {
         // close other drawers
@@ -13,8 +13,8 @@ weavy.drawer = (function ($) {
         $("html").removeClass("drawer-open");
         $(".drawer").removeClass("drawer-in");
 
-        setTimeout(weavy.notifications.sort, 200);
-        setTimeout(weavy.stars.prune, 200);
+        setTimeout(wvy.notifications.sort, 200);
+        setTimeout(wvy.stars.prune, 200);
     }
 
     function toggle(drawer) {
@@ -66,19 +66,19 @@ weavy.drawer = (function ($) {
         return new Promise(function (resolve) {
             setTimeout(function () { resolve(); }, time);
         });
-    };
+    }
 
     // load active tab when drawer is opened
     $(document).on("click", "[data-toggle=drawer][data-target='#drawer-user']", function () {
         var $drawer = $("#drawer-user");
         var $active = $("[data-toggle=tab].active", $drawer);
 
-        weavy.tab.load($active.attr("href"), promiseTimeout(250));
+        wvy.tab.load($active.attr("href"), promiseTimeout(250));
     });
 
     // configure remote loading of tabs in #drawer-user
     $(document).on("click", "#drawer-user [data-toggle=tab]", function (e) {
-        weavy.tab.load($(this).attr("href"));
+        wvy.tab.load($(this).attr("href"));
     });
 
 

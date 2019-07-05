@@ -1,5 +1,5 @@
-﻿var weavy = weavy || {};
-weavy.context = {
+﻿var wvy = wvy || {};
+wvy.context = {
     path: "/",
     area: null,
     user: -1,
@@ -14,7 +14,7 @@ weavy.context = {
 };
 
 (function ($) {
-    if (weavy.turbolinks.enabled) {
+    if (wvy.turbolinks.enabled) {
         document.addEventListener("turbolinks:load", init);
     } else {
         document.addEventListener("DOMContentLoaded", init);
@@ -22,31 +22,31 @@ weavy.context = {
 
     // populates the context object with data attributes from body element
     function init() {
-        weavy.context.path = document.body.getAttribute("data-path") || "/";
-        weavy.context.area = document.body.getAttribute("data-area");
-        weavy.context.user = Number(document.body.getAttribute("data-user")) || -1;
-        weavy.context.space = Number(document.body.getAttribute("data-space")) || null;
-        weavy.context.app = Number(document.body.getAttribute("data-app")) || null;
-        weavy.context.content = Number(document.body.getAttribute("data-content")) || null;
-        weavy.context.culture = document.body.getAttribute("data-culture") || "en-US";
-        weavy.context.uiculture = document.body.getAttribute("data-ui-culture") || "en-US";
-        weavy.context.time = Number(document.body.getAttribute("data-time"));
-        weavy.context.notify = JSON.parse(document.body.getAttribute("data-notify")) === true ? true : false;
-        weavy.context.enter = JSON.parse(document.body.getAttribute("data-enter")) === true ? true : false;
+        wvy.context.path = document.body.getAttribute("data-path") || "/";
+        wvy.context.area = document.body.getAttribute("data-area");
+        wvy.context.user = Number(document.body.getAttribute("data-user")) || -1;
+        wvy.context.space = Number(document.body.getAttribute("data-space")) || null;
+        wvy.context.app = Number(document.body.getAttribute("data-app")) || null;
+        wvy.context.content = Number(document.body.getAttribute("data-content")) || null;
+        wvy.context.culture = document.body.getAttribute("data-culture") || "en-US";
+        wvy.context.uiculture = document.body.getAttribute("data-ui-culture") || "en-US";
+        wvy.context.time = Number(document.body.getAttribute("data-time"));
+        wvy.context.notify = JSON.parse(document.body.getAttribute("data-notify")) === true ? true : false;
+        wvy.context.enter = JSON.parse(document.body.getAttribute("data-enter")) === true ? true : false;
 
         // connect to signalr if stand-alone
-        if (weavy.connection && !weavy.browser.embedded) {
-            weavy.connection.init();
+        if (wvy.connection && !wvy.browser.embedded) {
+            wvy.connection.init();
 
             var disconnected = false;
 
-            weavy.connection.on("disconnected", function () {
+            wvy.connection.on("disconnected", function () {
                 disconnected = true;
             });
 
-            weavy.connection.on("state-changed", function (e, data) {                
+            wvy.connection.on("state-changed", function (e, data) {                
                 if (disconnected && data.state.newState === 1) {
-                    weavy.ui.update();
+                    wvy.badges.update();
                 }
             });
         }

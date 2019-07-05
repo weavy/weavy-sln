@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.posts = (function ($) {
+wvy.posts = (function ($) {
 
     // init edit post editor
     document.addEventListener("turbolinks:load", function () {
@@ -27,7 +27,7 @@ weavy.posts = (function ($) {
         var $button = $form.find("button[type='submit']");
         data = $form.serializeObject();
         var method = "POST";
-        var url = weavy.url.resolve($form.attr("action"));
+        var url = wvy.url.resolve($form.attr("action"));
 
         // disable submit button
         $button.prop("disabled", true);
@@ -105,7 +105,7 @@ weavy.posts = (function ($) {
         if (!$post.length) return;
 
         $.ajax({
-            url: weavy.url.resolve("/posts/" + id + "/feedback"),
+            url: wvy.url.resolve("/posts/" + id + "/feedback"),
             method: "GET",
             contentType: "application/json"
         }).then(function (html) {
@@ -114,25 +114,25 @@ weavy.posts = (function ($) {
     }
 
     // bind events
-    weavy.comments.on("insert", function (e, data) {
+    wvy.comments.on("insert", function (e, data) {
         if (data.entityType === "post") {
             updateFeedback(data.entityId);
         }
     });
 
-    weavy.comments.on("get", function (e, data) {
+    wvy.comments.on("get", function (e, data) {
         if (data.entityType === "post") {
             updateFeedback(data.entityId);
         }
     });
 
-    weavy.comments.on("trash", function (e, data) {
+    wvy.comments.on("trash", function (e, data) {
         if (data.entityType === "post") {
             updateFeedback(data.entityId);
         }
     });
 
-    weavy.comments.on("restore", function (e, data) {
+    wvy.comments.on("restore", function (e, data) {
         if (data.entityType === "post") {
             updateFeedback(data.entityId);
         }
@@ -152,7 +152,7 @@ weavy.posts = (function ($) {
         var id = $el.data("post-like");
 
         // REVIEW: show spinner during ajax call?
-        weavy.api.like("post", id).then(function () {
+        wvy.api.like("post", id).then(function () {
             var $post = $el.closest(".post");
             updateFeedback(id);
         });
@@ -165,7 +165,7 @@ weavy.posts = (function ($) {
         var id = $el.data("post-unlike");
 
         // REVIEW: show spinner during ajax call?
-        weavy.api.unlike("post", id).then(function () {
+        wvy.api.unlike("post", id).then(function () {
             var $post = $el.closest(".post");
             updateFeedback(id);
         });
@@ -175,9 +175,9 @@ weavy.posts = (function ($) {
     $(document).on("click", "[data-trash=post][data-id]", function (e) {
         e.preventDefault();
         var id = this.dataset.id;
-        weavy.api.trash("post", id).then(function () {
+        wvy.api.trash("post", id).then(function () {
             $("[data-type=post][data-id=" + id + "]").slideUp("fast");
-            weavy.alert.alert("success", "Post was trashed. <button type='button' class='btn btn-link alert-link' data-restore='post' data-id='" + id + "'>Undo</button>.", 5000, "alert-trash-post-" + id);
+            wvy.alert.alert("success", "Post was trashed. <button type='button' class='btn btn-link alert-link' data-restore='post' data-id='" + id + "'>Undo</button>.", 5000, "alert-trash-post-" + id);
         });
     });
 
@@ -185,9 +185,9 @@ weavy.posts = (function ($) {
     $(document).on("click", "[data-restore=post][data-id]", function (e) {
         e.preventDefault();
         var id = this.dataset.id;
-        weavy.api.restore("post", id).then(function () {
+        wvy.api.restore("post", id).then(function () {
             $("[data-type=post][data-id=" + id + "]").slideDown("fast");
-            weavy.alert.alert("success", "Post was restored.", 5000, "alert-trash-post-" + id);
+            wvy.alert.alert("success", "Post was restored.", 5000, "alert-trash-post-" + id);
         });
     });
 
@@ -196,7 +196,7 @@ weavy.posts = (function ($) {
         evt.preventDefault();
         var radio = $(this);
         var form = radio.closest("form");
-        var url = weavy.url.resolve(form[0].action + "/" + radio.val());
+        var url = wvy.url.resolve(form[0].action + "/" + radio.val());
         var poll = form.closest(".poll");
 
         if (!poll.hasClass("loading")) {
@@ -220,11 +220,11 @@ weavy.posts = (function ($) {
     });
 
     // rtm post
-    weavy.realtime.on("post-inserted.weavy", function (e, post) {
+    wvy.realtime.on("post-inserted.weavy", function (e, post) {
         var uid = post.createdBy.id;
 
         // do nothing of we are displaying another space
-        if (weavy.context.space !== post.spaceId) {
+        if (wvy.context.space !== post.spaceId) {
             return;
         }
 
@@ -244,10 +244,10 @@ weavy.posts = (function ($) {
         $.ajax({
             contentType: "application/json; charset=utf-8",
             type: "GET",
-            url: weavy.url.resolve("/posts/" + post.id)
+            url: wvy.url.resolve("/posts/" + post.id)
         }).then(function (post) {
             // remove fake post if rtm post created by current user
-            if (weavy.context.user === uid) {
+            if (wvy.context.user === uid) {
                 $(".fake-post:last", $posts).remove()
             }
 
@@ -257,14 +257,14 @@ weavy.posts = (function ($) {
     });
 
     // rtm like post
-    weavy.realtime.on("like.weavy", function (e, liked) {
+    wvy.realtime.on("like.weavy", function (e, liked) {
         if (liked.type === 'post') {
             updateFeedback(liked.id);
         }
     });
 
     // rtm unlike post
-    weavy.realtime.on("unlike.weavy", function (e, unliked) {
+    wvy.realtime.on("unlike.weavy", function (e, unliked) {
         if (unliked.type === 'post') {
             updateFeedback(unliked.id);
         }
@@ -284,7 +284,7 @@ weavy.posts = (function ($) {
         $(".modal-title", $modal).text(title);
 
         $.ajax({
-            url: weavy.url.resolve(path),
+            url: wvy.url.resolve(path),
             type: "GET"
         }).then(function (html) {
             $body.html(html);

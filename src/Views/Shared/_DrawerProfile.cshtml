@@ -13,7 +13,7 @@
             @if (!ConfigurationService.WindowsAuthentication) {
                 <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Svg.Icon("account-key") Change password</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut("/notify")))" title="Sign out" data-widget-event data-widget-name="signing-out">@Svg.Icon("logout") Sign out</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut("/notify")))" title="Sign out" data-weavy-event data-weavy-name="signing-out">@Svg.Icon("logout") Sign out</a>
             }
         </nav>
     </div>

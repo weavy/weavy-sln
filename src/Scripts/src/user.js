@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.user = (function ($) {
+wvy.user = (function ($) {
 
     // url to user profile that should be displayed in modal
     var _href = null;
@@ -14,9 +14,9 @@ weavy.user = (function ($) {
         var $el = $(this);
         var id = $el.data("id");
 
-        weavy.api.trash("user", id).then(function () {
+        wvy.api.trash("user", id).then(function () {
             $("[data-type=user][data-id="+id+"]").addClass("d-none");
-            weavy.alert.alert("success", "User was trashed. <button type='button' class='btn btn-link alert-link' data-restore='user' data-id='" + id + "'>Undo</button>", 5000, "alert-trash-user-" + id);
+            wvy.alert.alert("success", "User was trashed. <button type='button' class='btn btn-link alert-link' data-restore='user' data-id='" + id + "'>Undo</button>", 5000, "alert-trash-user-" + id);
         });
     });
 
@@ -26,9 +26,9 @@ weavy.user = (function ($) {
 
         var id = this.dataset.id;
 
-        weavy.api.restore("user", id).then(function () {
+        wvy.api.restore("user", id).then(function () {
             $("[data-type=user][data-id=" + id + "]").removeClass("d-none");
-            weavy.alert.alert("success", "User was restored.", 5000, "alert-trash-user-" + id);
+            wvy.alert.alert("success", "User was restored.", 5000, "alert-trash-user-" + id);
         });
     });
 
@@ -106,7 +106,7 @@ weavy.user = (function ($) {
         
         // get modal content from server
         $.ajax({
-            url: weavy.url.resolve(_href),
+            url: wvy.url.resolve(_href),
             type: "GET"
         }).then(function (html) {            
             $loading.addClass("d-none");
@@ -132,13 +132,13 @@ weavy.user = (function ($) {
     // follow user
     function follow(id) {
         // call api to follow user
-        return weavy.api.follow("user", id);
+        return wvy.api.follow("user", id);
     }
 
     // unfollow user
     function unfollow(id) {
         // call api to unfollow user
-        return weavy.api.unfollow("user", id);
+        return wvy.api.unfollow("user", id);
     }
 
     return {

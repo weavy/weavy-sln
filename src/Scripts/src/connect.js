@@ -1,5 +1,5 @@
-﻿var weavy = weavy || {};
-weavy.connect = (function ($) {
+﻿var wvy = wvy || {};
+wvy.connect = (function ($) {
 
     window.addEventListener("message", function (e) {
         switch (e.data.name) {
@@ -14,20 +14,20 @@ weavy.connect = (function ($) {
     });
 
     var requestConnect = function (spaceId) {
-        if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request:connect', spaceId: spaceId || weavy.context.space });
+        if (wvy.browser.embedded) {
+            wvy.postal.post({ name: 'request:connect', spaceId: spaceId || wvy.context.space });
         }
     }
 
     var requestDisconnect = function (spaceId) {
-        if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request:disconnect', spaceId: spaceId || weavy.context.space });
+        if (wvy.browser.embedded) {
+            wvy.postal.post({ name: 'request:disconnect', spaceId: spaceId || wvy.context.space });
         }
     }
 
     var requestClose = function (spaceId) {
-        if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request:close', spaceId: spaceId || weavy.context.space });
+        if (wvy.browser.embedded) {
+            wvy.postal.post({ name: 'request:close', spaceId: spaceId || wvy.context.space });
         }
     }
 
@@ -46,7 +46,7 @@ weavy.connect = (function ($) {
 
         // fetch modal content from server
         $.ajax({
-            url: weavy.url.resolve("/widget/connect") + "?url=" + encodeURIComponent(connectUrl),
+            url: wvy.url.resolve("/client/connect") + "?url=" + encodeURIComponent(connectUrl),
             type: "GET"
         }).then(function (html) {
             $form.replaceWith(html);
@@ -70,7 +70,7 @@ weavy.connect = (function ($) {
         $.ajax({
             contentType: "application/json; charset=utf-8",
             type: "POST",
-            url: weavy.url.resolve("/api/" + connectType + "/" + connectId + "/connect"),
+            url: wvy.url.resolve("/a/" + connectType + "/" + connectId + "/connect"),
             data: JSON.stringify({ url: url })
         }).then(function () {
             $("#connect-modal").modal('hide');

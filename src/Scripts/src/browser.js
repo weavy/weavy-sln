@@ -1,5 +1,6 @@
-﻿var weavy = weavy || {};
-weavy.browser = {
+﻿/*global DocumentTouch */
+var wvy = wvy || {};
+wvy.browser = {
     embedded: false,
     context: false,
     personal: false,
@@ -12,40 +13,40 @@ weavy.browser = {
 
 (function () {
     if (document.documentElement.classList.contains("embedded")) {
-        weavy.browser.embedded = true;
+        wvy.browser.embedded = true;
     } else if (window.name !== "weavy-standalone") {
         try {
-            weavy.browser.embedded = (window.self !== window.top) ? true : false;
+            wvy.browser.embedded = (window.self !== window.top) ? true : false;
         } catch (e) {
-            weavy.browser.embedded = true;
+            wvy.browser.embedded = true;
         }
-        if (weavy.browser.embedded) {
+        if (wvy.browser.embedded) {
             document.documentElement.classList.add("embedded");
         }
     }
     
     if ('ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch) {
-        weavy.browser.touch = true;
+        wvy.browser.touch = true;
         document.documentElement.classList.add("touch");
     }
 
     if (document.documentElement.classList.contains("ie")) {
-        weavy.browser.ie = true;
+        wvy.browser.ie = true;
     }
     if (document.documentElement.classList.contains("ios")) {
-        weavy.browser.ios = true;
+        wvy.browser.ios = true;
     }
     if (document.documentElement.classList.contains("mobile")) {
-        weavy.browser.mobile = true;
+        wvy.browser.mobile = true;
     }
     if (document.documentElement.classList.contains("tablet")) {
-        weavy.browser.tablet = true;
+        wvy.browser.tablet = true;
     }
 
     window.addEventListener("message", function (e) {                    
         switch (e.data.name) {
             case "ping":
-                e.source.postMessage({ "name": "ready" }, e.origin);
+                e.source.postMessage({ "name": "ready" }, e.origin !== "null" ? e.origin : "*");
                 break;
             case "reload":
                 window.location.reload();

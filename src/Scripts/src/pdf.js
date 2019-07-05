@@ -63,8 +63,8 @@ if (!Element.prototype.closest) {
     };
 }
 
-var weavy = weavy || {};
-weavy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
+var wvy = wvy || {};
+wvy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
 (function () {
     'use strict';
 
@@ -2594,5 +2594,5 @@ weavy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
         exports.PDFViewerApplication = PDFViewerApplication;
     }));
 
-}.call(weavy.pdf));
+}.call(wvy.pdf));
 

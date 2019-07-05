@@ -1,6 +1,15 @@
-var weavy = weavy || {};
+/*global Turbolinks */
+var wvy = wvy || {};
 
-weavy.turbolinks = (function ($) {
+wvy.turbolinks = (function ($) {
+
+    // prevent ie caching jquery xhr get requests
+    if (wvy.browser.ie) {
+        $.ajaxSetup({
+            cache: false
+        });
+    }
+
     // gets a value indicating whether turbolinks is enabled or not
     var enabled = typeof Turbolinks !== "undefined" && Turbolinks !== undefined && Turbolinks.supported !== undefined && Turbolinks.supported;
 
@@ -36,7 +45,18 @@ weavy.turbolinks = (function ($) {
         });
 
         //document.addEventListener("turbolinks:before-visit", function (e) { console.debug(e.type); });
-        //document.addEventListener("turbolinks:request-start", function (e) { console.debug(e.type); });
+
+        document.addEventListener("turbolinks:request-start", function (e) {
+
+            // prevent ie caching xhr get requests
+            if (wvy.browser.ie) {
+                e.data.xhr.setRequestHeader("Cache-Control", "no-cache");
+                e.data.xhr.setRequestHeader("Cache-Control", "no-store");
+                e.data.xhr.setRequestHeader("Pragma", "no-cache");
+                e.data.xhr.setRequestHeader("Expires", "0");
+            }                       
+        });
+
         //document.addEventListener("turbolinks:visit", function (e) { console.debug(e.type);  });
         //document.addEventListener("turbolinks:request-end", function (e) { console.debug(e.type); });
         //document.addEventListener("turbolinks:before-cache", function (e) { console.debug(e.type); });
@@ -58,7 +78,7 @@ weavy.turbolinks = (function ($) {
         //window.addEventListener("unload", function (e) { console.debug("window:" + e.type); });
 
         // submit form through turbolinks by clicking submit button
-        $(document).on("click", "form[data-turboform] [type=submit][name][value], form[data-turboform] [type=submit][data-bubble-formtarget], form[data-turboform] [type=submit][formaction]", function (e) {
+        $(document).on("click", "form[data-turboform] [type=submit][name][value], form[data-turboform] [type=submit][data-formtarget-panel], form[data-turboform] [type=submit][formaction]", function (e) {
             e.preventDefault();
 
             // serialize form
@@ -96,10 +116,10 @@ weavy.turbolinks = (function ($) {
         });
 
         // opening link with data-bubble-target
-        $(document).on("click", "a[href][data-bubble-target]", function (e) {
+        $(document).on("click", "a[href][data-target-panel]", function (e) {
             e.preventDefault();
             var $link = $(this);
-            sendData($link.attr('href'), null, "get", this.dataset.bubbleTarget);
+            sendData($link.attr('href'), null, "get", this.dataset.targetPanel);
         });
 
         window.addEventListener("message", function (e) {
@@ -111,8 +131,8 @@ weavy.turbolinks = (function ($) {
         });
 
         $(document).on("DOMContentLoaded turbolinks:load", function (e) {
-            if (weavy.postal) {
-                weavy.postal.post({ name: "ready" });
+            if (wvy.postal) {
+                wvy.postal.post({ name: "ready" });
             }            
         });
     }
@@ -121,7 +141,7 @@ weavy.turbolinks = (function ($) {
     function submitFormWithData($form, data, $submit) {
         var url = $submit && $submit.attr("formaction") || $form.attr("action");
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
-        var target = $submit && $submit.attr("data-bubble-formtarget") || $form.attr("data-bubble-target");
+        var panelId = $submit && $submit.attr("data-formtarget-panel") || $form.attr("data-target-panel");
 
         if ($form.hasClass("tab-content")) {
             // add active tab to data (so that we can activate the correct tab when the page reloads)
@@ -129,7 +149,7 @@ weavy.turbolinks = (function ($) {
             data = data + "&tab=" + encodeURIComponent($tab.attr('id'));
         }
 
-        sendData(url, data, method, target);
+        sendData(url, data, method, panelId);
     }
 
     function absolutePath(href) {
@@ -138,10 +158,10 @@ weavy.turbolinks = (function ($) {
         return link.href;
     }
 
-    function sendData(url, data, method, bubbleTarget) {
+    function sendData(url, data, method, panelId) {
 
-        if (bubbleTarget && weavy.browser.embedded) {
-            weavy.postal.post({ name: 'send', url: absolutePath(url), data: data, method: method, bubbleTarget: bubbleTarget });
+        if (panelId && wvy.browser.embedded) {
+            wvy.postal.post({ name: 'send', url: absolutePath(url), data: data, method: method, panelId: panelId });
             return;
         }
 

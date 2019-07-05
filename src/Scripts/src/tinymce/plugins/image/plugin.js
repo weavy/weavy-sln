@@ -1,4 +1,7 @@
-﻿tinymce.PluginManager.add("weavy_image", function (editor, url) {
+﻿/*global tinymce */
+var wvy = wvy || {};
+
+tinymce.PluginManager.add("weavy_image", function (editor, url) {
 
     editor.addMenuItem("weavy_image", {
         icon: "image",
@@ -44,17 +47,17 @@
         // get attributes if current element is an img.
         var attrs;
         var elm = editor.selection.getNode();
-        if (elm != null && (elm.nodeName == "IMG" || elm.nodeName == "A")) {
+        if (elm != null && (elm.nodeName === "IMG" || elm.nodeName === "A")) {
             attrs = editor.dom.getAttribs(elm);
             for (var i = 0; i < attrs.length; i++) {
-                if (attrs[i].nodeName.indexOf('_') != 0) {
+                if (attrs[i].nodeName.indexOf('_') !== 0) {
                     params += (params.length > 0 ? "&" : "") + encodeURIComponent(attrs[i].nodeName) + "=" + encodeURIComponent(editor.dom.getAttrib(elm, attrs[i].nodeName, ""));
                 }
             }
         }
 
-        if (weavy.context.content) {
-            params += (params.length > 0 ? "&" : "") + "id=" + weavy.context.content;
+        if (wvy.context.content) {
+            params += (params.length > 0 ? "&" : "") + "id=" + wvy.context.content;
         }
 
         // img or link?
@@ -67,7 +70,7 @@
 
         editor.windowManager.open({
             title: isImage ? "Insert/edit image" : "Insert/edit file",
-            file: weavy.url.resolve("ui/insertimage?" + params),
+            file: wvy.url.resolve("ui/insertimage?" + params),
             width: 800,
             height: 600,
             resizable: true,
@@ -93,7 +96,7 @@
                         var pswpSize = props.width && props.height ? props.width + "x" + props.height : '';
 
                         // image
-                        if (elm != null && elm.nodeName == "IMG") {
+                        if (elm != null && elm.nodeName === "IMG") {
                             // update existing
                             dom.setAttrib(elm, "src", props.url);
                             dom.setAttrib(elm, "alt", props.description);
@@ -121,13 +124,13 @@
 
                     } else {
                         // link to file
-                        if (elm != null && elm.nodeName == 'A') {
+                        if (elm != null && elm.nodeName === 'A') {
                             // update existing
                             dom.setAttrib(elm, "href", props.url);
                         } else {
                             // create new
                             var text = editor.selection.getContent({ format: 'text' });
-                            if (text.length == 0) {
+                            if (text.length === 0) {
                                 text = props.name;
                             }
                             elm = editor.dom.create('a', { href: props.url }, text);

@@ -1,7 +1,7 @@
-﻿var weavy = weavy || {};
-weavy.comments = (function ($) {
+﻿var wvy = wvy || {};
+wvy.comments = (function ($) {
 
-    if (weavy.turbolinks.enabled) {
+    if (wvy.turbolinks.enabled) {
         // edit comment editor
         document.addEventListener("turbolinks:load", init);
 
@@ -33,7 +33,7 @@ weavy.comments = (function ($) {
         if ($el.length === 0) return;
         
         $el.weavyEditor({
-            context: weavy.browser.embedded,
+            context: wvy.browser.embedded,
             collapsed: true,
             embeds: false,
             polls: false,
@@ -66,7 +66,7 @@ weavy.comments = (function ($) {
         data["text"] = d.text;
 
         var method = "POST";
-        var url = weavy.url.resolve($form.attr("action"));
+        var url = wvy.url.resolve($form.attr("action"));
 
         // disable submit button
         $button.prop("disabled", true);
@@ -111,7 +111,7 @@ weavy.comments = (function ($) {
             // NOTE: the UI is updated by the RTM connection
             //// update comment list
             //$.ajax({
-            //    url: weavy.url.mvc(entityType) + entityId + "/comments",
+            //    url: wvy.url.mvc(entityType) + entityId + "/comments",
             //    method: "GET",
             //    cache: false,
             //    contentType: "application/json"
@@ -132,7 +132,7 @@ weavy.comments = (function ($) {
         if (!$comment.length) return;
         
         $.ajax({
-            url: weavy.url.mvc("comment") + id + "/feedback",
+            url: wvy.url.mvc("comment") + id + "/feedback",
             method: "GET",
             cache: false,
             contentType: "application/json"
@@ -162,8 +162,8 @@ weavy.comments = (function ($) {
             }
 
             // check for context
-            if (weavy.browser.embedded) {
-                weavy.urlContext.check();
+            if (wvy.browser.embedded) {
+                wvy.urlContext.check();
             }            
         }
 
@@ -174,7 +174,7 @@ weavy.comments = (function ($) {
         }
 
         $.ajax({
-            url: weavy.url.mvc(type) + id + "/comments",
+            url: wvy.url.mvc(type) + id + "/comments",
             method: "GET",
             cache: false
         }).then(function (html) {
@@ -228,8 +228,8 @@ weavy.comments = (function ($) {
         var id = $el.data("comment-like");
 
         // REVIEW: show spinner during ajax call?
-        weavy.api.like("comment", id).then(function () {
-            var $comment = $el.closest(".card-comment");
+        wvy.api.like("comment", id).then(function () {
+            //var $comment = $el.closest(".card-comment");
             updateCommentFeedback(id);
         });
     });
@@ -241,8 +241,8 @@ weavy.comments = (function ($) {
         var id = $el.data("comment-unlike");
 
         // REVIEW: show spinner during ajax call?
-        weavy.api.unlike("comment", id).then(function () {
-            var $comment = $el.closest(".card-comment");
+        wvy.api.unlike("comment", id).then(function () {
+            //var $comment = $el.closest(".card-comment");
             updateCommentFeedback(id);
         });
     });
@@ -256,9 +256,9 @@ weavy.comments = (function ($) {
         var parentId = $comment.data("parent-id");
         var parentEntity = $comment.data("parent-entity");
 
-        weavy.api.trash("comment", id).then(function () {
+        wvy.api.trash("comment", id).then(function () {
             $comment.slideUp("fast")
-            weavy.alert.alert("success", "Comment was trashed. <a class='alert-link' href='#' data-comment-restore='" + id + "' data-parent-id='" + parentId + "' data-parent-entity='" + parentEntity + "'>Undo</a>", 5000, "alert-comment-trash-" + id);
+            wvy.alert.alert("success", "Comment was trashed. <a class='alert-link' href='#' data-comment-restore='" + id + "' data-parent-id='" + parentId + "' data-parent-entity='" + parentEntity + "'>Undo</a>", 5000, "alert-comment-trash-" + id);
             triggerEvent("trash", { entityType: parentEntity, entityId: parentId });
 
         });
@@ -273,16 +273,16 @@ weavy.comments = (function ($) {
         var parentId = $el.data("parent-id");
         var parentEntity = $el.data("parent-entity");
 
-        weavy.api.restore("comment", id).then(function () {
+        wvy.api.restore("comment", id).then(function () {
             $comment.slideDown("fast")
-            weavy.alert.alert("success", "Comment was restored.", 5000, "alert-comment-trash-" + id);
+            wvy.alert.alert("success", "Comment was restored.", 5000, "alert-comment-trash-" + id);
             triggerEvent("restore", { entityType: parentEntity, entityId: parentId });
 
         });
     });
 
     // rtm comment
-    weavy.realtime.on("comment-inserted.weavy", function (e, comment) {
+    wvy.realtime.on("comment-inserted.weavy", function (e, comment) {
 
         // do nothing if already exists
         if ($("div[data-comment-id='" + comment.id + "']").length !== 0) return;
@@ -292,14 +292,14 @@ weavy.comments = (function ($) {
     });
 
     // rtm like comment
-    weavy.realtime.on("like.weavy", function (e, liked) {       
+    wvy.realtime.on("like.weavy", function (e, liked) {       
         if (liked.type === 'comment') {
             updateCommentFeedback(liked.id);
         }
     });
 
     // rtm unlike comment
-    weavy.realtime.on("unlike.weavy", function (e, unliked) {        
+    wvy.realtime.on("unlike.weavy", function (e, unliked) {        
         if (unliked.type === 'comment') {
             updateCommentFeedback(unliked.id);
         }

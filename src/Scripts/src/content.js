@@ -1,5 +1,6 @@
-﻿var weavy = weavy || {};
-weavy.content = (function ($) {
+﻿/*global Turbolinks */
+var wvy = wvy || {};
+wvy.content = (function ($) {
 
     // load move content form
     $(document).on("show.bs.modal", "#move-content-modal", function (e) {
@@ -38,7 +39,7 @@ weavy.content = (function ($) {
 
         // fetch select options for folder picker from server
         $.ajax({
-            url: weavy.url.resolve(url),
+            url: wvy.url.resolve(url),
             type: "GET"
         }).then(function (html) {
             $contentPicker.html(html);
@@ -61,7 +62,7 @@ weavy.content = (function ($) {
         var $body = $(".modal-body", $modal).empty();
 
         $.ajax({
-            url: weavy.url.resolve(path),
+            url: wvy.url.resolve(path),
             type: "GET"
         }).then(function (html) {
             $body.html(html);
@@ -124,7 +125,7 @@ weavy.content = (function ($) {
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
 
         $.ajax({
-            url: weavy.url.resolve(url),
+            url: wvy.url.resolve(url),
             type: method,
             data: data
         }).then(function (response) {
@@ -137,7 +138,7 @@ weavy.content = (function ($) {
             }
         }).fail(function (xhr, status, error) {
             var json = JSON.parse(xhr.responseText);
-            weavy.alert.danger(json.message);
+            wvy.alert.danger(json.message);
 
         }).always(function () {
             $("button[type='submit']").prop("disabled", false);

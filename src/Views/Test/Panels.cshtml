@@ -21,7 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <script src="/javascript/widget.slim.js"></script>
+    <script src="/javascript/weavy.js"></script>
 
     <style>
         html, body {
@@ -44,7 +44,7 @@
             height: 2rem;
         }
 
-        .widget-drawer {
+        .weavy-drawer {
             position: fixed;
             top: 3.5rem;
             bottom: 0;
@@ -59,11 +59,11 @@
             border-left: 1px solid #333;
         }
 
-        .widget-drawer.widget-drawer-in {
+        .weavy-drawer.weavy-drawer-in {
             transform: none;
         }
 
-        .widget-panel-block {
+        .weavy-panel-block {
             width: 320px;
             height: 472px;
             border: 1px solid #333;
@@ -72,41 +72,25 @@
         }
     </style>
 
-    <style id="widgetStyleOverrides" media="not all">
-        .weavy-dock {
-            border-radius: .5rem !important;
-            background-color: rgba(33,33,33,0.85) !important;
-        }
-
-        .weavy-button:not(.weavy-open) svg {
-            fill: #fafafa !important;
-        }
-
-        .weavy-button-messenger.weavy-dot {
-            background: #666 !important;
-        }
-
-        /*#widget-panel-authentication-wy-full, #widget-panel-authentication-wy-full{
-            display:none;
-        }*/
-
-    </style>
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark text-light">
         <a class="navbar-brand mr-auto" href="#">@Html.IconImg(24) Navbar</a>
-        <a id="widgetRightButtonPersonal" class="nav-link p-2">@Svg.Icon("bell")</a>
-        <a id="widgetRightButtonMessenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
+        <a id="weavyRightButtonPersonal" class="nav-link p-2">@Svg.Icon("bell")</a>
+        <a id="weavyRightButtonMessenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
     </nav>
 
     <div class="container-fluid py-3">
-        <div>
-            <button id="widgetPanelBlockToggle" class="btn btn-danger">A-team</button>            
-            <div id="widgetPanelBlock" class="widget-panel-block"></div>
+        <div class="py-3">
+            <button id="weavyApiTest" class="btn btn-primary">Invoke api</button>
         </div>
 
-        <div class="widget-panel-right">
-            <div id="widgetPanelRight" class="widget-drawer"></div>
+        <div>
+            <button id="weavyPanelBlockToggle" class="btn btn-danger">A-team</button>
+            <div id="weavyPanelBlock" class="weavy-panel-block"></div>
+        </div>
+        <div class="weavy-panel-right">
+            <div id="weavyPanelRight" class="weavy-drawer"></div>
         </div>
 
     </div>
@@ -115,36 +99,15 @@
     <script>
         (function ($) {
 
-            // FULL STANDARD WIDGET
-            // WITH STYLE OVERRIDES
-
-            var widgetFull = new WeavyWidget({
-                className: "weavy-left",
-                id: "full"                
-            });
-
-            widgetFull.addStyles($("#widgetStyleOverrides")[0].textContent);
-
-            widgetFull.on("load", function () {
-                if (widgetFull.isAuthenticated()) {
-                    widgetFull.alert("Full widget loaded");               
-                }
-            });
-
-
-
-
             // RIGHT SLIDING DRAWER
             // TOGGLED BY BUTTONS
 
-            var widgetRight = new WeavyWidget(WeavyWidget.presets.panel, {
-                container: $("#widgetPanelRight"),
+            var weavyRight = window.weavyRight = new Weavy(Weavy.presets.panel, {
+                container: $("#weavyPanelRight"),
                 className: "weavy-default",
                 id: "right",
                 plugins: {
                     alert: true,
-                    messenger: true,
-                    personal: true,
                     panels: {
                         controls: true
                     },
@@ -153,23 +116,22 @@
                     }
                 }
             });
+            weavyRight.addPanel("messenger", "/messenger");
+            weavyRight.addPanel("personal", "notifications");
                         
-            // Link the alerts
-            widgetRight.alert = widgetFull.alert;
-
-            widgetRight.on("open", function () {
-                $("#widgetPanelRight").addClass("widget-drawer-in");
+            weavyRight.on("open", function () {
+                $("#weavyPanelRight").addClass("weavy-drawer-in");
             });
 
-            widgetRight.on("close", function () {
-                $("#widgetPanelRight").removeClass("widget-drawer-in");
-                widgetRight.nodes.container.classList.remove("weavy-wide");
+            weavyRight.on("close", function () {
+                $("#weavyPanelRight").removeClass("weavy-drawer-in");
+                weavyRight.nodes.container.classList.remove("weavy-wide");
             });
 
-            widgetRight.on("load", function () {
-                if (widgetRight.isAuthenticated()) {
-                    widgetRight.alert("Right Widget loaded");
-                    widgetRight.preloadFrames();
+            weavyRight.on("load", function () {
+                if (weavyRight.isAuthenticated()) {
+                    weavyRight.alert("Right Weavy loaded");
+                    weavyRight.preloadFrames();
                 }
             });
 
@@ -187,13 +149,53 @@
 
             }
 
-            widgetRight.on("badge", function (e, data) {
-                setBadge("#widgetRightButtonPersonal", data.notifications);
-                setBadge("#widgetRightButtonMessenger", data.conversations);
+            function invokeApi() {
+                // SPACES
+                // search for a space name
+                weavyRight.ajax("/api/spaces/search", { q: "marketing" }).then(function (response) {
+                    weavyRight.alert("Search for 'marketing' resulted in " + response.data.length + " hit(s).");
+                });                
+
+                // get a space with a specific id
+                weavyRight.ajax("/api/spaces/1").then(function (response) {
+                    weavyRight.alert("Getting Space with id 1: " + response.name);
+                }).fail(function (message) {
+                    weavyRight.alert("Could not find any space  with id 1! [" + message + "].");
+                });
+
+                // list all apps in a specific space
+                weavyRight.ajax("/api/spaces/1/apps").then(function (response) {
+                    weavyRight.alert("Found " + response.length + " apps in space 1.");
+                });
+
+                // add members to a specific space
+                weavyRight.ajax("/api/spaces/1/members", { members: [1, 2] }, "POST").then(function (response) {                    
+                    weavyRight.alert("Added members " + response.map(function (u) { return u.username }) + " to space 1.");
+                });
+                // create a new space
+                //weavyRight.ajax("/api/spaces", { name: "myspace " + new Date().getTime()}, "POST").then(function (response) {
+                //    console.log(response)
+                //});                
+                
+                // POSTS
+                // create a new post in a Posts App
+                //weavyRight.ajax("/api/apps/3/posts", { text: "This is a post!" }, "POST");
+
+                // USERS
+                // search for users
+                weavyRight.ajax("/api/users", { q: "admin" }).then(function (response) {
+                    weavyRight.alert("Search for user 'admin' resulted in " + response.data.length + " hit(s).");
+                });;
+            }
+
+            weavyRight.on("badge", function (e, data) {
+                setBadge("#weavyRightButtonPersonal", data.notifications);
+                setBadge("#weavyRightButtonMessenger", data.conversations);
             });
 
-            $("#widgetRightButtonPersonal").on("click", widgetRight.toggle.bind(widgetBlock, "personal"))
-            $("#widgetRightButtonMessenger").on("click", widgetRight.toggle.bind(widgetBlock, "messenger"))
+            $("#weavyRightButtonPersonal").on("click", weavyRight.toggle.bind(weavyRight, "personal"))
+            $("#weavyRightButtonMessenger").on("click", weavyRight.toggle.bind(weavyRight, "messenger"))
+            $("#weavyApiTest").on("click", invokeApi)
 
 
 
@@ -201,43 +203,39 @@
             // EXPANDING PANEL
             // TOGGLED BY BUTTONS
 
-            var widgetBlock = new WeavyWidget(WeavyWidget.presets.core, {
-                container: $("#widgetPanelBlock"),
+            var weavyBlock = window.weavyBlock = new Weavy(Weavy.presets.core, {
+                container: $("#weavyPanelBlock"),
                 className: "",
                 id: "block",
                 plugins: {
-                    alert: true,
                     panels: {
                         controls: {
                             close: true,
                             expand: false
                         }
-                    },
-                    preview: true,
-                    theme: true,
-                    context: true
+                    }
                 }
             });
 
             // Link the alerts
-            widgetBlock.alert = widgetFull.alert;
+            weavyBlock.alert = weavyRight.alert;
 
-            widgetBlock.on("load", function () {
-                widgetBlock.addPanel("space-@firstSpace", { url: "/spaces/@firstSpace/" });
+            weavyBlock.on("load", function () {
+                weavyBlock.addPanel("space-@firstSpace", "/spaces/@firstSpace/");
 
-                if (widgetBlock.isAuthenticated()) {
-                    widgetBlock.alert("Toggle Widget loaded");
+                if (weavyBlock.isAuthenticated()) {
+                    weavyBlock.alert("Toggle Weavy loaded");
                 }
             });
 
-            $("#widgetPanelBlockToggle").on("click", widgetBlock.toggle.bind(widgetBlock, "space-@firstSpace"));
+            $("#weavyPanelBlockToggle").on("click", weavyBlock.toggle.bind(weavyBlock, "space-@firstSpace"));
 
-            widgetBlock.on("open", function () {
-                $("#widgetPanelBlock").slideDown();
+            weavyBlock.on("open", function () {
+                $("#weavyPanelBlock").slideDown();
             });
 
-            widgetBlock.on("close", function () {
-                $("#widgetPanelBlock").slideUp();
+            weavyBlock.on("close", function () {
+                $("#weavyPanelBlock").slideUp();
             });
 
 

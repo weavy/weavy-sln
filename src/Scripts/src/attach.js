@@ -1,11 +1,12 @@
-﻿var weavy = weavy || {};
-weavy.attach = (function ($) {
+﻿/*global Turbolinks */
+var wvy = wvy || {};
+wvy.attach = (function ($) {
 
     document.addEventListener("turbolinks:load", function () {
-        if (!weavy.browser.embedded) {
+        if (!wvy.browser.embedded) {
             $("#filebrowser").attr("src", "https://filebrowser.weavycloud.com?origin=" + window.location.origin);
         } else {
-            // request current origin from weavy widget
+            // request current origin from Weavy()
             window.parent.postMessage({ name: 'request:origin' }, "*")
         }
     });
@@ -67,7 +68,7 @@ weavy.attach = (function ($) {
 
     // hide show custom link properties
     $(document).on("change keyup input", "#attach-form input[name=url]", function (e) {
-        if ($(this).val() != "") {
+        if ($(this).val() !== "") {
             $("#attach-form input[name=linktitle]").parent().removeClass("d-none");
             $("#attach-form input[name=linkembedded]").parent().removeClass("d-none");
             $("#attach-form button[type=submit]").prop("disabled", false);
@@ -78,7 +79,7 @@ weavy.attach = (function ($) {
         }
     })
 
-    // listen to messages from filebrowser.weavycloud.com and widget
+    // listen to messages from filebrowser.weavycloud.com and weavy client
     window.addEventListener("message", function (e) {
 
         if (e.data.name === "insert") {
@@ -106,7 +107,7 @@ weavy.attach = (function ($) {
         var $overlaySpinner = $("#attach-modal-spinner");
         $overlaySpinner.removeClass("d-none");
 
-        var url = weavy.url.resolve($("#attach-form").attr("action"));
+        var url = wvy.url.resolve($("#attach-form").attr("action"));
 
         var data = [];
         for (var i = 0; i < links.length; i++) {
@@ -123,7 +124,7 @@ weavy.attach = (function ($) {
             if (response.skipped) {
                 
                 if (response.skipped.length === 1) {
-                    weavy.alert.warning('There is already an item named ' + response.skipped[0].name + '.' +
+                    wvy.alert.warning('There is already an item named ' + response.skipped[0].name + '.' +
                         '<div>' +
                         '<button type="button" class="btn btn-icon insert-content-keep"><svg class="i">' +
                         '<svg class="i i-check-all" height="24" viewBox="0 0 24 24" width="24"><path d="m.41 13.41 5.59 5.59 1.41-1.42-5.58-5.58m20.41-6.42-10.58 10.59-4.16-4.17-1.43 1.41 5.59 5.59 12-12m-5.66 0-1.41-1.42-6.35 6.35 1.42 1.41z"/></svg> Keep both' +
@@ -135,7 +136,7 @@ weavy.attach = (function ($) {
                         '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this item' +
                         '</button></div>');
                 } else {
-                    weavy.alert.warning('There are ' + response.skipped.length + ' items with the same names.' +
+                    wvy.alert.warning('There are ' + response.skipped.length + ' items with the same names.' +
                         '<div>' +
                         '<button type="button" class="btn btn-icon insert-content-keep">' +
                         '<svg class="i i-check-all" height="24" viewBox="0 0 24 24" width="24"><path d="m.41 13.41 5.59 5.59 1.41-1.42-5.58-5.58m20.41-6.42-10.58 10.59-4.16-4.17-1.43 1.41 5.59 5.59 12-12m-5.66 0-1.41-1.42-6.35 6.35 1.42 1.41z"/></svg> Keep all the items' +
@@ -167,7 +168,7 @@ weavy.attach = (function ($) {
         }).fail(function (xhr, status, error) {
             setTimeout(function () {
                 var json = JSON.parse(xhr.responseText);
-                weavy.alert.warning(json.message);
+                wvy.alert.warning(json.message);
             }, 100);
 
         }).always(function () {
@@ -184,7 +185,7 @@ weavy.attach = (function ($) {
             method: "PUT",
             contentType: "application/json",
             data: JSON.stringify({
-                action: action, items: _.map(items, function (i) {
+                action: action, items: items.map(function (i) {
                     i.guid = i.content_type;
                     i.url = i.link_url;
                     delete i["created_by"];

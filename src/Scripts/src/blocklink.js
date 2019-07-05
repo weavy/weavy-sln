@@ -1,5 +1,6 @@
-﻿// makes en entire block/row clickable like <a href=""></a>
-var weavy = weavy || {};
+﻿/*global Turbolinks */
+// makes en entire block/row clickable like <a href=""></a>
+var wvy = wvy || {};
 
 (function ($) {
     $(function () {

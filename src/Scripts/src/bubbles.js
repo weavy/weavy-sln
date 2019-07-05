@@ -1,5 +1,6 @@
-﻿var weavy = weavy || {};
-weavy.bubbles = (function ($) {
+﻿/*global Mousetrap */
+var wvy = wvy || {};
+wvy.bubbles = (function ($) {
     var visitUrl = null;
 
     //-------------------------------------------------------
@@ -15,24 +16,22 @@ weavy.bubbles = (function ($) {
         requestOpen(spaceId, destination);
 
         return $.ajax({
-            url: "/api/bubble",
+            url: "/a/bubble",
             type: "POST",
             data: JSON.stringify({ space_id: spaceId, url: destination, type: 1 }),
             contentType: "application/json"
         });
     }
 
-    function openBubble(bubbleTarget, destination) {
-        console.debug("opening bubble");
+    function requestOpen(requestId, destination) {
+        if (wvy.browser.embedded) {
+            console.log("requesting panel open", requestId, destination);
 
-        if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'send', bubbleTarget: bubbleTarget, url: destination });
-        }
-    }
-
-    function requestOpen(spaceId, destination) {
-        if (weavy.browser.embedded) {
-            weavy.postal.post({ name: 'request:open', spaceId: spaceId, destination: destination });
+            if (typeof requestId === 'number') {
+                wvy.postal.post({ name: 'request:open', spaceId: requestId, destination: destination });
+            } else {
+                wvy.postal.post({ name: 'request:open', panelId: requestId, destination: destination });
+            }
         }
     }
 
@@ -40,7 +39,7 @@ weavy.bubbles = (function ($) {
         console.debug("closing space bubble");
 
         return $.ajax({
-            url: "/api/bubble/" + bubbleId,
+            url: "/a/bubble/" + bubbleId,
             type: "DELETE",
             contentType: "application/json"
         });
@@ -55,13 +54,13 @@ weavy.bubbles = (function ($) {
 
         var $body = $(e.data.newBody);
         var $oldBody = $("body");
-        var currentSpaceId = $oldBody.get(0).getAttribute("data-space");
-        var newSpaceId = $body.data("space");
+        var currentSpaceId = parseInt($oldBody.get(0).getAttribute("data-space"));
+        var newSpaceId = parseInt($body.data("space"));
         var wasSignedOut = parseInt($oldBody.get(0).getAttribute("data-user"), 10) === -1;
 
-        if (!weavy.browser.embedded) {
+        if (!wvy.browser.embedded) {
             // Open bubble on page load
-            if (newSpaceId && newSpaceId != currentSpaceId) {
+            if (newSpaceId && newSpaceId !== currentSpaceId) {
                 open(newSpaceId);
             }
             return;
@@ -70,12 +69,17 @@ weavy.bubbles = (function ($) {
 
         // Intercept global search
         var urlBase = $body.data("path").indexOf("http") === 0 ? $body.data("path") : document.location.origin + $body.data("path");
-        var redirSpaceId = visitUrl.indexOf(urlBase + "search") === 0 ? -1 : newSpaceId;
+        var redirSpaceId = visitUrl && visitUrl.indexOf(urlBase + "search") === 0 ? -1 : newSpaceId;
 
-        if (!wasSignedOut && redirSpaceId && newSpaceId != currentSpaceId) {
+        if (!wasSignedOut && redirSpaceId && newSpaceId !== currentSpaceId) {
 
             if (redirSpaceId === -1) {
-                openBubble("start", visitUrl);
+                if (currentSpaceId > 0) {
+                    requestOpen("start", visitUrl);
+                } else {
+                    requestOpen("start");
+                    return;
+                }
             } else {
                 // restore page and open bubble 
                 open(newSpaceId, visitUrl);
@@ -103,8 +107,8 @@ weavy.bubbles = (function ($) {
         var removeBubble = $(this).data("removeBubble");
         if (removeBubble) {
             close(removeBubble.bubbleId).done(function (data) {
-                if ($("body").data("path") && removeBubble.spaceId == $("body").data("space")) {
-                    weavy.turbolinks.visit($("body").data("path"));
+                if ($("body").data("path") && removeBubble.spaceId === $("body").data("space")) {
+                    wvy.turbolinks.visit($("body").data("path"));
                 }
             });
         }
@@ -130,7 +134,7 @@ weavy.bubbles = (function ($) {
 
                 var $dropdownItem = $('<div class="dropdown-item weavy-bubble-item">')
                     .addClass("weavy-bubble-" + data.spaceId)
-                    .addClass(data.spaceId == $("body").data("space") ? "active" : "")
+                    .addClass(data.spaceId === $("body").data("space") ? "active" : "")
                     .attr("data-bubble-id", data.bubbleId)
                     .attr("data-href", data.url)
                     .append('<img class="avatar img-24" src="' + data.icon + '" />')
@@ -157,7 +161,7 @@ weavy.bubbles = (function ($) {
 
                 var $bubble = $('<div class="weavy-bubble-item block-link" data-type="personal">')
                     .addClass("weavy-bubble-" + data.spaceId)
-                    .addClass(data.spaceId == $("body").data("space") ? "active" : "")
+                    .addClass(data.spaceId === $("body").data("space") ? "active" : "")
                     .attr("data-bubble-id", data.bubbleId)
                     .attr("data-id", data.spaceId)
                     .attr("data-href", data.url)
@@ -187,7 +191,7 @@ weavy.bubbles = (function ($) {
 
     $(function () {
         // Open current space bubble on page ready
-        if (!weavy.browser.embedded) {
+        if (!wvy.browser.embedded) {
             // Open bubble
             var $body = $("body");
             var newSpaceId = $body.data("space");
@@ -208,19 +212,19 @@ weavy.bubbles = (function ($) {
 
     });
 
-    if (weavy.realtime) {
-        weavy.realtime.on("bubble-added.weavy", function (e, data) {
+    if (wvy.realtime) {
+        wvy.realtime.on("bubble-added.weavy", function (e, data) {
             addBubble(data);
         });
 
-        weavy.realtime.on("bubble-removed.weavy", function (e, data) {
+        wvy.realtime.on("bubble-removed.weavy", function (e, data) {
             removeBubble(data);
         });
 
-        weavy.realtime.on("space-trashed.weavy", function (e, data) {
+        wvy.realtime.on("space-trashed.weavy", function (e, data) {
             removeBubble({ spaceId: data.id }, true);
-            if ($("body").data("path") && data.id == $("body").data("space")) {
-                weavy.turbolinks.visit($("body").data("path"));
+            if ($("body").data("path") && data.id === $("body").data("space")) {
+                wvy.turbolinks.visit($("body").data("path"));
             }
         })
     }

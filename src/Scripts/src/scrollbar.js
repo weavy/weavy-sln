@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.scrollbar = (function () {
+wvy.scrollbar = (function () {
     
     // Scrollbar detection (mainly for MacOS/Chrome)
     function checkScrollbar(entries) {
@@ -28,8 +28,7 @@ weavy.scrollbar = (function () {
     // Register scrollbar detection
     var roScrollbar; 
     try {
-        roScrollbar = new ResizeObserver(checkScrollbar)
-        roScrollBar.observe(document.documentElement);
+        roScrollbar = new ResizeObserver(checkScrollbar);
     } catch (e) {}
 
     var container = document.documentElement.appendChild(document.createElement("section"))

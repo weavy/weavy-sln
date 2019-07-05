@@ -20,7 +20,7 @@
 ~/scripts/src/postal.js
 ~/scripts/src/audio.js
 ~/scripts/src/star.js
-~/scripts/src/urlContext.js
+~/scripts/src/url-context.js
 ~/scripts/_fileupload.bundle
 ~/scripts/_preview.bundle
 ~/scripts/_photoswipe.bundle

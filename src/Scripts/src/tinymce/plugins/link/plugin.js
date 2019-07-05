@@ -1,4 +1,7 @@
-﻿tinymce.PluginManager.add("weavy_link", function (editor, url) {
+﻿/*global tinymce */
+var wvy = wvy || {};
+
+tinymce.PluginManager.add("weavy_link", function (editor, url) {
 
     var bookmark;
 
@@ -66,7 +69,7 @@
 
         editor.windowManager.open({
             title: "Insert/edit link",
-            file: weavy.url.resolve("ui/insertlink?q=" + textSelection + "&url=" + encodeURIComponent(url) + params),
+            file: wvy.url.resolve("ui/insertlink?q=" + textSelection + "&url=" + encodeURIComponent(url) + params),
             width: 'auto',
             height: 600,
             resizable: true,

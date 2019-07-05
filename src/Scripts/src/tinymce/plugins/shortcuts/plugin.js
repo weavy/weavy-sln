@@ -1,10 +1,13 @@
-﻿tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
+﻿/*global tinymce, Mousetrap */
+var wvy = wvy || {};
+
+tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
 
     // perform some things on init
     editor.on("init", function () {
 
         // start autosave
-        weavy.autosave.registerEditor();
+        wvy.autosave.registerEditor();
         
         // register "global" shortcuts
         var regex = new RegExp("ctrl", "gi");
@@ -26,7 +29,7 @@
 
         // close plugin window on escape
         Mousetrap(editor.contentWindow.document).bind("esc", function (e) {
-            tinyMCE.activeEditor.windowManager.close();
+            tinymce.activeEditor.windowManager.close();
         });
     });
 
@@ -151,11 +154,11 @@
 
     function getHelpText(items) {
         var markup = "<table class='table table-condensed shortcuts'><tbody>";
-        var meta = navigator.appVersion.indexOf("Mac") != -1 ? "&#8984;" : "Ctrl";
+        var meta = navigator.appVersion.indexOf("Mac") !== -1 ? "&#8984;" : "Ctrl";
 
         for (var i = 0; i < items.length; i++) {
             if (items[i].shortcut == null) {
-                markup += "<tr><th colspan='2' class='" + (i == 0 ? "first" : "") + "'>" + items[i].label + "</th></tr>";
+                markup += "<tr><th colspan='2' class='" + (i === 0 ? "first" : "") + "'>" + items[i].label + "</th></tr>";
             } else {
                 markup += "<tr><td>" + items[i].label + "</td><td style='text-align:right'>" + meta + items[i].shortcut + "</td></tr>";
             }

@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.subscribe = (function ($) {
+wvy.subscribe = (function ($) {
 
     // attach click event handler to [data-toggle=subscribe]
     $(document).on("click", "[data-toggle=subscribe]", function (e) {
@@ -20,7 +20,7 @@ weavy.subscribe = (function ($) {
         $("[data-toggle=subscribe][data-entity=" + entity + "][data-id=" + id + "]").addClass("on");
 
         // call api to subscribe (follow) to entity
-        weavy.api.follow(entity, id).then(function () {
+        wvy.api.follow(entity, id).then(function () {
             updateSubscribers(entity, id);
         });
     }
@@ -31,7 +31,7 @@ weavy.subscribe = (function ($) {
         $("[data-toggle=subscribe][data-entity=" + entity + "][data-id=" + id + "]").removeClass("on");
 
         // call api to unsubscribe (unfollow) to entity
-        weavy.api.unfollow(entity, id).then(function () {
+        wvy.api.unfollow(entity, id).then(function () {
             updateSubscribers(entity, id);
         });
     }
@@ -44,7 +44,7 @@ weavy.subscribe = (function ($) {
         }
 
         $.ajax({
-            url: weavy.url.mvc(entity) + id + "/subscribers",
+            url: wvy.url.mvc(entity) + id + "/subscribers",
             method: "GET",
             contentType: "application/json"
         }).then(function (html) {

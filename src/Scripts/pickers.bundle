@@ -1,10 +1,10 @@
-﻿~/scripts/vendor/jquery/jquery.min.js
+﻿~/scripts/src/browser.js
+~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/vendor/turbolinks/turbolinks.js
 ~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/_bootstrap.bundle
 ~/scripts/src/_extensions.js
 ~/scripts/src/turbolinks.js 
-~/scripts/src/browser.js
 ~/scripts/src/context.js
 ~/scripts/src/url.js
 ~/scripts/src/api.js

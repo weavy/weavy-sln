@@ -1,5 +1,5 @@
-﻿var weavy = weavy || {};
-weavy.audio = (function ($) {
+﻿var wvy = wvy || {};
+wvy.audio = (function ($) {
 
     function play(sound) {        
         try {

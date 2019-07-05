@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.scroll = (function ($) {
+wvy.scroll = (function ($) {
     var currentScroll;
 
     function preventScrollChaining(ev) {

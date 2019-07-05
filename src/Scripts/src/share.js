@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.share = (function ($) {
+wvy.share = (function ($) {
 
     document.addEventListener("turbolinks:before-cache", function () {
         $(".weavy-editor").next("textarea[data-editor-location=share]").weavyEditor("destroy");        
@@ -51,7 +51,7 @@ weavy.share = (function ($) {
 
         $.ajax({
             method: $form.attr("method"),
-            url: weavy.url.resolve($form.attr("action")),
+            url: wvy.url.resolve($form.attr("action")),
             data: $form.serialize()
         }).done(function () {           
             // hide modal

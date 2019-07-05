@@ -1,20 +1,20 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.notifications = (function ($) {
+wvy.notifications = (function ($) {
     
     // mark notification as read
     function read(id) {
-        return weavy.api.read(id);
+        return wvy.api.read(id);
     }
 
     // mark notification as unread
     function unread(id) {
-        return weavy.api.unread(id);
+        return wvy.api.unread(id);
     }
 
     // mark all notifcations as read
     function readAll() {
-        return weavy.api.readAll();
+        return wvy.api.readAll();
     }
 
     function sortTabNotifications() {
@@ -57,11 +57,11 @@ weavy.notifications = (function ($) {
         readAll();      
 
         // finally close drawer
-        weavy.drawer.close();
+        wvy.drawer.close();
     });
     
     // callbacks for realtime events
-    weavy.realtime.on("notification-inserted.weavy", function (event, data) {
+    wvy.realtime.on("notification-inserted.weavy", function (event, data) {
         $("#tab-notifications .empty").remove();
                 
         get(data.id).then(function (html) {            
@@ -69,7 +69,7 @@ weavy.notifications = (function ($) {
         });        
     });
 
-    weavy.realtime.on("notification-updated.weavy", function (event, data) {
+    wvy.realtime.on("notification-updated.weavy", function (event, data) {
         if (data.isRead) {
             $("a.notification[data-id='" + data.id + "']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");                       
         } else {
@@ -77,11 +77,11 @@ weavy.notifications = (function ($) {
         }
     });
 
-    weavy.realtime.on("notifications-all-read.weavy", function (event, data) {
+    wvy.realtime.on("notifications-all-read.weavy", function (event, data) {
         $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
     });
 
-    weavy.realtime.on("badge.weavy", function (event, data) {                
+    wvy.realtime.on("badge.weavy", function (event, data) {                
         if (data.notifications > 0) {
             $(".badge[data-badge='notification']").text(data.notifications).removeClass("d-none");
         } else {
@@ -92,7 +92,7 @@ weavy.notifications = (function ($) {
     // get html for notification
     function get(id) {
         return $.ajax({
-            url: weavy.url.resolve("/notifications/" + id),
+            url: wvy.url.resolve("/notifications/" + id),
             method: "GET",
             contentType: "application/json"
         });

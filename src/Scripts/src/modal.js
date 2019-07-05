@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.modal = (function ($) {
+wvy.modal = (function ($) {
 
     document.addEventListener("turbolinks:before-cache", function (e) {
         // hide modals
@@ -22,7 +22,7 @@ weavy.modal = (function ($) {
         var $body = $(".modal-body", $modal).empty();
 
         $.ajax({
-            url: weavy.url.resolve(path),
+            url: wvy.url.resolve(path),
             type: "GET"
         }).then(function (html) {
             $body.html(html);
@@ -92,7 +92,7 @@ weavy.modal = (function ($) {
         var $modal = $form.closest(".modal");
         var $body = $(".modal-body", $modal);
 
-        var url = weavy.url.resolve($submit && $submit.attr("formaction") || $form.attr("action"));
+        var url = wvy.url.resolve($submit && $submit.attr("formaction") || $form.attr("action"));
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
 
         var xhr = new XMLHttpRequest();
@@ -101,15 +101,17 @@ weavy.modal = (function ($) {
             url: url,
             type: method,
             data: data,
+            cache: false,
             xhr: function () {
                 // Use custom xhr to be able to read final location (xhr.responseURL)
                 return xhr;
             }
         }).done(function (response) {
-            var $html = $(response);
 
-            if ($html.find(".invalid-feedback").length !== 0) {
-                $body.html(response);
+            var invalid = response.match(/.invalid-feedback/gm);
+
+            if (invalid && invalid.length > 0) {
+                $body.html($(response));
                 focusFirst($body);
             } else {
                 var redirectLocation = xhr.responseURL !== url && xhr.responseURL || window.location.href;
@@ -117,7 +119,7 @@ weavy.modal = (function ($) {
             }
         }).fail(function (jqXhr, status, error) {
             var json = JSON.parse(jqXhr.responseText);
-            weavy.alert.danger(json.message);
+            wvy.alert.danger(json.message);
 
         }).always(function () {
             $("button[type='submit']").prop("disabled", false);

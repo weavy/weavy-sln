@@ -1,4 +1,4 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
 (function ($) {
     $(function () {

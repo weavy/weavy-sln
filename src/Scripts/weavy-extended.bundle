@@ -1,0 +1,13 @@
+﻿# Plugins for the dock, requires weavy.bundle
+# Plugins may be loaded in any order
+~/scripts/src/weavy/extended/bubbles.js
+~/scripts/src/weavy/extended/context.js
+~/scripts/src/weavy/extended/dock.js
+~/scripts/src/weavy/extended/fallback.js
+~/scripts/src/weavy/extended/notifications.js
+~/scripts/src/weavy/extended/position.js
+~/scripts/src/weavy/extended/upgrade.js
+~/scripts/src/weavy/extended/badge.js
+~/scripts/src/weavy/extended/messenger.js
+~/scripts/src/weavy/extended/personal.js
+~/scripts/src/weavy/extended/start.js

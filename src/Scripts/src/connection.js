@@ -1,13 +1,13 @@
-var weavy = weavy || {};
-if (weavy.connection && weavy.connection.destroy) {
-    console.log("recreating weavy.connection");
-    weavy.connection.destroy();
+var wvy = wvy || {};
+if (wvy.connection && wvy.connection.destroy) {
+    console.log("recreating wvy.connection");
+    wvy.connection.destroy();
 }
-weavy.connection = (function ($, w) {
+wvy.connection = (function ($, w) {
     // create a new hub connection
     var connection = $.hubConnection("/signalr", { useDefaultPath: false });
     var reconnecting = false;
-    var hubProxies = { rtm: connection.createHubProxy('rtm'), widget: connection.createHubProxy('widget'), messenger: connection.createHubProxy('messenger') };
+    var hubProxies = { rtm: connection.createHubProxy('rtm'), client: connection.createHubProxy('client'), messenger: connection.createHubProxy('messenger') };
     var wins = [w]; // all windows when in embedded mode
     var _events = [];
     var _reconnectTimeout = null;
@@ -15,6 +15,7 @@ weavy.connection = (function ($, w) {
     var reconnectRetries = 0;
     var explicitlyDisconnected = false;
     var authenticated = null;
+    var whenConnectionStart;
 
     //----------------------------------------------------------
     // Init the connection
@@ -36,10 +37,10 @@ weavy.connection = (function ($, w) {
         wins = windows || wins;
 
         if (authenticated === null) {
-            authenticated = (weavy.context && weavy.context.user > 0) ? true : false;
+            authenticated = (wvy.context && wvy.context.user > 0) ? true : false;
         }
 
-        if ((weavy.context && weavy.context.user > 0) || force) {
+        if ((wvy.context && wvy.context.user > 0) || force) {
             // connect to the server                
             return connect();
         } else {
@@ -52,20 +53,20 @@ weavy.connection = (function ($, w) {
     function connect() {
         explicitlyDisconnected = false;
 
-        if (authenticated === null || weavy.context) {
-            authenticated = (weavy.context && weavy.context.user > 0) ? true : false;
+        if (authenticated === null || wvy.context) {
+            authenticated = (wvy.context && wvy.context.user > 0) ? true : false;
         }
 
         if (connection.state === $.signalR.connectionState.disconnected) {
-            return connection.start();
+            return whenConnectionStart = connection.start();
         } else {
-            return Promise.resolve();
+            return whenConnectionStart;
         }
     }
 
     // stop connection
     function disconnect(async, notify) {
-        if (connection.state !== $.signalR.connectionState.disconnected && explicitlyDisconnected == false) {
+        if (connection.state !== $.signalR.connectionState.disconnected && explicitlyDisconnected === false) {
             explicitlyDisconnected = true;
 
             try {
@@ -115,8 +116,8 @@ weavy.connection = (function ($, w) {
             // reset retries
             reconnectRetries = 0;
 
-            if (weavy.alert) {
-                weavy.alert.close("connection-state");
+            if (wvy.alert) {
+                wvy.alert.close("connection-state");
             } else {
                 triggerPostMessage("alert", "close", "connection-state");
             }
@@ -140,8 +141,8 @@ weavy.connection = (function ($, w) {
         }
 
         _reconnectTimeout = setTimeout(function () {
-            if (weavy.alert) {
-                weavy.alert.alert("warning", "Reconnecting...", null, "connection-state");
+            if (wvy.alert) {
+                wvy.alert.alert("warning", "Reconnecting...", null, "connection-state");
             } else {
                 triggerPostMessage("alert", "show", { type: "warning", title: "Reconnecting...", id: "connection-state" });
             }
@@ -219,8 +220,8 @@ weavy.connection = (function ($, w) {
     }
 
     function updateAuthenticationState() {
-        var authUrl = connection.url.substr(0, connection.url.lastIndexOf("/") + 1) + "api/users/authenticated";
-        console.log("weavy.connection.updateAuthenticationState");
+        var authUrl = connection.url.substr(0, connection.url.lastIndexOf("/") + 1) + "a/users/authenticated";
+        console.log("wvy.connection.updateAuthenticationState");
 
         $.ajax(authUrl, {
             crossDomain: true,
@@ -231,7 +232,7 @@ weavy.connection = (function ($, w) {
         }).done(function (userIsAuthenticated) {
             if (userIsAuthenticated) {
                 if (!authenticated) {
-                    console.log("weavy.connection.updateAuthenticationState -> authenticated");
+                    console.log("wvy.connection.updateAuthenticationState -> authenticated");
                     window.postMessage({ name: "signing-in" }, "*");
                     disconnectAndConnect().then(function () {
                         triggerEvent("user-change.connection.weavy", { eventName: "signed-in" });
@@ -240,29 +241,29 @@ weavy.connection = (function ($, w) {
                 authenticated = true;
             } else {
                 if (authenticated) {
-                    console.log("weavy.connection.updateAuthenticationState -> unauthorized");
+                    console.log("wvy.connection.updateAuthenticationState -> unauthorized");
                     window.postMessage({ name: "signing-out" }, "*");
                     disconnectAndConnect().then(function () {
                         triggerEvent("user-change.connection.weavy", { eventName: "signed-out" });
                     });
-                    if (weavy.context && weavy.context.user > 0) {
-                        weavy.context.user = -1;
+                    if (wvy.context && wvy.context.user > 0) {
+                        wvy.context.user = -1;
                     }
-                    if (weavy.alert) {
-                        weavy.alert.warning("You have been signed out. Reload to sign in again.");
+                    if (wvy.alert) {
+                        wvy.alert.warning("You have been signed out. Reload to sign in again.");
                     }
                 }
                 authenticated = false;
             }
 
         }).fail(function () {
-            console.warn("weavy.connection.updateAuthenticationState Request fail");
+            console.warn("wvy.connection.updateAuthenticationState Request fail");
             authenticated = false;
         });
     }
 
     // generic callback used by server to notify clients that a realtime event happened
-    // NOTE: we only need to hook this up in standalone, in the widget we wrap realtime events in the cross-frame-event and post to the frames
+    // NOTE: we only need to hook this up in standalone, in the weavy client we wrap realtime events in the cross-frame-event and post to the frames
     function rtmEventRecieved(name, args) {
         if (name === "request:authentication.weavy") {
             updateAuthenticationState.call(this);
@@ -272,38 +273,39 @@ weavy.connection = (function ($, w) {
         }
     }
 
-    if (!weavy.browser || !weavy.browser.embedded) {
+    if (!wvy.browser || !wvy.browser.embedded) {
         hubProxies["rtm"].on("eventReceived", rtmEventRecieved);
     }
 
 
-    // callback from widget onload
-    function widgetLoaded(args) {
+    // callback from weavy client onload
+    function weavyLoaded(args) {
         var name = "loaded.rtmweavy.weavy";
-        if (!weavy.browser || !weavy.browser.standalone && !weavy.browser.embedded) {
+        if (!wvy.browser || !wvy.browser.standalone && !wvy.browser.embedded) {
             try {
                 var options = JSON.parse(args);
                 authenticated = options.userId > -1;
-            } catch (e) { console.warn("weavy.connection could not parse widget options"); }
+            } catch (e) { console.warn("wvy.connection could not parse weavy client options"); }
 
         }
         triggerEvent(name, args);
     }
-    hubProxies["widget"].on("loaded", widgetLoaded);
+    hubProxies["client"].on("loaded", weavyLoaded);
 
-    // callback from widget conversation received
-    function widgetConversationsReceived(args) {
+    // callback from weavy client conversation received
+    function weavyConversationsReceived(args) {
         var name = "conversation-received.rtmweavy.weavy";
         triggerEvent(name, args);
     }
-    hubProxies["widget"].on("conversationReceived", widgetConversationsReceived);
+    hubProxies["client"].on("conversationReceived", weavyConversationsReceived);
 
-    if (!weavy.browser || !weavy.browser.standalone && !weavy.browser.embedded) {
+    if (!wvy.browser || !wvy.browser.standalone && !wvy.browser.embedded) {
         window.addEventListener("message", function (e) {
             switch (e.data.name) {
-                case "signed-in":
                 case "signed-out":
                     authenticated = false;
+                    // falls through
+                case "signed-in":
                     disconnectAndConnect().then(function () {
                         triggerEvent("user-change.connection.weavy", { eventName: e.data.name });
                     });
@@ -324,7 +326,7 @@ weavy.connection = (function ($, w) {
 
     function removeWindow(win) {
         wins = wins.filter(function (existingWindow) {
-            return existingWindow != win;
+            return existingWindow !== win;
         });
     }
 
@@ -343,11 +345,11 @@ weavy.connection = (function ($, w) {
         } catch (e) { }
 
         try {
-            hubProxies["widget"].off("loaded", widgetLoaded);
+            hubProxies["client"].off("loaded", weavyLoaded);
         } catch (e) { }
 
         try {
-            hubProxies["widget"].off("conversationReceived", widgetConversationsReceived);
+            hubProxies["client"].off("conversationReceived", weavyConversationsReceived);
         } catch (e) { }
 
         _events.forEach(function (eventHandler) {
@@ -356,8 +358,8 @@ weavy.connection = (function ($, w) {
         });
         _events = [];
 
-        weavy.connection = null;
-        delete weavy.connection;
+        wvy.connection = null;
+        delete wvy.connection;
     }
 
 

@@ -1,6 +1,6 @@
-﻿var weavy = weavy || {};
+﻿var wvy = wvy || {};
 
-weavy.tab = (function ($) {
+wvy.tab = (function ($) {
 
     // load remote tab content for specified tab-pane
     function load(tabpane, optionalPromise) {
@@ -38,17 +38,17 @@ weavy.tab = (function ($) {
     }
 
     // Reload tabs on show
-    if (weavy.browser.embedded) {
+    if (wvy.browser.embedded) {
         window.addEventListener("message", function (e) {
             switch (e.data.name) {
                 case "show":
-                    setTimeout(weavy.tab.load, 200, "#tab-notifications");
-                    setTimeout(weavy.tab.load, 200, "#tab-stars");
-                    setTimeout(weavy.tab.load, 200, "#tab-drafts");
+                    setTimeout(wvy.tab.load, 200, "#tab-notifications");
+                    setTimeout(wvy.tab.load, 200, "#tab-stars");
+                    setTimeout(wvy.tab.load, 200, "#tab-drafts");
                     break;
                 case "hide":
-                    setTimeout(weavy.notifications.sort, 200);
-                    setTimeout(weavy.stars.prune, 200);
+                    setTimeout(wvy.notifications.sort, 200);
+                    setTimeout(wvy.stars.prune, 200);
                     break;
             }
         });

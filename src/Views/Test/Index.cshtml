@@ -768,7 +768,7 @@
             $(document).on("click", ".btn[data-alert]", function (e) {
                 var type = this.dataset.alert;
                 var text = $(this).text();
-                weavy.alert.alert(type, text, 3000);
+                wvy.alert.alert(type, text, 3000);
             });
 
             document.addEventListener("turbolinks:load", function () {

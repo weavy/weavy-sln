@@ -1,0 +1,36 @@
+﻿@{
+    // create token valid for 60 seconds
+    var token = JwtHelper.Encode(new Dictionary<string, string> {
+        { "iss", "SSO TEST"}, // required
+        { "sub", "ssotest-sub"}, // required
+        { "email", "ssotest2@weavy.com"}, // required
+        { "username", "ssotest2"},
+        { "name", "SSO Test 2"}
+    }, 60);
+
+}
+
+<div class="container m-3">
+    <button type="button" class="btn btn-primary" id="btn">Sign in with JWT Token</button>
+    <pre><code class="language-js" id="result"></code></pre>
+</div>
+
+@section footer {
+    <script>
+        $(document).on("click", "#btn", function () {
+            console.info("signing in with token");
+             $.ajax({
+                 url: '@(Url.Action<AccountController>(x => x.SignInToken(null)))',
+                 method: "POST",
+                 data: 'jwt=@token'
+             }).done(function (data) {
+                 // display result
+                 $("#result").text(JSON.stringify(data, null, 2));
+             }).fail(function (xhr,status,error) {
+                 // display result
+                 $("#result").text(error);
+             });
+        });
+
+    </script>
+}

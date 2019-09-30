@@ -114,11 +114,10 @@ wvy.tiny = (function ($) {
                 group.find(".help-block").text("");
                 group.removeClass("has-error");
 
-                // basic check for duplicate filenames
-                var existing = $(".result [data-filename]").map(function (f) { return $(f).data("filename") });
-
+                // basic check for duplicate filenames               
+                var names = $.map($(".result [data-name]"), function (val, i) { return $(val).data("name"); });
                 data.files.forEach(function (file) {
-                    if (existing.indexOf(file.name) !== -1) {
+                    if (names.indexOf(file.name) !== -1) {
                         uploadErrors.push("There is already a file named " + file.name);
                     }
                 });
@@ -155,7 +154,7 @@ wvy.tiny = (function ($) {
                         '<small title="' + f.name + '">' + f.name + '</small>' +
                         '<input type="hidden" name="blobs" value="' + f.id + '" />' +
                         '</div>'
-                        '</a>' +
+                    '</a>' +
                         '</div>';
                 });
                 container.prepend(html);

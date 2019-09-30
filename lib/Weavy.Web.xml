@@ -2853,12 +2853,12 @@
             <param name="path"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.SignInIdentity(System.Security.Claims.ClaimsIdentity,System.String)">
+        <member name="M:Weavy.Web.Controllers.AccountController.SignInIdentity(System.Security.Claims.ClaimsIdentity,System.Boolean)">
             <summary>
             Sign in with an external identity.
             </summary>
             <param name="identity">An externally authenticated identity.</param>
-            <param name="path">The url to redirect to after sign in.</param>
+            <param name="update"><c>true</c> to update the local user account with claims from the specified <paramref name="identity"/>, otherwise <c>false</c>.</param>
             <returns>A <see cref="T:Weavy.Core.Models.User"/> and a <see cref="T:Weavy.Core.Models.Login"/> object.</returns>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignInOwin(Weavy.Core.Models.User,System.Boolean)">

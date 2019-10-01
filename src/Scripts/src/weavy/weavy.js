@@ -1339,7 +1339,7 @@
                          * @returns {Object}
                          * @property {boolean} isLocal - Is the origin of the event from this weavy instance
                          */
-                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === weavy.getId()) }));
+                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (!message.sourceWeavyId || message.sourceWeavyId === weavy.getId()) }));
                         break;
                     case "signing-out":
                         weavy.close();
@@ -1352,7 +1352,7 @@
                          * @returns {Object}
                          * @property {boolean} isLocal - Is the origin of the event from this weavy instance
                          */
-                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-out", { isLocal: typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === weavy.getId()) }));
+                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-out", { isLocal: typeof e.source !== "undefined" && (!message.sourceWeavyId || message.sourceWeavyId === weavy.getId()) }));
                         break;
                     case "signed-out":
                         weavy.options.userId = null;
@@ -1369,7 +1369,7 @@
                         break;
                 }
 
-                if (typeof e.source !== "undefined" && (!message.sourceWidgetId || message.sourceWidgetId === weavy.getId())) {
+                if (typeof e.source !== "undefined" && (!message.sourceWeavyId || message.sourceWeavyId === weavy.getId())) {
                     /**
                      * Event for window messages directed to the current weavy instance, such as messages sent from panels belonging to the weavy instance.
                      * The original message event is attached as event.originalEvent.

@@ -7,31 +7,35 @@ SDK is divided into the Client SDK which is a javascript library for embedding W
 based application, and the Server SDK which is an ASP.NET/C# solution that can be used to completely 
 customize a Weavy installation. See https://docs.weavy.com for more information.
 
+### 4.0.2 (2019-10-01)
+
+* Fixed an issue with SSO getting stuck in a loop.
+
 ### 4.0.1 (2019-09-30)
 
-* Added ability to update user profile when signing in via JWT 
+* Added ability to update user profile when signing in via JWT.
 * Fixed an issue with uploading images when editing a Note.
 * Fixed compilation warning that System.Web.Http could not be found.
-* Removed invalid configuration for Microsoft.IdentityModel.Protocols from web.config
+* Removed invalid configuration for Microsoft.IdentityModel.Protocols from web.config.
 
 ### Weavy 4.0.0 (2019-07-04)
 
 * Fixed a realtime connection bug when connecting multiple clients at the same time.
 * Fixed an issue with signing out when using the sso plugin.
 * Client: Added .ajax(..) method in the client for easy access to server JSON endpoints.
-* Client: .close() supports optional panelId to only close a specific panel
-* Client: Fixed an issue with .sendToFrame() that caused an occational bug in sign-in 
+* Client: .close() supports optional panelId to only close a specific panel.
+* Client: Fixed an issue with .sendToFrame() that caused an occational bug in sign-in. 
 
 #### Breaking Changes
 
-* Widget API is now Weavy Client SDK
+* Widget API is now Weavy Client SDK.
 * Weavy Widget Wizard previously at /widget is now Weavy Client Configurator found at /client.
 * widget.js is now weavy.js and is by default only the minimal required for panels and without jQuery. 
   To use the full dock including jQuery use weavy.extended.bundle.js.
-* Client: WeavyWidget() is now Weavy()
-* Client: All promises are now prefixed "when" instead of "await"
-* Client: .loadInTarget(...) is now .load(..)
-* Client: .addPanel(panelId, attributes) now has the url as a parameter .addPanel(panelId, url, attributes)
+* Client: WeavyWidget() is now Weavy().
+* Client: All promises are now prefixed "when" instead of "await".
+* Client: .loadInTarget(...) is now .load(..).
+* Client: .addPanel(panelId, attributes) now has the url as a parameter .addPanel(panelId, url, attributes).
 * Client: Option preset names now reflect the widget.js core and extended packages.
 
 ## Weavy 3.0

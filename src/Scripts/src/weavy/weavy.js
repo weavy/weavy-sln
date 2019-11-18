@@ -1246,6 +1246,7 @@
          * @param {object} [data] - Data to send. May be an object that will be encoded or a string with pre encoded data.
          * @param {string} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
          * @param {external:jqAjaxSettings} [settings] - Settings to extend or override [jQuery Ajax settings]{@link external:jqAjaxSettings}.
+         * @param {bool} [skipAuthenticationCheck] - Skip authentication check and disable sign-in panel when unauthenticated
          * @returns {external:jqXHR} {@link external:Promise}
          * 
          * @example <caption>Requires custom endpoints on the server, normally included in a sandbox installation.</caption>
@@ -1260,7 +1261,7 @@
          *   console.log("Found " + result.count + " results");
          * });
          */
-        weavy.ajax = function (url, data, method, settings) {
+        weavy.ajax = function (url, data, method, settings, skipAuthenticationCheck) {
             url = weavy.httpsUrl(url, weavy.options.url);
             method = method || "GET";
             data = data && typeof data === "string" && data || method !== "GET" && data && JSON.stringify(data) || data;
@@ -1277,7 +1278,28 @@
                 }
             }, settings, true);
 
-            return $.ajax(settings);
+            if (!skipAuthenticationCheck) {
+                // Wait for load to get auth state
+                return weavy.whenLoaded.then(function () {
+                    if (weavy.isAuthenticated()) {
+                        // If signed in do ajax
+                        return $.ajax(settings);
+                    } else if (weavy.plugins.authentication) {
+                        // If authentication plugin is active, show sign-in panel
+                        return weavy.signIn().then(function () {
+                            // When signed-in, do ajax
+                            return $.ajax(settings);
+                        });
+                    } else {
+                        // Give up if not signed in and authentication plugin disabled (no sign-in panel)
+                        return Promise.reject();
+                    }
+                });
+            } else {
+                // Skip the auth check and try ajax anyway
+                return $.ajax(settings);
+            }
+
         }
 
         /**
@@ -1710,6 +1732,7 @@
             className: "weavy-default",
             plugins: {
                 attach: true,
+                authentication: true,
                 panels: {
                     controls: false
                 },

@@ -7,6 +7,10 @@ SDK is divided into the Client SDK which is a javascript library for embedding W
 based application, and the Server SDK which is an ASP.NET/C# solution that can be used to completely 
 customize a Weavy installation. See https://docs.weavy.com for more information.
 
+### 4.0.3 (2019-11-18)
+
+* Fixed some sign-in issues in the Client SDK.
+
 ### 4.0.2 (2019-10-01)
 
 * Fixed an issue with SSO getting stuck in a loop.

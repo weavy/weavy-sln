@@ -83,52 +83,53 @@
          * 
          * @example
          * // Open the sign in panel and wait for the user to complete authentication
-         * weavy.signIn().then(function(signedIn) {
-         *     if (signedIn) {
-         *         weavy.log("User has signed in");
-         *     } else {
-         *         weavy.warn("User sign-in failed");
-         *     }
+         * weavy.signIn().then(function() {
+         *     weavy.log("User has signed in");
+         * }).catch(function() {
+         *     weavy.warn("User sign-in failed");
          * });
          * @param {string} [username]
          * @param {string} [password]
          * @returns {external:Promise}
-         * @resolves {true} - On successful sign-in
-         * @resolves {false} - On authentication error
+         * @resolves - On successful sign-in
+         * @rejects - On authentication error if [username] and [password] is provided
          * @fires Weavy#signed-in
          * @fires Weavy#authentication-error
          */
-        weavy.signIn = function (username, password) {
+        weavy.signIn = function (username, password, skipPanelOpen) {
             var options = weavy.options.plugins[PLUGIN_NAME];
             var dfd = $.Deferred();
 
             var doSignIn = username && password;
 
             function onMessage(e, message) {
-                switch (message.name) {
+                var messageName = message && message.name || e.type;
+                switch (messageName) {
                     case "signed-in":
-                        dfd.resolve(true);
-                        weavy.off("message", onMessage);
+                        dfd.resolve();
+                        weavy.off("message signed-in authentication-error", onMessage);
                         break;
                     case "authentication-error":
-                        dfd.resolve(false);
-                        weavy.off("message", onMessage);
+                        if (doSignIn) {
+                            dfd.reject();
+                            weavy.off("message signed-in authentication-error", onMessage);
+                        }
                         break;
                 }
             }
 
             // listen to signed-in message
-            weavy.on("message", onMessage);
+            weavy.on("message signed-in authentication-error", onMessage);
 
             // post message to sign in user
             var url = weavy.signInUrl;
             var data = doSignIn ? "username=" + username + "&password=" + password : null;
             var method = doSignIn ? "POST" : "GET";
 
-            if (weavy.plugins.panels) {
+            if (doSignIn || skipPanelOpen) {
                 weavy.load.call(weavy, options.frameName, url, data, method, true);
             } else {
-                weavy.sendToFrame.call(weavy, weavy.getId(options.frameName), url, data, method);
+                weavy.open.call(weavy, options.frameName, url);
             }
 
             // return promise
@@ -158,23 +159,20 @@
             var url = weavy.signOutUrl;
             var data = "";
 
-            if (weavy.plugins.panels) {
-                weavy.load.call(weavy, options.frameName, url, data, "GET", true);
-            } else {
-                weavy.sendToFrame.call(weavy, weavy.getId(options.frameName), url, data, "GET");
-            }
+            weavy.load.call(weavy, options.frameName, url, data, "GET", true);
 
             function onMessage(e, message) {
-                switch (message.name) {
+                var messageName = message && message.name || e.type;
+                switch (messageName) {
                     case "signed-out":
                         dfd.resolve(true);
-                        weavy.off("message", onMessage);
+                        weavy.off("message signed-out", onMessage);
                         break;
                 }
             }
 
             // listen to signed-out message
-            weavy.on("message", onMessage);
+            weavy.on("message signed-out", onMessage);
 
             return dfd.promise();
         }
@@ -188,33 +186,13 @@
         weavy.on("build", function () {
             var options = weavy.options.plugins[PLUGIN_NAME];            
             if (!weavy.nodes.authenticationFrame) {
-                if (weavy.plugins.panels) {
-                    weavy.nodes.authenticationPanel = weavy.addPanel(options.frameName, { persistent: true });
-                    weavy.nodes.authenticationFrame = weavy.nodes.authenticationPanel.querySelector("iframe");
-                } else {
-                    weavy.nodes.authenticationPanel = document.createElement("div");
-                    weavy.nodes.authenticationPanel.className = "weavy-panel";
-                    weavy.nodes.authenticationPanel.id = weavy.getId("weavy-panel-" + options.frameName);
-                    weavy.nodes.authenticationPanel.dataset.id = options.frameName;
-                    weavy.nodes.authenticationPanel.dataset.persistent = true;
-
-                    weavy.nodes.authenticationFrame = document.createElement("iframe");
-                    weavy.nodes.authenticationFrame.className = "weavy-frame-" + options.frameClassName;
-                    weavy.nodes.authenticationFrame.id = weavy.getId(options.frameName);
-                    weavy.nodes.authenticationFrame.name = weavy.getId(options.frameName);
-
-                    weavy.on(weavy.nodes.authenticationFrame, "load", function () {
-                        weavy.sendWindowId(weavy.nodes.authenticationFrame.contentWindow, weavy.nodes.authenticationFrame.id, options.frameName);
-                    });
-
-                    weavy.nodes.authenticationPanel.appendChild(weavy.nodes.authenticationFrame);
-                    weavy.nodes.container.appendChild(weavy.nodes.authenticationPanel);                    
-                }
+                weavy.nodes.authenticationPanel = weavy.addPanel(options.frameName, { persistent: true });
+                weavy.nodes.authenticationFrame = weavy.nodes.authenticationPanel.querySelector("iframe");
             }
         });
 
         weavy.on("before:open", function (e, open) {
-            if (weavy.plugins.authentication && !weavy.isAuthenticated() && open.panelId !== "authentication") {
+            if (!weavy.isAuthenticated() && open.panelId !== "authentication") {
                 weavy.one("after:signed-in", function () {
                     $.when(weavy.whenClosed).then(function () {
                         weavy.open(weavy.openPanelId, open.destination);
@@ -231,14 +209,7 @@
                 if (open.panelId === "authentication" || !weavy.isAuthenticated()) {
                     weavy.log("override: opening authentication panel");
                     if (!weavy.nodes.authenticationPanel.classList.contains("weavy-open")) {
-                        weavy.signIn();
-                    }
-                    if (!weavy.plugins.panels) {
-                        weavy.nodes.authenticationPanel.classList.add("weavy-open");
-                    }
-                } else {
-                    if (!weavy.plugins.panels) {
-                        weavy.nodes.authenticationPanel.classList.remove("weavy-open");
+                        weavy.signIn(null, null, true);
                     }
                 }
             }
@@ -318,6 +289,17 @@
         frameName: "authentication"
     };
 
+    /**
+     * Non-optional dependencies.
+     * - {@link panels}
+     *
+     * @name dependencies
+     * @memberof authentication
+     * @type {string[]}
+     */
+    Weavy.plugins[PLUGIN_NAME].dependencies = [
+        "panels"
+    ];
 })(jQuery);
 
 /**

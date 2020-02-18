@@ -1,0 +1,18 @@
+﻿@model Conversation
+<div class="dropdown-menu dropdown-menu-right conversation-menu">
+    @* menu contains all possible actions, individual item are hidden with css like .starred, .unread etc. on parent element *@
+    <button type="button" class="dropdown-item" data-action="show-info">Show info</button>
+    <button type="button" class="dropdown-item" data-action="hide-info">Hide info</button>
+    <button type="button" class="dropdown-item" data-action="star" data-id="@Model.Id">Star conversation</button>
+    <button type="button" class="dropdown-item" data-action="unstar" data-id="@Model.Id">Unstar conversation</button>
+    <button type="button" class="dropdown-item" data-action="pin" data-id="@Model.Id">Pin conversation</button>
+    <button type="button" class="dropdown-item" data-action="unpin" data-id="@Model.Id">Unpin conversation</button>
+    <button type="button" class="dropdown-item" data-action="read" data-id="@Model.Id">Mark as read</button>
+    <button type="button" class="dropdown-item" data-action="unread" data-id="@Model.Id">Mark as unread</button>
+    @if (Model.IsRoom && Model.HasPermission(Permission.AddMembers)) {
+        <button type="button" class="dropdown-item" data-action="add-people" data-id="@Model.Id">Add people</button>
+    }
+    <button type="button" class="dropdown-item" data-action="leave" data-id="@Model.Id">Leave conversation</button>
+    @*<button type="button" class="dropdown-item" data-action="archive" data-id="@Model.Id">Archive conversation</button>*@
+
+</div>

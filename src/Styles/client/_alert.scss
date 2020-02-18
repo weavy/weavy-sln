@@ -1,0 +1,30 @@
+/// <reference path="../client.scss" />
+
+// Global alerts
+
+.weavy-alert-message {
+    padding: rem(.25) rem(.5);
+    background-color: #d4edda;
+    text-align: center;
+    width: $widget-panel-width;
+    color: #155724;
+    border-radius: rem(.1875);
+    margin: 0 auto;
+    margin-top: rem(1);
+    font-family: $font-family-base;
+    position: relative;
+    z-index: 10;
+    box-shadow: $md-shadow-8dp;
+    max-width: calc(100% - 3rem);
+    pointer-events: none;
+    user-select: none;
+
+    &.fade {
+        transition: opacity $md-animation-duration $md-animation-curve-default;
+        opacity: 0;
+
+        &.in {
+            opacity: 1;
+        }
+    }
+}

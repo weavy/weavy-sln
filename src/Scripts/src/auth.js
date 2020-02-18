@@ -2,7 +2,7 @@
 
 wvy.auth = (function ($) {
 
-    if (wvy.browser.embedded) {
+    if (wvy.browser.framed) {
 
         // catch the submit and open in new window to enable provider based sign in from iframes
         $('form#embedded-providers').on('submit', function (e) {

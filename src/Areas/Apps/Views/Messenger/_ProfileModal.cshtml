@@ -1,0 +1,16 @@
+﻿<div class="modal" id="profile-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content loading">
+            <div class="cover cover-bg text-center py-4">
+                <button type="button" class="btn btn-icon top-left" data-dismiss="modal">@Svg.Icon("arrow-left")</button>
+                @(new User().AvatarImg(128))
+                <p class="pt-2 mb-0">&nbsp;</p>
+                <button type="button" class="btn btn-icon top-right" data-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                @Svg.Spinner()
+            </div>
+        </div>
+        <div class="modal-content d-none"></div>
+    </div>
+</div>

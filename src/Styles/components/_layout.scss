@@ -1,7 +1,7 @@
 /// <reference path="../_core.scss" />
 html {
     // show/hide stuff depending on if we are running embedded or standalone
-    &.embedded {
+    &.framed {
         .d-standalone {
             display: none !important;
         }
@@ -19,8 +19,8 @@ html {
         }
     }
 
-    &:not(.embedded) {
-        .d-embedded, .d-connected, .d-not-connected {
+    &:not(.framed) {
+        .d-framed, .d-connected, .d-not-connected {
             display: none !important;
         }
     }
@@ -99,6 +99,11 @@ body {
 
     &.has-navbar-secondary {
         padding-top: $navbar-height * 2;
+    }
+    
+    // prevent pointer events for children when dragging
+    &.dragging [draggable='true'] * > * {
+        pointer-events: none;
     }
 }
 

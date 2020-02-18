@@ -69,7 +69,7 @@
 
                 // when server says state is authenticating we should call sign-in-token to get an auth cookie
                 weavy.log("Signing in with JWT token");
-                window.postMessage({ name: "signing-in" }, "*");
+                wvy.postal.postToSelf({ name: "signing-in" });
                 $.ajax(weavy.httpsUrl(weavy.options.url + "sign-in-token", weavy.options.url), {
                     crossDomain: true,
                     data: "jwt=" + options.jwt,
@@ -80,11 +80,11 @@
                 }).done(function () {
                     state = states.authorized;
                     weavy.log("Signed in with JWT token");
-                    window.postMessage({ name: "signed-in" }, "*");
+                    wvy.postal.postToSelf({ name: "signed-in" });
                 }).fail(function () {
                     state = states.unauthorized;
                     weavy.warn("Sign in with JWT token failed");
-                    window.postMessage({ name: "authentication-error" }, "*");
+                    wvy.postal.postToSelf({ name: "authentication-error" });
                 });
             }
         });

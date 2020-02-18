@@ -149,7 +149,7 @@ wvy.tiny = (function ($) {
                 data.result.data.forEach(function (f) {
                     html += '<div class="card mr-1" style="width: 96px;">' +
                         '<a href="javascript:;" class="thumbnail" data-name="' + f.name + '" data-file-url="' + f.file_url + '" data-thumb-url="' + f.thumb_url + '" data-width="' + f.width + '" data-height="' + f.height + '" title="' + f.name + '">' +
-                        '<img src="' + f.thumb_url.replace("{options}", "96x96-crop,both") + '" alt="" />' +
+                        '<img src="' + f.thumb_url.replace("{options}", "96") + '" alt="" />' +
                         '<div class="card-block p-1">' +
                         '<small title="' + f.name + '">' + f.name + '</small>' +
                         '<input type="hidden" name="blobs" value="' + f.id + '" />' +
@@ -286,8 +286,8 @@ wvy.tiny = (function ($) {
 
         function convertToRelativeUrl(url) {
             if (url && url.length) {
-                var rootPath = location.protocol + "//" + location.hostname + wvy.context.path;
-                return url.replace(rootPath, wvy.context.path);
+                var rootPath = location.protocol + "//" + location.hostname + wvy.config.applicationPath;
+                return url.replace(rootPath, wvy.config.applicationPath);
             } else {
                 return null;
             }

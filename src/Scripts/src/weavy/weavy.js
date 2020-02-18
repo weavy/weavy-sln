@@ -102,6 +102,15 @@
         }
 
         /**
+         * Data about the current user.
+         * Use weavy.user.id to get the id of the user.
+         * 
+         * @category properties
+         * @type {Object}
+         */
+        weavy.user = null;
+
+        /**
          * Indicating if the browser supports using ShadowDOM
          * 
          * @category properties
@@ -176,6 +185,9 @@
          */
         weavy.nodes.overlay = null;
 
+        // WEAVY REALTIME CONNECTION
+        weavy.connection = wvy.connection.get(weavy.options.url);
+
         // EVENT HANDLING
         var _events = [];
 
@@ -226,63 +238,31 @@
             _events = [];
         }
 
-
-        /**
-         * List of internal namespaces for events.
-         * 
-         * @category eventhandling
-         * @type {Object.<string, string>}
-         * @property {string} global=​ - Empty namespace for global events that should not use any specific namespace: "".
-         * @property {string} connection=.connection.weavy - Used by wvy.connection events: ".connection.weavy".
-         * @property {string} realtime=.rtmweavy - Used by wvy.realtime events: ".rtmweavy".
-         * @property {string} weavy=.event.weavy - Default namespace used by all weavy events: ".event.weavy".
-         */
-        weavy.eventNamespaces = {
-            global: "",
-            connection: ".connection.weavy",
-            realtime: ".rtmweavy",
-            weavy: ".event.weavy",
-        };
-
-        function getEventArguments(context, events, selector, handler, namespace) {
-            var defaultNamespace = weavy.eventNamespaces.global
+        function getEventArguments(context, events, selector, handler) {
+            var namespace = "";
+            var defaultNamespace = ".event.weavy"
 
             if (typeof arguments[0] === "string") {
                 // Widget event
-                namespace = typeof arguments[1] === 'function' ? arguments[2] : arguments[3];
                 handler = typeof arguments[1] === 'function' ? arguments[1] : arguments[2];
                 selector = typeof arguments[1] === 'function' ? null : arguments[1];
                 events = arguments[0];
                 context = null;
 
-                defaultNamespace = weavy.eventNamespaces.weavy;
+                namespace = defaultNamespace;
             } else {
                 // Global event
 
-                // Default settings for wvy.connection
-                if (arguments[0] === wvy.connection) {
-                    defaultNamespace = weavy.eventNamespaces.connection;
-                    context = $(document);
-                }
-
-                // Default settings for wvy.realtime
-                if (arguments[0] === wvy.realtime) {
-                    defaultNamespace = weavy.eventNamespaces.realtime;
-                    context = $(document);
-                }
-
-                namespace = typeof arguments[2] === 'function' ? arguments[3] : arguments[4];
                 handler = typeof arguments[2] === 'function' ? arguments[2] : arguments[3];
                 selector = typeof arguments[2] === 'function' ? null : arguments[2];
             }
 
-            namespace = typeof namespace === 'string' ? namespace : defaultNamespace;
-            context = context && $(context) || (namespace === weavy.eventNamespaces.weavy ? $(weavy) : $(document));
+            context = context && context.on && context || context && $(context) || (namespace === defaultNamespace ? $(weavy) : $(document));
 
             // Supports multiple events separated by space
             events = events.split(" ").map(function (eventName) { return eventName + namespace; }).join(" ");
 
-            return { context: context, events: events, selector: selector, handler: handler, namespace: namespace };
+            return { context: context, events: events, selector: selector, handler: handler };
         }
 
 
@@ -298,10 +278,10 @@
          * weavy.on("after:options", function(e, options) { ... })
          *  
          * @example <caption>Realtime event</caption>
-         * weavy.on(wvy.realtime, "eventname", function(e, message) { ... })
+         * weavy.on(weavy.connection, "eventname", function(e, message) { ... })
          *   
          * @example <caption>Connection event</caption>
-         * weavy.on(wvy.connection, "disconnect", function(e) { ... })
+         * weavy.on(weavy.connection, "disconnect.connection", function(e) { ... })
          *   
          * @example <caption>Button event</caption>
          * weavy.on(myButton, "click", function() { ... })
@@ -310,16 +290,15 @@
          * weavy.on(document, ".modal", "show hide", function() { ... }, ".bs.modal")
          * 
          * @category eventhandling
-         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. wvy.connection and wvy.realtime may also be used as contexts.
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
          * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
          * @param {function} handler - The listener. The first argument is always the event, followed by any data arguments provided by the trigger.
-         * @param {string} [namespace] - Optional namespace applied to all the event names. Namespaces are automatically selected for weavy-, realtime- and connection- events. Any {@link Weavy#eventNamespaces} may be used as parameter.
          * @see The underlying jQuery.on: {@link http://api.jquery.com/on/}
          */
-        weavy.on = function (context, events, selector, handler, namespace) {
+        weavy.on = function (context, events, selector, handler) {
             var args = getEventArguments.apply(this, arguments);
-            var once = arguments[5];
+            var once = arguments[4];
 
             if (once) {
                 var attachedHandler = function () {
@@ -352,27 +331,25 @@
          * Similar to {@link Weavy#on}.
          * 
          * @category eventhandling
-         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. wvy.connection and wvy.realtime may also be used as contexts.
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
          * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
          * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
-         * @param {string} [namespace] - Optional namespace applied to all the event names. Namespaces are automatically selected for weavy-, realtime- and connection- events. Any {@link Weavy#eventNamespaces} may be used as parameter.
          */
-        weavy.one = function (context, events, selector, handler, namespace) {
-            weavy.on(context, events, selector, handler, namespace, true);
+        weavy.one = function (context, events, selector, handler) {
+            weavy.on(context, events, selector, handler, true);
         };
 
         /**
          * Unregisters event listneres. The arguments must match the arguments provided on registration using .on() or .one().
          *
          * @category eventhandling
-         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. wvy.connection and wvy.realtime may also be used as contexts.
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
          * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
          * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
-         * @param {string} [namespace] - Optional namespace applied to all the event names. Namespaces are automatically selected for weavy-, realtime- and connection- events. Any {@link Weavy#eventNamespaces} may be used as parameter.
          */
-        weavy.off = function (context, events, selector, handler, namespace) {
+        weavy.off = function (context, events, selector, handler) {
             var args = getEventArguments.apply(this, arguments);
 
             var offHandler = getEventHandler(args.events, args.handler, args.context, args.selector);
@@ -389,7 +366,7 @@
         }
 
         /**
-         * Trigger a custom event. Events are per default triggered on the weavy instance using the weavy.eventNamespaces.weavy namespace.
+         * Trigger a custom event. Events are per default triggered on the weavy instance using the weavy namespace.
          * 
          * The trigger has an event chain that adds `before:` and `after:` events automatically for all events except when any custom `prefix:` is specified. This way you may customize the eventchain by specifying `before:`, `on:` and `after:` in your event name to fire them one at the time. The `on:` prefix will then be removed from the name when the event is fired.
          * 
@@ -413,15 +390,13 @@
          * @category eventhandling
          * @param {any} name - The name of the event.
          * @param {(Array/Object/JSON)} [data] - Data may be an array or plain object with data or a JSON encoded string. Unlike jQuery, an array of data will be passed as an array and _not_ as multiple arguments.
-         * @param {string} [namespace] - The namespace is applied to the name. It defaults to the weavy namespace. Any weavy.eventNamespaces may also be used as parameter.
-         * @param {Element} [context] - Context Element to trigger the event on. If omitted it defaults to the Widget instance.
          * @param {Event} [originalEvent] - When relaying another event, you may pass the original Event to access it in handlers.
          * @returns {data} The data passed to the event trigger including any modifications by event handlers.
          */
-        weavy.triggerEvent = function (name, data, namespace, context, originalEvent) {
+        weavy.triggerEvent = function (name, data, originalEvent) {
             var hasPrefix = name.indexOf(":") !== -1;
-            namespace = typeof namespace === 'string' ? namespace : weavy.eventNamespaces.weavy;
-            context = context || (namespace === weavy.eventNamespaces.weavy ? $(weavy) : $(document));
+            var namespace = ".event.weavy";
+            var context = $(weavy);
             name = name.replace("on:", "") + namespace;
 
             // Triggers additional before:* and after:* events
@@ -439,23 +414,28 @@
                 try {
                     data = JSON.parse(data);
                 } catch (e) {
-                    weavy.warn("Could not parse event data");
+                    weavy.warn("triggerEvent: Could not parse event data");
                 }
             }
 
             weavy.debug("trigger", name);
+            var result;
 
             // Wrap arrays in an array to avoid arrays converted to multiple arguments by jQuery
             if (hasPrefix) {
-                data = context.triggerHandler(event, $.isArray(data) ? [data] : data) || data;
+                result = context.triggerHandler(event, $.isArray(data) ? [data] : data);
+                data = (result || result === false) ? result : data;
             } else {
-                data = context.triggerHandler(beforeEvent, $.isArray(data) ? [data] : data) || data;
+                result = context.triggerHandler(beforeEvent, $.isArray(data) ? [data] : data);
+                data = (result || result === false) ? result : data;
                 if (data === false || beforeEvent.isPropagationStopped()) { return data; }
 
-                data = context.triggerHandler(event, $.isArray(data) ? [data] : data) || data;
+                result = context.triggerHandler(event, $.isArray(data) ? [data] : data);
+                data = (result || result === false) ? result : data;
                 if (data === false || event.isPropagationStopped()) { return data; }
 
-                data = context.triggerHandler(afterEvent, $.isArray(data) ? [data] : data) || data;
+                result = context.triggerHandler(afterEvent, $.isArray(data) ? [data] : data);
+                data = (result || result === false) ? result : data;
             }
 
             return data;
@@ -629,20 +609,15 @@
         }
 
         function connect() {
-            return wvy.connection.init(weavy.options.url, null, true);
+            return weavy.connection.init(true);
         }
 
         function disconnect(async, notify) {
             weavy.log("disconnecting weavy");
-            if (weavy.nodes.container) {
-                $(weavy.nodes.container).find("iframe").each(function (index, frame) {
-                    //wvy.connection.removeWindow(frame.contentWindow);
-                });
-            }
 
             // NOTE: stop/disconnect directly if we are not authenticated 
             // signalr does not allow the user identity to change in an active connection
-            return wvy.connection.disconnect(async, notify);
+            return weavy.connection.disconnect(async, notify);
         }
 
         function connectAndLoad(fullReload, notify) {
@@ -656,7 +631,7 @@
                 weavy.options.href = window.location.href;
                 if (notify !== false) {
 
-                    wvy.realtime.invoke("client", "load", weavy.options);
+                    weavy.connection.invoke("client", "load", weavy.options);
                 }
             });
 
@@ -667,12 +642,10 @@
         function registerLoading(panelId) {
             var frame = $(weavy.getId("#weavy-panel-" + panelId), weavy.nodes.container).find("iframe").get(0);
             if (frame && !frame.registered) {
+                weavy.sendWindowId(frame.contentWindow, frame.name, panelId);
                 var onload = function () {
-                    weavy.sendWindowId(frame.contentWindow, frame.id, panelId);
                     weavy.setPanelLoading.call(weavy, panelId, false);
                     delete frame.dataset.src;
-                    // add window to connections
-                    wvy.connection.addWindow(frame.contentWindow);
                     frame.loaded = true;
                 };
                 weavy.on(frame, "load", onload);
@@ -704,6 +677,7 @@
                 weavy.statusFrame.className = "weavy-status-check weavy-hidden-frame";
                 weavy.statusFrame.style.display = "none";
                 weavy.statusFrame.id = weavy.getId("weavy-status-check");
+                weavy.statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
 
                 /**
                  * Event triggered when frame blocking check has finished. You may also use the {@link Weavy#whenBlockChecked} promise to make sure the blocked check has finished.
@@ -713,30 +687,22 @@
                  * @returns {object}
                  * @property {boolean} blocked - Indicates if frames are blocked.
                  */
-
-                weavy.on(weavy.statusFrame, "load", function () {
+                weavy.on(weavy.statusFrame, "load", function (e) {
                     // start testing for blocked iframe             
                     weavy.isBlocked = true;
                     try {
-                        this.contentWindow.postMessage({ "name": "ping" }, "*");
+                        wvy.postal.registerContentWindow(this.contentWindow, weavy.getId("weavy-status-check"), weavy.getId("weavy-status-check"));
                     } catch (e) {
-                        weavy.warn("Frame postMessage is blocked", e);
+                        weavy.warn("Statuscheck: Frame postMessage is blocked. ", e);
                         weavy.triggerEvent("frame-check", { blocked: true });
                     }
 
                 });
 
-                var onFrameReady = function (e) {
-                    e = e.originalEvent || e;
-                    switch (e.data.name) {
-                        case "ready":
-                            weavy.triggerEvent("frame-check", { blocked: false });
-                            weavy.off(window, "message", onFrameReady);
-                            break;
-                    }
-                };
-
-                weavy.on(window, "message", onFrameReady);
+                weavy.one(wvy.postal, "ready", weavy.getId("weavy-status-check"), function () {
+                    weavy.isBlocked = false;
+                    weavy.triggerEvent("frame-check", { blocked: false });
+                });
 
                 weavy.nodes.container.appendChild(weavy.statusFrame);
                 weavy.timeout(1).then(function () {
@@ -822,14 +788,10 @@
          * Checks if the user is signed in. May chack against any optional provided data.
          * 
          * @category authentication
-         * @param {Object} [optionalData] - Data that contains userId to verify against current user `{ userId: id }`, such as {@link Weavy#options}.
          * @returns {boolean} True if the user is signed in
          */
-        weavy.isAuthenticated = function (optionalData) {
-            if (optionalData) {
-                return optionalData.userId && optionalData.userId === weavy.options.userId ? true : false;
-            }
-            return weavy.options.userId ? true : false;
+        weavy.isAuthenticated = function () {
+            return weavy.user && weavy.user.id !== -1 ? true : false;
         }
 
         /**
@@ -841,15 +803,10 @@
          * @param {string} windowName - The frame name attribute.
          * @param {string} [panelId] - If the frame is a panel, the panelId may also be provided.
          */
-        weavy.sendWindowId = function (contentWindow, windowName, panelId) {
+        weavy.sendWindowId = function (contentWindow, windowName) {
+            weavy.log("sendWindowId", windowName);
             try {
-                contentWindow.postMessage({
-                    name: "window-id",
-                    panelId: panelId,
-                    weavyId: weavy.getId(),
-                    windowName: windowName,
-                    weavyUrl: weavy.options.url
-                }, "*");
+                wvy.postal.registerContentWindow(contentWindow, windowName, weavy.getId());
             } catch (e) {
                 weavy.error("Could not send window id", windowName, e);
             }
@@ -869,7 +826,7 @@
                 var frame = $(weavy.getId("#weavy-panel-" + panelId), weavy.nodes.container).find("iframe").get(0);
                 if (frame) {
                     try {
-                        frame.contentWindow.postMessage(message, "*", transfer);
+                        wvy.postal.postToFrame(frame.name, weavy.getId(), message, transfer);
                     } catch (e) {
                         weavy.error("Could not post panel message", e);
                     }
@@ -974,7 +931,7 @@
             var $target = $(weavy.getId("#weavy-panel-" + panelId), weavy.nodes.container);
             var frame = $target.find("iframe");
 
-            frame[0].contentWindow.postMessage({ "name": "reload" }, "*");
+            wvy.postal.postToFrame(frame[0].name, weavy.getId(), { "name": "reload" });
 
             /**
              * Event triggered when a panel is resfreshed and needs to reload it's content.
@@ -1149,7 +1106,7 @@
                         weavy.sendToFrame(weavy.getId(frameTarget.name), url, data, method);
                     } else {
                         // Fully loaded, send using turbolinks
-                        frameTarget.contentWindow.postMessage({ name: 'send', url: url, data: data, method: method }, "*");
+                        wvy.postal.postToFrame(frameTarget.name, weavy.getId(), { name: 'send', url: url, data: data, method: method });
                     }
                 }
             });
@@ -1345,159 +1302,151 @@
         // MESSAGE EVENTS
 
         // listen for dispatched messages from weavy (close/resize etc.)
-        weavy.on(window, "message", function (e, message) {
-            e = e.originalEvent || e;
-            message = message || e.data;
+        weavy.on(wvy.postal, "signing-in", function (e) {
+            var message = e.data;
+            /**
+             * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link Weavy#event:signed-in} or {@link Weavy#event:authentication-error}.
+             * This event may be triggered from anywhere, not only the Weavy instance.
+             * 
+             * @category events
+             * @event Weavy#signing-in
+             * @returns {Object}
+             * @property {boolean} isLocal - Is the origin of the event from this weavy instance
+             */
+            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (message.weavyId === true || message.weavyId === weavy.getId()) }));
+        });
 
-            if (message) {
-                switch (message.name) {
-                    case "signing-in":
-                        /**
-                         * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link Weavy#event:signed-in} or {@link Weavy#event:authentication-error}.
-                         * This event may be triggered from anywhere, not only the Weavy instance.
-                         * 
-                         * @category events
-                         * @event Weavy#signing-in
-                         * @returns {Object}
-                         * @property {boolean} isLocal - Is the origin of the event from this weavy instance
-                         */
-                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (!message.sourceWeavyId || message.sourceWeavyId === weavy.getId()) }));
-                        break;
-                    case "signing-out":
-                        weavy.close();
-                        /**
-                         * Event triggered when signing out process has begun. Use this event to do signing out animations and eventually clean up your elements. It will be followed by {@link Weavy#event:signed-out}
-                         * This event may be triggered from anywhere, not only the Weavy instance.
-                         * 
-                         * @category events
-                         * @event Weavy#signing-out
-                         * @returns {Object}
-                         * @property {boolean} isLocal - Is the origin of the event from this weavy instance
-                         */
-                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-out", { isLocal: typeof e.source !== "undefined" && (!message.sourceWeavyId || message.sourceWeavyId === weavy.getId()) }));
-                        break;
-                    case "signed-out":
-                        weavy.options.userId = null;
-                        break;
-                    case "authentication-error":
-                        /**
-                         * Event triggered when a sign-in attempt was unsuccessful.
-                         * This event may be triggered from anywhere, not only the Weavy instance.
-                         * 
-                         * @category events
-                         * @event Weavy#authentication-error
-                         */
-                        weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "authentication-error"));
-                        break;
-                }
+        weavy.on(wvy.postal, "signing-out", function (e) {
+            var message = e.data;
+            weavy.close();
+            /**
+             * Event triggered when signing out process has begun. Use this event to do signing out animations and eventually clean up your elements. It will be followed by {@link Weavy#event:signed-out}
+             * This event may be triggered from anywhere, not only the Weavy instance.
+             * 
+             * @category events
+             * @event Weavy#signing-out
+             * @returns {Object}
+             * @property {boolean} isLocal - Is the origin of the event from this weavy instance
+             */
+            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-out", { isLocal: typeof e.source !== "undefined" && (message.weavyId === true || message.weavyId === weavy.getId()) }));
+        });
 
-                if (typeof e.source !== "undefined" && (!message.sourceWeavyId || message.sourceWeavyId === weavy.getId())) {
-                    /**
-                     * Event for window messages directed to the current weavy instance, such as messages sent from panels belonging to the weavy instance.
-                     * The original message event is attached as event.originalEvent.
-                     * 
-                     * Use data.name to determine which type of message theat was receivied.
-                     * 
-                     * @category events
-                     * @event Weavy#message
-                     * @returns {Object.<string, data>}
-                     * @property {string} name - The name of the message
-                     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
-                     */
-                    weavy.triggerEvent("message", message, null, null, e);
-                }
+        weavy.on(wvy.postal, "signed-out", function (e) {
+            weavy.user = null;
+        });
+
+        weavy.on(wvy.postal, "signing-out", function (e) {
+            /**
+             * Event triggered when a sign-in attempt was unsuccessful.
+             * This event may be triggered from anywhere, not only the Weavy instance.
+             * 
+             * @category events
+             * @event Weavy#authentication-error
+             */
+            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "authentication-error"));
+        });
+
+
+        weavy.on(wvy.postal, "message", weavy.getId(), function (e) {
+
+            /**
+                * Event for window messages directed to the current weavy instance, such as messages sent from panels belonging to the weavy instance.
+                * The original message event is attached as event.originalEvent.
+                * 
+                * Use e.data.name to determine which type of message theat was receivied.
+                * 
+                * @deprecated
+                * @category events
+                * @event Weavy#message
+                * @returns {Object.<string, data>}
+                * @property {string} name - The name of the message
+                * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
+                */
+            weavy.triggerEvent("message", e.data, e);
+        });
+
+        weavy.on(wvy.postal, "ready", weavy.getId(), function (e) {
+            weavy.isBlocked = false;
+            // page loaded
+            var $sourceFrame = $('iframe[name="' + e.data.windowName + '"]', weavy.nodes.container);
+            var sourcePanelId = $sourceFrame.closest(".weavy-panel").data("id");
+            if (sourcePanelId) {
+                weavy.setPanelLoading.call(weavy, sourcePanelId, false); // Is this really needed, seems to be handled elsewhere?
+            }
+
+            /**
+             * Event triggered when a panel sends a ready message. Check the sourcePanelId or sourceWindowName to see which panel that sent the ready message.
+             * 
+             * @category events
+             * @event Weavy#ready
+             * @returns {Object}
+             * @property {string} sourceWindowName - The name of the frame (or window) for the panel.
+             * @property {string} sourcePanelId - The panelId of the panel
+             */
+            weavy.triggerEvent("ready", e.data);
+        });
+
+        weavy.on(wvy.postal, "reload", weavy.getId(), function (e) {
+            // reload and re-init all weavy instances
+            connectAndLoad(true);
+        });
+
+        weavy.on(wvy.postal, "reset", weavy.getId(), function (e) {
+            var active = $(".weavy-panel.weavy-open", weavy.nodes.container); // TODO: use weavy.panelId?
+            if (active.length) {
+                weavy.reset(active.attr("data-id"));
             }
         });
 
-        weavy.on("message", function (e, message) {
-            weavy.debug("window message:", message.name);
+        weavy.on(wvy.postal, "close", weavy.getId(), function (e) {
+            weavy.close();
+        });
 
-            switch (message.name) {
-                case "invoke":
-                    if (wvy.connection.connection.state === wvy.connection.state.connected) {
-                        var proxy = wvy.connection.proxies[message.hub];
-                        proxy.invoke.apply(proxy, message.args).fail(function (error) {
-                            weavy.error(error)
-                        });
-                    }
-                    break;
-                case "ready":
-                    weavy.isBlocked = false;
-                    // page loaded
-                    if (message.sourcePanelId) {
-                        weavy.setPanelLoading.call(weavy, message.sourcePanelId, false);
-                    }
+        weavy.on(wvy.postal, "maximize", weavy.getId(), function (e) {
+            weavy.maximize();
+        });
 
-                    /**
-                     * Event triggered when a panel sends a ready message. Check the sourcePanelId or sourceWindowName to see which panel that sent the ready message.
-                     * 
-                     * @category events
-                     * @event Weavy#ready
-                     * @returns {Object}
-                     * @property {string} sourceWindowName - The name of the frame (or window) for the panel.
-                     * @property {string} sourcePanelId - The panelId of the panel
-                     */
-                    weavy.triggerEvent("ready", message);
-                    break;
-                case "reload":
-                    // reload and re-init all weavy instances
-                    connectAndLoad(true);
-                    break;
-                case "reset":
-                    var active = $(".weavy-panel.weavy-open", weavy.nodes.container);
-                    if (active.length) {
-                        weavy.reset(active.attr("data-id"));
-                    }
-                    break;
-                case "close":
-                    weavy.close();
-                    break;
-                case "maximize":
-                    weavy.maximize();
-                    break;
-                case "send":
-                    weavy.load(message.panelId, message.url, message.data, message.method, true);
-                    weavy.open(message.panelId);
-                    break;
+        weavy.on(wvy.postal, "send", weavy.getId(), function (e) {
+            weavy.load(e.data.panelId, e.data.url, e.data.data, e.data.method, true);
+            weavy.open(e.data.panelId);
+        });
 
-                case "request:open":
-                    if (message.panelId) {
-                        if (message.destination) {
-                            weavy.load(message.panelId, message.destination, null, null, true);
-                        }
-                        weavy.open(message.panelId);
-                    }
-                    break;
-                case "request:close":
-                    if (message.panelId) {
-                        weavy.close(message.panelId);
-                    }
-                    break;   
+        weavy.on(wvy.postal, "request:open", weavy.getId(), function (e) {
+            if (e.data.panelId) {
+                if (e.data.destination) {
+                    weavy.load(e.data.panelId, e.data.destination, null, null, true);
+                }
+                weavy.open(e.data.panelId);
             }
+        });
 
+        weavy.on(wvy.postal, "request:close", weavy.getId(), function (e) {
+            if (e.data.panelId) {
+                weavy.close(e.data.panelId);
+            }
         });
 
         // REALTIME EVENTS
 
         // signalR connection state has changed
-        weavy.on(wvy.connection, "state-changed", function (e, data) {
-            if (disconnected && data.state.newState === wvy.connection.state.connected && weavy.isAuthenticated()) {
+        weavy.on(weavy.connection, "state-changed.connection", function (e, data) {
+            if (disconnected && data.state === weavy.connection.states.connected && weavy.isAuthenticated()) {
                 disconnected = false;
 
-                // reload weavy                
-                wvy.connection.reload();
+                // reload weavy?
+                //weavy.connection.reload();
             }
         });
 
         // signalR connection disconnected
-        weavy.on(wvy.connection, "disconnected", function (e, data) {
+        weavy.on(weavy.connection, "disconnected.connection", function (e, data) {
             if (!data.explicitlyDisconnected) {
                 disconnected = true;
             }
         });
 
-        weavy.on(wvy.connection, "user-change", function (e, data) {
-            weavy.log("user-change", data.eventName);
+        weavy.on(weavy.connection, "user-change.connection", function (e, data) {
+            weavy.log("user-change", data.state);
 
             /**
              * Event triggered when the user is successfully signed in using any authentication method. The realtime connection gets automatically reconnected before this event occurs.
@@ -1515,14 +1464,18 @@
              * @event Weavy#signed-out
              */
 
-            if (data.eventName === "signed-out") {
-                weavy.options.userId = null;
+            weavy.close();
+
+            if (data.state === "signed-out") {
+                weavy.user = null;
+            } else {
+                weavy.user = data.user;
             }
-            // Connnect then trigger signed-in or signed-out
-            connectAndLoad(true, true).then(weavy.triggerEvent.bind(weavy, data.eventName));
+            // Connect then trigger signed-in or signed-out
+            connectAndLoad(true, true).then(weavy.triggerEvent.bind(weavy, data.state));
         });
 
-        weavy.on(wvy.realtime, "badge.weavy", function (e, data) {
+        weavy.on(weavy.connection, "badge.weavy", function (e, data) {
 
             /**
              * Triggers when the number of unread conversations or notifications change.
@@ -1543,8 +1496,13 @@
             weavy.triggerEvent("badge", data);
         });
 
-        weavy.on(wvy.realtime, "loaded.weavy", function (e, data) {
+        weavy.on(weavy.connection, "loaded.weavy", function (e, data) {
             if (data.id && data.id === weavy.getId()) {
+
+                // Set current user data
+                if (data.user) {
+                    weavy.user = data.user;
+                }
 
                 // Merge options
                 weavy.options = weavy.extendDefaults(weavy.options, data, true);
@@ -1716,8 +1674,8 @@
             includePlugins: false,
             plugins: {
                 alert: true,
-                attach: true,
                 authentication: true,
+                filebrowser: true,
                 panels: true,
                 preview: true,
                 sso: true,
@@ -1731,8 +1689,8 @@
             includePlugins: false,
             className: "weavy-default",
             plugins: {
-                attach: true,
                 authentication: true,
+                filebrowser: true,
                 panels: {
                     controls: false
                 },
@@ -1892,7 +1850,7 @@
      * Retrieves data for the current domain from the weavy namespace.
      * 
      * @category options
-     * @param {string} key - The name of the data to retrevie
+     * @param {string} key - The name of the data to retrieve
      * @param {boolean} [isJson=false] - True if the data shoul be decoded from JSON
      */
     Weavy.prototype.retrieveItem = function (key, isJson) {

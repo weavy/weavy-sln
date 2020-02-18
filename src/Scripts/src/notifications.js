@@ -12,9 +12,14 @@ wvy.notifications = (function ($) {
         return wvy.api.unread(id);
     }
 
-    // mark all notifcations as read
+    // mark all notifications as read
     function readAll() {
         return wvy.api.readAll();
+    }
+
+    // mark notifications as read in space
+    function readAllForParent(parentType, parentId) {
+        return wvy.api.readAllForParent(parentType, parentId);
     }
 
     function sortTabNotifications() {
@@ -26,7 +31,6 @@ wvy.notifications = (function ($) {
         $(".notification:not(.read)", "#tab-notifications .list-group").sort(byDataIdDesc).appendTo("#tab-notifications .list-group");
         $(".notification.read", "#tab-notifications .list-group").sort(byDataIdDesc).appendTo("#tab-notifications .list-group");
     }
-
     
     // toggle notification read/unread on click
     $(document).on("click", "[data-toggle='notification']", function (e) {
@@ -52,24 +56,43 @@ wvy.notifications = (function ($) {
 
     // mark all notifications as read on click
     $(document).on("click", "[data-read='notifications']", function (e) {
-        // first add .read class then call api (for better perceived perf.)
-        $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
-        readAll();      
+
+        var parentEntity = $(this).data("parent-entity");
+        var parentId = $(this).data("parent-id");
+
+        if (typeof parentEntity !== "undefined" && typeof parentId !== "undefined") {
+            // first add .read class then call api (for better perceived perf.)
+            $(".notifications-list[data-parent-entity='" + parentEntity + "'][data-parent-id='" + parentId + "']").find("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
+            readAllForParent(parentEntity, parentId);
+        } else {
+            // first add .read class then call api (for better perceived perf.)
+            $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
+            readAll();
+        }
 
         // finally close drawer
         wvy.drawer.close();
     });
     
     // callbacks for realtime events
-    wvy.realtime.on("notification-inserted.weavy", function (event, data) {
+    wvy.connection.default.on("notification-inserted.weavy", function (event, data) {
+
+        var $notificationsLists = $(".notifications-list[data-parent-entity][data-parent-id]");
+
+        if ($notificationsLists.length) {
+            index().then(function (html) {
+                $notificationsLists.closest("main").empty().append(html);
+            });
+        }
+
         $("#tab-notifications .empty").remove();
-                
-        get(data.id).then(function (html) {            
-            $(html).prependTo("#tab-notifications .list-group");            
-        });        
+
+        get(data.id).then(function (html) {
+            $(html).prependTo("#tab-notifications .list-group");
+        });
     });
 
-    wvy.realtime.on("notification-updated.weavy", function (event, data) {
+    wvy.connection.default.on("notification-updated.weavy", function (event, data) {
         if (data.isRead) {
             $("a.notification[data-id='" + data.id + "']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");                       
         } else {
@@ -77,18 +100,14 @@ wvy.notifications = (function ($) {
         }
     });
 
-    wvy.realtime.on("notifications-all-read.weavy", function (event, data) {
+    wvy.connection.default.on("notifications-read.weavy", function (event, data) {
         $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
     });
 
-    wvy.realtime.on("badge.weavy", function (event, data) {                
-        if (data.notifications > 0) {
-            $(".badge[data-badge='notification']").text(data.notifications).removeClass("d-none");
-        } else {
-            $(".badge[data-badge='notification']").text("").addClass("d-none");
-        }
+    wvy.connection.default.on("notifications-space-read.weavy", function (event, data) {
+        $(".notifications-list[data-spaceid='" + data.spaceId + "']").find("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
     });
-
+    
     // get html for notification
     function get(id) {
         return $.ajax({
@@ -98,10 +117,20 @@ wvy.notifications = (function ($) {
         });
     }
 
+    // get index view
+    function index() {
+        return $.ajax({
+            url: document.location.href,
+            method: "GET",
+            contentType: "application/json"
+        });
+    }
+
     return {
         read: read,
         unread: unread,
         readAll: readAll,
+        readAllForParent: readAllForParent,
         sort: sortTabNotifications
     };
 

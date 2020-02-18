@@ -16,7 +16,7 @@
         @Html.HttpMethodOverride(HttpVerbs.Put)
 
         <div class="text-center">
-            @Html.EditorFor(x => Model.Avatar, additionalViewData: new { AvatarFor = Model })
+            @Html.EditorFor(x => Model.Avatar)
         </div>
 
         @Html.EditorsForModel()

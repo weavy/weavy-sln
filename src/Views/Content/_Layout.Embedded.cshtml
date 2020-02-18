@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.Embedded.cshtml";
+}
+
+@if (IsSectionDefined("styles")) {
+    @section styles {
+        @RenderSection("styles")
+    }
+}
+
+@if (IsSectionDefined("scripts")) {
+    @section scripts {
+        @RenderSection("scripts")
+    }
+}
+
+@if (IsSectionDefined("navbar_content")) {
+    @RenderSection("navbar_content")
+} else {
+    Html.RenderPartial("_Navbar", WeavyContext.Content);
+}
+
+@RenderBody()
+
+@if (IsSectionDefined("fab")) {
+    @section fab {
+        @RenderSection("fab")
+    }
+}
+
+@section footer {
+    @{
+        Html.RenderPartial("_EditCommentModal");
+        Html.RenderPartial("_FeedbackModal");
+        Html.RenderPartial("_ContentModal");
+        Html.RenderPartial("_MoveModal");
+        Html.RenderPartial("_ShareModal");
+        @RenderSection("footer", required: false)
+    }
+}
+
+

@@ -1,0 +1,440 @@
+﻿/// <reference path="../../../styles/_core.scss" />
+
+// vendor/emojionearea/variables.scss
+$css-prefix: emojionearea !default;
+$z-index: 90 !default;
+$picker-width: (10 * 32px + 28px);
+$picker-height: 276px;
+$filters-height: 40px;
+$search-height: 40px;
+
+.#{$css-prefix} {
+
+    &, &.form-control {
+        height: auto;
+        padding: 0 !important;
+    }
+
+    .#{$css-prefix}-editor {
+        @include scroll-y;
+        padding: .75rem 4.75rem .75rem 2.75rem;
+        cursor: text;
+        display: block;
+        height: auto;
+        max-height: 15em;
+
+        &:empty:before {
+            content: attr(placeholder);
+            display: block;
+            color: $input-placeholder-color;
+        }
+
+        &:focus {
+            outline: 0;
+        }
+    }
+
+    .#{$css-prefix}-button {
+        z-index: 5;
+        position: absolute;
+        right: 2.75rem;
+        bottom: .75rem;
+        width: 24px;
+        height: 24px;
+        opacity: 0.55;
+        cursor: pointer;
+        @include transition(opacity 0.15s ease-in-out);
+
+        fieldset:disabled & {
+            opacity: 0.3575;
+        }
+
+        &:hover {
+            opacity: 1;
+        }
+
+        > div {
+            display: block;
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            @include transition(all .15s ease-in-out);
+
+            &.#{$css-prefix}-button-open {
+                background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDE3LjVDMTQuMzMsMTcuNSAxNi4zLDE2LjA0IDE3LjExLDE0SDYuODlDNy42OSwxNi4wNCA5LjY3LDE3LjUgMTIsMTcuNU04LjUsMTFDOS4zMywxMSAxMCwxMC4zMyAxMCw5LjVDMTAsOC42NyA5LjMzLDggOC41LDhDNy42Nyw4IDcsOC42NyA3LDkuNUM3LDEwLjMzIDcuNjcsMTEgOC41LDExTTE1LjUsMTFDMTYuMzMsMTEgMTcsMTAuMzMgMTcsOS41QzE3LDguNjcgMTYuMzMsOCAxNS41LDhDMTQuNjcsOCAxNCw4LjY3IDE0LDkuNUMxNCwxMC4zMyAxNC42NywxMSAxNS41LDExTTEyLDIwQzcuNTgsMjAgNCwxNi40MiA0LDEyQzQsNy41OCA3LjU4LDQgMTIsNEMxNi40Miw0IDIwLDcuNTggMjAsMTJDMjAsMTYuNDIgMTYuNDIsMjAgMTIsMjBNMTIsMkM2LjQ3LDIgMiw2LjUgMiwxMkMyLDE3LjUyIDYuNDgsMjIgMTIsMjJDMTcuNTIsMjIgMjIsMTcuNTIgMjIsMTJDMjIsNi40OCAxNy41MiwyIDEyLDJaIiAvPjwvc3ZnPg==');
+                background-position: 0 -24px;
+                opacity: 1;
+            }
+
+            &.#{$css-prefix}-button-close {
+                background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDYuNDFMMTcuNTksNUwxMiwxMC41OUw2LjQxLDVMNSw2LjQxTDEwLjU5LDEyTDUsMTcuNTlMNi40MSwxOUwxMiwxMy40MUwxNy41OSwxOUwxOSwxNy41OUwxMy40MSwxMkwxOSw2LjQxWiIgLz48L3N2Zz4=');
+                background-position: 0 0;
+                -webkit-transform: rotate(-45deg);
+                -o-transform: rotate(-45deg);
+                transform: rotate(-45deg);
+                opacity: 0;
+            }
+        }
+
+        &.active {
+            > div {
+                &.#{$css-prefix}-button-open {
+                    -webkit-transform: rotate(45deg);
+                    -o-transform: rotate(45deg);
+                    transform: rotate(45deg);
+                    opacity: 0;
+                }
+
+                &.#{$css-prefix}-button-close {
+                    -webkit-transform: rotate(0deg);
+                    -o-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .#{$css-prefix}-button.active {
+        + .#{$css-prefix}-picker {
+            opacity: 1;
+        }
+
+        + .#{$css-prefix}-picker-position-top {
+            margin-top: - $picker-height + 7;
+        }
+
+        + .#{$css-prefix}-picker-position-left,
+        + .#{$css-prefix}-picker-position-right {
+            margin-right: - $picker-width + 7;
+        }
+
+        + .#{$css-prefix}-picker-position-bottom {
+            margin-top: - 7px;
+        }
+    }
+
+    .#{$css-prefix}-picker {
+        background: $white;
+        position: absolute;
+        @include box-shadow(0 1px 5px rgba(0, 0, 0, 0.32));
+        border-radius: $border-radius;
+        height: $picker-height;
+        width: $picker-width;
+        top: -15px;
+        right: -15px;
+        z-index: $z-index;
+        @include transition(all ease-in-out .15s);
+        opacity: 0;
+        user-select: none;
+
+        &.hidden {
+            display: none;
+        }
+
+        .#{$css-prefix}-wrapper {
+            position: relative;
+            height: $picker-height;
+            width: $picker-width;
+
+            &:after {
+                content: "";
+                display: block;
+                position: absolute;
+                background-repeat: no-repeat;
+                z-index: $z-index + 1;
+            }
+        }
+
+        .#{$css-prefix}-filters, .#{$css-prefix}-search {
+            width: 100%;
+            position: absolute;
+            z-index: $z-index + 5;
+        }
+
+        .#{$css-prefix}-search {
+            display: none;
+        }
+
+        .#{$css-prefix}-filters {
+            background: #F5F7F9;
+            padding: 0 0 0 7px;
+            height: $filters-height;
+
+            .#{$css-prefix}-filter {
+                display: block;
+                float: left;
+                height: $filters-height;
+                width: 32px;
+                filter: inherit;
+                padding: 7px 1px 0;
+                cursor: pointer;
+
+                &.active {
+                    background: #fff;
+                }
+
+                > i {
+                    width: 24px;
+                    height: 24px;
+                    top: 0;
+                }
+
+                > img {
+                    width: 24px;
+                    height: 24px;
+                    margin: 0 3px;
+                }
+            }
+        }
+
+        .#{$css-prefix}-tones {
+            position: absolute;
+            top: $filters-height + 6px;
+            right: 10px;
+            height: 22px;
+            z-index: $z-index + 5;
+
+            > .btn-tone {
+                display: inline-block;
+                padding: 0;
+                border: 0;
+                vertical-align: middle;
+                outline: none;
+                background: transparent;
+                cursor: pointer;
+                position: relative;
+
+                &.btn-tone-0 {
+                    &, &:after {
+                        background-color: #ffcf3e;
+                    }
+                }
+
+                &.btn-tone-1 {
+                    &, &:after {
+                        background-color: #fae3c5;
+                    }
+                }
+
+                &.btn-tone-2 {
+                    &, &:after {
+                        background-color: #e2cfa5;
+                    }
+                }
+
+                &.btn-tone-3 {
+                    &, &:after {
+                        background-color: #daa478;
+                    }
+                }
+
+                &.btn-tone-4 {
+                    &, &:after {
+                        background-color: #a78058;
+                    }
+                }
+
+                &.btn-tone-5 {
+                    &, &:after {
+                        background-color: #5e4d43;
+                    }
+                }
+            }
+
+            &.#{$css-prefix}-tones-bullet,
+            &.#{$css-prefix}-tones-square {
+                > .btn-tone {
+                    width: 20px;
+                    height: 20px;
+                    margin: 0;
+                    background-color: transparent;
+
+                    &:after {
+                        content: "";
+                        position: absolute;
+                        display: block;
+                        top: 4px;
+                        left: 4px;
+                        width: 12px;
+                        height: 12px;
+                    }
+
+                    &.active:after {
+                        top: 0;
+                        left: 0;
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+            }
+
+            &.#{$css-prefix}-tones-radio,
+            &.#{$css-prefix}-tones-checkbox {
+                > .btn-tone {
+                    width: 16px;
+                    height: 16px;
+                    margin: 0px 2px;
+
+                    &.active {
+                        &:after {
+                            content: "";
+                            position: absolute;
+                            display: block;
+                            background-color: transparent;
+                            border: 2px solid #fff;
+                            width: 8px;
+                            height: 8px;
+                            top: 2px;
+                            left: 2px;
+                            box-sizing: initial;
+                        }
+                    }
+                }
+            }
+
+            &.#{$css-prefix}-tones-bullet,
+            &.#{$css-prefix}-tones-radio {
+                > .btn-tone {
+                    &, &:after {
+                        @include border-radius(100%);
+                    }
+                }
+            }
+
+            &.#{$css-prefix}-tones-square,
+            &.#{$css-prefix}-tones-checkbox {
+                > .btn-tone {
+                    &, &:after {
+                        @include border-radius(1px);
+                    }
+                }
+            }
+        }
+
+        .#{$css-prefix}-scroll-area {
+            height: $picker-height - $filters-height - $search-height;
+            overflow: auto;
+            overflow-x: hidden;
+            width: 100%;
+            position: absolute;
+            padding: 0 0 5px;
+
+            .#{$css-prefix}-emojis-list {
+                z-index: 1;
+            }
+
+            h1 {
+                display: block;
+                font-size: $font-size-sm;
+                font-weight: normal;
+                color: $text-muted;
+                background: $white;
+                line-height: $line-height-base;
+                margin: 0;
+                padding: 7px 0 5px 6px;
+
+                &:after, &:before {
+                    content: " ";
+                    display: block;
+                    clear: both;
+                }
+            }
+
+            .#{$css-prefix}-category {
+                padding: 0 0 0 7px;
+
+                &:after, &:before {
+                    content: " ";
+                    display: block;
+                    clear: both;
+                }
+            }
+
+            [class*=emojione-] {
+                box-sizing: content-box;
+                margin: 0;
+                width: 24px;
+                height: 24px;
+                top: 0;
+            }
+
+            .emojibtn {
+                box-sizing: content-box;
+                width: 24px;
+                height: 24px;
+                float: left;
+                display: block;
+                margin: 1px;
+                padding: 3px;
+
+                &:hover {
+                    @include border-radius(4px);
+                    background-color: #e4e4e4;
+                    cursor: pointer;
+                }
+
+                i, img {
+                    float: left;
+                    display: block;
+                    width: 24px;
+                    height: 24px;
+                }
+
+                img.lazy-emoji {
+                    opacity: 0;
+                }
+            }
+        }
+
+        &.#{$css-prefix}-filters-position-top {
+            .#{$css-prefix}-filters {
+                top: 0;
+                border-top-left-radius: $border-radius;
+                border-top-right-radius: $border-radius;
+            }
+
+            .#{$css-prefix}-search {
+                top: $filters-height;
+            }
+
+            .#{$css-prefix}-scroll-area {
+                bottom: 0;
+            }
+        }
+
+        &.#{$css-prefix}-picker-position-top {
+            margin-top: - $picker-height - 10;
+            right: -14px;
+            right: .75rem;
+
+            .#{$css-prefix}-wrapper:after {
+                width: 19px;
+                height: 10px;
+                background-position: -2px -49px;
+                bottom: -10px;
+                right: 20px;
+            }
+
+            &.#{$css-prefix}-filters-position-bottom {
+                .#{$css-prefix}-wrapper:after {
+                    background-position: -2px -80px;
+                }
+            }
+        }
+    }
+}
+
+.emojioneemoji {
+    @extend .eo;
+}
+
+html.mobile {
+    .#{$css-prefix}-editor {
+        padding-right: 2.75rem;
+    }
+
+    .#{$css-prefix}-button, .#{$css-prefix}-picker {
+        display: none;
+    }
+}

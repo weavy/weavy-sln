@@ -104,6 +104,8 @@
             frame.name = weavy.getId("weavy-panel-frame-" + panelId);
             frame.allowFullscreen = 1;
 
+            frame.dataset.weavyId = weavy.getId();
+
             if (url) {
                 frame.dataset.src = weavy.httpsUrl(url, weavy.options.url);
             }
@@ -144,6 +146,43 @@
             return panel;
         };
 
+
+        /**
+         * Resets a panel to initial state
+         * @param {string} panelId - The id of the panel to remove
+         * 
+         **/
+        weavy.resetPanel = function (panelId) {
+            var $panel = $(weavy.nodes.panels).children(weavy.getId("#weavy-panel-removed-" + panelId) + ", " + weavy.getId("#weavy-panel-" + panelId)).first();
+            if ($panel.length) {
+                var frame = $panel.find("iframe")[0];
+                if ($panel.hasClass("weavy-open")) {
+                    $panel[0].id = weavy.getId("weavy-panel-removed-" + panelId);
+                    weavy.timeout(0).then(function () {
+                        weavy.close().then(function () {
+                            weavy.resetPanel(panelId);
+                        });
+                    });
+                } else {
+                    var frameSrc = frame.src || frame.dataset.src;
+                    var frameType = frame.getAttribute('data-type');
+
+                    // frame
+                    var newFrame = document.createElement("iframe");
+                    newFrame.className = "weavy-panel-frame";
+                    newFrame.id = weavy.getId("weavy-panel-frame-" + panelId);
+                    newFrame.name = weavy.getId("weavy-panel-frame-" + panelId);
+                    newFrame.allowFullscreen = 1;
+                    newFrame.dataset.src = frameSrc;
+                    newFrame.setAttribute("data-type", frameType);
+
+                    $(frame).remove();
+                    $panel.append(newFrame);
+                }
+            }
+        }
+
+
         /**
          * Removes a panel. If the panel is open it will be closed before it's removed.
          * 
@@ -164,7 +203,6 @@
                         });
                     });
                 } else {
-                    wvy.connection.removeWindow(frame.contentWindow);
                     $panel.remove();
 
                     /**
@@ -188,6 +226,15 @@
                 weavy.removePanel(this.dataset.id);
             });
         };
+
+        /**
+         * Resets all panels to initial state.
+         */
+        weavy.resetPanels = function () {
+            $(weavy.nodes.panels).children().each(function () {
+                weavy.resetPanel(this.dataset.id);
+            });
+        }
 
         /**
          * Create panel controls for expand/collapse and close. Set control settings in {@link panels.defaults|options}
@@ -319,7 +366,7 @@
 
             if ($openFrame.length && $openFrame[0].loaded) {
                 try {
-                    $openFrame[0].contentWindow.postMessage({ name: 'hide' }, "*");
+                    wvy.postal.postToFrame($openFrame[0].name, weavy.getId(), { name: 'hide' });
                 } catch (e) {
                     weavy.debug("Could not postMessage:hide to frame");
                 }
@@ -348,7 +395,7 @@
                         } else {
                             // already loaded
                             try {
-                                $frame[0].contentWindow.postMessage({ name: 'show' }, "*");
+                                wvy.postal.postToFrame($frame[0].name, weavy.getId(), { name: 'show' });
                             } catch (e) {
                                 weavy.debug("Could not postMessage:show to frame");
                             }
@@ -378,6 +425,7 @@
         });
 
         weavy.on("signing-out", weavy.clearPanels);
+        weavy.on("signed-out", weavy.resetPanels);
 
         // Exports (not required)
         return {}

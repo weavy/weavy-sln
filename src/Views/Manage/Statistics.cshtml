@@ -22,7 +22,7 @@
         <tr>
             <td>Blobs</td>
             <td class="text-right">@Model.BlobCount</td>
-            <td class="text-right">@FileHelper.FileSizeAsString(Model.BlobSize)</td>
+            <td class="text-right">@FileUtils.FileSizeAsString(Model.BlobSize)</td>
         </tr>
         <tr>
             <td>Comments</td>
@@ -37,12 +37,12 @@
         <tr>
             <td>Database</td>
             <td class="text-right">--</td>
-            <td class="text-right">@FileHelper.FileSizeAsString(Model.DatabaseSize)</td>
+            <td class="text-right">@FileUtils.FileSizeAsString(Model.DatabaseSize)</td>
         </tr>
         <tr>
             <td>Index</td>
             <td class="text-right">@Model.IndexCount</td>
-            <td class="text-right">@FileHelper.FileSizeAsString(Model.IndexSize)</td>
+            <td class="text-right">@FileUtils.FileSizeAsString(Model.IndexSize)</td>
         </tr>
         <tr>
             <td>Likes</td>

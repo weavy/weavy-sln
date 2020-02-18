@@ -1,14 +1,14 @@
-﻿~/scripts/src/signalr/jquery.signalR.js
+﻿~/scripts/src/postal.js
+~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/src/connection.js
-~/scripts/src/realtime.js
 ~/scripts/src/weavy/weavy.js
 #~/scripts/src/weavy/_weavy-plugin-helloworld.js
 #~/scripts/src/weavy/_weavy-plugin-template.js
 
 # Plugins may be loaded in any order
 ~/scripts/src/weavy/alert.js
-~/scripts/src/weavy/attach.js
 ~/scripts/src/weavy/authentication.js
+~/scripts/src/weavy/filebrowser.js
 ~/scripts/src/weavy/panels.js
 ~/scripts/src/weavy/preview.js
 ~/scripts/src/weavy/sso.js

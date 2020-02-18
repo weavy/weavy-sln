@@ -1,0 +1,1274 @@
+﻿// Custom variables and colors
+@import "../../../styles/variables";
+
+// Bootstrap
+@import "../../../styles/vendor/bootstrap/functions";
+@import "../../../styles/functions"; // override some of the default bootstrap functions
+@import "../../../styles/vendor/bootstrap/variables";
+@import "../../../styles/vendor/bootstrap/mixins";
+@import "../../../styles/vendor/bootstrap/root";
+//@import "../../../styles/vendor/bootstrap/print";
+@import "../../../styles/vendor/bootstrap/reboot";
+@import "../../../styles/vendor/bootstrap/type";
+//@import "../../../styles/vendor/bootstrap/images";
+//@import "../../../styles/vendor/bootstrap/code";
+//@import "../../../styles/vendor/bootstrap/grid";
+@import "../../../styles/vendor/bootstrap/tables";
+@import "../../../styles/vendor/bootstrap/forms";
+@import "../../../styles/vendor/bootstrap/buttons";
+@import "../../../styles/vendor/bootstrap/transitions";
+@import "../../../styles/vendor/bootstrap/dropdown";
+//@import "../../../styles/vendor/bootstrap/button-group";
+@import "../../../styles/vendor/bootstrap/input-group";
+@import "../../../styles/vendor/bootstrap/custom-forms";
+//@import "../../../styles/vendor/bootstrap/nav";
+@import "../../../styles/vendor/bootstrap/navbar";
+//@import "../../../styles/vendor/bootstrap/card";
+//@import "../../../styles/vendor/bootstrap/breadcrumb";
+//@import "../../../styles/vendor/bootstrap/pagination";
+@import "../../../styles/vendor/bootstrap/badge";
+//@import "../../../styles/vendor/bootstrap/jumbotron";
+//@import "../../../styles/vendor/bootstrap/alert";
+@import "../../../styles/vendor/bootstrap/progress";
+@import "../../../styles/vendor/bootstrap/media";
+@import "../../../styles/vendor/bootstrap/list-group";
+@import "../../../styles/vendor/bootstrap/close";
+//@import "../../../styles/vendor/bootstrap/modal";
+//@import "../../../styles/vendor/bootstrap/tooltip";
+//@import "../../../styles/vendor/bootstrap/popover";
+//@import "../../../styles/vendor/bootstrap/carousel";
+@import "../../../styles/vendor/bootstrap/utilities";
+
+// Additional mixins
+@import "../../../styles/mixins/animation";
+@import "../../../styles/mixins/dot";
+@import "../../../styles/utilities/color";
+@import "../../../styles/utilities/scroll";
+
+// Custom components
+@import "../../../styles/components/buttons";
+@import "../../../styles/components/cover";
+@import "../../../styles/components/emojione";
+@import "../../../styles/components/icons";
+@import "../../../styles/components/images";
+@import "../../../styles/components/image-grid";
+@import "../../../styles/components/photoswipe";
+@import "../../../styles/components/presence";
+@import "../../../styles/components/preview";
+@import "../../../styles/components/spinner";
+@import "../../../styles/components/togglers";
+
+// emojione area
+@import 'emojionearea';
+
+// custom modal
+@import "messenger_modal";
+
+
+.turbolinks-progress-bar {
+    display:none;
+}
+
+body {
+    html:not(.mobile) & {
+        overflow: hidden;
+        height: 100vh;
+    }
+}
+
+.pane {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    html:not(.mobile) & {
+        height: 100vh;
+        overflow: hidden;
+    }
+}
+
+.pane-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    height: $navbar-height;
+    flex: 0 0 $navbar-height;
+    border-bottom: 1px solid $border-color;
+    padding: 0 .5rem;
+    background: $body-bg;
+
+    html.mobile & {
+        position: sticky;
+        top: 0;
+        z-index: $zindex-sticky;
+    }
+}
+
+.pane-actions {
+    display: flex;
+    align-items: center;
+    width: 4rem; // makes room for 2 icons
+    &:last-child {
+        justify-content: flex-end;
+    }
+
+    .badge {
+        border-radius: 50%;
+        min-width: 1.5rem;
+        max-width: 2rem;
+        font-size: $font-size-sm;
+        padding: .3125rem .25rem;
+    }
+}
+
+.pane-title {
+    @include text-truncate;
+    padding: 0 .5rem;
+
+    a {
+        @include text-truncate;
+        color: inherit;
+    }
+}
+
+.pane-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    // for scroll
+    html:not(.mobile) & {
+        @include scrollbar;
+        @include scroll-y;
+    }
+}
+
+// pane with conversation list
+#sidebar {
+}
+
+// pane with conversation and details
+#main {
+    .pane-body {
+        flex-direction: row;
+    }
+}
+// conversations list
+#conversations {
+
+    .conversation {
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+
+        &.active {
+            background-color: $list-group-bg;
+            border-color: $list-group-border-color;
+            color: $list-group-action-color;
+            z-index: unset;
+
+            .two & {
+                background-color: $list-group-hover-bg;
+            }
+
+            @include media-breakpoint-up(md) {
+                .dual.one & {
+                    background-color: $list-group-hover-bg;
+                }
+            }
+        }
+
+        &.unread {
+            .media-title, .media-text {
+                font-weight: $font-weight-bold;
+            }
+        }
+
+
+        &:not(.pinned) {
+            .dropdown-toggle {
+                > .i-pin {
+                    display: none;
+                }
+            }
+
+            .conversation-menu {
+                [data-action=pin] {
+                    display: block;
+                }
+            }
+        }
+
+        &.pinned {
+            .dropdown-toggle {
+
+                > .i-dots-vertical {
+                    display: none;
+                }
+
+                > .i-pin {
+                    display: inline-flex;
+                }
+            }
+
+            .conversation-menu {
+                [data-action=unpin] {
+                    display: block;
+                }
+            }
+        }
+
+        &:hover {
+            background-color: $list-group-hover-bg;
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    time {
+        color: $text-muted;
+        float: right;
+        font-size: $font-size-xs;
+        margin-top: .25rem;
+    }
+}
+
+// conversation div with messages and form for posting message
+#conversation {
+    width: 100%;
+
+    html.mobile & {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - #{$navbar-height});
+    }
+}
+
+// div with messages
+#messages {
+
+
+    html:not(.mobile) & {
+        @include scrollbar;
+        @include scroll-y;
+    }
+
+    > .spinner {
+        position: absolute;
+        top: calc(50% - .75rem);
+        left: calc(50% - .75rem);
+        // hide spinner from the start
+        display: none;
+    }
+
+    padding: $spacer 9% 0 9%;
+    margin-top: auto;
+    padding-left: .75rem;
+    padding-right: .75rem;
+
+
+    @include media-breakpoint-up(sm) { // 576+
+    }
+
+
+    @include media-breakpoint-up(md) { // 768+
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    @include media-breakpoint-up(lg) { // 992+
+        padding-left: 7%;
+        padding-right: 7%;
+    }
+
+    @include media-breakpoint-up(xl) { // 1200+
+        padding-left: 9%;
+        padding-right: 9%;
+    }
+}
+
+// individual message
+.message {
+    display: flex;
+    margin-bottom: 1.5rem;
+
+    .author {
+        margin: 1.375rem .5rem 0 0;
+
+        .avatar {
+            width: 1.5rem;
+            height: 1.5rem;
+
+            @include media-breakpoint-up(md) {
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+    }
+
+    .content {
+        width: 100%;
+        max-width: calc(100% - 2rem); // without this .image-grid could overflow
+    }
+
+    .meta {
+        font-size: $font-size-xs;
+        margin: 0 0 .25rem .5rem;
+        color: $text-muted;
+
+        a {
+            color: inherit;
+        }
+    }
+
+    .bubble {
+        background-color: $gray-100;
+        border-radius: $border-radius;
+        display: inline-block;
+        padding: .5rem;
+        position: relative; // so that we can position .reactions
+        max-width: 100%;
+
+        @media (min-width: 576px) and (max-width: 900px) {
+            max-width: 90%;
+        }
+
+        @media (min-width: 901px) and (max-width: 1024px) {
+            max-width: 85%;
+        }
+
+        @media (min-width: 1025px) and (max-width: 1300px) {
+            max-width: 75%;
+        }
+
+        @media (min-width: 1301px) {
+            max-width: 65%;
+        }
+
+        &:hover {
+            .badge-reaction[data-toggle=reactions] {
+                display: inline-flex;
+            }
+        }
+
+        > div {
+            margin-bottom: .5rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .card-images {
+        max-width: 100%;
+        background-color: inherit;
+    }
+
+    .card-files {
+
+        .i {
+            margin-right: .25rem;
+        }
+
+        .media-body {
+            margin-right: .25rem;
+        }
+
+        .media-title {
+            margin-bottom: 0;
+        }
+
+        .list-group-item {
+            padding: .5rem;
+        }
+
+        .list-group-item-action {
+            &:hover, &:focus {
+                background: $list-group-bg;
+            }
+        }
+    }
+
+    .text {
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+    /*
+    .reactions {
+        position: absolute;
+        right: .25rem;
+        bottom: -.9375em;
+        display: flex;
+        align-items: center;
+        max-width: 100%;
+
+
+        .badge-reaction {
+            background: $white;
+            border-radius: 1.5rem;
+            border: $border-width solid $border-color;
+            color: $text-muted;
+            display: inline-flex;
+            cursor: pointer;
+            font-size: $font-size-base;
+            font-weight: normal;
+            height: 1.375rem;
+            padding: 0 .25rem;
+            margin-left: .125rem;
+            align-items: center;
+
+            .eo, .i {
+                width: 1rem;
+                height: 1rem;
+                margin: 0;
+            }
+
+            span {
+                padding: 0 .125rem 0 .25rem;
+                font-size: $font-size-xs;
+            }
+
+            &.active {
+                border-color: $primary;
+                color: $link-color;
+            }
+
+            &:hover {
+                color: $icon-color;
+            }
+
+            &[data-toggle=reactions] {
+                display: none;
+            }
+        }
+    }*/
+    &.me {
+        display: block;
+        padding-left: 3rem;
+
+        .meta {
+            margin: 0 .5rem .25rem 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            max-width: none;
+        }
+
+        .bubble {
+            background-color: $theme-200;
+        }
+
+        .reactions {
+            max-width: none;
+        }
+    }
+
+    &.emoji {
+        .bubble {
+            background: none;
+            padding: 0 .5rem 0 0;
+        }
+
+        img.eo, img.emojione {
+            font-size: 2rem;
+            margin: 0 .25rem 0 0;
+        }
+
+        object.emojione {
+            width: 2.625rem; // 42px;
+            height: 2.625rem; // 42px;
+            margin: 0 .25rem 0 0;
+        }
+
+        &.me {
+            img.eo, img.emojione, object.emojione {
+                margin: 0 0 0 .25rem;
+            }
+        }
+    }
+
+    &.sending {
+        .bubble {
+            opacity: .5;
+        }
+    }
+
+    &.system {
+        justify-content: center;
+        margin-bottom: .25rem;
+
+        .bubble {
+            background-color: inherit;
+            color: $text-muted;
+            text-align: center;
+            padding: 0;
+        }
+    }
+}
+// sending message and status indicator
+#sending {
+    display: none;
+}
+// date separator
+.date-separator {
+    font-size: $font-size-sm;
+    line-height: 1;
+    text-align: center;
+    margin: 1.5rem 0;
+    position: sticky;
+    top: .5rem;
+    z-index: 2;
+    pointer-events: none;
+
+    time {
+        background: $theme-100;
+        padding: .5rem .625rem;
+        border-radius: $border-radius;
+        display: inline-block;
+    }
+}
+// new messages separator
+.new-separator {
+    font-size: $font-size-sm;
+    line-height: 1;
+    text-align: center;
+    background: $primary;
+    padding: .5rem 0;
+    border-radius: $border-radius;
+    color: color-yiq($primary);
+    width: 50%;
+    margin: 1.5rem auto;
+    position: sticky;
+    top: .5rem;
+    z-index: 3;
+}
+// message status indicator (sending, sent, delivered, read)
+.status {
+    display: flex;
+    justify-content: flex-end;
+    color: $theme-200;
+    font-size: $font-size-xs;
+    margin-top: -.75rem;
+    margin-bottom: 1rem;
+
+    > * {
+        margin-left: .25rem;
+    }
+}
+
+// conversation menu
+.conversation-menu {
+    [data-action] {
+        display: none;
+    }
+
+    .conversation.starred & {
+        [data-action=unstar] {
+            display: block;
+        }
+    }
+
+    .conversation:not(.starred) & {
+        [data-action=star] {
+            display: block;
+        }
+    }
+
+    .conversation.unread & {
+        [data-action=read] {
+            display: block;
+        }
+    }
+
+    .conversation:not(.unread) & {
+        [data-action=unread] {
+            display: block;
+        }
+    }
+
+    .conversation.room & {
+        [data-action=leave] {
+            display: block;
+        }
+    }
+
+
+    #main.conversation.room & {
+        [data-action=add-people] {
+            display: block;
+        }
+    }
+}
+
+button.dropdown-item {
+    &:focus {
+        outline: none;
+    }
+}
+
+.btn-checkbox {
+
+    .i-checkbox-blank-outline {
+        display: inline-flex;
+    }
+
+    .i-checkbox-marked-outline {
+        display: none;
+    }
+
+    [type=checkbox] {
+        visibility: hidden;
+        position: absolute;
+
+        &:checked {
+            ~ .i-checkbox-blank-outline {
+                display: none;
+            }
+
+            ~ .i-checkbox-marked-outline {
+                display: inline-flex;
+            }
+        }
+    }
+}
+// only show first .loader (infinite scroll)
+.loader ~ .loader {
+    display: none;
+}
+// media
+.media {
+    align-items: center;
+}
+
+.media-actions {
+    position: absolute;
+    bottom: .5rem;
+    right: 0;
+    display: flex;
+}
+
+.media-body {
+    line-height: 1.5;
+    // needed for text-truncate to work, see https://css-tricks.com/flexbox-truncated-text/
+    min-width: 0;
+}
+
+.media-title, .media-text {
+    @include text-truncate;
+}
+
+.media-text {
+    // make room for dropdown and star
+    padding-right: 3.25rem;
+}
+// typing indicators
+.typing-hide {
+    display: initial;
+
+    .typing & {
+        display: none !important;
+    }
+}
+
+.typing-show {
+    color: $text-muted;
+    display: none;
+    font-weight: $font-weight-normal;
+
+    .typing & {
+        display: initial !important;
+    }
+}
+// change some styles when loading
+body.loading {
+
+    #messages {
+        > .spinner {
+            display: block;
+        }
+
+        > :not(.spinner) {
+            display: none;
+        }
+    }
+}
+
+// change some styles while sending
+body.sending {
+    // display #sending
+    #sending {
+        display: block;
+    }
+    // hide prev status indicators
+    .status-sent, .status-delivered {
+        display: none;
+    }
+}
+// start with only one pane visible
+.one {
+    #main {
+        display: none;
+    }
+}
+
+.two {
+    #sidebar {
+        display: none;
+    }
+
+    #conversation {
+
+        html:not(.mobile) & {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+    }
+}
+// single pane layout
+body.single {
+    // show info pane side-by-side with conversation, also move scrollbar from body to the individual panes (even on mobile)
+    @include media-breakpoint-up(md) {
+        &.two {
+            display: flex;
+            flex-wrap: wrap;
+            height: 100vh;
+            overflow: hidden;
+
+            .pane {
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .pane-header {
+                position: static;
+                top: auto;
+                z-index: unset;
+            }
+
+            #main {
+                display: flex;
+                flex: 3;
+
+                .pane-body {
+                    height: 100%;
+                }
+            }
+
+            #conversation {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                height: 100%;
+            }
+
+            #messages {
+                min-height: 0;
+                @include scroll-y;
+            }
+
+            .message-form {
+                position: static;
+            }
+        }
+    }
+}
+// responsive two pane layout
+body.dual {
+
+    .pane-actions {
+        .btn-avatar {
+            display: none;
+        }
+    }
+    // show both panes on medium sized devices (768px and up), also move scrollbar from body to the individual panes (even on mobile)
+    @include media-breakpoint-up(md) {
+        display: flex;
+        flex-wrap: wrap;
+        height: 100vh;
+        overflow: hidden;
+
+        .pane {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .pane-header {
+            position: static;
+            top: auto;
+            z-index: unset;
+        }
+
+        .pane-actions {
+            .btn-avatar {
+                display: flex;
+            }
+
+            .btn-back {
+                display: none;
+            }
+
+            .badge {
+                display: none;
+            }
+        }
+
+        #conversation {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            height: 100%;
+        }
+
+        #messages {
+            min-height: 0;
+            @include scroll-y;
+        }
+
+        .message-form {
+            position: static;
+        }
+
+        &.one, &.two {
+            #sidebar {
+                border-right: 1px solid $border-color;
+                display: flex;
+                flex: 0 0 40%;
+                max-width: 420px;
+
+                .pane-body {
+                    @include scroll-y;
+                }
+            }
+
+            #main {
+                display: flex;
+                flex: 3;
+
+                .pane-body {
+                    height: 100%;
+                    overflow: hidden;
+                }
+            }
+        }
+    }
+}
+// tables
+.table {
+    table-layout: fixed;
+    margin: 0;
+
+    th, td {
+        border: none;
+        padding-left: .25rem;
+        padding-right: .25rem;
+
+        &:first-child {
+            padding-left: .5rem;
+        }
+
+        &:last-child {
+            padding-right: .5rem;
+        }
+
+        &.table-icon {
+            // cell with .img-32 or .btn-icon
+            line-height: 0;
+            color: $icon-color;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+            width: 2.5rem;
+
+            > :only-child {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            &:first-child {
+                padding: .25rem 0 .25rem .5rem;
+
+                > :only-child {
+                    margin: auto;
+                    justify-content: flex-start;
+                }
+            }
+
+            &:last-child {
+                padding: .25rem .5rem .25rem 0;
+
+                > :only-child {
+                    margin-left: auto;
+                    justify-content: flex-end;
+                }
+            }
+        }
+
+        .btn-icon {
+            margin-top: -.25rem;
+            margin-bottom: -.25rem;
+        }
+    }
+}
+// attached files in new message
+.table-uploads {
+
+    td {
+        background-color: $gray-100;
+    }
+    // file type icon
+    td:nth-child(1) {
+        padding: .25rem .25rem .25rem .75rem;
+    }
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // close icon
+    td.table-icon:nth-child(3) {
+        padding: .25rem;
+    }
+
+    tr:last-child td {
+        border-bottom: $border-width solid rgba(0, 0, 0, .08);
+    }
+}
+// room members
+.table-members {
+
+    td, th {
+        // avatar
+        &.table-icon:nth-child(1) {
+            padding-left: 1rem;
+            padding-right: .25rem;
+            width: 3.25rem;
+        }
+        // name
+        &:nth-child(2) {
+            width: 100%;
+            @include text-truncate;
+        }
+        // icon
+        &.table-icon:nth-child(3) {
+            padding-left: .25rem;
+            padding-right: .5rem;
+            width: 2.75rem;
+        }
+    }
+}
+// select people
+.table-people {
+
+    tr {
+        cursor: pointer;
+    }
+
+    td, th {
+        // avatar
+        &.table-icon:nth-child(1) {
+            padding-left: 1rem;
+            padding-right: .25rem;
+            width: 3.25rem;
+        }
+        // name
+        &:nth-child(2) {
+            width: 100%;
+            @include text-truncate;
+        }
+        // icon
+        &.table-icon:nth-child(3) {
+            padding-left: .25rem;
+            padding-right: 1rem;
+            width: 3.25rem;
+        }
+    }
+
+    tr.info {
+        cursor: default;
+    }
+}
+// forms
+.form-text {
+    color: $text-muted;
+    font-size: $font-size-sm;
+}
+
+// form for posting message
+.message-form {
+    position: sticky;
+    bottom: 0;
+    z-index: $zindex-sticky;
+    background: $white;
+    border-top: 1px solid $border-color;
+
+    .form-container {
+        // relative so that we can position the file upload progress bar and emoji picker
+        position: relative;
+    }
+
+    .progress {
+        position: absolute;
+        top: -.25rem;
+        left: 0;
+        right: 0;
+        height: .25rem;
+        box-shadow: none;
+    }
+
+    .form-group {
+        margin: 0;
+        position: relative;
+    }
+
+    .form-control {
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        padding: .75rem 2.75rem;
+
+        &:disabled {
+            background-color: $input-bg;
+        }
+    }
+    // file upload button
+    .btn-file {
+        position: absolute;
+        bottom: .5rem;
+        left: .5rem;
+        overflow: hidden;
+        display: inline-flex;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        > input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            opacity: 0;
+            -ms-filter: 'alpha(opacity=0)';
+            font-size: 8.125rem; // 130px;
+            direction: ltr;
+            cursor: pointer;
+        }
+    }
+    // submit button
+    .btn-primary {
+        position: absolute;
+        bottom: .5rem;
+        right: .5rem;
+    }
+}
+
+.search-form {
+
+    .form-group {
+        margin: .5rem;
+        position: relative;
+    }
+
+    .form-control {
+        padding-right: 2rem;
+        box-shadow: none;
+        border-color: $border-color;
+
+        &::-ms-clear {
+            display: none;
+        }
+    }
+
+    .btn-icon {
+        color: $text-muted;
+        position: absolute;
+        top: -1px;
+        right: 0;
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    .btn-reset {
+        display: none;
+    }
+
+    &.searching {
+        .btn-search {
+            display: none;
+        }
+
+        .btn-reset {
+            display: inline-flex;
+
+            .spinner {
+                display: inline-flex;
+            }
+
+            .i-close {
+                display: none;
+            }
+        }
+    }
+
+    &.reset {
+        .btn-search {
+            display: none;
+        }
+
+        .btn-reset {
+            display: inline-flex;
+
+            .spinner {
+                display: none;
+            }
+
+            .i-close {
+                display: inline-flex;
+            }
+        }
+    }
+}
+
+
+.edit-form {
+
+
+    .name-label {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: .5rem 0 1.5rem 0;
+    }
+
+    .form-group {
+        display: none;
+        margin-bottom: 0;
+        padding: .5rem 0 .625rem 0;
+    }
+
+    &.edit {
+        .form-group {
+            display: block;
+        }
+
+        .name-label {
+            display: none;
+        }
+    }
+}
+// modals
+.modal-body {
+
+    .search-form {
+
+        .form-group {
+            margin: 0 0 1rem 0;
+        }
+    }
+
+    .search-form + form[method=post] {
+        margin: 0 -1rem;
+    }
+}
+// user profile modal
+.display-group {
+    margin-bottom: .75rem;
+
+    label {
+        margin: 0;
+    }
+}
+// images
+.image-grid {
+    background-color: inherit;
+
+    .image {
+
+        .img-play {
+            display: none;
+            animation-play-state: paused;
+        }
+
+        &:hover, &:focus {
+            .img-play {
+                display: block;
+                animation-play-state: running;
+            }
+        }
+    }
+}
+// preview navbar (instead of including _navbar.scss to avoid lots of unused rules)
+.navbar-preview {
+    .navbar-icons {
+        display: flex;
+        flex: 1 0 2rem;
+
+        &:not(:first-child):last-child {
+            justify-content: flex-end;
+        }
+    }
+
+    .navbar-middle {
+        display: flex;
+        flex: 0 1 auto;
+        align-items: center;
+        justify-content: center;
+        margin: 0 .5rem;
+        min-width: 0;
+
+        .navbar-text {
+            padding: 0;
+            display: inline-block;
+            @include text-truncate();
+            color: inherit !important;
+        }
+    }
+
+    .navbar-title {
+        line-height: 2rem;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+// emoji and mentions autocomplete
+.textcomplete-dropdown {
+    max-width: 16rem;
+
+    @include media-breakpoint-down(xs) {
+        left: 1rem !important;
+        max-width: calc(100vw - 2rem);
+    }
+}
+
+.textcomplete-item {
+    @extend .dropdown-item;
+
+    a {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+
+        .emojioneemoji {
+            margin-right: .325rem;
+        }
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1 1 0%;
+        }
+    }
+}

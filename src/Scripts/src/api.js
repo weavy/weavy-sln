@@ -127,6 +127,15 @@ wvy.api = (function ($) {
         });
     }
 
+    // marks all notifications refering to the parent as read
+    function readAllForParent(parentType, parentId) {
+        return $.ajax({
+            url: wvy.url.api("notification") + parentType + "/" + parentId + "/read",
+            method: "POST",
+            ContentType: "application/json"
+        });       
+    }
+
     // marks notification as unread
     function unread(notificationId) {
         return $.ajax({
@@ -169,6 +178,7 @@ wvy.api = (function ($) {
         restore: restore,
         unread: unread,
         readAll: readAll,
+        readAllForParent: readAllForParent,
         pin: pin,
         unpin: unpin,
         badges: badges

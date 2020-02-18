@@ -33,18 +33,12 @@ wvy.comments = (function ($) {
         if ($el.length === 0) return;
         
         $el.weavyEditor({
-            context: wvy.browser.embedded,
             collapsed: true,
             embeds: false,
             polls: false,
             placeholder: 'Your comment...',
             onSubmit: function (e, d) {
                 insertComment(e, d, this);
-                $(this).closest("form").find("#contextUrl").attr("disabled", true);
-            },
-            onContextChange: function (e, data) {
-                var $editor = $(this);                
-                $editor.closest("form").find("input[name=hasContext]").val(data.hasContext);
             }
         });
     }
@@ -160,11 +154,6 @@ wvy.comments = (function ($) {
             if (focus) {
                 $(selector + " textarea.comments-form").weavyEditor("focus");
             }
-
-            // check for context
-            if (wvy.browser.embedded) {
-                wvy.urlContext.check();
-            }            
         }
 
         // start and show spinner
@@ -282,7 +271,7 @@ wvy.comments = (function ($) {
     });
 
     // rtm comment
-    wvy.realtime.on("comment-inserted.weavy", function (e, comment) {
+    wvy.connection.default.on("comment-inserted.weavy", function (e, comment) {
 
         // do nothing if already exists
         if ($("div[data-comment-id='" + comment.id + "']").length !== 0) return;
@@ -292,14 +281,14 @@ wvy.comments = (function ($) {
     });
 
     // rtm like comment
-    wvy.realtime.on("like.weavy", function (e, liked) {       
+    wvy.connection.default.on("like.weavy", function (e, liked) {       
         if (liked.type === 'comment') {
             updateCommentFeedback(liked.id);
         }
     });
 
     // rtm unlike comment
-    wvy.realtime.on("unlike.weavy", function (e, unliked) {        
+    wvy.connection.default.on("unlike.weavy", function (e, unliked) {        
         if (unliked.type === 'comment') {
             updateCommentFeedback(unliked.id);
         }

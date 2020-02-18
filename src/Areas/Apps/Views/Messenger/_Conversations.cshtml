@@ -1,0 +1,11 @@
+﻿@model Messenger
+
+@foreach (var conversation in Model.Conversations) {
+    Html.RenderPartial("_Conversation", conversation, new ViewDataDictionary { { "Messenger", Model } });
+}
+
+@if (Model.Conversations.HasNextPage) {
+    <div class="loader text-center m-3" data-next="@Url.ScrollNext(Model.Conversations, Url.Action<MessengerController>(c => c.Conversations(null)))">
+        @Svg.Spinner()
+    </div>
+}

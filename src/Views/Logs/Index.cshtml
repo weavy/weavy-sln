@@ -22,7 +22,7 @@
                     <td class="table-icon"><a class="btn btn-icon" href="@Url.Action(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() })" target="_blank">@Svg.Icon("file-document")</a></td>
                     <td>@Html.ActionLink(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() }, new { target = "_blank" })</td>
                     <td>@Html.Time(item.Value.LastWriteTimeUtc, format: "g")</td>
-                    <td>@FileHelper.FileSizeAsString(item.Value.Length)</td>
+                    <td>@FileUtils.FileSizeAsString(item.Value.Length)</td>
                     <td class="table-icon text-right">
                         <div class="dropdown">
                             <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">

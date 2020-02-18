@@ -1,5 +1,18 @@
 # Changelog for Weavy
 
+## Weavy 5.0
+
+Weavy 5.0 has new and improved Client and Mobile SDKs, improved handling of configuration settings, 
+and adds the ability to store files in Azure Blob storage.
+
+### Weavy 5.0.0 (2020-02-18)
+
+* Added ability to configure Azure Blob Storage for storing files.
+* Added Weavy Web View component to the Mobile SDK. 
+* Moved configuration settings from custom element in web.config to standard app settings.
+* Rewritten Client SDK.
+* Stability improvements to Messenger.
+
 ## Weavy 4.0
 
 The main focus of this release has been documenting, improving, and simplifying the Weavy SDK. The 

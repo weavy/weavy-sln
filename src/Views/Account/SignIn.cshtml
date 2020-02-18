@@ -35,7 +35,7 @@
             {
                 <p class="text-center mt--3">&ndash; or &ndash;</p>
 
-                <div class="d-embedded">
+                <div class="d-framed">
                     @using (Html.BeginForm(nameof(AccountController.SignInExternal), typeof(AccountController).ControllerName(), new { path = "/sign-in-embedded" }, FormMethod.Post, new { id = "embedded-providers", data_weavy_event_notify = "signing-in" }))
                     {
                         <div class="buttons text-center">
@@ -67,11 +67,7 @@
 @if (ViewData.ModelState.Values.SelectMany(x => x.Errors).Any()) {
     <script>
         $(function () {
-            var win = null;
-            if (window.opener) {
-                win = window.opener.parent;
-            }
-            wvy.postal.post({ name: "authentication-error" }, win, true);
+            wvy.postal.postToParent({ name: "authentication-error" });
         })
     </script>
 }

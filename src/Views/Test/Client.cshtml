@@ -1,0 +1,120 @@
+﻿@{
+    Layout = null;
+
+    
+
+
+    // create token valid for 60 seconds
+    var token = JwtUtils.Encode(new Dictionary<string, string> {
+                        { "iss", "SSO TEST"}, // required
+                        { "sub", User.Id.ToString()}, // required
+                        { "email", User.Email}, // required
+                        { "username", User.Username},
+                        { "name", User.Profile.Name}
+                    }, 60);
+
+}
+<html>
+<head>
+    @Bundler.Scripts(
+    "~/scripts/vendor/jquery/jquery.min.js",
+    "~/scripts/src/signalr/jquery.signalR.js"
+    )
+    <script>
+        var connection = $.hubConnection();
+        connection.logging = true;
+
+        var clientHubProxy = connection.createHubProxy('client');
+
+        connection.start().done(function () {
+            console.log('Connection = ' + connection.id + ", Transport = " + connection.transport.name);
+        }).fail(function () {
+            console.log('Could not connect');
+        });
+
+
+        $(document).on("click", "#init0", function (e) {
+            clientHubProxy.invoke('init', null).done(function (json) {
+                var data = JSON.parse(json);
+                console.log(data);
+            });
+        });
+
+        $(document).on("click", "#init1", function (e) {
+            clientHubProxy.invoke('init', {
+                contexts: {
+                    key: "test-index"
+                },
+                plugins: {
+                    sso: {
+                        jwt: "@token"
+                    },
+                    theme: ""
+                }
+            }).done(function (json) {
+                var data = JSON.parse(json);
+                console.log(data);
+            });
+        });
+
+        $(document).on("click", "#init2", function (e) {
+            clientHubProxy.invoke('init', {
+                contexts: [
+                    {
+                        key: "global"
+                    },
+                    {
+                        key: "test-index"
+                    }
+                ]
+            }).done(function (json) {
+                var data = JSON.parse(json);
+                console.log(data);
+            });
+        });
+
+        $(document).on("click", "#init-context", function (e) {
+            clientHubProxy.invoke('initContext', {
+                key: "test-index",
+                apps: [{
+                    type: "posts"
+                }]
+            }).done(function (json) {
+                var data = JSON.parse(json);
+                console.log(data);
+            });
+
+        });
+
+        $(document).on("click", "#init-app", function (e) {
+            clientHubProxy.invoke('initApp', {
+                    context: "test-index",
+                    type: "posts"
+                }).done(function (json) {
+                var data = JSON.parse(json);
+                console.log(data);
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <section>
+            <h1 class="display-3 mt-4">Init client</h1>
+            <button id="init0" class="btn btn-primary">Init with no context</button>
+            <button id="init1" class="btn btn-primary">Init with context</button>
+            <button id="init2" class="btn btn-primary">Init with 2 contexts</button>
+            <br /><br />
+            <button id="init-context" class="btn btn-primary">Init context and app</button>
+            <button id="init-app" class="btn btn-primary">Init app</button>
+        </section>
+
+        <p>token = @token</p>
+    </div>
+
+
+
+</body>
+</html>

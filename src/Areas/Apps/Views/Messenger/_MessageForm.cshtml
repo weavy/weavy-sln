@@ -1,0 +1,16 @@
+﻿@model Messenger
+
+@* different actions depending on if we are rendering full messenger or conversation only *@
+<form class="message-form" action="@(Model.IsMessenger ? Url.Action<MessengerController>(c => c.InsertMessengerMessage(Model.Conversation.Id, null)) : Url.Action<MessengerController>(c => c.InsertMessage(Model.Conversation.Id, null)))" method="post">
+    <table class="table table-uploads"></table>
+    <fieldset class="form-container" disabled>
+        <div class="progress d-none">
+            <div class="progress-bar" role="progressbar"></div>
+        </div>
+        <div class="form-group">
+            @Html.TextArea("text", string.Empty, new { placeholder = "Type a message...", rows = "1", @class = "form-control" })
+            <button type="submit" class="btn btn-icon btn-primary" title="Send message">@Svg.Icon("send")</button>
+            <button type="button" class="btn btn-icon btn-file" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" multiple /></button>
+        </div>
+    </fieldset>
+</form>

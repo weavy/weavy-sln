@@ -1,0 +1,169 @@
+﻿@using System.Text.RegularExpressions
+@model Message
+@{
+    Messenger messenger = ViewBag.Messenger;
+
+    // get attachments
+    var attachments = Model.AttachmentIds.Any() ? Model.Attachments() : new List<Attachment>();
+    var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
+    var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
+
+    // set .emoji class?
+    string emoji = !attachments.Any() && !Model.Html.IsNullOrEmpty() && Regex.Replace(Model.Html, "<[^>]*>|\\s+", "").Length == 0 ? " emoji" : "";
+
+    // get members for status indicator (but only on the last page of messages)
+    var seenby = messenger.Messages.Skip == 0 ? messenger.GetSeenBy(Model) : null;
+
+    // calculate a suitable width for the image grid (to avoid upscaling in the browser)
+    var gridStyle = "";
+    double? gridWidth = null;
+    var count = images.Count();
+    if (count > 0) {
+        var blobs = images.Select(x => x.Blob);
+        // max thumbnail width = 512 * 2 = 1024px
+        int maxWidth = 1024;
+
+        // start with sum of first 3 image widths
+        double? width = blobs.Take(3).Sum(x => x.Width * Math.Min(x.Ratio(), 1));
+
+        if (width > maxWidth) {
+            // calculate an average width for the images
+            width = width / count;
+        }
+
+        if (count > 3) {
+            // more than 3 images, must at least make room for +
+            width = Math.Max(width ?? 0, 96);
+        }
+
+        // make sure width is not larger than maxWidth
+        gridWidth = Math.Round(Math.Min(width ?? 0, maxWidth), MidpointRounding.AwayFromZero);
+        gridStyle = $@"style=""width:{gridWidth}px""";
+    }
+}
+
+@if (Model.CreatedById == UserService.SystemId && messenger.Other?.Id != UserService.SystemId) {
+    <div id="message-@Model.Id" class="message system" data-message="@Model.Id">
+        <div class="bubble">
+            @Html.Raw(Model.Html)
+        </div>
+    </div>
+} else if (Model.CreatedById == User.Id) {
+    <div id="message-@Model.Id" class="message me@(emoji)" data-message="@Model.Id">
+        <div class="content">
+            <div class="meta">
+                <a href="#message-@Model.Id">@Html.Time(Model.CreatedAt, "t")</a>
+            </div>
+            <div class="bubble">
+                @if (images.Any()) {
+                    <div class="card-images" @Html.Raw(gridStyle)>
+                        @{ Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", Model }, { "Width", gridWidth } }); }
+                    </div>
+                }
+                @if (files.Any()) {
+                    <div class="card-files">
+                        @{ Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", Model } }); }
+                    </div>
+                }
+                @if (Model.Html != null) {
+                    <div class="text">@Html.Raw(Model.Html)</div>
+                }
+
+                @*@if (Model.Id == 12805) {
+                        <div class="reactions">
+                            <div class="badge badge-reaction">
+                                @Html.Raw(Emojione.GetImage(":joy:"))<span>1</span>
+                            </div>
+                            <div class="badge badge-reaction">
+                                @Html.Raw(Emojione.GetImage(":heart_eyes:"))<span>2</span>
+                            </div>
+                            <div class="badge badge-reaction">
+                                @Html.Raw(Emojione.GetImage(":angry:"))<span>1</span>
+                            </div>
+                        </div>
+                    }*@
+            </div>
+        </div>
+    </div>
+
+    if (seenby != null) {
+        var last = seenby.Any() ? false : messenger.Messages.LastOrDefault()?.Id == Model.Id;
+        if (seenby.Any()) {
+            <div class="status status-read">
+                @foreach (var member in seenby) {
+                    <a href="@member.Url()">
+                        @member.AvatarImg(18, htmlAttributes: new { title = $"Seen by {member.GetTitle()} {member.ReadAt.Value.When()}" })
+                    </a>
+                }
+            </div>
+        } else if (last && Model.Conversation.Members.Any(x => x.Id != Model.CreatedById && x.DeliveredAt >= Model.CreatedAt)) {
+            <div class="status status-delivered" title="Delivered">
+                @Svg.Icon("check-circle", size: 18)
+            </div>
+        } else if (last) {
+            <div class="status status-sent" title="Sent">
+                @Svg.Icon("check-circle-outline", size: 18)
+            </div>
+        }
+    }
+
+} else {
+    var createdby = Model.CreatedBy();
+    <div id="message-@Model.Id" class="message@(emoji)" data-message="@Model.Id">
+        <a class="author" href="@createdby.Url()">@createdby.AvatarImg(32)</a>
+        <div class="content">
+            <div class="meta">
+                @if (messenger.Conversation.IsRoom) {
+                    <a href="@createdby.Url()">@createdby.GetTitle()</a>
+                }
+                <a href="#message-@Model.Id">@Html.Time(Model.CreatedAt, "t")</a>
+            </div>
+
+            <div class="bubble">
+                @if (images.Any()) {
+                    <div class="card-images" @Html.Raw(gridStyle)>
+                        @{ Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", Model }, { "Width", gridWidth } }); }
+                    </div>
+                }
+                @if (files.Any()) {
+                    <div class="card-files">
+                        @{ Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", Model } }); }
+                    </div>
+                }
+                @if (Model.Html != null) {
+                    <div class="text">@Html.Raw(Model.Html)</div>
+                }
+
+                @*<div class="reactions">
+                        @if (Model.Id == 12805) {
+                            <div class="badge badge-reaction active">
+                                @Html.Raw(Emojione.GetImage(":joy:"))<span>1</span>
+                            </div>
+                            <div class="badge badge-reaction">
+                                @Html.Raw(Emojione.GetImage(":heart_eyes:"))<span>2</span>
+                            </div>
+                            <div class="badge badge-reaction">
+                                @Html.Raw(Emojione.GetImage(":angry:"))<span>1</span>
+                            </div>
+                        } else {
+                            <div class="badge badge-reaction" data-toggle="reactions">@Svg.Icon("emoticon-plus")</div>
+                        }
+                    </div>*@
+
+            </div>
+        </div>
+    </div>
+
+    // we only want the status indicator on the last page of messages
+    if (seenby != null && seenby.Any()) {
+        <div class="status status-read">
+            @foreach (var member in seenby) {
+                <a href="@member.Url()">
+                    @member.AvatarImg(18, htmlAttributes: new { title = $"Seen by {member.GetTitle()} {member.ReadAt.Value.When()}" })
+                </a>
+            }
+        </div>
+    }
+}
+
+

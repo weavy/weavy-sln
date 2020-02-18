@@ -4,7 +4,7 @@ var wvy = wvy || {};
 wvy.turbolinks = (function ($) {
 
     // prevent ie caching jquery xhr get requests
-    if (wvy.browser.ie) {
+    if (wvy.browser["browser"] === "IE") {
         $.ajaxSetup({
             cache: false
         });
@@ -49,7 +49,7 @@ wvy.turbolinks = (function ($) {
         document.addEventListener("turbolinks:request-start", function (e) {
 
             // prevent ie caching xhr get requests
-            if (wvy.browser.ie) {
+            if (wvy.browser.browser === "IE") {
                 e.data.xhr.setRequestHeader("Cache-Control", "no-cache");
                 e.data.xhr.setRequestHeader("Cache-Control", "no-store");
                 e.data.xhr.setRequestHeader("Pragma", "no-cache");
@@ -122,17 +122,13 @@ wvy.turbolinks = (function ($) {
             sendData($link.attr('href'), null, "get", this.dataset.targetPanel);
         });
 
-        window.addEventListener("message", function (e) {
-            switch (e.data.name) {
-                case "send":
-                    sendData(e.data.url, e.data.data, e.data.method);
-                    break;
-            }
-        });
+        wvy.postal.on("send", function (e) {
+            sendData(e.data.url, e.data.data, e.data.method);
+        })
 
-        $(document).on("DOMContentLoaded turbolinks:load", function (e) {
+        $(document).on("turbolinks:load", function (e) {
             if (wvy.postal) {
-                wvy.postal.post({ name: "ready" });
+                wvy.postal.postToParent({ name: "ready" });
             }            
         });
     }
@@ -160,8 +156,9 @@ wvy.turbolinks = (function ($) {
 
     function sendData(url, data, method, panelId) {
 
-        if (panelId && wvy.browser.embedded) {
-            wvy.postal.post({ name: 'send', url: absolutePath(url), data: data, method: method, panelId: panelId });
+        if (panelId && wvy.browser.framed) {
+            console.log("turbolinks trying open panel", { name: 'send', url: absolutePath(url), data: data, method: method, panelId: panelId })
+            wvy.postal.postToParent({ name: 'send', url: absolutePath(url), data: data, method: method, panelId: panelId });
             return;
         }
 

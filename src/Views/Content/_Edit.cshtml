@@ -16,7 +16,7 @@
     }
 }
 
-@using (Html.BeginForm(nameof(ContentController.Update), typeof(ContentController).ControllerName(), new RouteValueDictionary(new { id = Model.Id }), FormMethod.Post, htmlAttributes)) {
+<form action="@Model.Url()" method="post" @Html.Attributes(htmlAttributes)>
     @Html.HttpMethodOverride(HttpVerbs.Put)
     @Html.EditorsForModel()
     <div class="form-buttons">
@@ -33,4 +33,4 @@
     <div id="blobs">
         @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
     </div>
-}
+</form>

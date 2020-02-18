@@ -1,0 +1,74 @@
+﻿@model Conversation
+@{
+    var user = Model.Members.FirstOrDefault(x => x.Id != User.Id) ?? User;
+}
+
+<div class="modal" id="info-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="cover cover-bg text-center pt-4">
+                <button type="button" class="btn btn-icon top-left" data-dismiss="modal">@Svg.Icon("arrow-left")</button>
+                @if (Model.IsRoom) {
+                    @Model.AvatarImg(128)
+                    if (Model.HasPermission(Permission.Edit)) {
+                        <form class="edit-form mx-3" action="@Url.Action(nameof(MessengerController.SetName), new { id = Model.Id })" method="post">
+                            @Html.HttpMethodOverride(HttpVerbs.Put)
+                            <div class="name-label" data-action="edit" data-id="@Model.Id">
+                                <div class="text-truncate mr-1">@Model.GetTitle()</div>
+                                @Svg.Icon("pencil")
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="conversation-name" name="@nameof(Model.Name)" value="@Model.Name" placeholder="Enter a name for this conversation...">
+                            </div>
+                        </form>
+                    } else {
+                        <p class="pt-2">@Model.GetTitle()</p>
+                    }
+                } else {
+                    @user.AvatarImg(128)
+                    if (user.Username == user.GetTitle()) {
+                        <p class="pt-2">@@@user.Username @Html.Badge(user)</p>
+                    } else {
+                        <p class="pt-2">@user.GetTitle() <small>@@@user.Username</small> @Html.Badge(user)</p>
+                    }
+                }
+                <button type="button" class="btn btn-icon dropdown-toggle top-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Svg.Icon("dots-vertical")</button>
+                @{ Html.RenderPartial("_Menu", Model); }
+            </div>
+            <div class="modal-body px-0">
+                @if (Model.IsRoom) {
+                    <table class="table table-members">
+                        @foreach (var member in Model.Members) {
+                            <tr data-member="@member.Id">
+                                <td class="table-icon">
+                                    <a href="@member.Url()">@member.AvatarImg(32, presence: true)</a>
+                                </td>
+                                <td>
+                                    <a href="@member.Url()">
+                                        @if (member.Username != member.GetTitle()) {
+                                            @member.GetTitle()
+                                        }
+                                        <small class="text-muted">@@@member.Username</small>
+                                    </a>
+                                </td>
+                                <td class="table-icon">
+                                    @if (member.Id == User.Id) {
+                                        <button type="button" class="btn btn-icon" data-action="leave" data-id="@Model.Id" title="Leave conversation">@Svg.Icon("account-minus")</button>
+                                    } else if (Model.HasPermission(Permission.Edit)) {
+                                        <button type="button" class="btn btn-icon" data-action="remove-member" data-id="@member.Id" title="Remove from conversation">@Svg.Icon("account-minus")</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+
+
+                } else {
+                    <div class="px-3">
+                        @{ Html.RenderPartial("_Profile", user); }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

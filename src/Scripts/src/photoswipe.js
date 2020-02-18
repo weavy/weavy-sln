@@ -5,13 +5,13 @@
     // open photoswipe on click
     $(document).on("click", "[data-photoswipe]", function (e) {
         // open weavy client preview
-        if (wvy.browser.embedded) {
+        if (wvy.browser.framed) {
             document.documentElement.classList.add("pswp-transparent");
-            wvy.postal.post({ name: "preview-open" });
+            wvy.postal.postToParent({ name: "preview-open" });
         }
 
         e.preventDefault();
-        if (wvy.browser.embedded) {
+        if (wvy.browser.framed) {
             // embedded: let weavy client apply styles before photoswipe init
             var $that = $(this);
             $(window).one("resize", function () { photoswipe($that, true); });
@@ -83,8 +83,8 @@
         // Gallery unbinds events (triggers before closing animation)
         pswp.listen('unbindEvents', function () {
             // close weavy client preview
-            if (wvy.browser.embedded) {
-                wvy.postal.post({ name: "preview-close" });
+            if (wvy.browser.framed) {
+                wvy.postal.postToParent({ name: "preview-close" });
                 $(window).one("resize", function () { requestAnimationFrame(function () { document.documentElement.classList.remove("pswp-transparent"); }) });
             }
         });

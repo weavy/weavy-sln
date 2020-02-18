@@ -1,18 +1,34 @@
 ﻿@using System.Linq;
+@using Weavy.Utils
 @{
     Title = "Cloud Pickers Test";
     Back = Url.Action<TestController>(c => c.Index());
-
+    var fid = 34;
+    var f = ContentService.Get<Folder>(fid);
 }
-<iframe id="filebrowser" src="about:blank" style="display:none;width:100%;height:100%;position:absolute;top:0;left:0" frameborder="0" scrolling="no"></iframe>
 
+@if(f == null)
+{
+    <div class="alert alert-warning">
+        NOTE! Folder with id [@fid] does not exist! To test this out, please specify an existing Folder id.
+    </div>
+}
+
+@Html.FAB(f)
+
+
+@{
+    Html.RenderPartial("~/Areas/Apps/Views/Shared/_AttachModal.cshtml", new ViewDataDictionary { { "content_path", $"/a/content/{f?.Id}/content" } });
+    Html.RenderPartial("_ContentModal");
+    Html.RenderPartial("_OfficeModal");
+}
 @section scripts{
-    
+
     <script>
 
         // FOR RESEARCH ONLY - NO PRODUCTION CODE!
 
-        var loadIframe = function (origin) {
+        @*var loadIframe = function (origin) {
             $("#filebrowser").attr("src", "https://filebrowser.weavycloud.com?origin=" + origin);
             $("#filebrowser").show();
         };
@@ -30,27 +46,28 @@
         })();
 
         $(function () {
-            if (wvy.browser.embedded) {
-                window.parent.postMessage({ name: 'request:origin' }, "*");
+            if (wvy.browser.framed) {
+                var pickerId =  "filebrowser-" + Math.random().toString().substr(2);
+                wvy.postal.postToParent({ name: 'request:origin', weavyId: pickerId });
+                wvy.postal.one("origin", pickerId, function (e) {
+                    loadIframe(e.data.url);
+                });
             } else {
                 loadIframe("@Request.Url.GetLeftPart(UriPartial.Authority)");
             }
 
+            // Messages from filebrowser.weavycloud.com
             window.addEventListener("message", function (e) {
-                if (e.data.name === "insert") {
+                if (e.origin === "https://filebrowser.weavycloud.com" && e.data.name === "insert") {
                     pickerHelpers.addLink(e.data.link);
                     console.log("Message", e)
                     alert("Top window received file: " + e.data.link)
                 }
 
-                if (e.data.name === "origin") {
-                    loadIframe(e.data.url);
-                }
-
             })
-        });
-        
+        });*@
+
     </script>
-    
+
 
 }

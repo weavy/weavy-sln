@@ -1,0 +1,53 @@
+﻿@model Messenger
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="turbolinks-cache-control" content="no-cache">
+    <title>@Model.Conversation.GetTitle() | @Theme.Name</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/areas/apps/styles/messenger.scss")
+    <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @Bundler.Scripts("~/areas/apps/scripts/messenger.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+</head>
+<body class="@BodyClasses("single two")" @BodyAttributes>
+    <script>@Html.ContextInfo()@Html.UserSettings()</script>
+    <main id="main" class="pane conversation@(Model.Conversation.IsRoom ? " room" : "")@(Model.Conversation.IsPinned ? " pinned" : "")@(Model.Conversation.IsStarred() ? " starred" : "")@(Model.Conversation.IsRead ? "" :" unread")" data-id="@(Model.Conversation.Id)">
+        <header class="pane-header">
+            <div class="pane-actions">
+                <a href="@(Url.Action<MessengerController>(c => c.Conversation(Model.Conversation.Id)))" class="btn btn-icon btn-avatar">@Model.Conversation.AvatarImg(24)</a>
+            </div>
+            <div class="pane-title">
+                <span class="typing-hide d-flex align-items-center">@Html.StarToggle(Model.Conversation)<a href="@(Url.Action<MessengerController>(c => c.Conversation(Model.Conversation.Id)))">@Model.Conversation.GetTitle()</a></span>
+                <span class="typing-show"></span>
+            </div>
+            <div class="pane-actions">
+                <button type="button" class="btn btn-primary btn-icon" data-toggle="modal" data-target="#info-modal" title="Details">@Svg.Icon("information-outline")</button>
+            </div>
+        </header>
+        <div class="pane-body">
+            <div id="conversation">
+                <div id="messages">
+                    @Svg.Spinner(spin: true)
+                    @{ Html.RenderPartial("_Messages", Model); }
+                </div>
+                @{ Html.RenderPartial("_MessageForm", Model); }
+            </div>
+        </div>
+        @{
+            Html.RenderPartial("_InfoModal", Model.Conversation);
+            Html.RenderPartial("_ProfileModal");
+            Html.RenderPartial("_PeopleModal", Model);
+        }
+    </main>
+
+    @{
+        Html.RenderPartial("_PhotoSwipe");
+        Html.RenderPartial("_Preview");
+    }
+</body>
+</html>

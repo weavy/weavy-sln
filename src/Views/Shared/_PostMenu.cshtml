@@ -34,7 +34,10 @@
 
         @if (Model.HasPermission(Permission.Edit)) {
             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#edit-post-modal" data-path="@(Url.Action<PostController>(c => c.EditModal(Model.Id)))" title="Edit post">@Svg.Icon("pencil", "primary") Edit</button>
-            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-post-modal" data-path="@(Url.Action<PostController>(c => c.MoveModal(Model.Id)))" title="Move post">@Svg.Icon("undo", "warning") Move</button>
+            //don't show move if embedded
+            if (!IsEmbedded) {
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-post-modal" data-path="@(Url.Action<PostController>(c => c.MoveModal(Model.Id)))" title="Move post">@Svg.Icon("undo", "warning") Move</button>
+            }
         }
         @if (Model.HasPermission(Permission.Delete)) {
             <button type="button" class="dropdown-item" data-trash="post" data-id="@Model.Id">@Svg.Icon("delete", "danger") Trash</button>

@@ -1,0 +1,47 @@
+﻿@model Conversation
+@{
+    // different actions depending on if we are rendering full messenger or conversation only
+    Messenger messenger = ViewBag.Messenger;
+    var href = messenger.IsMessenger ? Url.Action<MessengerController>(c => c.Messenger(Model.Id, null)): Url.Action<MessengerController>(c => c.Conversation(Model.Id));
+}
+
+<a href="@href" data-action="load" data-id="@Model.Id" class="list-group-item list-group-item-action conversation@(Model.IsRoom ? " room" : "")@(Model.IsPinned ? " pinned" : "")@(Model.IsStarred() ? " starred" : "")@(Model.IsRead ? "" :" unread")@(messenger.Conversation?.Id == Model.Id ? " active" : "")">
+    <div class="media">
+        <div class="img-48 mr-3">
+            @Model.AvatarImg(presence: true)
+        </div>
+        <div class="media-body">
+            @Html.TimeWhen(Model.LastMessageAt, abbrev: true)
+            <div class="media-title">@Model.GetTitle()</div>
+            <div class="media-text">
+                <span class="typing-hide">
+                    @if (Model.LastMessageById == null) {
+                        <text>&nbsp;</text>
+                    } else {
+                        if (Model.LastMessageById == User.Id) {
+                            <text>You:</text>
+                        } else if (Model.IsRoom) {
+                            <text>@Model.LastMessageBy.GetTitle():</text>
+                        }
+
+                        if (Model.Description.IsNullOrWhiteSpace()) {
+                            @Svg.Icon("attachment")
+                        } else {
+                            @Html.Raw(Emojione.ShortnameToImage(Html.Encode(Model.Description)))
+                        }
+                    }
+                </span>
+                <span class="typing-show"></span>
+            </div>
+        </div>
+        <div class="media-actions">
+            @Html.StarToggle(Model)
+            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" data-offset="-10" aria-haspopup="true" aria-expanded="false">
+                @Svg.Icon("pin")
+                @Svg.Icon("dots-vertical")
+            </button>
+            @{ Html.RenderPartial("_Menu", Model); }
+        </div>
+
+    </div>
+</a>

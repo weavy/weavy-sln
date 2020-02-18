@@ -3,14 +3,13 @@
 @{
     bool details = ViewData["details"] as bool? ?? false;
     var creator = Model.CreatedBy();
-    var attachments = Model.Attachments();
+    var attachments = Model.AttachmentIds.Any() ? Model.Attachments() : new List<Attachment>();
 
-    var images = attachments.Where(x => FileHelper.IsWebImage(x.Blob.Name));
-    var files = attachments.Where(x => !FileHelper.IsWebImage(x.Blob.Name));
+    var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
+    var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
 
-    var embeds = Model.Embeds();
+    var embeds = Model.EmbedIds.Any() ? Model.Embeds(): new List<Embed>();
     var embed = embeds.FirstOrDefault(x => !x.IsLink);
-    var link = embeds.FirstOrDefault(x => x.IsLink);
 }
 <div class="card post" data-type="post" data-id="@Model.Id" data-post-id="@Model.Id">
 
@@ -31,7 +30,7 @@
 
     @if (images.Any()) {
         <div class="card-images">
-            @{ Html.RenderPartial("_ImageGrid", images); }
+            @{ Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", Model } }); }
         </div>
     }
 
@@ -45,7 +44,7 @@
         <div class="card-body">
             <p class="card-text">@Html.Raw(Model.Html)</p>
             
-            @if (Model.Poll != null && Model.Poll.Options.HasItems()) {
+            @if (Model.Poll != null) {
                 Html.RenderPartial("_Poll", Model);
             }
         </div>
@@ -54,13 +53,7 @@
 
     @if (files.Any()) {
         <div class="card-files">
-            @{ Html.RenderPartial("_Attachments", files); }
-        </div>
-    }
-
-    @if (link != null) {
-        <div class="card-context">
-            @{Html.RenderPartial("_ContextLink", link); }
+            @{ Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", Model } }); }
         </div>
     }
 
@@ -71,10 +64,10 @@
     <div class="section-comments post-comments@(details ? "":" d-none")">
         @if (details) {
             <div class="list-group comments">
-                @{Html.RenderPartial("_Comments", Model.Comments()); }
+                @{Html.RenderPartial("_Comments", Model.CommentIds.Any() ? Model.Comments() : new List<Comment>(), new ViewDataDictionary { { "Parent", Model } }); }
             </div>
         } else {
-            @Html.SvgSpinner()
+            @Svg.Spinner()
             <div class="list-group comments"></div>
         }
         @Html.Partial("_CommentForm", Model, new ViewDataDictionary() { { "container", ".comments" } })

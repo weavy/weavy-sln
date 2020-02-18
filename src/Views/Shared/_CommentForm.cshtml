@@ -9,9 +9,6 @@
 @if (Model.HasPermission(Permission.Comment)) {
 <form action="@url" method="post" id="comment-form-@id" data-type="@type" data-id="@id" data-comments-container="@commentsContainer">
   <textarea class="comments-form" name="text"></textarea>
-  <input type="hidden" name="hasContext" id="hasContext" value="false" />
-  <input type="hidden" name="contextUrl" id="contextUrl" />
-  <input type="hidden" name="contextTitle" id="contextTitle" />
 </form>
 
 } else if (!Model.CommentIds.Any()) {

@@ -1,0 +1,40 @@
+﻿@model PostsViewModel
+@{
+    Title = Model.App.Name;
+}
+<div class="container my-3">
+    @if (Model.App.HasPermission(Permission.Post)) {
+        <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform>
+            <textarea id="text" class="form-control" name="text" data-editor-location="discuss"></textarea>
+        </form>
+        <div class="card post fake-post">
+            <div class="card-header media">
+                @User.AvatarImg()
+                <h6 class="media-title">
+                    <span class="fake-text w-50"></span>
+                    <span class="fake-text w-25"></span>
+                </h6>
+            </div>
+            <div class="card-body">
+                <span class="fake-text"></span>
+                <span class="fake-text w-50"></span>
+                <span class="fake-text w-75"></span>
+            </div>
+        </div>
+    }
+
+    @if (WeavyContext.Space.HasPermission(Permission.List)) {
+        <div id="infinite-scroll-target" class="posts">
+            @Html.Partial("_Posts", Model.Posts)
+        </div>
+        @Html.ScrollMore(Model.Posts)
+    }
+</div>
+
+@section footer {
+    @{
+        Html.RenderPartial("_FeedbackModal");
+        Html.RenderPartial("_EditPostModal");
+        Html.RenderPartial("_EditCommentModal");
+    }
+}

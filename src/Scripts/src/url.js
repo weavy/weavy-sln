@@ -15,7 +15,7 @@ wvy.url = (function ($) {
     // converts a URL into one that is usable on the requesting client
     function resolve(url) {
         if (url.length > 0) {
-            if (url.indexOf("http") === 0 || url.indexOf(wvy.context.path) === 0) {
+            if (url.indexOf("http") === 0 || url.indexOf(wvy.config.applicationPath) === 0) {
                 // return unmodified
             } else {
                 // remove ~ and leading / 
@@ -26,7 +26,7 @@ wvy.url = (function ($) {
                     url = url.substr(1);
                 }
                 // prepend app path
-                url = wvy.context.path + url;
+                url = wvy.config.applicationPath + url;
             }
         }
         return url;

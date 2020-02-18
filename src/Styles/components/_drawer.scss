@@ -11,8 +11,26 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
     [data-toggle="tab"][href="#notifications"]:not(.active) ~ [data-read="notifications"] {
         display: none;
     }
-}
 
+    .tab-content {
+        position: relative;
+    }
+
+    #tab-messages {
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        overflow: hidden;
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    }
+}
 
 .drawer {
     @include overscroll-behavior-contain;
@@ -105,6 +123,10 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
     .dropdown-menu a {
         color: $dropdown-link-color !important;
     }
+}
+
+.drawer-body {
+    flex: 1 1 auto;
 }
 
 .drawer-title {

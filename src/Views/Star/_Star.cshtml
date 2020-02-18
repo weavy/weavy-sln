@@ -2,7 +2,7 @@
 <tr data-href="@Model.Url()">
   <td class="table-icon">
     @if ((Model.Type == EntityType.Space || Model.Type == EntityType.User) && Model.Value is IHasAvatar entity) {
-      @entity.AvatarImg(size: 32)
+      @entity.AvatarImg(32)
     } else {
       @Svg.Icon(Model)
     }

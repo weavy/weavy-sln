@@ -84,6 +84,7 @@
                 notificationFrame = document.createElement("iframe");
                 notificationFrame.className = "weavy-notification-frame";
                 notificationFrame.id = weavy.getId("weavy-notification-frame-" + notification.id);
+                notificationFrame.name = weavy.getId("weavy-notification-frame-" + notification.id);
 
                 if ($(weavy.nodes.notifications).children().length > 0) {
                     notificationFrame.setAttribute("style", "display:none");
@@ -93,7 +94,7 @@
                 }
 
                 weavy.on(notificationFrame, "load", function () {
-                    weavy.sendWindowId(notificationFrame.contentWindow, notificationFrame.id);
+                    weavy.sendWindowId(notificationFrame.contentWindow, notificationFrame.name);
                 });
 
                 weavy.nodes.notifications.appendChild(notificationFrame);
@@ -128,7 +129,7 @@
         }
 
         // Realtime events
-        weavy.on(wvy.realtime, "notification-inserted.weavy", function (e, data) {
+        weavy.on(weavy.connection, "notification-inserted.weavy", function (e, data) {
             showNotification.call(weavy, data);
 
             /**
@@ -141,7 +142,7 @@
             weavy.triggerEvent("notification-inserted", data);
         });
 
-        weavy.on(wvy.realtime, "notification-updated.weavy", function (e, data) {
+        weavy.on(weavy.connection, "notification-updated.weavy", function (e, data) {
             /**
              * Triggered when a notification update is received from the server.
              * 
@@ -152,16 +153,16 @@
             weavy.triggerEvent("notification-updated", data);
         });
 
-        weavy.on(wvy.realtime, "notifications-all-read.weavy", function (e, data) {
+        weavy.on(weavy.connection, "notifications-read.weavy", function (e, data) {
             /**
              * Triggered when all notifications have been read.
              * 
-             * @event notifications#notifications-all-read
+             * @event notifications#notifications-read
              * @category events
              * @returns {Object}
              * @property {int} userId - The id of the user
              */
-            weavy.triggerEvent("notifications-all-read", data);
+            weavy.triggerEvent("notifications-read", data);
         });
 
         // Widget events

@@ -6,7 +6,7 @@
 
 <a href="@Model.Url()" class="list-group-item list-group-item-action @(Model.IsRead ? "notification read": "notification")" data-entity="notification" data-id="@Model.Id">
     <div class="media">
-        @Model.AvatarImg(size: 32, htmlAttributes: new { @class = "mt-1" })
+        @Model.AvatarImg(32, htmlAttributes: new { @class = "mt-1" })
         <div class="media-body">
             <p class="mb-2" title="@title">@Html.Raw(html)</p>
             <div class="d-flex justify-content-between text-muted">

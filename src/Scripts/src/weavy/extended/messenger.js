@@ -161,7 +161,7 @@
             }
 
             if (weavy.nodes.messengerFrame) {
-                weavy.nodes.messengerFrame.contentWindow.postMessage({ "name": "open-conversation", "id": conversationId }, "*");
+                wvy.postal.postToFrame(weavy.nodes.messengerFrame.name, weavy.getId(), { "name": "open-conversation", "id": conversationId })
             }
 
             weavy.open(options.panelId);
@@ -226,16 +226,16 @@
             updateConversations.call(weavy, weavy.unreadConversations);
         }
 
-        function appendConversation(conversation) {
-            // remove if already in list - will be added again
-            weavy.unreadConversations = weavy.unreadConversations.filter(function (unreadConversation) { return unreadConversation.id !== conversation.id });
-            weavy.unreadConversations.unshift(conversation);
-            updateConversations.call(weavy, weavy.unreadConversations);
-        }
+        //function appendConversation(conversation) {
+        //    // remove if already in list - will be added again
+        //    weavy.unreadConversations = weavy.unreadConversations.filter(function (unreadConversation) { return unreadConversation.id !== conversation.id });
+        //    weavy.unreadConversations.unshift(conversation);
+        //    updateConversations.call(weavy, weavy.unreadConversations);
+        //}
 
         // Realtime events
-        weavy.on(wvy.realtime, "conversation-read.weavy", function (e, data) {
-            if (data.user.id === weavy.options.userId) {
+        weavy.on(weavy.connection, "conversation-read.weavy", function (e, data) {
+            if (weavy.user && weavy.user.id === data.user.id) {
                 conversationRead.call(weavy, data.conversation.id);
 
                 /**
@@ -251,10 +251,10 @@
             }
         });
 
-        weavy.on(wvy.realtime, "message-inserted.weavy", function (e, data) {
+        weavy.on(weavy.connection, "message-inserted.weavy", function (e, data) {
             var message = data;
-            if (message.createdBy.id !== weavy.options.userId && message.createdBy.id > 0) {
-                wvy.realtime.invoke("client", "getConversation", message.conversation);
+            if (weavy.user && weavy.user.id !== message.createdBy.id && message.createdBy.id > 0) {
+                weavy.connection.invoke("client", "getConversation", message.conversation);
 
                 /**
                  * Triggered when a message is appended in a conversation.
@@ -267,23 +267,6 @@
             }
         });
 
-        weavy.on(wvy.realtime, "conversation-received.weavy", function (e, data) {
-            appendConversation.call(weavy, data);
-        });
-
-        // Message events
-        // REVIEW: Is this message deprecated?
-        weavy.on("message", function (e, message) {
-            var options = weavy.options.plugins[PLUGIN_NAME];
-
-            switch (message.name) {
-                case "messenger":
-                    weavy.open(options.panelId, weavy.options.url + message.url);
-                    break;
-            }
-        });
-
-
         // Widget events
         weavy.on("build", function (e) {
             var options = weavy.options.plugins[PLUGIN_NAME];
@@ -293,6 +276,12 @@
                 if (!weavy.nodes.messengerPanel) {
                     weavy.nodes.messengerPanel = weavy.addPanel(options.panelId, options.url, panelOptions);
                     weavy.nodes.messengerFrame = weavy.nodes.messengerPanel.querySelector(".weavy-panel-frame");
+
+
+                    var header = document.createElement("div");
+                    header.className = "weavy-panel-header";
+                    header.innerHTML = "<div class=\"weavy-panel-title\">" + options.title + "</div>";
+                    weavy.nodes.messengerPanel.appendChild(header);
 
                     if (weavy.plugins.dock) {
                         weavy.nodes.messengerButtonContainer = weavy.addButton(options.panelId, panelOptions)

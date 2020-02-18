@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Web;
-using Weavy.Core.Helpers;
+using Weavy.Core.Utils;
 
 namespace Weavy {
 
@@ -18,7 +18,7 @@ namespace Weavy {
         protected void Application_BeginRequest(object sender, EventArgs e) {
             // set preferred culture based on Accept-Language header
             if (sender is HttpApplication app && app.Context?.Request?.Headers != null) {
-                Thread.CurrentThread.CurrentCulture = CultureHelper.GetCultureFromHeader(app.Context.Request.Headers["Accept-Language"]) ?? Thread.CurrentThread.CurrentCulture;
+                Thread.CurrentThread.CurrentCulture = CultureUtils.GetCultureFromHeader(app.Context.Request.Headers["Accept-Language"]) ?? Thread.CurrentThread.CurrentCulture;
             }
         }
 

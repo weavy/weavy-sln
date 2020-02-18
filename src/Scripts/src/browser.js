@@ -1,58 +1,17 @@
-﻿/*global DocumentTouch */
-var wvy = wvy || {};
-wvy.browser = {
-    embedded: false,
-    context: false,
-    personal: false,
-    ie: false,
-    ios: false,
-    mobile: false,
-    tablet: false,
-    touch: false
-};
-
+﻿var wvy = wvy || {};
+wvy.browser = wvy.browser || {};
 (function () {
-    if (document.documentElement.classList.contains("embedded")) {
-        wvy.browser.embedded = true;
-    } else if (window.name !== "weavy-standalone") {
+    wvy.browser.framed = document.documentElement.classList.contains("framed");
+    if (!wvy.browser.framed) {
         try {
-            wvy.browser.embedded = (window.self !== window.top) ? true : false;
+            wvy.browser.framed = window.self !== window.top;
         } catch (e) {
-            wvy.browser.embedded = true;
+            // browsers can block access to window.top due to same origin policy, if that happens we know that we are framed
+            wvy.browser.framed = true;
         }
-        if (wvy.browser.embedded) {
-            document.documentElement.classList.add("embedded");
+        if (wvy.browser.framed) {
+            document.documentElement.classList.add("framed");
         }
     }
-    
-    if ('ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch) {
-        wvy.browser.touch = true;
-        document.documentElement.classList.add("touch");
-    }
-
-    if (document.documentElement.classList.contains("ie")) {
-        wvy.browser.ie = true;
-    }
-    if (document.documentElement.classList.contains("ios")) {
-        wvy.browser.ios = true;
-    }
-    if (document.documentElement.classList.contains("mobile")) {
-        wvy.browser.mobile = true;
-    }
-    if (document.documentElement.classList.contains("tablet")) {
-        wvy.browser.tablet = true;
-    }
-
-    window.addEventListener("message", function (e) {                    
-        switch (e.data.name) {
-            case "ping":
-                e.source.postMessage({ "name": "ready" }, e.origin !== "null" ? e.origin : "*");
-                break;
-            case "reload":
-                window.location.reload();
-                break;            
-            default:
-        }
-    }, false);
 })();
 

@@ -1,0 +1,42 @@
+﻿@model SpaceSearchResult
+
+@if (Model.Any()) {
+    foreach (var space in Model) {
+        bool visible = !space.IsTrashed() && space.HasPermission(Permission.View);
+        <tr class="@(space.IsArchived() ? "table-muted" : "") @(space.IsTrashed() ? "table-trashed" : "")" @Html.Raw(visible ? $@"data-href=""{space.Url()}""" : "")>
+            <td class="table-icon">@space.AvatarImg(32)</td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="text-truncate">
+                        @if (visible) {
+                            <a href="@space.Url()">@space.Name</a>
+                        } else {
+                            @space.Name
+                        }
+                        @if (space.Teamname != null) {<small class="text-muted">@@@space.Teamname</small>}
+                    </div>
+
+                    @if (space.IsHQ) {
+                        <span class="badge badge-info m-1">main</span>
+                    } else if (space.Privacy != Privacy.Open) {
+                        @Html.Badge(space.Privacy, htmlAttributes: new { @class = "ml-1" })
+                    }
+                    @Html.StarToggle(space, htmlAttributes: new { @class = "ml-auto" })
+                </div>
+            </td>
+            <td>@space.Description</td>
+            <td class="text-right">
+                @if (visible) {
+                    <a href="@(Url.Action<SpaceController>(c => c.Members(space.Id, null, null)))" class="badge @(space.IsMember ? "badge-info" : "badge-secondary")">@space.MemberIds.Count()</a>
+                } else {
+                    <span class="badge badge-secondary opacity-muted">@space.MemberIds.Count()</span>
+                }
+            </td>
+            <td class="table-icon">@{ Html.RenderPartial("_SpaceMenu", space);}</td>
+        </tr>
+    }
+    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+        <td colspan="4"></td>
+    </tr>
+}
+

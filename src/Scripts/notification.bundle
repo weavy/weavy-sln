@@ -8,8 +8,8 @@
 ~/scripts/vendor/twitter-text/punycode.js
 ~/scripts/vendor/twitter-text/twitter-text.js
 ~/scripts/src/_extensions.js
+~/scripts/src/postal.js
 ~/scripts/src/turbolinks.js 
-~/scripts/src/context.js
 ~/scripts/src/url.js
 ~/scripts/src/emoji.js
 ~/scripts/src/guid.js
@@ -17,7 +17,6 @@
 ~/scripts/src/star.js
 ~/scripts/src/editor.js
 ~/scripts/src/alert.js
-~/scripts/src/postal.js
 ~/scripts/src/bubbles.js
 ~/scripts/src/weavy-notifications.js
 ~/scripts/src/weavy-personal.js

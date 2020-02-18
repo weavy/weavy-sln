@@ -2,7 +2,7 @@
 @{
     var image = Model.Image;
     string provider = Model.ProviderName;
-    var entity = Weavy.Core.Helpers.UrlHelper.GetEntityFromUrl(Model.OriginalUrl).Value();
+    var entity = Weavy.Core.Utils.UrlUtils.GetEntityFromUrl(Model.OriginalUrl).Value();
     if (entity != null) {
         provider = Theme.Name;
         if (entity is IHasAvatar && image == null) {
@@ -10,7 +10,7 @@
         }
     }
     var file = entity as IFile;
-    if (image == null && file != null && FileHelper.IsWebImage(file.Name)) {
+    if (image == null && file != null && FileUtils.IsWebImage(file.Name)) {
         image = file.Blob;
     }
 
@@ -46,7 +46,7 @@
             <h6 class="embed-title"> @Model.Title</h6>
             <p class="embed-description">
                 @if (file != null) {
-                    @FileHelper.FileSizeAsString(file.Blob.Size)
+                    @FileUtils.FileSizeAsString(file.Blob.Size)
                     if (image != null) {
                         <text>/ @(image.Width)x@(image.Height)</text>
                     }

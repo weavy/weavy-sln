@@ -1,12 +1,7 @@
 ﻿@{
     Layout = null;
 
-
-    var firstSpace = -1;
-    if (!SpaceService.GetByPermission(Permission.View).IsNullOrDefault()) {
-        firstSpace = SpaceService.GetByPermission(Permission.View).First().Id;
-    }
-
+    var firstSpace = SpaceService.GetByPermission(Permission.View).FirstOrDefault()?.Id ?? -1;
 }
 
 <!DOCTYPE html>

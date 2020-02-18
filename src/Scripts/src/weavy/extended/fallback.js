@@ -120,13 +120,14 @@
                 if (chrome !== undefined && chrome.runtime !== undefined) {
                     chrome.runtime.sendMessage(null, message, function (response) { });
                 } else {
-                    fallbackWindow = window.open(message.url, "weavy-" + message.name + "-" + message.key, windowFeatures + "," + windowPosition);
+                    var windowName = "weavy-" + message.name + "-" + message.key;
+                    fallbackWindow = window.open(message.url, windowName, windowFeatures + "," + windowPosition);
                     weavy.on(fallbackWindow, "load", function () {
                         // start testing for blocked iframe             
                         weavy.isBlocked = true;
                         try {
                             weavy.log("window.load");
-                            this.contentWindow.postMessage({ "name": "ping" }, "*");
+                            wvy.postal.registerContentWindow(this.contentWindow, windowName, weavy.getId());
                         } catch (e) { weavy.warn("Frame postMessage is blocked", e); }
 
                     });

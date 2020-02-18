@@ -50,6 +50,10 @@
     @include img-size(8rem); // 128px
 }
 
+.img-192 {
+    @include img-size(12rem); // 192px
+}
+
 .img-256 {
     @include img-size(16rem); // 256px
 }

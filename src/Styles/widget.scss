@@ -16,6 +16,7 @@
 // Widget styles (wrap all styles in .weavy-widget)
 .weavy-widget {
     &.weavy-default, &.weavy-extended, &.weavy-custom {
+        font-family: $font-family-base;
         font-size: rem(1);
         line-height: rem(1.5);
         position: relative;
@@ -80,7 +81,7 @@
         left: 0;
         z-index: $widget-zindex;
         pointer-events: none;
-        
+
         > * {
             pointer-events: auto;
         }

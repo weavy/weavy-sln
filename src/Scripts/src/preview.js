@@ -105,9 +105,9 @@ wvy.preview = (function ($) {
         // show preview container
         $container.show();
 
-        if (wvy.browser.embedded) {
+        if (wvy.browser.framed) {
             // maximize weavy client window
-            wvy.postal.post({ name: "preview-open" });
+            wvy.postal.postToParent({ name: "preview-open" });
         }
     }
 
@@ -118,9 +118,9 @@ wvy.preview = (function ($) {
             return;
         }
 
-        if (wvy.browser.embedded) {
+        if (wvy.browser.framed) {
             // close weavy client preview
-            wvy.postal.post({ name: "preview-close" });
+            wvy.postal.postToParent({ name: "preview-close" });
         }
 
         // remove event handler for ESC

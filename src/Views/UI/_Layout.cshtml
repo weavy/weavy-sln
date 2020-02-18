@@ -6,15 +6,17 @@
     <meta name="turbolinks-cache-control" content="no-preview">
     <title>@Title</title>
     @Html.ThemeStyle("~/styles/weavy.scss")
+    <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
     @Bundler.Scripts("~/scripts/pickers.bundle")
     @RenderSection("scripts", required: false)
 </head>
 <body class="@ControllerName.ToLower()-@ActionName.ToLower() no-navbar dialog">
-  <div class="alerts">
-    @Html.AlertMessages()
-  </div>
-  <main>
-    @RenderBody()
-  </main>
+    <script>@Html.ContextInfo()@Html.UserSettings()</script>
+    <div class="alerts">
+        @Html.AlertMessages()
+    </div>
+    <main>
+        @RenderBody()
+    </main>
 </body>
 </html>

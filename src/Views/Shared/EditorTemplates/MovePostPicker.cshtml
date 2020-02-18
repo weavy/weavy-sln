@@ -17,13 +17,13 @@
     }
 
     var source = ViewData["Source"] as Post;
-    var app = source?.App() as PostsApp;
+    var app = source?.App() as Posts;
 
     // get spaces where we have Post permission
     var spaces = SpaceService.Search(new SpaceQuery() { Archived = false, Filter = true, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Post));
 
     //  get PostApps for each space above
-    var apps = spaces.Select(s => AppService.GetApps<PostsApp>(s.Id).FirstOrDefault()).Where(a => a != null);
+    var apps = spaces.Select(s => AppService.GetApps<Posts>(s.Id).FirstOrDefault()).Where(a => a != null);
 }
 
 

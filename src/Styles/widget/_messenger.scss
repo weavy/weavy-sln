@@ -2,6 +2,27 @@
 
 // Messenger
 
+.weavy-panel[data-id=messenger] {
+    .weavy-panel-header {
+        background: #fff;
+        height: rem(3);
+    }
+
+    .weavy-panel-title {
+        background: rgba($theme-700, $opacity-panel);
+        color: color-yiq($theme-700);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .weavy-panel-frame {
+        top: rem(3);
+        height: calc(100% - #{rem(3)});
+    }
+}
+
 .weavy-conversations {
     margin: rem(-.5) 0 rem(.5) 0;
     display: flex;
@@ -45,7 +66,6 @@
         &:first-child {
             color: $theme;
         }
-
         /*&:last-child {
             margin: rem(-.25) 0 rem(-.5) 0;
         }*/

@@ -62,8 +62,9 @@
          */
         weavy.openContextFrame = function (weavyContext) {
             if (weavyContext) {                                
-                var contextData = JSON.parse(weavyContext);                                                
-                weavy.open(contextData.panelId, contextData.url);
+                var contextData = JSON.parse(weavyContext);
+                var panelId = contextData.panelId || "bubble-" + contextData.spaceId;
+                weavy.open(panelId, contextData.url);
             }
         }
 
@@ -85,60 +86,43 @@
             var activeFrame = $(".weavy-panel.weavy-open iframe.weavy-panel-frame", weavy.nodes.container);
 
             if (activeFrame.length) {
-                activeFrame[0].contentWindow.postMessage({ "name": "connect", url: document.location.href, id: spaceId, type: type }, "*");
+                var frameName = activeFrame[0].name;
+                wvy.postal.postToFrame(frameName, weavy.getId(), { "name": "connect", url: document.location.href, id: spaceId, type: type });
             }
         }
 
         weavy.on("location-changed", function (objEvent, objData) {
-            $("iframe.weavy-panel-frame", weavy.nodes.container).each(function () {
-                if ($(this)[0].contentWindow !== null) {
-                    $(this)[0].contentWindow.postMessage({ "name": "context-url", "value": objData.currentHref, 'title': document.title, 'origin': document.location.origin }, "*");
-                }
-            });
             weavy.reload();
         });
 
-        // Message events
-        weavy.on("message", function (e, message) {
-            e = e.originalEvent || e;
-            var spaceId, bubble, type;
+        weavy.on(wvy.postal, "open:context", function (e) {
+            weavy.log("restoring context", e.data.context);
+            weavy.openContextFrame(e.data.context);
+        });
 
-            switch (message.name) {
-                case "request:connect":
-                    weavy.connectBubble.call(weavy, message.spaceId, "space");
-                    break;
-                case "request:disconnect":
-                    // get the requesting space
-                    spaceId = message.spaceId;
-                    bubble = [].filter.call(weavy.bubbles, function (b) { return b.spaceId === spaceId }).pop();
+        weavy.on(wvy.postal, "request:connect", weavy.getId(), function (e) {
+            weavy.connectBubble.call(weavy, e.data.spaceId, "space");
+        });
 
-                    type = bubble ? bubble.type : "personal";
+        weavy.on(wvy.postal, "request:disconnect", weavy.getId(), function (e) {
+            // get the requesting space
+            var spaceId = e.data.spaceId;
+            var bubble = [].filter.call(weavy.bubbles, function (b) { return b.spaceId === spaceId }).pop();
 
-                    if (type === "global") {
-                        weavy.removeBubble.call(weavy, bubble.bubbleId);
-                    }
-                    break;
-                case "request:url":
-                    // get the requesting space                    
-                    type = "";
+            var type = bubble ? bubble.type : "personal";
 
-                    if (weavy.plugins.bubbles) {
-                        bubble = [].filter.call(weavy.bubbles, function (b) { return b.spaceId === message.spaceId }).pop();
-                        type = bubble ? bubble.type : "personal";
-                    }
-                    
-                    e.source.postMessage({ name: 'context-url', 'value': window.location.href, 'title': document.title, 'origin': document.location.origin, 'type': type }, "*");
-                    break;
-                case "set:context-url":
-                    window.location.href = e.data.context;
-                    break;
+            if (type === "global") {
+                weavy.removeBubble.call(weavy, bubble.bubbleId);
             }
         });
 
-        // Widget events
-        weavy.on("ready", function (e, ready) {            
-            if (ready.context) {                
-                weavy.openContextFrame(ready.context);
+        weavy.on(wvy.postal, "request:url", weavy.getId(), function (e) {
+            // get the requesting space                    
+            var type = "";
+
+            if (weavy.plugins.bubbles) {
+                var bubble = [].filter.call(weavy.bubbles, function (b) { return b.spaceId === e.data.spaceId }).pop();
+                type = bubble ? bubble.type : "personal";
             }
         });
 
@@ -171,11 +155,6 @@
                         }
                     });
                     buttonContainer.appendChild(connect);
-                }
-            } else {
-                var frame = panel.querySelector("iframe");
-                if (frame.src) {
-                    frame.contentWindow.postMessage({ name: 'context-url', 'value': window.location.href, 'title': document.title, 'origin': document.location.origin, 'type': bubble.type }, "*");
                 }
             }
         });

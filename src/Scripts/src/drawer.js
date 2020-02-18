@@ -55,25 +55,39 @@ wvy.drawer = (function ($) {
         setTimeout(close, 500);
     });
 
-    //// close drawer on ESC
-    //$(document).on("keydown", "body.drawer-open", function (ev) {
-    //    if (ev.which === 27) {
-    //        close();
-    //    }
-    //});
-
     function promiseTimeout(time) {
         return new Promise(function (resolve) {
             setTimeout(function () { resolve(); }, time);
         });
     }
 
-    // load active tab when drawer is opened
+    // load (active) tab when drawer is opened
     $(document).on("click", "[data-toggle=drawer][data-target='#drawer-user']", function () {
         var $drawer = $("#drawer-user");
-        var $active = $("[data-toggle=tab].active", $drawer);
 
-        wvy.tab.load($active.attr("href"), promiseTimeout(250));
+        // first check if there is an .active tab with a badge
+        var $tab = $("[data-toggle=tab].active .badge:not(:empty)", $drawer).closest("[data-toggle=tab]");
+        if (!$tab.length) {
+            // then check if there is a tab with a badge
+            $tab = $("[data-toggle=tab] .badge:not(:empty)", $drawer).closest("[data-toggle=tab]");
+            if (!$tab.length) {
+                // then check if there is an .active tab
+                $tab = $("[data-toggle=tab].active", $drawer);
+                if (!$tab.length) {
+                    // finally select the first tab
+                    $tab = $("[data-toggle=tab]", $drawer);
+                }
+            }
+        }
+
+        $tab = $tab.first();
+
+        // load remote tab content (iframe[data-src] or .tab-remote[data-urö])
+        wvy.tab.load($tab.attr("href"), promiseTimeout(250));
+
+        // and make sure tab is visible
+        $tab.tab("show");
+
     });
 
     // configure remote loading of tabs in #drawer-user

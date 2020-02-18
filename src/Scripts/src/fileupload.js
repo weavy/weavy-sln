@@ -83,29 +83,14 @@ wvy.fileupload = (function ($) {
             },
             done: function (e, data) {
                 var json = data.result.data[0];
-                
+
                 var $upload = $(this).closest(".file-upload");
                 $upload.find("input[type=hidden]").val(json.id);
                 $upload.find(".clear").removeClass("d-none");
-
-                var $custom = $upload.find(".custom-file-control");
-                $custom.text(json.name);
-
-                var $img = $upload.find("img");
-                var $svg = $upload.find("svg");
-                if (json.kind === "image") {                    
-                    $svg.parent().addClass("d-none");
-                    $img.removeClass("d-none");
-                    $img.prop("src", json.thumb_url.replace("{options}", "256x256-crop,both"));                    
-                } else {
-                    $svg.parent().removeClass("d-none");
-                    $img.addClass("d-none");
-                    $img.prop("src", $img.data("thumb"));
-                    $svg.html('<use xmlns: xlink="http://www.w3.org/1999/xlink" xlink: href="#' + json.icon.name + '"></use>');
-                    $svg.removeClass();
-                    $svg.addClass("i i-96 text-" + json.icon.color);
+                $upload.find(".custom-file-control").text(json.name);
+                if (json.thumb_url) {
+                    $upload.find("img").removeClass("d-none").prop("src", json.thumb_url.replace("{options}", "256"));                    
                 }
-
                 
                 $(this).focus();
             },
@@ -182,16 +167,16 @@ wvy.fileupload = (function ($) {
         $(".content-upload input[type=file]").fileupload({
             dataType: "json",
             pasteZone: null,
+            dropZone: $(".content-dropzone"),
             add: function (e, data) {
-                // TODO: start displaying upload progress/spinner
-                //$(".upload-progress").removeClass("invisible");
+                $("head").after("<div class='turbolinks-progress-bar custom'></div>");
 
                 // upload file
                 data.submit();
             },
             progressall: function (e, data) {
-                // TODO: update progress bar/spinner            
-                //$(".upload-progress").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
+                
+                $("html > .turbolinks-progress-bar.custom").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
             },
             done: function (e, data) {
                 if (data.result.skipped) {
@@ -229,9 +214,8 @@ wvy.fileupload = (function ($) {
             fail: function (e, data) {
                 console.error(data.jqXHR.responseJSON.message);
             },
-            always: function () {
-                // TODO: hide progress/spinner
-                //$(".upload-progress").addClass("invisible");
+            always: function () {                
+                $("html > .turbolinks-progress-bar.custom").remove();
             }
         });
     });
@@ -264,9 +248,6 @@ wvy.fileupload = (function ($) {
     function validate(files, maxSize, accept) {
         var errors = [];
 
-        // global setting for file size
-        var maxUploadSize = $("html").data("file-size");
-
         $.each(files, function (index, file) {
 
             // accepted file types for this field
@@ -288,8 +269,8 @@ wvy.fileupload = (function ($) {
             }
 
             // maximum file size (global)
-            if (errors.length === 0 && maxUploadSize) {
-                if (fs > parseInt(maxUploadSize)) {
+            if (errors.length === 0 && wvy.config.maxUploadSize) {
+                if (fs > parseInt(wvy.config.maxUploadSize)) {
                     errors.push("The file is too big.");
                 }
             }

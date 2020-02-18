@@ -9,6 +9,6 @@
 </header>
 
 <div id="tab-trash">
-    <div class="tab-loading d-none">@Html.SvgSpinner()</div>
+    <div class="tab-loading d-none">@Svg.Spinner()</div>
     <div class="tab-remote loaded" data-url="@(Url.Action<RecycleBinController>(c => c.UserTrash()))"> @{ Html.RenderPartial("_UserTrash"); }</div>
 </div>

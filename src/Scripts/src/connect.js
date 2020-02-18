@@ -1,33 +1,30 @@
 ﻿var wvy = wvy || {};
 wvy.connect = (function ($) {
 
-    window.addEventListener("message", function (e) {
-        switch (e.data.name) {
-            case "connect":
-                var modal = $("#connect-modal");
-                modal.attr("data-connect-id", e.data.id);
-                modal.attr("data-connect-type", e.data.type);
-                modal.attr("data-connect-url", e.data.url);
-                $("#connect-modal").modal("toggle");
-                break;
-        }
-    });
+    wvy.postal.on("connect", function (e) {
+        var modal = $("#connect-modal");
+        modal.attr("data-connect-id", e.data.id);
+        modal.attr("data-connect-type", e.data.type);
+        modal.attr("data-connect-url", e.data.url);
+        $("#connect-modal").modal("toggle");
+
+    })
 
     var requestConnect = function (spaceId) {
-        if (wvy.browser.embedded) {
-            wvy.postal.post({ name: 'request:connect', spaceId: spaceId || wvy.context.space });
+        if (wvy.browser.framed) {
+            wvy.postal.postToParent({ name: 'request:connect', spaceId: spaceId || wvy.context.space });
         }
     }
 
     var requestDisconnect = function (spaceId) {
-        if (wvy.browser.embedded) {
-            wvy.postal.post({ name: 'request:disconnect', spaceId: spaceId || wvy.context.space });
+        if (wvy.browser.framed) {
+            wvy.postal.postToParent({ name: 'request:disconnect', spaceId: spaceId || wvy.context.space });
         }
     }
 
     var requestClose = function (spaceId) {
-        if (wvy.browser.embedded) {
-            wvy.postal.post({ name: 'request:close', spaceId: spaceId || wvy.context.space });
+        if (wvy.browser.framed) {
+            wvy.postal.postToParent({ name: 'request:close', spaceId: spaceId || wvy.context.space });
         }
     }
 

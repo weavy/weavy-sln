@@ -1,13 +1,9 @@
 ﻿@model Content
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
     Title = "Edit " + Model.MetaData().Name;
     Back = Url.Back(Model.Url());
     ViewData["turboform"] = true;
-}
-
-@section navbar_middle {
-    <div class="navbar-middle"><span class="navbar-text">@Title</span></div>
 }
 
 <div class="container mt-3">

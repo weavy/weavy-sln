@@ -11,10 +11,10 @@
         <button type="button" class="dropdown-item" data-toggle="modal" data-target="#share-modal" data-share-type="@Model.Type" data-share-id="@Model.Id" data-share-title="Share @Model.Kind()">@Svg.Icon("share-variant", "success") Share</button>
 
         @if (Model is IFile file) {
-            if (FileHelper.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
-                <a class="dropdown-item" href="@file.OfficeUrl()">@Svg.Icon(Model)<span>Open in @OfficeHelper.GetProductName(file.Name)</span></a>
+            if (FileUtils.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
+                <a class="dropdown-item" href="@file.OfficeUrl()">@Svg.Icon(Model)<span>Open in @OfficeUtils.GetProductName(file.Name)</span></a>
             }
-            <a class="dropdown-item" href="@file.FileUrl(download: true)">@Svg.Icon("download", "primary")<span>Download</span></a>
+            <a class="dropdown-item" href="@file.ContentUrl(download: true)">@Svg.Icon("download", "primary")<span>Download</span></a>
         }
 
         @if (Model.HasPermission(Permission.Edit)) {
@@ -46,11 +46,11 @@
         }
 
         @if (Model is IVersionable versionable) {
-            <a class="dropdown-item" href="@(Url.Action<ContentController>(c => c.Versions(versionable.Id)))">@Svg.Icon("backup-restore")<span>Versions</span></a>
+            <a class="dropdown-item" href="@Model.Url()/versions">@Svg.Icon("backup-restore")<span>Versions</span></a>
         }
 
         @if (Model.HasPermission(Permission.Delete)) {
-            <form action="@(Url.Action<ContentController>(c => c.Trash(Model.Id)))" method="post" data-turboform>
+            <form action="@Model.Url()/trash" method="post" data-turboform>
                 <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Trash</button>
             </form>
         }

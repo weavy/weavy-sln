@@ -1,0 +1,43 @@
+﻿@model Messenger
+
+@{
+    var readAt = Model.Conversation?.ReadAt;
+}
+
+@if (Model.Messages.HasNextPage) {
+    <div class="loader text-center" data-prev="@Url.ScrollNext(Model.Messages, Url.Action<MessengerController>(c => c.PartialMessages(Model.Conversation.Id, null)))">
+        @Svg.Spinner()
+    </div>
+}
+
+@foreach (var messagesGroupedByDate in Model.Messages.GroupBy(x => x.CreatedAt.ToLocal().Date)) {
+    <div class="date-separator"><time>@messagesGroupedByDate.Key.ToShortDateString()</time></div>
+    foreach (var message in messagesGroupedByDate) {
+        if (readAt < message.CreatedAt) {
+            <div class="new-separator">New messages</div>
+            readAt = null;
+        }
+        Html.RenderPartial("_Message", message, new ViewDataDictionary(ViewData) { { "Messenger", Model } });
+    }
+}
+
+@if (!Model.Messages.HasPreviousPage) {
+    <div id="sending">
+        <div class="message me sending">
+            <div class="content">
+                <div class="meta">
+                    &nbsp;
+                </div>
+                <div class="bubble">
+                    @*
+                        <div class="card-images"></div>
+                        <div class="card-files"></div>
+                    *@
+                    <div class="text">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+        <div class="status status-sending" title="Sending">@Svg.Icon("circle-outline", size: 18)</div>
+    </div>
+}
+

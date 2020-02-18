@@ -6,10 +6,10 @@
 
     //new message links
     $(document).on("click", "a[data-role=messenger]", function (e) {
-        if (wvy.browser.embedded) {
+        if (wvy.browser.framed) {
             e.preventDefault();
             var url = wvy.url.resolve($(this).attr("href"));
-            window.parent.postMessage({ "name": "messenger", "url": url }, "*");
+            wvy.postal.postToParent({ "name": "request:open", panelId: "messenger", "destination": url });
         }
     })
 

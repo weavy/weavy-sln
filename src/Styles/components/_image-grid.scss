@@ -10,6 +10,10 @@
     overflow: hidden;
     background-color: $card-bg;
 
+
+    &[data-image-count="1"] {
+    }
+
     &::before {
         content: "";
         position: absolute;
@@ -34,6 +38,16 @@
         border: $card-border-width solid $card-border-color;
         pointer-events: none;
         border-radius: inherit;
+    }
+
+    &[data-image-count="1"] {
+        &::before {
+            border: none;
+        }
+
+        &::after {
+            border: none;
+        }
     }
 
 

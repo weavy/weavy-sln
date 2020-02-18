@@ -30,9 +30,9 @@
     }
 }
 
-// fullscreen on mobile+touch
+// fullscreen on mobile
 @include media-breakpoint-down(sm) {
-    .mobile.touch {
+    .mobile {
 
         .nav-menu {
 
@@ -82,7 +82,7 @@
 }
 
 @include media-breakpoint-down(xs) {
-    .mobile.touch {
+    .mobile {
         .nav-menu {
             &.show {
                 .dropdown-menu {

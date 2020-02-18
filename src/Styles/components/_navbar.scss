@@ -24,7 +24,7 @@
 }
 
 @include media-breakpoint-down(xs) {
-    html:not(.embedded) {
+    html:not(.framed) {
         .navbar {
             padding: $navbar-padding-y #{$navbar-padding-x + $edge-margin} !important;
         }
@@ -79,7 +79,7 @@
 }
 
 @include media-breakpoint-down(xs) {
-    html:not(.embedded) {
+    html:not(.framed) {
         .navbar-content {
             padding: .5rem #{.5rem + $edge-margin};
         }

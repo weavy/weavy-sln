@@ -1,0 +1,18 @@
+﻿@model User
+@{
+    Title = Model.GetTitle();
+}
+
+<div class="cover cover-bg text-center py-4">
+    <button type="button" class="btn btn-icon top-left" data-dismiss="modal">@Svg.Icon("arrow-left")</button>
+    @Model.AvatarImg(128)
+    @if (Model.Username == Title) {
+        <p class="pt-2 mb-0">@@@Model.Username @Html.Badge(Model)</p>
+    } else {
+        <p class="pt-2 mb-0">@Title <small>@@@Model.Username</small> @Html.Badge(Model)</p>
+    }
+    <button type="button" class="btn btn-icon top-right" data-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    @{ Html.RenderPartial("_Profile", Model); }
+</div>

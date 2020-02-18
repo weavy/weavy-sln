@@ -14,16 +14,20 @@
     }
 }
 
-
 <article class="container my-3" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
     @{
-        <section class="content-section properties">
-            @Html.DisplayGroups(exclude: new string[] { nameof(Model.Name) })
-        </section>
+        <div class="content-dropzone">            
+            <section class="content-section properties">
+                @Html.DisplayGroups(exclude: new string[] { nameof(Model.Name) })
+            </section>
 
-        Html.RenderPartial("_Meta");
-        if (current) {
-            Html.RenderPartial("_ContentAttachments");
+            @{Html.RenderPartial("_Meta"); }
+
+            @if (current) {
+                Html.RenderPartial("_ContentAttachments");            
+            }
+        </div>        
+        if (current) {        
             Html.RenderPartial("_Comments");
             Html.RenderPartial("_Subscribers");
         }

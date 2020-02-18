@@ -172,7 +172,7 @@
                         // Try adding the new bubble
                         if (weavy.bubbles.length >= options.bubbleLimit) {
                             if (weavy.plugins.alert) {
-                                weavy.alert("<strong>You reached the bubble limit</strong><br/>Please close some bubbles before you open another.");
+                                weavy.alert("<strong>You have to many open spaces</strong><br/>Please close some before you open any new ones.");
                             }
                             return;
                         } else {
@@ -232,7 +232,7 @@
         });
 
         // real-time events
-        weavy.on(wvy.realtime, "bubble-added.weavy", function (e, data) {
+        weavy.on(weavy.connection, "bubble-added.weavy", function (e, data) {
             // TODO: move connectedURL check to context.js?
             if (data.type === "personal" || data.type === "global" && (!weavy.plugins["context"] || weavy.plugins["context"].connectedUrl(data.connectedToUrl))) {
                 if (data.type === "personal" && [].some.call(weavy.bubbles, function (b) { return parseInt(b.spaceId) === parseInt(data.spaceId) && b.type === "global"; })) {
@@ -259,7 +259,7 @@
             }
         });
 
-        weavy.on(wvy.realtime, "bubble-removed.weavy", function (e, data) {
+        weavy.on(weavy.connection, "bubble-removed.weavy", function (e, data) {
             var bubbleIsRemoved = false;
             // remove from array of added bubbles
             weavy.bubbles = [].filter.call(weavy.bubbles, function (bubble) {
@@ -285,7 +285,7 @@
             }
         });
 
-        weavy.on(wvy.realtime, "space-trashed.weavy", function (e, data) {
+        weavy.on(weavy.connection, "space-trashed.weavy", function (e, data) {
             // remove from array of added bubbles
             weavy.bubbles = [].filter.call(weavy.bubbles, function (bubble) {
                 if (data.id === bubble.spaceId) {

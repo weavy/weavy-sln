@@ -1,0 +1,46 @@
+﻿@model Messenger
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="turbolinks-cache-control" content="no-cache">
+    <title>Conversations | @Theme.Name</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/areas/apps/styles/messenger.scss")
+    <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @Bundler.Scripts("~/areas/apps/scripts/messenger.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+</head>
+<body class="@BodyClasses("single one")" @BodyAttributes>
+    <script>@Html.ContextInfo()@Html.UserSettings()</script>
+    <div class="pane" id="sidebar">
+        <header class="pane-header">
+            <button type="button" class="btn btn-primary btn-icon" data-toggle="modal" data-target="#new-message-modal" title="New message">@Svg.Icon("message-plus")</button>
+            <div class="pane-title"><a href="@(Url.Action<MessengerController>(c => c.Conversations(null)))">Conversations</a></div>
+            <button type="button" class="btn btn-icon dropdown-toggle top-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Svg.Icon("dots-vertical")</button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#settings-modal">Settings</button>
+            </div>
+        </header>
+        <div class="pane-body">
+            <form class="search-form" action="@(Url.Action<MessengerController>(c => c.Conversations(null)))" method="get" role="search" data-target="#conversations">
+                <div class="form-group">
+                    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." autocomplete="off" />
+                    <button type="button" class="btn btn-icon btn-search">@Svg.Icon("magnify")</button>
+                    <button type="button" class="btn btn-icon btn-reset">@Svg.Spinner(size: 18, spin: true)@Svg.Icon("close")</button>
+                </div>
+            </form>
+            <nav class="list-group" id="conversations">
+                @{ Html.RenderPartial("_Conversations", Model); }
+            </nav>
+        </div>
+    </div>
+
+    @{ Html.RenderPartial("_SettingsModal", Model.Settings); }
+    @{ Html.RenderPartial("_MessageModal", Model); }
+
+</body>
+</html>

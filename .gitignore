@@ -3,6 +3,7 @@
 /src/css/
 /src/js/
 /src/settings.config
+/src/Properties/BuildInfo.cs
 
 # Dist folder
 /dist/

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
+// to COM components. If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
@@ -17,4 +17,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("70cffd0f-7b12-43ec-9c57-9080937a6b04")]
 
 // Assembly version
-[assembly: AssemblyVersion("4.0.3")]
+[assembly: AssemblyVersion("5.0.0")]

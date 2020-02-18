@@ -5,19 +5,32 @@ wvy.discuss = (function ($) {
     document.addEventListener("turbolinks:load", function () {
         $("[data-editor-location='discuss']").weavyEditor({
             minimized: true,
-            context: wvy.browser.embedded,
-            onClick: function (e, wrapper) {
-                $(".post-form").addClass("focused");
-                wrapper.addClass("active");
-            },
             onSubmit: function (e, data) {
-                $(".post-form").removeClass("focused");
-                data.wrapper.removeClass("active");
-                wvy.posts.insert(e, data, this);
-                $(this).closest("form").find("#contextUrl").attr("disabled", true);
-            },
-            onContextChange: function (e, data) {
-                $(".post-form").find("input[name=hasContext]").val(data.hasContext);
+                var $editor = $(this);
+                var $form = $editor.closest("form");
+
+                // simpe check to see that post contains any data
+                var json = $form.serializeObject(false);
+                if (json.text || json.blobs || json.embeds) {
+
+                    // remove .is-invalid
+                    $form.removeClass("is-invalid");
+
+                    // display "fake" post
+                    $form.addClass("sending");
+
+                    // disable submit button
+                    $form.find("button[type=submit]").prop("disabled", true);
+
+                    // submit form
+                    $form.submit();
+
+                    // reset editor
+                    $editor.weavyEditor("reset");
+                } else {
+                    $form.addClass("is-invalid");
+                    $form.find("button[type=submit]").prop("disabled", false);
+                }
             }
         });
     });
@@ -25,13 +38,6 @@ wvy.discuss = (function ($) {
     // destroy editors
     document.addEventListener("turbolinks:before-cache", function () {
         $("[data-editor-location='discuss']").weavyEditor("destroy");
-        $(".post-form").removeClass("focused");
-    });
-
-    // backdrop click
-    $(document).on("click touchend", ".post-backdrop", function (e) {
-        e.preventDefault();
-        $(".post-form").removeClass("focused");
     });
 
 })(jQuery);

@@ -1,5 +1,7 @@
 ﻿@model Content
 @{
+
+
     var draftable = Model as IDraftable;
 
     var htmlAttributes = new Dictionary<string, object>(){
@@ -14,12 +16,11 @@
         htmlAttributes.Add("data-turboform", "");
     }
 
-    var routeValues = new RouteValueDictionary();
-    routeValues.Add("id", WeavyContext.Content?.Id ?? WeavyContext.App.Id);
+    var formAction = (WeavyContext.Content?.Url() ?? WeavyContext.App?.Url()) + "/content";
 }
 
 
-@using (Html.BeginForm(WeavyContext.Content != null ? nameof(ContentController.Insert) : nameof(ContentController.InsertRoot), typeof(ContentController).ControllerName(), routeValues, FormMethod.Post, htmlAttributes)) {
+<form action="@formAction" method="post" @Html.Attributes(htmlAttributes)>
     @Html.EditorsForModel()
     @Html.Hidden(nameof(Guid), Model.ContentGuid)
     <div class="form-buttons">
@@ -33,5 +34,5 @@
     <div id="blobs">
         @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
     </div>
-}
+</form>
 

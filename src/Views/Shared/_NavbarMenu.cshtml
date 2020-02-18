@@ -7,7 +7,7 @@
     var navtitle = WeavyContext.Space?.Name ?? Title;
 }
 
-<div class="navbar-middle d-embedded">
+<div class="navbar-middle d-framed">
     @Html.StarToggle(WeavyContext.Space)
     <a href="@(WeavyContext.Space?.Url() ?? Url.Action<HomeController>(c => c.Index()))" class="navbar-text">
         @navtitle
@@ -52,11 +52,15 @@
             @(Html.ActionLink<SpaceController>(c => c.Index(null, null), icon: "view-grid", color: "primary", text: "Spaces", htmlAttributes: new { @class = "dropdown-item spaces" }, active: LinkActive.Action))
 
             @(Html.ActionLink<PeopleController>(c => c.Index(null, null), icon: "account-multiple", color: "primary", text: "People", htmlAttributes: new { @class = "dropdown-item" }, active: LinkActive.Controller))
-            <a class="dropdown-item d-desktop" href="@(Url.Action<Weavy.Web.Controllers.MessengerController>(c => c.Index()))" target="_blank" title="Open Messenger">
+
+            @if (WeavyContext.Browser.Desktop) {
+            <a class="dropdown-item" href="@(Url.Action<Weavy.Areas.Apps.Controllers.MessengerController>(c => c.Index(null)))" target="_blank" title="Open Messenger">
                 @Svg.Icon("message-text", color: "primary")
                 <span>Messenger</span>
                 @Svg.Icon("open-in-new", size: 18, htmlAttributes: new { @class = "mr--1" })
             </a>
+            }
+
 
         </div>
     </div>

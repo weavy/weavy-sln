@@ -1,0 +1,80 @@
+// Custom variables and colors
+@import 'variables';
+
+// Bootstrap functions, variables and mixins
+@import "vendor/bootstrap/functions";
+@import "functions"; // override some of the default bootstrap functions
+@import "vendor/bootstrap/variables";
+@import "vendor/bootstrap/mixins";
+
+// Additional mixins
+@import 'mixins/animation';
+//@import 'mixins/dot';
+
+@import "client/variables";
+
+// Client styles (wrap all styles in .weavy)
+
+    .weavy-frame {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        pointer-events: none;
+
+        font-size: rem(1);
+        line-height: rem(1.5);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
+        flex: 1 1 100%;
+        height: 100%;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+
+    @import "client/panels";
+    @import "client/panels.wide";
+    @import "client/preview";
+    @import "client/notifications";
+    @import "client/filebrowser";
+    @import "client/dot";
+
+    .weavy-hidden-frame {
+        display: none;
+    }
+
+    .weavy-cache {
+        display: none !important;
+    }
+
+    .weavy-disable-transition, .weavy-cache {
+        &, & * {
+            transition-duration: 0s !important;
+            transition-delay: 0s !important;
+        }
+    }
+
+    .weavy-overlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: $widget-zindex;
+        pointer-events: none;
+
+        > * {
+            pointer-events: auto;
+        }
+    }
+
+    @import "client/alert";
+
+.weavy {
+    @media print {
+        display: none;
+    }
+}

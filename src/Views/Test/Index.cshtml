@@ -102,6 +102,8 @@
 </nav>
 
 <div class="container">
+
+
     <section id="icons">
         <h1 class="display-3 mt-4">Icons</h1>
         @Svg.Icons()
@@ -220,11 +222,10 @@
             @Html.EditorFor(x => Model.Tags)
             <div class="row">
                 <div class="col">
-                    @Html.EditorFor(x => Model.Image)
+                    @Html.EditorFor(x => Model.Thumb)
                 </div>
                 <div class="col">
-                    <label>&nbsp;<!-- this is just used for alignment--></label>
-                    @Html.EditorFor(x => Model.Avatar, additionalViewData: new { FormLabel = false, FormText = false })
+                    @Html.EditorFor(x => Model.Avatar)
                 </div>
                 <div class="col">
                     @Html.EditorFor(x => Model.File)
@@ -702,9 +703,9 @@
         <h1 class="display-3 mt-4">Spinners</h1>
         <hr />
         <div class="d-flex align-items-center">
-            @Html.SvgSpinner(spin: true)
-            @Html.SvgSpinner(size: 32, spin: true)
-            @Html.SvgSpinner(size: 48, spin: true)
+            @Svg.Spinner(spin: true)
+            @Svg.Spinner(size: 32, spin: true)
+            @Svg.Spinner(size: 48, spin: true)
             <img src="@Url.Content("~/img/spinner.svg")" class="ml-auto" width="24" height="24" alt="spinner" />
         </div>
     </section>
@@ -748,37 +749,37 @@
 
 @section footer {
     @* testing that adding inline script to a page works *@
-        <script>
-            console.info("script on test page");
+    <script>
+        console.info("script on test page");
 
-            $(document).on("click", "[data-body-bg]", function (e) {
-                console.log("Going " + this.dataset.bodyBg);
-                if (this.dataset.bodyBg === "light") {
+        $(document).on("click", "[data-body-bg]", function (e) {
+            console.log("Going " + this.dataset.bodyBg);
+            if (this.dataset.bodyBg === "light") {
 
-                    $(document.body).removeClass("body-dark");
-                } else {
-                    $(document.body).addClass("body-dark");
-                }
-            });
+                $(document.body).removeClass("body-dark");
+            } else {
+                $(document.body).addClass("body-dark");
+            }
+        });
 
-            $(document).on("click", ".fab .btn-round", function (e) {
-                $(this).toggleClass("show");
-            });
+        $(document).on("click", ".fab .btn-round", function (e) {
+            $(this).toggleClass("show");
+        });
 
-            $(document).on("click", ".btn[data-alert]", function (e) {
-                var type = this.dataset.alert;
-                var text = $(this).text();
-                wvy.alert.alert(type, text, 3000);
-            });
+        $(document).on("click", ".btn[data-alert]", function (e) {
+            var type = this.dataset.alert;
+            var text = $(this).text();
+            wvy.alert.alert(type, text, 3000);
+        });
 
-            document.addEventListener("turbolinks:load", function () {
-                // init tooltips
-                $('[data-toggle="tooltip"]').tooltip();
-            });
+        document.addEventListener("turbolinks:load", function () {
+            // init tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+        });
 
-            document.addEventListener("turbolinks:before-cache", function () {
-                // destroy tooltips
-                $('[data-toggle="tooltip"]').tooltip('dispose');
-            });
-        </script>
-        }
+        document.addEventListener("turbolinks:before-cache", function () {
+            // destroy tooltips
+            $('[data-toggle="tooltip"]').tooltip('dispose');
+        });
+    </script>
+}

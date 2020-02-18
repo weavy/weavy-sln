@@ -1,4 +1,4 @@
-﻿<aside id="drawer-user" class="drawer drawer-right d-standalone" data-turbolinks-permanent>
+﻿<aside id="drawer-user" class="drawer drawer-right d-standalone">
     <header class="drawer-header">
         <div class="dropdown d-standalone">
             <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
@@ -9,9 +9,9 @@
                 <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditSettings()))">@Svg.Icon("format-list-checks") Settings</a>
                 <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditAccount()))">@Svg.Icon("account-network") Account details</a>
                 @if (!ConfigurationService.WindowsAuthentication) {
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Svg.Icon("account-key") Change password</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut(null)))" data-turbolinks="false">@Svg.Icon("logout") Sign out</a>
+                    <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Svg.Icon("account-key") Change password</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut(null)))" data-turbolinks="false">@Svg.Icon("logout") Sign out</a>
                 }
             </div>
         </div>
@@ -25,33 +25,43 @@
             </p>
         </div>
         <nav class="nav nav-tabs" role="tablist">
-            <a class="nav-link nav-icon active" href="#tab-notifications" data-toggle="tab" role="tab" title="Notifications">@Svg.Icon("bell")@Html.NotificationsBadge()</a>
+            @if (WeavyContext.Browser.Desktop) {
+                <a class="nav-link nav-icon" href="#tab-messages" data-toggle="tab" role="tab" title="Messages">@Svg.Icon("message-text")@Html.ConversationsBadge()</a>
+            }
+            <a class="nav-link nav-icon" href="#tab-notifications" data-toggle="tab" role="tab" title="Notifications">@Svg.Icon("bell")@Html.NotificationsBadge()</a>
             <a class="nav-link nav-icon" href="#tab-stars" data-toggle="tab" role="tab" title="Stars">@Svg.Icon("star")</a>
             <a class="nav-link nav-icon" href="#tab-drafts" data-toggle="tab" role="tab" title="Drafts">@Svg.Icon("file")</a>
             <a class="nav-link nav-icon" href="#tab-trash" data-toggle="tab" role="tab" title="Recycle bin">@Svg.Icon("delete")</a>
         </nav>
     </header>
     <div class="drawer-body scroll-y tab-content">
-        <div class="tab-pane active" id="tab-notifications" role="tabpanel">
+        @if (WeavyContext.Browser.Desktop) {
+            <div class="tab-pane" id="tab-messages" role="tabpanel">
+                <div class="tab-loading">@Svg.Spinner()</div>
+                <iframe data-src="@Url.RouteUrl(nameof(Weavy.Areas.Apps.Controllers.MessengerController) + nameof(Weavy.Areas.Apps.Controllers.MessengerController.Index))" name="messenger-global"></iframe>
+            </div>
+        }
+        <div class="tab-pane" id="tab-notifications" role="tabpanel">
             <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">Notifications</h6>
                 <button type="button" class="btn btn-icon btn-primary" data-read="notifications" title="Mark all as read">@Svg.Icon("check-all")</button>
             </header>
-            <div class="tab-loading">@Html.SvgSpinner()</div>
+            <div class="tab-loading">@Svg.Spinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<NotificationController>(c => c.Index()))"></div>
         </div>
+
         <div class="tab-pane" id="tab-stars" role="tabpanel">
             <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">Stars</h6>
             </header>
-            <div class="tab-loading">@Html.SvgSpinner()</div>
+            <div class="tab-loading">@Svg.Spinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<StarController>(c => c.Index()))"></div>
         </div>
         <div class="tab-pane" id="tab-drafts" role="tabpanel">
             <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">Drafts</h6>
             </header>
-            <div class="tab-loading">@Html.SvgSpinner()</div>
+            <div class="tab-loading">@Svg.Spinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<ContentController>(c => c.Drafts()))"></div>
         </div>
         <div class="tab-pane" id="tab-trash" role="tabpanel">
@@ -59,7 +69,7 @@
                 <h6 class="navbar-title mr-auto">Recycle bin</h6>
                 @*<button type="button" class="btn btn-icon btn-danger" title="Empty recycle bin">@Svg.Icon("delete")</button>*@
             </header>
-            <div class="tab-loading">@Html.SvgSpinner()</div>
+            <div class="tab-loading">@Svg.Spinner()</div>
             <div class="tab-remote" data-url="@(Url.Action<RecycleBinController>(c => c.UserTrash()))"></div>
         </div>
     </div>

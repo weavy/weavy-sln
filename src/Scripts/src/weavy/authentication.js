@@ -107,19 +107,19 @@
                 switch (messageName) {
                     case "signed-in":
                         dfd.resolve();
-                        weavy.off("message signed-in authentication-error", onMessage);
+                        weavy.off("signed-in authentication-error", onMessage);
                         break;
                     case "authentication-error":
                         if (doSignIn) {
                             dfd.reject();
-                            weavy.off("message signed-in authentication-error", onMessage);
+                            weavy.off("signed-in authentication-error", onMessage);
                         }
                         break;
                 }
             }
 
             // listen to signed-in message
-            weavy.on("message signed-in authentication-error", onMessage);
+            weavy.on("signed-in authentication-error", onMessage);
 
             // post message to sign in user
             var url = weavy.signInUrl;
@@ -152,29 +152,27 @@
          * @fires Weavy#signed-out
          */
         weavy.signOut = function () {
-            var options = weavy.options.plugins[PLUGIN_NAME];
             var dfd = $.Deferred();
 
-            // sign out user in Weavy
-            var url = weavy.signOutUrl;
-            var data = "";
-
-            weavy.load.call(weavy, options.frameName, url, data, "GET", true);
+            wvy.postal.postToSelf({ name: "signing-out" });
 
             function onMessage(e, message) {
-                var messageName = message && message.name || e.type;
-                switch (messageName) {
-                    case "signed-out":
-                        dfd.resolve(true);
-                        weavy.off("message signed-out", onMessage);
-                        break;
-                }
+                dfd.resolve(true);
+                weavy.off("signed-out", onMessage);
             }
 
             // listen to signed-out message
-            weavy.on("message signed-out", onMessage);
+            weavy.on("signed-out", onMessage);
 
             return dfd.promise();
+        }
+
+        function doSignOut() {
+            var options = weavy.options.plugins[PLUGIN_NAME];
+
+            // sign out user in Weavy
+            var url = weavy.signOutUrl;
+            weavy.load.call(weavy, options.frameName, url, null, "GET", true);
         }
 
         weavy.on("options", function () {
@@ -222,25 +220,24 @@
             weavy.close();
 
             function onMessage(e, message) {
-                e = e.originalEvent || e;
                 message = message || e.data;
 
                 switch (message.name) {
                     case "signed-in":
-                        weavy.off(window, "message", onMessage);
+                        weavy.off(wvy.postal, "message", onMessage);
                         break;
                     case "authentication-error":
                         if (wasOpen) {
                             weavy.open(options.frameName)
                         }
-                        weavy.off(window, "message", onMessage);
+                        weavy.off(wvy.postal, "message", onMessage);
                         break;
                 }
                 
             }
 
             // listen to signed-in message
-            weavy.on(window, "message", onMessage);
+            weavy.on(wvy.postal, "message", onMessage);
         });
 
         weavy.on("before:signed-in", function () {
@@ -252,7 +249,7 @@
         weavy.on("after:signing-out", function (e, signingOut) {
             if (signingOut.isLocal) {
                 weavy.whenClosed.then(function () {
-                    weavy.timeout(250).then(weavy.signOut.bind(weavy));
+                    weavy.timeout(250).then(doSignOut.bind(weavy));
                 });
             }
         });

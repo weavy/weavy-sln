@@ -527,13 +527,13 @@
                         case "signed-out":
                         case "authentication-error":
                             weavy.nodes.weavyButton.classList.remove("weavy-loading");
-                            weavy.off(window, "message", onMessage);
+                            weavy.off(wvy.postal, "message", onMessage);
                             break;
                     }
                 }
 
                 // listen to signed-out message
-                weavy.on(window, "message", onMessage);
+                weavy.on(wvy.postal, "message", onMessage);
             }
         });
 

@@ -1,0 +1,25 @@
+﻿@model Messenger
+
+<div id="new-message-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header pane-header">
+                <button type="button" class="btn btn-icon btn-primary" data-dismiss="modal">@Svg.Icon("arrow-left")</button>
+                <div class="pane-title text-truncate">New message</div>
+                <button type="button" class="btn btn-icon" data-action="submit" data-form="#new-message-form" title="Create message" disabled>@Svg.Icon("check")</button>
+            </div>
+            <div class="modal-body">
+                <form class="search-form" action="@(Url.Action<MessengerController>(c => c.PartialPeople(null, null)))" method="get" role="search" data-target="#new-message-form">
+                    <div class="form-group">
+                        <input type="text" name="q" value="" class="form-control form-control-sm" placeholder="Search or select from recent contacts..." autocomplete="off" />
+                        <button type="submit" class="btn btn-icon btn-search">@Svg.Icon("magnify")</button>
+                        <button type="button" class="btn btn-icon btn-reset">@Svg.Spinner(size: 18, spin: true)@Svg.Icon("close")</button>
+                    </div>
+                </form>
+                @* different actions depending on if we are rendering full messenger or conversation only *@
+                <form id="new-message-form" action="@(Model.IsMessenger ? Url.Action<MessengerController>(c => c.InsertMessengerConversation(null)) : Url.Action<MessengerController>(c => c.InsertConversation(null)))" method="post">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

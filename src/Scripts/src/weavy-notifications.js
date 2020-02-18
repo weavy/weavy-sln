@@ -90,7 +90,7 @@
         
         _height = $("html").height() || $("main").outerHeight();
 
-        window.top.postMessage({ "name": "notification-loaded", "id": _notificationId, "height": _height }, "*");
+        wvy.postal.postToParent({ "name": "notification-loaded", "id": _notificationId, "height": _height })
 
         window.requestAnimationFrame(reportHeight);
 
@@ -111,7 +111,7 @@
 
         if (tempHeight !== _height) {
             _height = tempHeight;
-            window.top.postMessage({ "name": "notification-layout-changed", "id": _notificationId, "height": _height }, "*");
+            wvy.postal.postToParent({ "name": "notification-layout-changed", "id": _notificationId, "height": _height });
         }
     }
 
@@ -161,10 +161,10 @@
     function close(timespan) {
         if (timespan) {
             return window.setTimeout(function () {
-                window.parent.postMessage({ "name": "notification-closed", "id": _notificationId }, "*");
+                wvy.postal.postToParent({ "name": "notification-closed", "id": _notificationId });
             }, timespan);
         } else {
-            window.parent.postMessage({ "name": "notification-closed", "id": _notificationId }, "*");
+            wvy.postal.postToParent({ "name": "notification-closed", "id": _notificationId });
         }
     }
 })(jQuery);

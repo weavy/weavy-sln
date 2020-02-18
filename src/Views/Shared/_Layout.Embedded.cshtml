@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <meta name="turbolinks-cache-control" content="no-preview">
+    <title>@Html.Title(Title)</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @RenderSection("styles", required: false)
+    <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @Bundler.Scripts("~/scripts/asap.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @if (WeavyContext.Browser.Browser == "IE")
+    {
+        @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    }
+    @Bundler.Scripts("~/scripts/wvy.bundle", htmlAttributes: new { data_turbolinks_track = "reload", defer = "" })
+    @RenderSection("scripts", required: false)
+</head>
+<body class="@BodyClasses(Back != null ? "has-navbar": "")" @BodyAttributes>
+    <script>@Html.ContextInfo()@Html.UserSettings()</script>
+    @if (Back != null) {
+        <nav class="navbar-theme fixed-top">
+            <div class="navbar navbar-primary">
+                <div class="navbar-icons">
+                    <a class="btn btn-icon" href="@Back" data-link>@Svg.Icon("arrow-left")</a>
+                </div>
+                <div class="navbar-middle"><span class="navbar-text">@Title</span></div>
+                <div class="navbar-icons"></div>
+            </div>
+        </nav>
+    }
+
+    <div class="alerts">@Html.AlertMessages()</div>
+    <main @if (IsSectionDefined("fab")) { <text> class="has-fab" </text> }>
+        @RenderBody()
+        @RenderSection("fab", required: false)
+    </main>
+    @{
+        Html.RenderPartial("_PhotoSwipe");
+        Html.RenderPartial("_Preview");
+        Html.RenderPartial("_ProfileModal");
+        @RenderSection("footer", required: false)
+    }
+    <audio id="notification-sound" src="~/media/notification.mp3" preload="none"></audio>
+    @Html.Scripts()
+</body>
+</html>

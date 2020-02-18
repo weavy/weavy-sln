@@ -10,7 +10,7 @@ wvy.userspicker = (function ($) {
     function formatUser(user) {
         if (user.loading) return user.text;
         if (user.invite) return user.email + " <span class='badge badge-info'>invite</span>";
-        return "<img class='img-32 avatar' src='" + wvy.url.thumb(user.thumb_url, "32x32-crop,both") + "'/> " + (user.profile && user.profile.name ? user.profile.name : user.username) + ' <small>@' + user.username + '</small>'+ (user.is_external ? " <span class='badge badge-warning'>external</span>" : "");
+        return "<img class='img-32 avatar' src='" + wvy.url.thumb(user.thumb_url, "32") + "'/> " + (user.profile && user.profile.name ? user.profile.name : user.username) + ' <small>@' + user.username + '</small>'+ (user.is_external ? " <span class='badge badge-warning'>external</span>" : "");
     }
 
     function formatUserSelection(user) {                

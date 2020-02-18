@@ -20,13 +20,6 @@
 @if (Title == "Notify") {
     <script id="@(User.IsAuthenticated() ? "signedInScript" : "signedOutScript")">
         $(function () {
-            var win = null;
-
-            if (window.opener) {
-                win = window.opener.parent;
-            }
-
-            var forced = win ? true : false;
 
             @if (User.IsAuthenticated()) {
                 <text>var message = { name: "signed-in" };</text>
@@ -34,9 +27,9 @@
                 <text>var message = { name: "signed-out" };</text>
             }
 
-            wvy.postal.post(message, win, forced);
+            wvy.postal.postToParent(message);
 
-            if (win != null) {
+            if (window.opener !== null) {
                 window.close();
             }
         });

@@ -1,0 +1,12 @@
+﻿@model User
+@{
+    var profiledata = Html.DisplayGroups(Model.Profile, exclude: new[] { nameof(Model.Avatar), nameof(Model.Profile.Name) })?.ToHtmlString();
+}
+
+@Html.Raw(profiledata)
+@if (Model.Email != null) {
+    <div class="display-group" data-type="string">
+        <label class="font-weight-bold">Email</label>
+        <div>@Html.DisplayFor(x => Model.Email)</div>
+    </div>
+}

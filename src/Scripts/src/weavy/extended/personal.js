@@ -60,7 +60,7 @@
          * @type {?Element}
          * @created Widget event: {@link Weavy#event:build}
          */
-        weavy.nodes.personalButtonConainer = null;
+        weavy.nodes.personalButtonContainer = null;
 
         /**
          * The actual button in the {@link personal#nodes#personalButtonContainer}
@@ -127,6 +127,19 @@
             weavy.nodes.personalFrame = null;
             weavy.nodes.personalButtonContainer = null;
             weavy.nodes.personalButton = null;
+        });
+
+        weavy.on("signed-in", function () {
+            var options = weavy.options.plugins[PLUGIN_NAME];
+            var panelOptions = weavy.extendDefaults(options, { url: null });
+
+            if (weavy.isAuthenticated() && weavy.plugins.dock) {
+                if (weavy.nodes.personalButtonContainer && panelOptions.title) {
+                    weavy.nodes.personalButtonContainer.querySelector(".weavy-button").setAttribute("data-name", panelOptions.title)
+                    weavy.nodes.personalButtonContainer.querySelector(".weavy-button-tooltip-text").innerText = panelOptions.title;
+                }
+            }
+
         });
 
         // Exports (not required)

@@ -138,7 +138,7 @@ wvy.editor = (function ($) {
                         },
                         index: 1,
                         template: function (item) {
-                            var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48x48-crop,both") + '" alt="" /><span>' + (item.name || item.username);
+                            var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" /><span>' + (item.name || item.username);
                             if (item.username) {
                                 html += ' <small>@' + item.username + '</small>';
                             }
@@ -185,11 +185,89 @@ wvy.editor = (function ($) {
                 }
 
                 if (!options.textonly) {
+                    // polls
+                    if (options.polls) {
+
+                        // add options button
+                        var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
+                        $optionsbutton.prependTo($buttoncontainer);
+
+                        // add options container
+                        var $options = $('<div class="poll-options"></div>');
+                        $options.insertBefore($buttoncontainer);
+
+                        // init existing poll
+                        var pollId = $textarea.data("editor-poll-id");
+                        if (pollId) {
+                            $.ajax({
+                                url: wvy.url.resolve("/a/posts/" + pollId),
+                                method: "GET"
+                            }).then(function (post) {
+                                if (post.poll) {
+                                    post.poll.options.map(function (option, index) {
+                                        var optIndexer = "opt_" + index;
+                                        var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
+                                            "<input type='hidden' name='options[" + optIndexer + "].Id'  value='" + option.id + "'/>" +
+                                            "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='+add an option' />" +
+                                            "</div>");
+                                        $options.append(opt);
+                                    });
+                                    $options.show();
+                                }
+                            });
+
+                        }
+
+
+                        // show options
+                        $wrapper.on("click", ".btn-poll", function (evt) {
+                            evt.preventDefault();
+
+                            // expand if minimized
+                            toggleMore(false);
+
+                            var options = $wrapper.find(".poll-options");
+
+                            if (!options.is(":visible")) {
+                                if (!options.find(".form-group").length) {
+                                    var optIndexer = "opt_" + randomNumber();
+                                    var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
+                                        "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
+                                        "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                        "</div>");
+                                    options.append(opt);
+                                }
+                                options.show();
+                                options.find("input:first").focus();
+
+                            } else {
+                                options.hide();
+                            }
+                        });
+
+                        // add option
+                        $wrapper.on("focus", ".poll-options input:last", function (evt) {
+                            var options = $(this).closest(".poll-options");
+                            var count = options.find(".form-group").length;
+                            if (count < 10) {
+                                var optIndexer = "opt_" + randomNumber();
+                                var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
+                                    "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
+                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                    "</div>");
+                                options.append(opt);
+                            }
+                        });
+                    }
+
                     // file upload
                     if (options.fileupload) {
                         // add file button
-                        var $file = $('<div class="btn-file btn btn-icon" title="Add files"><svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg><svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg><input type="file" name="files" multiple /></div>');
-                        $file.appendTo($buttoncontainer);
+                        var $file = $('<div class="btn-file btn btn-icon" title="Add files">' +
+                            //'<svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg>' +
+                            '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>' +
+                            '<input type="file" name="files" multiple /></div>');
+                        $file.prependTo($buttoncontainer);
 
                         // add upload container
                         var $uploads = $("<div class='uploads'><table class='table table-attachments'></table><div class='progress d-none'></div></div>");
@@ -278,7 +356,6 @@ wvy.editor = (function ($) {
 
                         // enable embeds
                         _emojiarea.on("keyup", function (evt) {
-                            var textarea = $el;
 
                             if (!embedAdded) {
 
@@ -352,130 +429,7 @@ wvy.editor = (function ($) {
                         })
                     }
 
-                    // polls
-                    if (options.polls) {
 
-                        // add options button
-                        var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
-                        $optionsbutton.appendTo($buttoncontainer);
-
-                        // add options container
-                        var $options = $('<div class="poll-options"></div>');
-                        $options.insertBefore($buttoncontainer);
-
-                        // init existing poll
-                        var pollId = $textarea.data("editor-poll-id");
-                        if (pollId) {
-                            $.ajax({
-                                url: wvy.url.resolve("/a/posts/" + pollId),
-                                method: "GET"
-                            }).then(function (post) {
-                                if (post.poll) {
-                                    post.poll.options.map(function (option, index) {
-                                        var optIndexer = "opt_" + index;
-                                        var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
-                                            "<input type='hidden' name='options[" + optIndexer + "].Id'  value='" + option.id + "'/>" +
-                                            "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='+add an option' />" +
-                                            "</div>");
-                                        $options.append(opt);
-                                    });
-                                    $options.show();
-                                }
-                            });
-
-                        }
-
-
-                        // show options
-                        $wrapper.on("click", ".btn-poll", function (evt) {
-                            evt.preventDefault();
-
-                            // expand if minimized
-                            toggleMore(false);
-
-                            var options = $wrapper.find(".poll-options");
-
-                            if (!options.is(":visible")) {
-                                if (!options.find(".form-group").length) {
-                                    var optIndexer = "opt_" + randomNumber();
-                                    var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
-                                        "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
-                                        "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
-                                        "</div>");
-                                    options.append(opt);
-                                }
-                                options.show();
-                                options.find("input:first").focus();
-
-                            } else {
-                                options.hide();
-                            }
-                        });
-
-                        // add option
-                        $wrapper.on("focus", ".poll-options input:last", function (evt) {
-                            var options = $(this).closest(".poll-options");
-                            var count = options.find(".form-group").length;
-                            if (count < 10) {
-                                var optIndexer = "opt_" + randomNumber();
-                                var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
-                                    "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
-                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
-                                    "</div>");
-                                options.append(opt);
-                            }
-                        });
-                    }
-                }
-
-                // add context button
-                if (options.context) {
-
-                    var $context = $('<div class="context">' +
-                        '<div class="context-data"><img class="context-icon" src=""/><span class="context-url"></span><a href="#" title="Remove context url" class="remove-context btn btn-icon"><svg class="i i-18 i-close-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.53 0 10 4.47 10 10s-4.47 10-10 10-10-4.47-10-10 4.47-10 10-10m3.59 5-3.59 3.59-3.59-3.59-1.41 1.41 3.59 3.59-3.59 3.59 1.41 1.41 3.59-3.59 3.59 3.59 1.41-1.41-3.59-3.59 3.59-3.59z"/></svg></a></div>' +
-                        '</div>');
-
-                    var $contextButton = $('<button type="button" class="context btn btn-icon btn-add-context" title="Embed current url as context"><svg class="i i-link-context" height="24" viewBox="0 0 24 24" width="24"><path d="m19 19h-14v-14h5l2-2h-7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7l-2 2zm-6.1-7.9c.3.3.3.8 0 1.1s-.8.3-1.1 0c-1.5-1.5-1.5-3.9 0-5.4l2.7-2.7c1.5-1.5 3.9-1.5 5.4 0s1.5 3.9 0 5.4l-1.1 1.1c0-.6-.1-1.2-.3-1.8l.4-.4c.9-.9.9-2.3 0-3.2s-2.3-.9-3.2 0l-2.7 2.7c-1 .8-1 2.3-.1 3.2zm2.2-3.2c.3-.3.8-.3 1.1 0 1.5 1.5 1.5 3.9 0 5.4l-2.7 2.7c-1.5 1.5-3.9 1.5-5.4 0s-1.5-3.9 0-5.4l1.1-1.1c0 .6.1 1.2.3 1.8l-.4.4c-.9.9-.9 2.3 0 3.2s2.3.9 3.2 0l2.7-2.7c.9-.9.9-2.3 0-3.2-.2-.4-.2-.8.1-1.1z"/></svg></button>');
-
-                    // Always hide context initially for comments
-                    if ($wrapper.closest(".section-comments").length) {
-                        $wrapper.closest("form").find("#contextUrl").attr("disabled", true);
-                        $context.hide();
-                    } else {
-                        $context.addClass("has-context");
-                        $contextButton.addClass("has-context");
-                    }
-
-                    $context.prependTo($wrapper);
-                    $contextButton.prependTo($buttoncontainer);
-
-                    $context.on("click", ".remove-context", function (e) {
-                        e.preventDefault();
-                        $wrapper.find(".context").removeClass("has-context");
-                        $context.find(".context-data").fadeOut(200);
-                        $context.slideUp(200);
-                        $wrapper.closest("form").find("#contextUrl").attr("disabled", true);
-                        hook("onContextChange", e, { hasContext: false });
-                    });
-
-                    $($contextButton).on("click", function (e) {
-                        e.preventDefault();
-                        $wrapper.find(".context").addClass("has-context");
-                        $wrapper.closest("form").find("#contextUrl").attr("disabled", false);
-                        $context.find(".context-data").fadeIn(200);
-                        $context.slideDown(200);
-                        hook("onContextChange", e, { hasContext: true });
-                    });
-                }
-
-                // add more button
-                if (options.minimized) {
-                    var $more = $('<button type="button" class="btn btn-icon btn-more" title="More"><svg class="i i-dots-horizontal-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10-10-4.48-10-10 4.48-10 10-10m0 8.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m-5.5 0c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m11 0c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/></svg></button>')
-                    $more.appendTo($buttoncontainer);
-                    $more.on("click", function (e) {
-                        e.preventDefault();
-                        $wrapper.toggleClass("minimized");
-                    });
                 }
 
                 // add submit button
@@ -490,9 +444,6 @@ wvy.editor = (function ($) {
                     e.preventDefault();
                     e.stopPropagation();
 
-                    $wrapper.find(".context").removeClass("has-context");
-                    $wrapper.find("div.context .context-data").fadeOut(200);
-                    $wrapper.find("div.context").slideUp(200);
                     toggleMore(true);
 
                     hook("onSubmit", e, { text: _emojiarea.getText(), wrapper: $wrapper, editor: _emojiarea });
@@ -561,7 +512,6 @@ wvy.editor = (function ($) {
         function destroy() {
             // Iterate over each matching element.            
             $el.each(function () {
-                var el = this;
                 var $el = $(this);
 
                 // Code to restore the element to its original state...                

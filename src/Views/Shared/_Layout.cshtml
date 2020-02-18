@@ -8,14 +8,16 @@
     @Html.ThemeHead()
     @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
     @RenderSection("styles", required: false)
-    @Bundler.Scripts("~/scripts/browser.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
-    @if (WeavyRequestContext.Current.Browser.Browser == "IE") {
+    <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @Bundler.Scripts("~/scripts/asap.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @if (WeavyContext.Browser.Browser == "IE") {
         @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     }
     @Bundler.Scripts("~/scripts/wvy.bundle", htmlAttributes: new { data_turbolinks_track = "reload", defer = "" })
     @RenderSection("scripts", required: false)
 </head>
 <body class="@BodyClasses("has-navbar" + (IsSectionDefined("navbar_secondary") ? " has-navbar-secondary" : ""))" @BodyAttributes>
+    <script>@Html.ContextInfo()@Html.UserSettings()</script>
     <nav class="navbar-theme fixed-top">
         <div class="navbar navbar-primary">
             @if (IsSectionDefined("navbar_left")) {
@@ -28,7 +30,7 @@
                     if (WeavyContext.Space != null) {
                         <button type="button" class="btn btn-icon" data-toggle="drawer" data-target="#drawer-space">@WeavyContext.Space.AvatarImg(24)</button>
                     } else {
-                        <a class="btn btn-icon d-embedded" href="@WeavyContext.ApplicationPath">@Svg.Icon("arrow-left")</a>
+                        <a class="btn btn-icon d-framed" href="@WeavyContext.ApplicationPath">@Svg.Icon("arrow-left")</a>
                         <a class="btn btn-icon d-standalone" href="@WeavyContext.ApplicationPath">@Html.IconImg(24)</a>
                     }
                 }
@@ -45,9 +47,15 @@
                 @RenderSection("navbar_right", required: false)
             } else {
                 <div class="navbar-icons">
-                    <button type="button" class="btn btn-icon d-standalone" data-toggle="drawer" data-target="#drawer-user">@User.AvatarImg(24)@Html.NotificationsBadge()</button>
-                    <button type="button" class="btn btn-icon d-embedded visibility-h">@Svg.Icon("expand-window")</button>
-                    <button type="button" class="btn btn-icon d-embedded visibility-h">@Svg.Icon("close")</button>
+                    <button type="button" class="btn btn-icon d-standalone" data-toggle="drawer" data-target="#drawer-user">@User.AvatarImg(24)
+                    @if (WeavyContext.Browser.Desktop) {
+                        @Html.TotalBadge()
+                    } else {
+                        @Html.NotificationsBadge()
+                    }
+                    </button>
+                    <button type="button" class="btn btn-icon d-framed visibility-h">@Svg.Icon("expand-window")</button>
+                    <button type="button" class="btn btn-icon d-framed visibility-h">@Svg.Icon("close")</button>
                 </div>
             }
         </div>

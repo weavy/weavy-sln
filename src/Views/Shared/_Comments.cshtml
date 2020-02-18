@@ -1,11 +1,13 @@
 ﻿@model IEnumerable<Comment>
+@{ 
+    var parent = ViewBag.Parent as IEntity;
+}
 
 @foreach (var comment in Model) {
     var creator = comment.CreatedBy();
-    var attachments = comment.Attachments();
-    var images = attachments.Where(x => FileHelper.IsWebImage(x.Blob.Name));
-    var files = attachments.Where(x => !FileHelper.IsWebImage(x.Blob.Name));
-    var context = comment.Embeds().FirstOrDefault(x => x.IsLink);
+    var attachments = comment.AttachmentIds.Any() ? comment.Attachments() : new List<Weavy.Core.Models.Attachment>();
+    var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
+    var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
 
     <div id="comment-@comment.Id" class="list-group-item comment" data-comment-id="@comment.Id" data-parent-id="@comment.Parent.Id" data-parent-entity="@comment.Parent.Type.ToString().ToLower()">
         <div class="media">
@@ -15,11 +17,11 @@
 
 
                 @if (images.Any()) {
-                    Html.RenderPartial("_ImageGrid", images);
+                    Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", parent } });
                 }
 
                 @if (files.Any()) {
-                    Html.RenderPartial("_Attachments", files);
+                    Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", parent } });
                 }
 
                 <div class="text-muted">
@@ -32,12 +34,6 @@
 
             </div>
             <div class="media-icons">
-
-                @if (context != null) {
-                    <a class="btn btn-icon" href="@context.OriginalUrl" target="_blank" title="Open in context - @context.OriginalUrl" data-context-url="@context.OriginalUrl" data-weavy-context-url="@comment.Url(absolute: true)" data-weavy-context-space="@comment.SpaceId">
-                        @Svg.Icon("open-in-new", size: 18)
-                    </a>
-                }
                 @Html.StarToggle(comment)
                 @{ Html.RenderPartial("_CommentMenu", comment); }
             </div>

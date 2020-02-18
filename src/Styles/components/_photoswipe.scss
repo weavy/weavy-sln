@@ -13,7 +13,7 @@ $pswp__error-text-color: $danger; // "Image not loaded" text color
     @include overscroll-behavior-contain;
 }
 
-html.embedded {
+html.framed {
     body {
         transition: background-color $md-animation-duration $md-animation-curve-default;
 
@@ -24,7 +24,7 @@ html.embedded {
 }
 
 
-html.embedded.pswp-transparent {
+html.framed.pswp-transparent {
     body {
         background-color: transparent;
         transition: none;

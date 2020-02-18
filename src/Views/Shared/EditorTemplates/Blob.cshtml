@@ -4,12 +4,10 @@
     var meta = ViewData.ModelMetadata;
     var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
     var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
-    var value = Model;
     bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
     bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
     bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
     bool remove = ViewData["Remove"] as bool? ?? true;
-    bool plain = ViewData["Plain"] as bool? ?? false;
     bool required = ViewData["Required"] as bool? ?? prop.IsRequired();
     string id = ViewData.TemplateInfo.GetFullHtmlFieldId("");
     string name = ViewData.TemplateInfo.GetFullHtmlFieldName("");
@@ -36,21 +34,15 @@
     }
 
     attrs["data-single-file-uploads"] = false;
-    attrs["data-url"] = WeavyRequestContext.Current.ApplicationPath + "a/blobs";
+    attrs["data-url"] = WeavyContext.ApplicationPath + "a/blobs";
 
     if (required) {
         attrs["required"] = null;
     }
-
-    string placeholder = meta.Watermark;
-    string thumb = null;
-    if (prop.PlaceholderImage() != null) {
-        placeholder = placeholder ?? "Choose image";
-        thumb = Url.Content(prop.PlaceholderImage());
-    } else {
-        placeholder = placeholder ?? "Choose file";
-    }
-
+    
+    string placeholder = meta.Watermark ?? "Choose file";
+    string placeholderImage = prop.PlaceholderImage() != null ? Url.Content(prop.PlaceholderImage()) : null;
+    string previewImage = prop.Name == nameof(IHasAvatar.Avatar) && ViewData.ModelMetadata.Container is IHasAvatar parent ? parent.AvatarUrl(size) : Model?.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both) ?? placeholderImage;
     string attributes = "";
     foreach (var attr in attrs) {
         attributes += " ";
@@ -70,46 +62,27 @@
 }
 
 <div class="file-upload" id="dz-@id">
-    <input type="hidden" name="@name" value="@(value != null ? value.Id.ToString() : "delete")" />
-    @if (plain) {
-        <div class="custom-file">
-            <input @Html.Raw(attributes.Trim()) />
-            <label class="custom-file-label custom-file-control" for="@id">@(value?.Name)</label>
-        </div>
-        <div class="progress invisible">
-            <div class="progress-bar" role="progressbar"></div>
-        </div>
-    } else if (thumb == null) {
-        var fmt = FileHelper.GetPreviewFormat(Model.Name);
-        var icon = FileHelper.GetIcon(Model.Name);
-        var imageUrl = (value != null && fmt == PreviewFormat.Image ? value.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both) : "");
+    <input type="hidden" name="@name" value="@(Model != null ? Model.Id.ToString() : "delete")" />
+    @if (placeholderImage != null) {
         <label class="custom-file custom-image">
-
-            <img class="img-@size @(fmt == PreviewFormat.Image ? "" : "d-none")" src="@imageUrl" data-thumb="" alt="" width="@size" height="@size" />
-
-            <span class="custom-icon @(fmt != PreviewFormat.Image ? "" : "d-none")">
-                @Svg.Icon(icon.Name, size: 96, color: icon.Color)
-            </span>
-
-            <input @Html.Raw(attributes.Trim()) />
-            <span class="custom-file-control">@(value?.Name)</span>
-        </label>
-        <div class="progress invisible">
-            <div class="progress-bar" role="progressbar"></div>
-        </div>
-    } else {
-        IHasAvatar avatarfor = ViewData["AvatarFor"] as IHasAvatar;
-        <label class="custom-file custom-image">
-            <img class="img-@size" src="@(value != null ? (avatarfor?.AvatarUrl(size, size) ?? value.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both)) : thumb)" data-thumb="@thumb" alt="" width="@size" height="@size" />
+            <img class="img-@size" src="@previewImage" data-thumb="@placeholderImage" alt="" width="@size" height="@size" />
             <span class="custom-file-label">@placeholder</span>
             <input @Html.Raw(attributes.Trim()) />
             <span class="progress invisible"><span class="progress-bar" role="progressbar"></span></span>
         </label>
+    } else {
+        <div class="custom-file">
+            <input @Html.Raw(attributes.Trim()) />
+            <label class="custom-file-label custom-file-control" for="@id">@(Model?.Name)</label>
+        </div>
+        <div class="progress invisible">
+            <div class="progress-bar" role="progressbar"></div>
+        </div>
     }
     <div class="invalid-feedback@(feedback != null ? " d-block" : "")">@feedback</div>
     <div class="form-text@(feedback != null ? " d-none" : "")">@description
     @if (remove) {
-        <a href="javascript:;" class="clear@(value == null ? " d-none" : "")">Remove @displayName.ToLower().</a>
+        <a href="javascript:;" class="clear@(Model == null ? " d-none" : "")">Remove @displayName.ToLower().</a>
     }
     </div>
 </div>

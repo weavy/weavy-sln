@@ -9,7 +9,7 @@
         @Html.HttpMethodOverride(HttpVerbs.Put)
         @Html.Hidden("back", Back)
         <div class="text-center">
-            @Html.EditorFor(x => x.Logo, additionalViewData: new { AvatarFor = WeavyRequestContext.Current.System })
+            @Html.EditorFor(x => x.Logo)
         </div>
         @Html.EditorsForModel()
         <div class="form-buttons">

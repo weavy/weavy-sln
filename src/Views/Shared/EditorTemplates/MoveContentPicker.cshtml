@@ -17,34 +17,42 @@
     }
 
     var source = ViewData["Source"] as Content;
-    var app = source?.App() as FilesApp;
+    var app = source?.App() as Files;
+
+    IEnumerable<Space> spaces = null;
+    IEnumerable<App> apps = null;
+}
+
+@* don't show other apps if embedded *@
+@if (!IsEmbedded) {
 
     // get spaces where we have content permission
-    var spaces = SpaceService.Search(new SpaceQuery() { Archived = false, Filter = true, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Content));
+    spaces = SpaceService.Search(new SpaceQuery() { Archived = false, Filter = true, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Content));
 
-    //  get FileApps for each space above
-    var apps = spaces.Select(s => AppService.GetApps<FilesApp>(s.Id).FirstOrDefault()).Where(a => a != null);
-}
+    // get Files apps for each space above
+    apps = spaces.Select(s => AppService.GetApps<Files>(s.Id).FirstOrDefault()).Where(a => a != null);
 
 
-@if (group) {
-    WriteLiteral(@"<div class=""form-group"">");
-}
-
-@if (label) {
-    <label for="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")">Space</label>
-}
-
-<select class="form-control custom-select app-picker" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")" name="AppId" data-content-picker="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
-    @foreach (var a in apps) {
-        <option value="@a.Id" @if (a.SpaceId == source?.SpaceId.Value) { <text> selected</text>}>@a.Space().Name</option>
+    if (group) {
+        WriteLiteral(@"<div class=""form-group"">");
     }
-</select>
 
-@if (group) {
-    WriteLiteral(@"</div>");
+    if (label) {
+        <label for="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")">Space</label>
+    }
+
+    <select class="form-control custom-select app-picker" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")" name="AppId" data-content-picker="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+        @foreach (var a in apps) {
+            <option value="@a.Id" @if (a.SpaceId == source?.SpaceId.Value) { <text> selected</text>}>@a.Space().Name</option>
+        }
+    </select>
+
+    if (group) {
+        WriteLiteral(@"</div>");
+    }
+} else {
+    <input type="hidden" name="AppId" value="@(WeavyContext?.App.Id)" />
 }
-
 
 @if (group) {
     WriteLiteral(@"<div class=""form-group"">");
@@ -60,7 +68,6 @@
     } else if (!spaces.IsNullOrEmpty()) {
         @Html.ContentPickerOptions(app)
     }
-
 </select>
 
 @if (feedback != null) {

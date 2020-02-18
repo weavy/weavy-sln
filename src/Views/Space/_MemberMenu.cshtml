@@ -25,7 +25,6 @@
 
         } else {
             // menu items for other space members
-            <a class="dropdown-item" href="@(Url.Action<Weavy.Web.Controllers.MessengerController>(c => c.GetConversationWithUser(Model.Id)))" data-role="messenger" target="_blank">@Svg.Icon("message-text") Message</a>
 
             if (Model.IsPending && WeavyContext.Space.HasPermission(Permission.ApproveMembers)) {
                 using (Html.BeginForm(nameof(SpaceController.ApproveMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {

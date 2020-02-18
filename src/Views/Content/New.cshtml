@@ -1,6 +1,6 @@
 ﻿@model Content
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
     Title = "New " + Model.MetaData().Name;
     Back = Url.Back(WeavyContext.Content.Url() ?? WeavyContext.App.Url());
     ViewData["turboform"] = true;

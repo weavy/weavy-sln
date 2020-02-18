@@ -1,9 +1,9 @@
 ﻿@{
-    if (WeavyRequestContext.Current.Content != null) {
-        Layout = "~/Views/Content/_Layout.cshtml";
-    } else if (WeavyRequestContext.Current.App != null) {
-        Layout = "~/Views/App/_Layout.cshtml";
-    } else if (WeavyRequestContext.Current.Space != null) {
+    if (WeavyContext.Current.Content != null) {
+        Layout = WeavyContext.Current.IsEmbedded ? "~/Views/Content/_Layout.Embedded.cshtml" : "~/Views/Content/_Layout.cshtml";
+    } else if (WeavyContext.Current.App != null) {
+        Layout = WeavyContext.Current.IsEmbedded ? "~/Views/App/_Layout.Embedded.cshtml" : "~/Views/App/_Layout.cshtml";
+    } else if (WeavyContext.Current.Space != null) {
         Layout = "~/Views/Space/_Layout.cshtml";
     } else {
         Layout = "~/Views/Shared/_Layout.cshtml";

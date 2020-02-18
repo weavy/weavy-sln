@@ -19,12 +19,6 @@
             @Svg.Icon("dots-vertical")
         </button>
         <div class="dropdown-menu dropdown-menu-right">
-            @if (isOther) {
-                <a class="dropdown-item d-desktop" href="@(Url.Action<Weavy.Web.Controllers.MessengerController>(c => c.GetConversationWithUser(Model.Id)))" data-role="messenger" target="_blank">@Svg.Icon("message-text", "light-blue") Message</a>
-                if (hasEdit || hasDeleteAndTrash) {
-                    <div class="dropdown-divider d-desktop"></div>
-                }
-            }
             @if (hasEdit) {
                 if (isSelf) {
                     <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))" data-target-panel="personal">@Svg.Icon("pencil", "primary") Edit</a>

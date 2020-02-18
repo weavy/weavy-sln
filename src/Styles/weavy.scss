@@ -2,7 +2,6 @@
 @import 'core';
 
 // additional components not in _core.scss
-@import 'components/context';
 @import 'components/embed';
 @import 'components/content';
 @import 'components/notification';
@@ -10,11 +9,6 @@
 @import 'components/poll';
 @import 'components/post';
 @import 'components/comment';
-@import 'components/widget';
-
-// Widget styles for widget-nav
-@import "widget/variables";
-@import "components/widgetnav";
 
 // Import app styles
 @import "../areas/apps/styles/apps";

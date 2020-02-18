@@ -1,7 +1,7 @@
 /// <reference path="../_core.scss" />
 
 @include media-breakpoint-down(xs) {
-    html:not(.embedded) {
+    html:not(.framed) {
         .container, .container-fluid {
             padding-left: #{$grid-gutter-width/2 + $edge-margin};
             padding-right: #{$grid-gutter-width/2 + $edge-margin};

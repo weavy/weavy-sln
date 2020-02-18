@@ -69,7 +69,7 @@
 }
 
 @include media-breakpoint-down(xs) {
-    html:not(.embedded) {
+    html:not(.framed) {
         .table {
             th, td {
                 &:first-child {
@@ -125,10 +125,14 @@ tr[data-href] {
     cursor: pointer;
 }
 
+// drag & drop
+tr.dragging-over {
+    background-color: $table-hover-bg;
+}
+
 .table-hover tbody tr:hover {
     transition: background-color linear 400ms;
 }
-
 
 // table with content in folder
 .table-content {
@@ -253,6 +257,7 @@ tr[data-href] {
         thead {
             display: table-header-group;
         }
+
         td:nth-child(4), th:nth-child(4) {
             display: table-cell;
         }
@@ -267,8 +272,6 @@ tr[data-href] {
             display: table-cell;
             width: 100%;
         }
-
-
     }
 }
 

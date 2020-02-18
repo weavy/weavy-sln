@@ -1,0 +1,6 @@
+﻿@model Messenger
+@{
+    Title = Model.Name;
+}
+
+<iframe class="content-iframe" style="height: calc(100vh - 6rem)" src="@(WeavyContext.ApplicationPath)e@(Url.Action<MessengerController>(c => c.Index(null)))" name="messenger-@Model.Id"></iframe>

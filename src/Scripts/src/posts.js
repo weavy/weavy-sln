@@ -19,87 +19,7 @@ wvy.posts = (function ($) {
         $("[data-editor-location='post-edit']").weavyEditor("destroy");
     });
 
-    // insert post
-    function insertPost(e, data, editor) {
-        e.preventDefault();
-        var $editor = $(editor);
-        var $form = $editor.closest("form");
-        var $button = $form.find("button[type='submit']");
-        data = $form.serializeObject();
-        var method = "POST";
-        var url = wvy.url.resolve($form.attr("action"));
-
-        // disable submit button
-        $button.prop("disabled", true);
-
-        // fix poll options for ajax post
-        var indices = data["options.Index"];
-
-        if (indices) {
-            if (!$.isArray(indices)) {
-                var optId = indices;
-                indices = [];
-                indices[0] = optId;
-            }
-
-            data["options"] = [];
-            indices.map(function (i, index) {
-                data["options"].push({ id: 0, text: data["options[" + i + "].Text"] })
-                delete data["options[" + i + "].Text"];
-                delete data["options[" + i + "].Id"];
-            });
-            delete data["options.Index"];
-        }
-
-        // make sure blobs is an array
-        if (data.blobs) {
-            if (!$.isArray(data.blobs)) {
-                var id = data.blobs;
-                data.blobs = [];
-                data.blobs[0] = id;
-            }
-        }
-
-        // insert temporary post
-        var $container = $(".posts");
-        $("<div class='card post fake-post'>" +
-            "<div class='card-header media'>" +
-            "<div class='fake-user'></div>" +
-            "<div class='media-title'><div class='fake-text fake-text-50'></div>" +
-            "<div class='fake-text fake-text-25'></div></div>" +
-            "</div>" +
-            "<div class='card-body'>" +
-            "<div class='fake-text'></div>" +
-            "<div class='fake-text fake-text-50'></div>" +
-            "<div class='fake-text fake-text-75'></div>" +
-            "</div>" +
-            "</div> ").prependTo($container);
-
-        // reset form
-        $form.removeClass("is-invalid");
-        $editor.weavyEditor('reset');
-
-        // insert post
-        $.ajax({
-            contentType: "application/json; charset=utf-8",
-            type: method || "POST",
-            url: url,
-            data: JSON.stringify(data)
-        }).then(function (post) {
-            // NOTE: insert from rtm for now, see if we can find a better/faster solution later
-
-            // reset form
-            $editor.weavyEditor('reset');
-        }).fail(function () {
-            $form.addClass("is-invalid");
-
-            $(".fake-post").remove();
-        }).always(function () {
-            $button.prop("disabled", false);
-        });
-    }
-
-    // update post feedback partial view
+    // populate feedback modal with fresh data
     function updateFeedback(id) {
         var $post = $("[data-post-id='" + id + "']");
         if (!$post.length) return;
@@ -153,7 +73,6 @@ wvy.posts = (function ($) {
 
         // REVIEW: show spinner during ajax call?
         wvy.api.like("post", id).then(function () {
-            var $post = $el.closest(".post");
             updateFeedback(id);
         });
     });
@@ -166,7 +85,6 @@ wvy.posts = (function ($) {
 
         // REVIEW: show spinner during ajax call?
         wvy.api.unlike("post", id).then(function () {
-            var $post = $el.closest(".post");
             updateFeedback(id);
         });
     });
@@ -220,8 +138,7 @@ wvy.posts = (function ($) {
     });
 
     // rtm post
-    wvy.realtime.on("post-inserted.weavy", function (e, post) {
-        var uid = post.createdBy.id;
+    wvy.connection.default.on("post-inserted.weavy", function (e, post) {
 
         // do nothing of we are displaying another space
         if (wvy.context.space !== post.spaceId) {
@@ -234,8 +151,13 @@ wvy.posts = (function ($) {
             return;
         }
 
+        // do nothing if .sending
+        if ($(".post-form").hasClass("sending")) {
+            return;
+        }
+
         // do nothing if already exists
-        var $post = $("div[data-type=post][data-id='" + post.id + "']", $posts);
+        var $post = $(".post[data-post-id=" + post.id + "]", $posts);
         if ($post.length) {
             return;
         }
@@ -244,27 +166,22 @@ wvy.posts = (function ($) {
         $.ajax({
             contentType: "application/json; charset=utf-8",
             type: "GET",
-            url: wvy.url.resolve("/posts/" + post.id)
+            url: wvy.url.resolve((wvy.context.embedded ? "/e": "") + "/posts/" + post.id)
         }).then(function (post) {
-            // remove fake post if rtm post created by current user
-            if (wvy.context.user === uid) {
-                $(".fake-post:last", $posts).remove()
-            }
-
             $(post).prependTo($posts);
         });
 
     });
 
     // rtm like post
-    wvy.realtime.on("like.weavy", function (e, liked) {
+    wvy.connection.default.on("like.weavy", function (e, liked) {
         if (liked.type === 'post') {
             updateFeedback(liked.id);
         }
     });
 
     // rtm unlike post
-    wvy.realtime.on("unlike.weavy", function (e, unliked) {
+    wvy.connection.default.on("unlike.weavy", function (e, unliked) {
         if (unliked.type === 'post') {
             updateFeedback(unliked.id);
         }
@@ -413,7 +330,6 @@ wvy.posts = (function ($) {
     });
 
     return {
-        insert: insertPost,
         updateFeedback: updateFeedback
     }
 })(jQuery);

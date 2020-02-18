@@ -1,0 +1,5 @@
+﻿# scripts loaded asap
+~/scripts/src/browser.js
+~/scripts/src/scrollbar.js
+~/scripts/vendor/jquery/jquery.min.js
+~/scripts/src/postal.js

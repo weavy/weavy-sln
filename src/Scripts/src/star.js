@@ -41,9 +41,9 @@ wvy.stars = (function ($) {
         $(this).parents(".show").children("[data-toggle=dropdown]").dropdown("toggle");
     });
 
-    if (wvy.realtime) {
+    if (wvy.connection) {
         // respond to realtime star event
-        wvy.realtime.on("star.weavy", function (e, data) {
+        wvy.connection.default.on("star.weavy", function (e, data) {
             
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").addClass("on").removeClass("d-none").attr("title", "Unstar");
 
@@ -65,7 +65,7 @@ wvy.stars = (function ($) {
         });
 
         // respond to realtime unstar event
-        wvy.realtime.on("unstar.weavy", function (e, data) {            
+        wvy.connection.default.on("unstar.weavy", function (e, data) {            
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").removeClass("on").attr("title", "Star");
         });
     }

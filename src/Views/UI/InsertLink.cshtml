@@ -54,14 +54,14 @@
                 <section class="attachments d-flex flex-wrap">
 
                     @foreach (var file in attachments) {
-                        <div class="card mr-1 mb-1" style="width: 96px;" data-url="@file.FileUrl()" data-text="@file.Name">
+                        <div class="card mr-1 mb-1" style="width: 96px;" data-url="@file.ContentUrl()" data-text="@file.Name">
                             <a href="javascript:;"><img alt="" src="@file.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" /></a>
                             <div class="card-block p-1">
                                 <a href="javascript:;" title="@file.Name"><small>@file.Name.Ellipsis(10)</small></a>
                                 <div class="meta">
                                     @file.Description
                                 </div>
-                                <div class="meta"><small>@FileHelper.FileSizeAsString(file.Blob.Size)</small></div>
+                                <div class="meta"><small>@FileUtils.FileSizeAsString(file.Blob.Size)</small></div>
                             </div>
                         </div>
                     }

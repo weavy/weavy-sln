@@ -11,8 +11,6 @@ wvy.bubbles = (function ($) {
     // * url - optional url to open up in the space
     //-------------------------------------------------------
     function open(spaceId, destination) {
-        console.debug("opening space bubble");
-
         requestOpen(spaceId, destination);
 
         return $.ajax({
@@ -24,20 +22,16 @@ wvy.bubbles = (function ($) {
     }
 
     function requestOpen(requestId, destination) {
-        if (wvy.browser.embedded) {
-            console.log("requesting panel open", requestId, destination);
-
+        if (wvy.browser.framed) {
             if (typeof requestId === 'number') {
-                wvy.postal.post({ name: 'request:open', spaceId: requestId, destination: destination });
+                wvy.postal.postToParent({ name: 'request:open', spaceId: requestId, destination: destination });
             } else {
-                wvy.postal.post({ name: 'request:open', panelId: requestId, destination: destination });
+                wvy.postal.postToParent({ name: 'request:open', panelId: requestId, destination: destination });
             }
         }
     }
 
     function close(bubbleId) {
-        console.debug("closing space bubble");
-
         return $.ajax({
             url: "/a/bubble/" + bubbleId,
             type: "DELETE",
@@ -52,15 +46,23 @@ wvy.bubbles = (function ($) {
 
     document.addEventListener("turbolinks:before-render", function (e) {
 
-        var $body = $(e.data.newBody);
-        var $oldBody = $("body");
-        var currentSpaceId = parseInt($oldBody.get(0).getAttribute("data-space"));
-        var newSpaceId = parseInt($body.data("space"));
-        var wasSignedOut = parseInt($oldBody.get(0).getAttribute("data-user"), 10) === -1;
+        // try to locate wvy.context.space in new body
+        var newSpaceId = null;
+        var scripts = e.data.newBody.querySelectorAll("script");
+        for (var i = 0; i < scripts.length; i++) {
+            var script = scripts[0].textContent;
+            var match = script.match(/wvy\.context=\{.*space:(\d+)/);
+            if (match) {
+                newSpaceId = parseInt(match[1]);
+                break;
+            }
+        }
 
-        if (!wvy.browser.embedded) {
+        console.debug("newSpaceId", newSpaceId);
+
+        if (!wvy.browser.framed) {
             // Open bubble on page load
-            if (newSpaceId && newSpaceId !== currentSpaceId) {
+            if (newSpaceId && newSpaceId !== wvy.context.space) {
                 open(newSpaceId);
             }
             return;
@@ -68,13 +70,14 @@ wvy.bubbles = (function ($) {
 
 
         // Intercept global search
-        var urlBase = $body.data("path").indexOf("http") === 0 ? $body.data("path") : document.location.origin + $body.data("path");
+        var urlBase = wvy.config.applicationPath.indexOf("http") === 0 ? wvy.config.applicationPath : document.location.origin + wvy.config.applicationPath;
         var redirSpaceId = visitUrl && visitUrl.indexOf(urlBase + "search") === 0 ? -1 : newSpaceId;
 
-        if (!wasSignedOut && redirSpaceId && newSpaceId !== currentSpaceId) {
+        var wasSignedOut = wvy.context.user === -1;
+        if (!wasSignedOut && redirSpaceId && newSpaceId !== wvy.context.space) {
 
             if (redirSpaceId === -1) {
-                if (currentSpaceId > 0) {
+                if (wvy.context.space > 0) {
                     requestOpen("start", visitUrl);
                 } else {
                     requestOpen("start");
@@ -85,16 +88,19 @@ wvy.bubbles = (function ($) {
                 open(newSpaceId, visitUrl);
             }
 
-            // update 
-            $body.html($oldBody.html());
 
-            // transfer attributes
-            $body.removeAttr("data-space"); // remove data-space since it's note present on all views
-            $.each($oldBody.get(0).attributes, function (i, attrib) {
-                $body.attr(attrib.name, attrib.value);
-            });
+            // keep old body          
+            var $oldBody = $("body");
+            var $newBody = $(e.data.newBody);
+            $newBody.html($oldBody.html());
 
-            e.data.newBody = $body[0];
+            // REVIEW: is this needed?
+            //// transfer attributes
+            //$.each($oldBody.get(0).attributes, function (i, attrib) {
+            //    $newBody.attr(attrib.name, attrib.value);
+            //});
+
+            e.data.newBody = $newBody[0];
 
             visitUrl = null;
         }
@@ -104,11 +110,12 @@ wvy.bubbles = (function ($) {
     $(document).on("click", "[data-remove-bubble]", function (e) {
         e.preventDefault();
         e.stopPropagation();
+
         var removeBubble = $(this).data("removeBubble");
         if (removeBubble) {
             close(removeBubble.bubbleId).done(function (data) {
-                if ($("body").data("path") && removeBubble.spaceId === $("body").data("space")) {
-                    wvy.turbolinks.visit($("body").data("path"));
+                if (wvy.config.applicationPath && removeBubble.spaceId === wvy.context.space) {
+                    wvy.turbolinks.visit(wvy.config.applicationPath);
                 }
             });
         }
@@ -134,7 +141,7 @@ wvy.bubbles = (function ($) {
 
                 var $dropdownItem = $('<div class="dropdown-item weavy-bubble-item">')
                     .addClass("weavy-bubble-" + data.spaceId)
-                    .addClass(data.spaceId === $("body").data("space") ? "active" : "")
+                    .addClass(data.spaceId === wvy.context.space ? "active" : "")
                     .attr("data-bubble-id", data.bubbleId)
                     .attr("data-href", data.url)
                     .append('<img class="avatar img-24" src="' + data.icon + '" />')
@@ -161,7 +168,7 @@ wvy.bubbles = (function ($) {
 
                 var $bubble = $('<div class="weavy-bubble-item block-link" data-type="personal">')
                     .addClass("weavy-bubble-" + data.spaceId)
-                    .addClass(data.spaceId === $("body").data("space") ? "active" : "")
+                    .addClass(data.spaceId === wvy.context.space ? "active" : "")
                     .attr("data-bubble-id", data.bubbleId)
                     .attr("data-id", data.spaceId)
                     .attr("data-href", data.url)
@@ -191,12 +198,10 @@ wvy.bubbles = (function ($) {
 
     $(function () {
         // Open current space bubble on page ready
-        if (!wvy.browser.embedded) {
+        if (!wvy.browser.framed) {
             // Open bubble
-            var $body = $("body");
-            var newSpaceId = $body.data("space");
-            if (newSpaceId) {
-                open(newSpaceId);
+            if (wvy.context.space) {
+                open(wvy.context.space);
             }
 
             // Bind Alt+W to navbar-menu
@@ -212,19 +217,19 @@ wvy.bubbles = (function ($) {
 
     });
 
-    if (wvy.realtime) {
-        wvy.realtime.on("bubble-added.weavy", function (e, data) {
+    if (wvy.connection) {
+        wvy.connection.default.on("bubble-added.weavy", function (e, data) {
             addBubble(data);
         });
 
-        wvy.realtime.on("bubble-removed.weavy", function (e, data) {
+        wvy.connection.default.on("bubble-removed.weavy", function (e, data) {
             removeBubble(data);
         });
 
-        wvy.realtime.on("space-trashed.weavy", function (e, data) {
+        wvy.connection.default.on("space-trashed.weavy", function (e, data) {
             removeBubble({ spaceId: data.id }, true);
-            if ($("body").data("path") && data.id === $("body").data("space")) {
-                wvy.turbolinks.visit($("body").data("path"));
+            if (wvy.config.applicationPath && data.id === wvy.context.space) {
+                wvy.turbolinks.visit(wvy.config.applicationPath);
             }
         })
     }

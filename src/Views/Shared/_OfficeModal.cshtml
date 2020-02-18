@@ -1,5 +1,11 @@
 ﻿@if (WeavyContext.App.HasPermission(Permission.Content)) {
-    var action = WeavyContext.Content != null ? Url.Action<ContentController>(c => c.InsertFile(null, WeavyContext.Content.Id, null, null)) : Url.Action<ContentController>(c => c.InsertFile(WeavyContext.App.Id, null, null, null));
+    string action = null;
+    if (WeavyContext.Content != null) {
+        action = Url.Action<ContentController>(c => c.InsertFile(null, WeavyContext.Content.Id, null, null));
+    } else {
+        action = Url.Action<ContentController>(c => c.InsertFile(WeavyContext.App.Id, null, null, null));
+    }
+
     <div class="modal" id="filename-dialog" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

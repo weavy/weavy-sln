@@ -119,7 +119,7 @@ tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
                 },
                 index: 1,
                 template: function (item) {
-                    return '<img class="avatar-24" src="' + item.thumb_url.replace('{options}', '24x24-crop,both') + '" alt="" /><span><span>' + (item.name || item.username) + ' <small> @' + item.username + '</small></span>'
+                    return '<img class="avatar-24" src="' + item.thumb_url.replace('{options}', '24') + '" alt="" /><span><span>' + (item.name || item.username) + ' <small> @' + item.username + '</small></span>'
                 },
                 replace: function (mention) {
                     return '<a class="' + mention.type + '" href="' + mention.url + '">@' + mention.username + '</a>';
@@ -155,7 +155,7 @@ tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
                     });
                 },
                 template: function (item) {
-                    return '<img class="avatar-24" src="' + wvy.url.thumb(item.thumb_url, "24x24-crop,both") + '" alt="" /><span>' + item.title + '</span><small> - ' + item.type + '</small>';
+                    return '<img class="avatar-24" src="' + wvy.url.thumb(item.thumb_url, "24") + '" alt="" /><span>' + item.title + '</span><small> - ' + item.type + '</small>';
 
                 },
                 replace: function (item) {

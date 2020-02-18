@@ -1,7 +1,7 @@
 ﻿@model Weavy.Web.Models.VersionsModel
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Title = Model.Content.Name ?? "Untitled";
+    Layout = IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+    Title = "Versions";
     Back = Model.Content.Url();
     var edit = Model.Content.HasPermission(Permission.Edit);
 }

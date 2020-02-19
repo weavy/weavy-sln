@@ -34,7 +34,9 @@
                     <a class="dropdown-item" href="@Model.Url()/edit" data-toggle="modal" data-target="#upsert-content-modal" data-param="@Model.ContentGuid" data-path="@Model.Url()/edit" data-title="Edit @Model.MetaData().Name">@Svg.Icon("pencil", "primary")<span>Edit</span></a>
                 }
             }
-            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-content-modal" data-path="@(Url.Action<ContentController>(c => c.MoveModal(Model.Id)))" title="Move @Model.Kind()">@Svg.Icon("undo", "warning") Move</button>
+            if (!IsEmbedded) {
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#move-content-modal" data-path="@(Url.Action<ContentController>(c => c.MoveModal(Model.Id)))" title="Move @Model.Kind()">@Svg.Icon("undo", "warning") Move</button>
+            }
         }
 
         @if (Model is IStarrable starrable) {

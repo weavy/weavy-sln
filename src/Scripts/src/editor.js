@@ -188,9 +188,9 @@ wvy.editor = (function ($) {
                         // link strategy
                         match: /\[([^\]]+)$/,
                         search: function (term, callback) {
-                            var url = wvy.url.resolve("/a/autocomplete")
+                            var url = wvy.url.resolve("/a/autocomplete");
                             if (wvy.context.space > 0) {
-                                url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete")
+                                url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete");
                             }
                             $.getJSON(url, { q: term, top: top }).done(function (resp) {
                                 callback(resp);

@@ -3448,6 +3448,7 @@
     <Content Include="Scripts\src\dropdown.js" />
     <Content Include="Scripts\src\editor.js" />
     <Content Include="Scripts\src\emoji.js" />
+    <Content Include="Scripts\src\emojionearea\emojionearea.js" />
     <Content Include="Scripts\src\fab.js" />
     <Content Include="Scripts\src\filebrowser.js" />
     <Content Include="Scripts\src\fileupload.js" />
@@ -3539,7 +3540,6 @@
     <Content Include="Scripts\vendor\commonmark\commonmark.min.js" />
     <Content Include="Scripts\vendor\corejs-typeahead\typeahead.jquery.min.js" />
     <Content Include="Scripts\vendor\emojione\emojione.js" />
-    <Content Include="Scripts\vendor\emojionearea\emojionearea.min.js" />
     <Content Include="Scripts\vendor\expanding-textareas\expanding.jquery.js" />
     <Content Include="Scripts\vendor\jquery\jquery.min.js" />
     <Content Include="Scripts\vendor\jquery-textcomplete\jquery.textcomplete.min.js" />

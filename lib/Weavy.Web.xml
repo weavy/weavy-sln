@@ -2095,6 +2095,15 @@
             <param name="top"></param>
             <returns>A <see cref="T:System.Collections.Generic.IEnumerable`1"/> with the results from the search.</returns>
         </member>
+        <member name="M:Weavy.Web.Api.Controllers.SearchController.SpaceAutocomplete(System.Int32,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Returns autocomplete suggestions for quicklinks in the specified space.
+            </summary>
+            <param name="id">Space id</param>
+            <param name="q"></param>
+            <param name="top"></param>
+            <returns>A <see cref="T:System.Collections.Generic.IEnumerable`1"/> with the results from the search.</returns>
+        </member>
         <member name="M:Weavy.Web.Api.Controllers.SearchController.AutocompleteUsers(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
             <summary>
             Returns user autocomplete suggestions for the specified query.

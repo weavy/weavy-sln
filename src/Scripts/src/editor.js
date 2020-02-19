@@ -5,7 +5,6 @@ wvy.editor = (function ($) {
 
     var pluginName = 'weavyEditor';
 
-
     /**
      * WeavyEditor object constructor.
      * Implements the Revealing Module Pattern.
@@ -21,6 +20,31 @@ wvy.editor = (function ($) {
 
         // Extend default options with those supplied by user.
         options = $.extend({}, $.fn[pluginName].defaults, options);
+
+        // Convert base64 encoded data to Blob 
+        function b64toBlob(b64Data, contentType, sliceSize) {
+            contentType = contentType || '';
+            sliceSize = sliceSize || 512;
+
+            var byteCharacters = atob(b64Data);
+            var byteArrays = [];
+
+            for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                var byteArray = new Uint8Array(byteNumbers);
+
+                byteArrays.push(byteArray);
+            }
+
+            var blob = new Blob(byteArrays, { type: contentType });
+            return blob;
+        }
 
         /**
          * Initialize plugin.
@@ -45,7 +69,7 @@ wvy.editor = (function ($) {
                     spellcheck: true,
                     autocomplete: "on",
                     autocorrect: "on",
-                    autocapitalize: "on"                    
+                    autocapitalize: "on"
                 },
                 buttonTitle: "Insert emoji",
                 container: $wrapper,
@@ -126,6 +150,7 @@ wvy.editor = (function ($) {
                         match: noPrefix ? /((@[a-zA-Z0-9_]+)|([a-zA-Z0-9_]+))$/ : /\B@([a-zA-Z0-9_]+)$/,
                         search: function (term, callback) {
 
+                            // TODO: we should probably only search users in the current space
                             $.getJSON(wvy.url.resolve("/a/autocomplete/mentions"), {
                                 q: term,
                                 top: 5
@@ -151,8 +176,8 @@ wvy.editor = (function ($) {
                         cache: false
 
                     }], {
-                            maxCount: 10, zIndex: 10000, listPosition: null, placement: "top"
-                        });
+                        maxCount: 10, zIndex: 10000, listPosition: null, placement: "top"
+                    });
                 }
 
                 // quicklinks
@@ -162,9 +187,12 @@ wvy.editor = (function ($) {
                     _emojiarea.editor.textcomplete([{
                         // link strategy
                         match: /\[([^\]]+)$/,
-
                         search: function (term, callback) {
-                            $.getJSON(wvy.url.resolve("/a/autocomplete"), { q: term, top: top }).done(function (resp) {
+                            var url = wvy.url.resolve("/a/autocomplete")
+                            if (wvy.context.space > 0) {
+                                url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete")
+                            }
+                            $.getJSON(url, { q: term, top: top }).done(function (resp) {
                                 callback(resp);
                             }).fail(function () {
                                 callback([]);
@@ -180,8 +208,8 @@ wvy.editor = (function ($) {
                         },
                         cache: false
                     }], {
-                            maxCount: 10, zIndex: 10000, placement: "top"
-                        });
+                        maxCount: 10, zIndex: 10000, placement: "top"
+                    });
                 }
 
                 if (!options.textonly) {
@@ -266,7 +294,7 @@ wvy.editor = (function ($) {
                         var $file = $('<div class="btn-file btn btn-icon" title="Add files">' +
                             //'<svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg>' +
                             '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>' +
-                            '<input type="file" name="files" multiple /></div>');
+                            '<input type="file" name="files" accept="' + options.accept + '" multiple /></div>');
                         $file.prependTo($buttoncontainer);
 
                         // add upload container
@@ -281,8 +309,33 @@ wvy.editor = (function ($) {
                             paramName: "blobs",
                             singleFileUploads: false,
                             add: function (e, data) {
-                                // TODO: add logic here to prevent upload of certain files?                            
-                                data.submit();
+                                // check if we allow the added file(s) to be uploaded
+                                var errors = [];
+                                $.each(data.files, function (index, file) {
+                                    // accepted file types for this field
+
+                                    if (errors.length === 0 && options.accept && options.accept.length && file["name"].length) {
+                                        var pattern = options.accept.split(",").join("|");
+                                        var rx = new RegExp("(" + pattern + ")$", "i");
+                                        if (!rx.test(file["name"])) {
+                                            errors.push("File type is not allowed.");
+                                        }
+                                    }
+
+                                    // maximum file size (global)
+                                    if (errors.length === 0 && wvy.config.maxUploadSize) {
+                                        var fs = parseInt(file["size"]);
+                                        if (fs > parseInt(wvy.config.maxUploadSize)) {
+                                            errors.push("The file is too big.");
+                                        }
+                                    }
+                                });
+
+                                if (errors.length > 0) {
+                                    console.error(errors.join("\n"));
+                                } else {
+                                    data.submit();
+                                }
                             },
                             start: function (e) {
                                 // disable submit button while upload in progress
@@ -324,14 +377,29 @@ wvy.editor = (function ($) {
                         $wrapper.on("click", ".table-attachments .remove", function (e) {
                             e.preventDefault();
                             $(this).closest("tr").remove();
-                        })
+                        });
+
+                        // handle pasted image
+                        _emojiarea.on("pasteImage", function (editor, data, html) {
+                            var file = data.dataURL;
+                            var block = file.split(";");
+                            // get the content type of the image
+                            var contentType = block[0].split(":")[1];// In this case "image/gif"
+                            // get the real base64 content of the file
+                            var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
+                            // convert it to a blob to upload
+                            var blob = b64toBlob(realData, contentType);
+                            var fileOfBlob = new File([blob], data.name, { type: contentType });
+                            $wrapper.fileupload('add', { files: fileOfBlob });
+                        });
+
                     }
 
                     // embeds                
 
                     // init existing embeds
                     var embedIds = $textarea.data("editor-embed-ids");
-                    
+
                     if (embedIds || options.embeds) {
                         var $embeds = $("<div class='embeds'/>");
                         $embeds.appendTo($wrapper);
@@ -615,6 +683,7 @@ wvy.editor = (function ($) {
     // passing an object literal, or after initialization:
     // $('#el').weavyEditor('option', 'key', value);
     $.fn[pluginName].defaults = {
+        accept: '', // accepted file types, i.e. '.gif,.png,.jpg,.svg'
         emojis: true,
         mentions: true,
         quicklinks: true,

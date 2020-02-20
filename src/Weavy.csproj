@@ -3375,12 +3375,12 @@
     <Content Include="img\icons\undo.svg" />
     <Content Include="img\icons\upload.svg" />
     <Content Include="img\icons\upload-network.svg" />
-    <Content Include="img\icons\weavy.svg" />
-    <Content Include="img\icons\weavy-messenger.svg" />
-    <Content Include="img\icons\webhook.svg" />
     <Content Include="img\icons\video.svg" />
     <Content Include="img\icons\view-grid.svg" />
     <Content Include="img\icons\view-module.svg" />
+    <Content Include="img\icons\weavy.svg" />
+    <Content Include="img\icons\weavy-messenger.svg" />
+    <Content Include="img\icons\webhook.svg" />
     <Content Include="img\icons\windows.svg" />
     <Content Include="img\icons\wrench.svg" />
     <Content Include="img\icons\zip-box.svg" />
@@ -3511,9 +3511,6 @@
     <Content Include="Scripts\src\weavy\weavy.js" />
     <Content Include="Scripts\src\weavy-notifications.js" />
     <Content Include="Scripts\src\weavy-personal.js" />
-    <Content Include="Scripts\weavy.bundle" />
-    <Content Include="Scripts\weavy-extended.bundle" />
-    <Content Include="Scripts\weavy-libs.bundle" />
     <Content Include="Scripts\vendor\bluebird\bluebird.core.min.js" />
     <Content Include="Scripts\vendor\blueimp-file-upload\jquery.fileupload.js" />
     <Content Include="Scripts\vendor\blueimp-file-upload\jquery.ui.widget.js" />
@@ -3754,6 +3751,9 @@
     <Content Include="Scripts\vendor\twitter-text\punycode.js" />
     <Content Include="Scripts\vendor\twitter-text\twitter-text.js" />
     <Content Include="Scripts\vendor\underscore\underscore-min.js" />
+    <Content Include="Scripts\weavy.bundle" />
+    <Content Include="Scripts\weavy-extended.bundle" />
+    <Content Include="Scripts\weavy-libs.bundle" />
     <Content Include="Scripts\wvy.bundle" />
     <Content Include="Styles\_bootstrap.scss" />
     <Content Include="Styles\_core.scss" />
@@ -3909,7 +3909,6 @@
     <Content Include="Styles\utilities\_position.scss" />
     <Content Include="Styles\utilities\_scroll.scss" />
     <Content Include="Styles\utilities\_text.scss" />
-    <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\vendor\bootstrap\bootstrap-grid.scss" />
     <Content Include="Styles\vendor\bootstrap\bootstrap-reboot.scss" />
     <Content Include="Styles\vendor\bootstrap\bootstrap.scss" />
@@ -4107,6 +4106,7 @@
     <Content Include="Styles\vendor\select2\theme\default\layout.scss" />
     <Content Include="Styles\vendor\select2\theme\default\_multiple.scss" />
     <Content Include="Styles\vendor\select2\theme\default\_single.scss" />
+    <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\widget.scss" />
     <Content Include="Styles\widget\_alert.scss" />
     <Content Include="Styles\widget\_avatars.scss" />
@@ -4124,7 +4124,6 @@
     <Content Include="Styles\widget\_preview.scss" />
     <Content Include="Styles\widget\_variables.scss" />
     <Content Include="Styles\widget\_wide.scss" />
-    <Content Include="Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\_Navbar.cshtml" />
     <Content Include="Views\Account\AddWindows.cshtml" />
@@ -4350,6 +4349,7 @@
     <Content Include="Views\WeavyClient\Index.cshtml" />
     <Content Include="Views\WeavyClient\Ping.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\Startup.cs" />

@@ -41,13 +41,13 @@
                 if (typeof value === "string") {
                     try {
                         return JSON.parse(value);
-                    } catch (e) { }
+                    } catch (e) { /* Ignore catch */ }
                 }
                 return value;
             });
 
             return callback.apply(callbackThis, args);
-        }
+        };
     }
 
     var connections = this;
@@ -61,6 +61,8 @@
          *  @lends WeavyConnection#
          */
         var weavyConnection = this;
+
+        var initialized = false;
 
         var connectionUrl = "/signalr";
         var connectionDomain = window.location.origin;
@@ -129,22 +131,25 @@
         // force: if to connect event if the user is not logged in
         //----------------------------------------------------------
         function init(connectAfterInit) {
+            if (!initialized) {
+                initialized = true;
+                console.debug("wvy.connection: init", connectionDomain, connectAfterInit ? "and connect" : "");
 
-            console.debug("wvy.connection: init", connectionDomain, connectAfterInit && "and connect");
+                initUserId();
 
-            initUserId();
+                wvy.postal.whenLeader.then(function () {
+                    console.log("connection postal is leader, let's go");
+                    broadcastingConnection = false;
+                    whenLeaderElected.resolve(true);
+                    connectionStart();
+                }, function () {
+                    broadcastingConnection = true;
+                    whenLeaderElected.resolve(false);
+                });
 
-            wvy.postal.whenLeader.then(function () {
-                console.log("connection postal is leader, let's go");
-                broadcastingConnection = false;
-                whenLeaderElected.resolve(true);
-                connectionStart();
-            }, function () {
-                broadcastingConnection = true;
-                whenLeaderElected.resolve(false);
-            });
+                wvy.postal.on("broadcast", onBroadcastMessageReceived);
 
-            wvy.postal.on("broadcast", onBroadcastMessageReceived);
+            }
 
             if (userId || connectAfterInit) {
                 // connect to the server?
@@ -195,7 +200,7 @@
                         return Promise.resolve();
                     }).catch(function () {
                         return Promise.resolve();
-                    })
+                    });
                 } catch (e) {
                     return Promise.resolve();
                 }
@@ -209,8 +214,8 @@
                 explicitlyDisconnected = false;
                 disconnect(true, false).then(function () {
                     connect().then(resolve);
-                })
-            })
+                });
+            });
         }
 
         function status() {
@@ -236,60 +241,60 @@
 
             var whenInvoked = new Promise(function (resolve, reject) {
 
-                if (status() === states.connecting || status() === states.connected && !broadcastingConnection) {
-                    console.debug("wvy.connection: invoke as leader", hub, args[0]);
-                    var proxy = hubProxies[hub];
+                whenLeaderElected.then(function (leader) {
+                    if (leader) {
 
-                    connect().then(function () {
-                        proxy.invoke.apply(proxy, args)
-                            .then(function (invokeResult) {
+                        console.debug("wvy.connection: invoke as leader", hub, args[0]);
+                        var proxy = hubProxies[hub];
 
-                                // Try JSON parse
-                                if (typeof invokeResult === "string") {
-                                    try {
-                                        invokeResult = JSON.parse(invokeResult);
-                                    } catch (e) { }
+                        connect().then(function () {
+                            proxy.invoke.apply(proxy, args)
+                                .then(function (invokeResult) {
+
+                                    // Try JSON parse
+                                    if (typeof invokeResult === "string") {
+                                        try {
+                                            invokeResult = JSON.parse(invokeResult);
+                                        } catch (e) { /* Ignore catch */ }
+                                    }
+
+                                    resolve(invokeResult);
+                                })
+                                .catch(function (error) {
+                                    console.error(error, hub, args);
+                                    reject(error);
+                                });
+                        });
+                    } else {
+                        // Invoke via broadcast
+                        var invokeId = "wvy.connection-" + Math.random().toString().substr(2);
+                        console.debug("wvy.connection: invoke via broadcast", hub, args[0], invokeId);
+
+                        var invokeResult = function (msg) {
+                            if (msg.data.name === "invokeResult" && msg.data.invokeId === invokeId) {
+                                console.debug("wvy.connection: broadcast invokeResult received", invokeId);
+                                if (msg.data.error) {
+                                    reject(msg.data.error);
+                                } else {
+                                    var invokeResult = msg.data.result;
+
+                                    // Try JSON parse
+                                    if (typeof invokeResult === "string") {
+                                        try {
+                                            invokeResult = JSON.parse(invokeResult);
+                                        } catch (e) { /* Ignore catch */ }
+                                    }
+                                    resolve(invokeResult);
                                 }
-
-                                resolve(invokeResult);
-                            })
-                            .catch(function (error) {
-                                console.error(error, hub, args);
-                                reject(error);
-                            });
-                    })
-                } else if (broadcast) {
-                    // Invoke via broadcast
-                    var invokeId = "wvy.connection-" + Math.random().toString().substr(2);
-                    console.debug("wvy.connection: invoke via broadcast", hub, args[0], invokeId);
-
-                    var invokeResult = function (msg) {
-                        if (msg.invokeId === invokeId) {
-                            console.debug("wvy.connection: broadcast invokeResult received", invokeId)
-                            if (msg.error) {
-                                reject(msg.error);
-                            } else {
-                                var invokeResult = msg.result
-
-                                // Try JSON parse
-                                if (typeof invokeResult === "string") {
-                                    try {
-                                        invokeResult = JSON.parse(invokeResult);
-                                    } catch (e) { }
-                                }
-                                resolve(invokeResult);
+                                wvy.postal.off("broadcast", invokeResult);
                             }
-                            broadcast.removeEventListener("message", invokeResult);
-                        }
-                    };
+                        };
 
-                    broadcast.addEventListener("message", invokeResult);
+                        wvy.postal.on("broadcast", invokeResult);
 
-                    broadcast.postMessage({ name: "invoke", hub: hub, args: args, invokeId: invokeId });
-
-                } else {
-                    reject("No valid connection");
-                }
+                        wvy.postal.postBroadcast({ name: "invoke", hub: hub, args: args, invokeId: invokeId });
+                    }
+                });
             });
 
             return whenInvoked;
@@ -339,7 +344,7 @@
             console.debug("wvy.connection: reconnecting...");
 
             // wait 2 seconds before showing message
-            if (_reconnectTimeout != null) {
+            if (_reconnectTimeout !== null) {
                 window.clearTimeout(_reconnectTimeout);
             }
 
@@ -439,7 +444,7 @@
                 setUserId(user.id);
             } else if (wasAuthenticated && !authenticated) {
                 triggerEvent("user-change.connection.weavy", { state: "signed-out", user: user });
-                setUserId(-1)
+                setUserId(-1);
             }
         }));
 
@@ -585,19 +590,18 @@
         // handle cross frame events from rtm
         var onBroadcastMessageReceived = function (e) {
             var msg = e.data;
-            console.debug("wvy.connection: broadcast received", msg.name, msg.eventName);
+            console.debug("wvy.connection: broadcast received", msg.name, msg.eventName || "");
             switch (msg.name) {
                 case "invoke":
                     whenLeaderElected.then(function (leader) {
-                        // Change to connected promise
-                        if (leader && status() === states.connected) {
+                        if (leader) {
                             var proxy = hubProxies[msg.hub];
                             var args = msg.args;
                             console.debug("wvy.connection: processing invoke request", msg.invokeId, msg.args);
                             connect().then(function () {
                                 proxy.invoke.apply(proxy, args)
                                     .then(function (invokeResult) {
-                                        console.debug("wvy.connection: returning invoke request result", msg.args[0], msg.invokeId)
+                                        console.debug("wvy.connection: returning invoke request result", msg.args[0], msg.invokeId);
                                         wvy.postal.postBroadcast({
                                             name: "invokeResult",
                                             hub: msg.hub,
@@ -619,14 +623,14 @@
                             });
                         }
 
-                    })
+                    });
                     break;
                 case "request:connection-start":
                     whenLeaderElected.then(function (leader) {
                         if (leader) {
                             connect().then(function () {
                                 wvy.postal.postBroadcast({ name: "connection-started" });
-                            })
+                            });
                         }
                     });
                     break;
@@ -697,7 +701,7 @@
                     return;
             }
 
-        }
+        };
 
 
         function destroy() {
@@ -712,11 +716,11 @@
 
             try {
                 hubProxies["rtm"].off("eventReceived", rtmEventRecieved);
-            } catch (e) { }
+            } catch (e) { /* Ignore catch */ }
 
             try {
                 hubProxies["client"].off("loaded", weavyLoaded);
-            } catch (e) { }
+            } catch (e) { /* Ignore catch */ }
 
             _events.forEach(function (eventHandler) {
                 var name = eventHandler[0], handler = eventHandler[1];
@@ -731,7 +735,7 @@
             disconnect: disconnect,
             init: init,
             invoke: invoke,
-            isAuthenticated: function () { return authenticated },
+            isAuthenticated: function () { return authenticated; },
             on: on,
             proxies: hubProxies,
             sso: sso,
@@ -742,7 +746,9 @@
     };
 
     connections.get = function (url) {
-        url = url || "";
+        var sameOrigin = url ? window.location.origin === (/^(https?:\/\/.+)\//.exec(url)[1] || null) : false;
+        url = (sameOrigin ? "" : url) || "";
+        console.log("connection is sameorigin", sameOrigin);
         if (_connections.has(url)) {
             return _connections.get(url);
         } else {
@@ -750,7 +756,7 @@
             _connections.set(url, connection);
             return connection;
         }
-    }
+    };
 
     connections.remove = function (url) {
         url = url || "";
@@ -787,13 +793,19 @@
         }
     });
 
-    // Bridge for backward compatibility with the mobile apps
+    // Bridge for simple syntax and backward compatibility with the mobile apps
     Object.defineProperty(connections, "on", {
         get: function () {
-            console.warn("Using wvy.connection.on is deprecated, use wvy.connection.default.on instead.")
             return connections.default.on;
         }
-    })
+    });
+
+    // Bridge for simple syntax
+    Object.defineProperty(connections, "invoke", {
+        get: function () {
+            return connections.default.invoke;
+        }
+    });
 }));
 
 

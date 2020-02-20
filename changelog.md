@@ -5,7 +5,7 @@
 Weavy 5.0 has new and improved Client and Mobile SDKs, improved handling of configuration settings, 
 and adds the ability to store files in Azure Blob storage.
 
-### Weavy 5.0.0 (2020-02-19)
+### Weavy 5.0.0 (2020-02-20)
 
 * Added ability to configure Azure Blob Storage for storing files.
 * Added Weavy Web View component to the Mobile SDK. 

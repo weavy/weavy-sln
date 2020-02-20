@@ -64,16 +64,19 @@
                     e.data.windowName = contentWindowNames.get(e.source);
                 }
 
+                var messageName = e.data.name;
+                if (messageName === "broadcast") {
+                    e.data.name = e.data.broadcastName;
+                }
+
                 messageListeners.forEach(function (listener) {
-                    var matchingName = listener.name === e.data.name || listener.name === "message";
+                    var matchingName = listener.name === messageName || listener.name === "message";
                     var genericListener = listener.weavyId === null;
                     var matchingWeavyId = listener.weavyId === e.data.weavyId;
 
                     if (matchingName && (genericDistribution || genericListener || matchingWeavyId)) {
                         console.debug("postal: triggering listener", listener.name);
-                        if (e.data.name === "broadcast") {
-                            e.data.name = e.data.broadcastName;
-                        }
+
                         listener.handler(e);
 
                         if (listener.once) {
@@ -130,7 +133,7 @@
                             _parentWeavyId = e.data.weavyId;
                         }
 
-                        console.log("postal: is not leader");
+                        console.debug("postal: is not leader");
                         _isLeader = false;
                         _whenLeader.reject({ parentName: _parentName, parentWeavyId: _parentWeavyId, parentOrigin: _parentOrigin });
 
@@ -271,6 +274,17 @@
             message.broadcastName = message.name;
             message.name = "broadcast";
             message.weavyId = message.weavyId || true;
+
+            if (_parentWindow) {
+                try {
+                    if (_parentWindow && _parentWindow !== window) {
+                        _parentWindow.postMessage(message, _parentOrigin || "*", transfer);
+                        console.debug("postal: Posted upstream broadcast message", message.name, message.broadcastName);
+                    }
+                } catch (e) {
+                    console.error("postal: Error posting message", message.name, e);
+                }
+            }
 
             contentWindows.forEach(function (contentWindow) {
                 try {
@@ -422,7 +436,7 @@
             requestAnimationFrame(function () {
                 window.setTimeout(function () {
                     if (_whenLeader.state() === "pending") {
-                        console.log("postal: is leader");
+                        console.debug("postal: is leader");
                         _isLeader = true;
                         _whenLeader.resolve();
                     }
@@ -461,11 +475,20 @@
         this.postToSource = postToSource;
         this.postBroadcast = postBroadcast;
         this.extractOrigin = extractOrigin;
-        this.parentWeavyId = _parentWeavyId;
-        this.parentName = _parentName;
-        this.parentOrigin = _parentOrigin;
         this.whenLeader = _whenLeader.promise();
-        this.isLeader = _isLeader;
+
+        Object.defineProperty(this, "isLeader", {
+            get: function () { return _isLeader; }
+        });
+        Object.defineProperty(this, "parentWeavyId", {
+            get: function () { return _parentWeavyId; }
+        });
+        Object.defineProperty(this, "parentName", {
+            get: function () { return _parentName; }
+        });
+        Object.defineProperty(this, "parentOrigin", {
+            get: function () { return _parentOrigin; }
+        });
 
         checkForParent();
     };

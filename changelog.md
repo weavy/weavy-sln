@@ -5,6 +5,12 @@
 Weavy 5.0 has new and improved Client and Mobile SDKs, improved handling of configuration settings, 
 and adds the ability to store files in Azure Blob storage.
 
+### 5.0.1 (2020-02-25)
+
+* Fixed a scaling issue with profile images in notification emails.
+* Fixed problem with editing comments and content when embedded.
+* Added support for profile picture claim. 
+
 ### Weavy 5.0.0 (2020-02-20)
 
 * Added ability to configure Azure Blob Storage for storing files.

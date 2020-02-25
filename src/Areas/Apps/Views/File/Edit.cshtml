@@ -18,7 +18,7 @@
 }
 
     <div class="container mt-3">
-        @using (Html.BeginForm(nameof(ContentController.Update), typeof(ContentController).ControllerName(), new { id = Model.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        <form action="@(Url.Action<ContentController>(x => x.Update(Model.Id, null, null)))" autocomplete="off" data-turboform="" novalidate="" method="post">
             @Html.HttpMethodOverride(HttpVerbs.Put)
             @Html.EditorsForModel()
             @Html.EditorFor(x => Model.Blob, additionalViewData: new { DisplayName = "Replace file", DisplayDescription = "Select new file, or leave as is to keep existing.", Required = false, Remove = false })
@@ -26,5 +26,6 @@
                 <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
                 <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel">Cancel</button>
             </div>
-        }
+            
+        </form>
     </div>

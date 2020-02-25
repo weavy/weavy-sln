@@ -9831,11 +9831,6 @@
             Gets the notification.
             </summary>
         </member>
-        <member name="P:Weavy.Core.Events.NotificationEmailUrl.Space">
-            <summary>
-            Gets the space to which the notification belongs.
-            </summary>
-        </member>
         <member name="P:Weavy.Core.Events.NotificationEmailUrl.User">
             <summary>
             Gets the user the email is created for.
@@ -11961,6 +11956,13 @@
             <param name="identity">A claims-based identity.</param>
             <returns></returns>
         </member>
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetPicture(System.Security.Claims.ClaimsIdentity)">
+            <summary>
+            Get the profile picture if it exists, otherwise <c>null</c>.
+            </summary>
+            <param name="identity">A claims-based identity.</param>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Core.Utils.ClaimsUtils.GetEmail(System.Security.Claims.ClaimsIdentity)">
             <summary>
             Get the email if it exists, otherwise <c>null</c>.
@@ -12965,7 +12967,7 @@
         </member>
         <member name="M:Weavy.Core.Utils.FileUtils.GetImageFromUrl(System.String)">
             <summary>
-            Return a file from the specified url.
+            Returns the image at the specified url (for use in outgoing emails etc.).
             </summary>
             <returns></returns>
         </member>

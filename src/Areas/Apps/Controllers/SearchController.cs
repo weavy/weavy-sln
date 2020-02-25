@@ -35,7 +35,7 @@ namespace Weavy.Areas.Apps.Controllers {
         [HttpGet]
         // NOTE: Using best practice of adding AppGuid to routes in order to avoid route conflicts with built-in controllers/actions
         [Route("{id:int}/0337A872-D760-4CBF-8AC4-1FBD9EAC1E47/{tab:vals(posts|files|comments)?}")]
-        [Route(ControllerUtils.EMBEDDED_PREFIX + "apps/{id:int}/0337A872-D760-4CBF-8AC4-1FBD9EAC1E47/{tab:vals(posts|files|comments)?}", Order = 1)]
+        [Route(ControllerUtils.EMBEDDED_PREFIX + "apps/{id:int}/0337A872-D760-4CBF-8AC4-1FBD9EAC1E47/{tab:vals(posts|files|comments)?}", Name = nameof(SearchController) + "Search", Order = 1)]
         public ActionResult Search(int id, string tab = null, Query query = null) {
             var app = GetApp(id) as Search;
 

@@ -163,7 +163,7 @@ wvy.comments = (function ($) {
         }
 
         $.ajax({
-            url: wvy.url.mvc(type) + id + "/comments",
+            url: (wvy.context.embedded ? "/e" : "") + wvy.url.mvc(type) + id + "/comments",
             method: "GET",
             cache: false
         }).then(function (html) {

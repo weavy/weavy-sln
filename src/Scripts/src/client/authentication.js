@@ -367,7 +367,7 @@
      * Default plugin options
      * 
      * @example
-     * WeavyAuthentication.authentication.defaults = {
+     * WeavyAuthentication.defaults = {
      *     redirect: '/notify',
      *     frameClassName: "",
      *     frameName: "authentication",

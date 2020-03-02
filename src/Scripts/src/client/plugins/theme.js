@@ -106,7 +106,6 @@
             if (weavy.data && weavy.data.plugins[PLUGIN_NAME]) {
                 var data = weavy.data.plugins[PLUGIN_NAME];
 
-                weavy.log("theme options", createRoot.root.id);
                 // add styles
                 weavy.createStyleSheet(data.clientCss, createRoot.root);
             }

@@ -56,7 +56,7 @@
             var fromFrame = contentWindowOrigins.has(e.source) && e.origin === contentWindowOrigins.get(e.source);
 
             if (fromSelf || fromParent || fromFrame) {
-                console.debug("postal: message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame", e.data.name);
+                console.debug("wvy.postal: message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame", e.data.name);
 
                 var genericDistribution = !e.data.weavyId || e.data.weavyId === true;
 
@@ -75,7 +75,6 @@
                     var matchingWeavyId = listener.weavyId === e.data.weavyId;
 
                     if (matchingName && (genericDistribution || genericListener || matchingWeavyId)) {
-                        console.debug("postal: triggering listener", listener.name);
 
                         listener.handler(e);
 
@@ -92,7 +91,6 @@
                 switch (e.data.name) {
                     case "register-child":
                         if (!_parentWindow) {
-                            console.log("postal: registering child")
                             if (!contentWindowWeavyIds.has(e.source)) {
                                 // get the real frame window
                                 var frameWindow = Array.from(window.frames).filter(function (frame) {
@@ -120,28 +118,32 @@
                                     weavyId: weavyId,
                                 }, "*");
                             } catch (e) {
-                                console.error("postal.register: Could not register frame window", weavyId, contentWindowName, e);
+                                console.error("wvy.postal: Could not register frame window", weavyId, contentWindowName, e);
                             }
                         }
                         break;
                     case "register-window":
                         if (!_parentWindow) {
-                            console.debug("postal: registering frame window", e.data.weavyId, e.data.windowName);
+                            console.debug("wvy.postal: registering frame window", e.data.weavyId, e.data.windowName);
                             _parentOrigin = e.origin;
                             _parentWindow = e.source;
                             _parentName = e.data.windowName;
                             _parentWeavyId = e.data.weavyId;
                         }
 
-                        console.debug("postal: is not leader");
+                        console.debug("wvy.postal: is not leader");
                         _isLeader = false;
                         _whenLeader.reject({ parentName: _parentName, parentWeavyId: _parentWeavyId, parentOrigin: _parentOrigin });
 
-                        e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: _parentWeavyId }, e.origin);
+                        try {
+                            e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId }, e.origin);
+                        } catch (e) {
+                            console.error("wvy.postal: register-window could not post back ready-message to source");
+                        }
 
                         if (parentQueue.length) {
                             parentQueue.forEach(function (message) {
-                                console.debug("postal: sending queued to parent:", message.name);
+                                console.debug("wvy.postal: sending queued to parent:", message.name);
 
                                 postToParent(message)
                             });
@@ -158,7 +160,6 @@
                         break;
                     case "ready":
                         if (contentWindowsByWeavyId.has(e.data.weavyId) && contentWindowNames.has(e.source) && contentWindowsByWeavyId.get(e.data.weavyId).get(contentWindowNames.get(e.source))) {
-                            console.debug("postal: ready, register origin", e.data.weavyId, contentWindowNames.get(e.source));
                             contentWindowOrigins.set(e.source, e.origin);
                             distributeMessage(e);
                         }
@@ -169,10 +170,8 @@
                         break;
                     default:
                         if (e.source === window || _parentWindow || contentWindowsByWeavyId.size) {
-                            console.debug("postal: distribute inbound message", e.data.weavyId, e.data.name);
                             distributeMessage(e);
                         } else {
-                            console.debug("postal: queueing inbound message", e.data.weavyId, e.data.name)
                             inQueue.push(e);
                         }
 
@@ -221,11 +220,11 @@
         function registerContentWindow(contentWindow, contentWindowName, weavyId) {
             try {
                 if (!contentWindowName) {
-                    console.error("postal.register: No valid contentWindow to register, must be a window and have a name.");
+                    console.error("wvy.postal: registerContentWindow() No valid contentWindow to register, must be a window and have a name.");
                     return;
                 }
             } catch (e) {
-                console.error("cannot access contentWindowName")
+                console.error("wvy.postal: registerContentWindow() cannot access contentWindowName")
             }
 
             if (!weavyId || weavyId === "true") {
@@ -240,9 +239,6 @@
             contentWindows.add(contentWindow);
             contentWindowNames.set(contentWindow, contentWindowName);
             contentWindowWeavyIds.set(contentWindow, weavyId);
-
-            console.debug("register contentWindow", contentWindowName, weavyId);
-
         }
 
         function unregisterWeavyId(weavyId) {
@@ -262,7 +258,7 @@
 
         function postBroadcast(message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("postal: Invalid message format", message);
+                console.error("wvy.postal: postBroadcast() Invalid message format", message);
                 return;
             }
 
@@ -279,10 +275,10 @@
                 try {
                     if (_parentWindow && _parentWindow !== window) {
                         _parentWindow.postMessage(message, _parentOrigin || "*", transfer);
-                        console.debug("postal: Posted upstream broadcast message", message.name, message.broadcastName);
+                        console.debug("wvy.postal: postBroadcast() Posted upstream broadcast message", message.name, message.broadcastName);
                     }
                 } catch (e) {
-                    console.error("postal: Error posting message", message.name, e);
+                    console.error("wvy.postal: postBroadcast() Error posting message", message.name, e);
                 }
             }
 
@@ -290,7 +286,7 @@
                 try {
                     contentWindow.postMessage(message, "*", transfer);
                 } catch (e) {
-                    console.warn("postal: could not broadcast message to " + contentWindowNames.get(contentWindow))
+                    console.warn("wvy.postal: postBroadcast() Could not broadcast message to " + contentWindowNames.get(contentWindow))
                 }
             })
 
@@ -298,7 +294,7 @@
 
         function postToFrame(windowName, weavyId, message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("postal: Invalid message format", message);
+                console.error("wvy.postal: postToFrame() Invalid message format", message);
                 return;
             }
 
@@ -311,7 +307,7 @@
             try {
                 contentWindow = contentWindowsByWeavyId.get(weavyId).get(windowName);
             } catch (e) {
-                console.error("postal.postToFrame: Window not registered", weavyId, windowName);
+                console.error("wvy.postal: postToFrame() Window not registered", weavyId, windowName);
             }
 
             if (contentWindow) {
@@ -319,14 +315,14 @@
                 try {
                     contentWindow.postMessage(message, "*", transfer);
                 } catch (e) {
-                    console.error("Could not post message to frame", windowName)
+                    console.error("wvy.postal: postToFrame() Could not post message to frame", windowName)
                 }
             }
         }
 
         function postToSelf(message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("postal: Invalid message format", message);
+                console.error("wvy.postal: postToSelf() Invalid message format", message);
                 return;
             }
 
@@ -339,15 +335,14 @@
 
             try {
                 window.postMessage(message, extractOrigin(window.location.href) || "*", transfer);
-                console.debug("postal: Posted message to self", message);
             } catch (e) {
-                console.error("postal: Could not post message to self");
+                console.error("wvy.postal: postToSelf() Could not post message to self");
             }
         }
 
         function postToParent(message, transfer, allowInsecure) {
             if (typeof message !== "object" || !message.name) {
-                console.error("postal: Invalid message format", message);
+                console.error("wvy.postal: postToParent() Invalid message format", message);
                 return;
             }
 
@@ -364,10 +359,9 @@
                 try {
                     if (_parentWindow && _parentWindow !== window) {
                         _parentWindow.postMessage(message, _parentOrigin || "*", transfer);
-                        console.debug("postal: Posted message", _parentWeavyId, _parentName, message.name);
                     }
                 } catch (e) {
-                    console.error("postal: Error posting message", message.name, e);
+                    console.error("wvy.postal: postToParent() Error posting message", message.name, e);
                 }
             } else if (allowInsecure) {
                 var parents = [];
@@ -382,14 +376,14 @@
                 parents.forEach(function (parent) {
                     try {
                         parent.postMessage(message, "*", transfer);
-                        console.debug("postal: Posted insecure message", message.name)
+                        console.debug("wvy.postal: postToParent() Posted insecure message", message.name)
                     } catch (e) {
-                        console.error("postal: Error posting insecure message", message.name, e);
+                        console.error("wvy.postal: postToParent() Error posting insecure message", message.name, e);
                     }
                 });
 
             } else {
-                console.debug("postal: queueing to parent", message.name);
+                console.debug("wvy.postal: postToParent() queueing to parent", message.name);
                 parentQueue.push(message);
             }
 
@@ -408,8 +402,12 @@
 
                 if (fromSelf || fromParent || fromFrame) {
                     message.weavyId = e.data.weavyId;
-                    console.debug("postal: posted to source", message.name)
-                    e.source.postMessage(message, e.origin, transfer);
+
+                    try {
+                        e.source.postMessage(message, e.origin, transfer);
+                    } catch (e) {
+                        console.error("wvy.postal: postToSource() Could not post message back to source");
+                    }
                 }
             }
         }
@@ -427,16 +425,16 @@
             parents.forEach(function (parent) {
                 try {
                     parent.postMessage({ name: "register-child", weavyId: true }, "*");
-                    console.debug("postal: checking for parent")
+                    console.debug("wvy.postal: checking for parent")
                 } catch (e) {
-                    console.error("postal: Error checking for parent", e);
+                    console.error("wvy.postal: Error checking for parent", e);
                 }
             });
 
             requestAnimationFrame(function () {
                 window.setTimeout(function () {
                     if (_whenLeader.state() === "pending") {
-                        console.debug("postal: is leader");
+                        console.debug("wvy.postal: is leader");
                         _isLeader = true;
                         _whenLeader.resolve();
                     }

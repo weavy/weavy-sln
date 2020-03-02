@@ -199,13 +199,29 @@
     }
 
     .uploads {
+        width: 100%;
 
         .table-attachments {
+            table-layout: unset;
+
             tr:first-child td {
                 border-top: $border-width solid $border-color;
             }
 
-            margin: 0;
+            margin: 0 0.3rem 0rem 0;
+
+            .table-icon {
+                padding: .5rem .4rem .5rem 0;
+                text-align: left;
+
+                &:first-child {
+                    padding-left: .8rem;
+                }
+
+                svg {
+                    margin: 0 !important;
+                }
+            }
         }
 
         .progress {

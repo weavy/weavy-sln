@@ -41,6 +41,7 @@
          */
         context.options = options;
         context.data = data;
+
         context.apps = [];
 
 
@@ -61,17 +62,62 @@
 
     function addApps(appsData) {
         var context = this;
-        if (appsData && typeof appsData === "object") {
-            for (var app in appsData) {
-                var appOptions = WeavyApp.getOptionsByData(context.options.apps, appsData[app]);
-                var existingApp = WeavyApp.getDataByOptions(this.apps, appOptions);
-                if (!existingApp) {
-                    context.apps.push(new WeavyApp(context.weavy, context, appOptions, appsData[app]));
-                }
+        if (appsData && $.isPlainObject(appsData)) {
+            appsData = [appsData];
+        }
+
+        // App options must exist
+        // Check if the app already exists
+        // Otherwise add
+
+        for (var app in appsData) {
+            var appOptions = WeavyApp.getOptionsByData(context.options.apps, appsData[app]);
+            var existingApp;
+
+            if (appOptions) {
+                try {
+                    existingApp = context.apps.filter(function (a) {
+                        return a.match(appsData[app])
+                    }).length > 0;
+                } catch (e) { }
+            }
+
+            if (appOptions && !existingApp) {
+                context.apps.push(new WeavyApp(context.weavy, context, appOptions, appsData[app]));
             }
         }
     }
 
+    WeavyContext.prototype.app = function (appOptions) {
+        var context = this;
+        var weavy = this.weavy;
+        var app;
+
+        var isAppId = Number.isInteger(appOptions);
+        var isAppKey = typeof appOptions === "string";
+        var isAppConfig = $.isPlainObject(appOptions);
+        var appSelector = isAppConfig && appOptions || isAppId && { id: appOptions } || isAppKey && { key: appOptions };
+
+        if (appSelector) {
+            try {
+                app = context.apps.filter(function (a) { return a.match(appSelector) }).pop();
+            } catch (e) { }
+
+            if (!app) {
+                if (isAppConfig) {
+                    app = new WeavyApp(weavy, context, appOptions);
+                    context.apps.push(context);
+                    $.when(weavy.authentication.whenAuthenticated, weavy.whenLoaded).then(function () {
+                        app.init();
+                    });
+                } else {
+                    weavy.warn("App " + (isAppConfig ? JSON.stringify(appSelector) : appOptions) + " does not exist. Use weavy.context(...).app(" + JSON.stringify(appSelector) + ") to create the context.")
+                }
+            }
+        }
+
+        return app;
+    } 
 
     WeavyContext.prototype.init = function (options) {
         var context = this;
@@ -93,7 +139,7 @@
         var context = this;
 
         if (context.options && typeof context.options === "object") {
-            context.weavy.log("Context has options", context.options);
+            context.weavy.debug("Context has options", context.options);
             context.container = context.options.container;
 
             if (context.id === null && context.options.id) {
@@ -113,6 +159,10 @@
             context.id = context.data.id;
             context.name = context.data.name;
 
+            if (!context.key && context.data.key) {
+                context.key = context.data.key;
+            }
+
             if (this.weavy.isLoaded) {
                 this.build();
             }
@@ -125,7 +175,7 @@
         var context = this;
         var weavy = this.weavy;
         if (weavy.isAuthenticated() && context.data && typeof context.data === "object") {
-            weavy.log("Building context", context.id);
+            weavy.debug("Building context", context.id);
 
             if (!context.root && context.container) {
                 context.root = weavy.createRoot(context.container, context.id);
@@ -134,28 +184,6 @@
             }
         }
     }
-
-    WeavyContext.prototype.app = function (appOptions) {
-        var context = this;
-        var app = WeavyApp.getDataByOptions(this.apps, appOptions);
-
-        if (!app) {
-            context.weavy.log("Context app match not found, adding new app");
-            context.options = context.options || {};
-            context.options.apps = context.options.apps || [];
-            context.options.apps.push(appOptions);
-            app = new WeavyApp(context.weavy, context);
-            context.apps.push(app);
-        }
-
-        if (!app.isInitialized) {
-            app.init(appOptions);
-        } else {
-            app.configure(appOptions);
-        }
-
-        return app;
-    } 
 
     WeavyContext.prototype.open = function (appOptions, destination) {
         return this.app(appOptions).open(destination);

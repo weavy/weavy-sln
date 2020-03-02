@@ -47,9 +47,14 @@
         app.container = null;
         app.root = null;
         app.panel = null;
+        app.url = null;
+
         app.id = null;
         app.name = null;
-        app.url = null;
+        app.key = null;
+        app.guid = null;
+        app.type = null;
+        app.typeName = null;
 
         app.autoOpen = null;
 
@@ -88,15 +93,33 @@
 
             if (app.options && typeof app.options === "object") {
                 if (app.autoOpen === null || app.container === null) {
-                    app.weavy.log("Setting app options");
                     app.autoOpen = app.options && app.options.open !== undefined ? app.options.open : (context && context.options && context.options.open !== undefined ? context.options.open : (context && !context.toggled || false));
                     app.container = app.options.container;
+                }
+
+                if (app.id === null && app.options.id) {
+                    app.id = app.options.id;
+                }
+
+                if (app.key === null && app.options.key) {
+                    app.key = app.options.key;
+                }
+
+                if (app.name === null && app.options.name) {
+                    app.name = app.options.name;
+                }
+
+                if (app.type === null && app.options.type) {
+                    app.type = app.options.type;
                 }
             }
 
             if (app.data && typeof app.data === "object") {
                 app.id = app.data.id;
                 app.name = app.data.name;
+                app.typeName = app.data.typeName;
+                app.guid = app.data.guid;
+
                 app.url = app.data.url;
 
                 if (!app.isBuilt && app.weavy.isLoaded) {
@@ -171,7 +194,7 @@
 
                     if (!app.isBuilt && root) {
                         app.isBuilt = true;
-                        weavy.log("Building app", app.id);
+                        weavy.debug("Building app", app.id);
                         var panelId = "app-" + app.id;
                         var controls = app.options && app.options.controls !== undefined ? app.options.controls : (app.context.options && app.context.options.controls !== undefined ? app.context.options.controls : false);
                         app.panel = root.container.panels.addPanel(panelId, app.url, { controls: controls });
@@ -243,6 +266,14 @@
         return typeof str1 === "string" && typeof str2 === "string" && str1.toUpperCase() === str2.toUpperCase();
     }
 
+    WeavyApp.prototype.match = function (options) {
+        if (options) {
+            return matchDataToOptions(this, options);
+        }
+
+        return false;
+    };
+
     // Finds an option set that is matching the provided app/appdata
     function matchDataToOptions(appData, appOptions) {
         if (appOptions.type || appOptions.guid || appOptions.name || appOptions.key || appOptions.id) {
@@ -254,45 +285,31 @@
             var matchTypeName = appData.typeName && ciEq(appData.typeName.split(".").pop(), appOptions.type);
             var matchType = appData.typeName && ciEq(appData.typeName.split(".").pop().split("App").shift(), appOptions.type);
 
-            return (!appOptions.id || matchId)
+            var matchResult = (!appOptions.id || matchId)
                 && (!appOptions.key || matchKey)
                 && (!appOptions.name || matchName)
                 && (!appOptions.type || matchGuid || matchFullTypeName || matchTypeName || matchType);
+
+            return matchResult;
         }
+        return false;
     }
 
     WeavyApp.getOptionsByData = function (appsOptions, appData) {
         var optionsList = asArray(appsOptions);
 
-        var results = optionsList.filter(function (appOptions) {
-            if (appOptions.type || appOptions.guid || appOptions.name || appOptions.key || appOptions.id) {
-                return matchDataToOptions(appData, appOptions);
-            }
-        });
+        if (!$.isPlainObject(appData)) {
+            return null;
+        }
+
+        var results = optionsList.filter(function (appOptions) { return matchDataToOptions(appData, appOptions); });
 
         if (results.length > 1) {
             throw new Error("App data is matching multiple options, please specify apps more in detail.")
         }
 
-        return results.length === 1 && results.shift();
+        return results.length === 1 && results.shift() || null;
     };
-
-    // finds an app that is matching the provided option set
-    WeavyApp.getDataByOptions = function (appsData, appOptions) {
-        var apps = asArray(appsData);
-
-        if (appOptions.type || appOptions.guid || appOptions.name || appOptions.key || appOptions.id) {
-            var results = apps.filter(function (app) {
-                return matchDataToOptions(app.data || app, appOptions);
-            });
-
-            if (results.length > 1) {
-                throw new Error("App options is matching multiple apps, please specify options more in detail.")
-            }
-
-            return results.length === 1 && results.shift();
-        }
-    }
 
     return WeavyApp;
 }));

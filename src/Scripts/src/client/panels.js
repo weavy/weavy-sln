@@ -368,7 +368,7 @@
             panel.appendChild(frame);
 
             if (panelRoot) {
-                weavy.info("Appending panel", panelId)
+                weavy.debug("Appending panel", panelId)
                 panelRoot.appendChild(panel);
                 _panels.set(panelId, panel);
             } else {

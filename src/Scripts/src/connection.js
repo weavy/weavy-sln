@@ -397,7 +397,6 @@
                 return a;
             });
 
-            console.debug("wvy.connection: triggerEvent", name);
             $(weavyConnection).triggerHandler(event, data);
             triggerBroadcast("broadcast-event", name, data);
         }
@@ -748,7 +747,6 @@
     connections.get = function (url) {
         var sameOrigin = url ? window.location.origin === (/^(https?:\/\/.+)\//.exec(url)[1] || null) : false;
         url = (sameOrigin ? "" : url) || "";
-        console.log("connection is sameorigin", sameOrigin);
         if (_connections.has(url)) {
             return _connections.get(url);
         } else {

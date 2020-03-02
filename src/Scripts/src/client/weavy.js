@@ -162,6 +162,14 @@
         weavy.isBlocked = false;
 
         /**
+         * True when weavy is loading options from the server.
+         * 
+         * @category properties
+         * @type {boolean}
+         */
+        weavy.isLoading = false;
+
+        /**
          * True when weavy has loaded options from the server.
          * 
          * @category properties
@@ -266,14 +274,16 @@
                     context = _contexts.filter(function (ctx) { return ctx.match(contextSelector) }).pop();
                 } catch (e) {}
 
-                if (!context && isContextConfig) {
-                    context = new WeavyContext(weavy, options);
-                    _contexts.push(context);
-                    $.when(weavy.authentication.whenAuthenticated, weavy.whenLoaded).then(function () {
-                        context.init();
-                    });
-                } else {
-                    weavy.warn("Context " + isContextConfig ? JSON.stringify(contextSelector) : contextSelector + " does not exist. Use weavy.context({ " + (isContextKey ? "key: \"" + contextSelector + "\"" : "id: " + contextSelector) + " }) to create the context.")
+                if (!context) {
+                    if (isContextConfig) {
+                        context = new WeavyContext(weavy, options);
+                        _contexts.push(context);
+                        $.when(weavy.authentication.whenAuthenticated, weavy.whenLoaded).then(function () {
+                            context.init();
+                        });
+                    } else {
+                        weavy.warn("Context " + (isContextConfig ? JSON.stringify(contextSelector) : options) + " does not exist. Use weavy.context(" + JSON.stringify(contextSelector) + ") to create the context.")
+                    }
                 }
             }
 
@@ -439,9 +449,6 @@
         }
 
         // INTERNAL FUNCTIONS
-        function connect() {
-            return weavy.connection.init(true);
-        }
 
         function disconnect(async, notify) {
             weavy.log("disconnecting weavy");
@@ -458,17 +465,21 @@
             if (fullReload === true) {
                 weavy.isLoaded = false;
             }
-            connect.call(weavy).then(function () {
-                weavy.options.href = window.location.href;
-                if (notify !== false) {
 
-                    weavy.connection.invoke("client", "init", weavy.options).then(function (clientData) {
-                        weavy.triggerEvent("clientdata", clientData);
-                    }).catch(function (error) {
-                        weavy.error("Weavy connect", error.message, error);
-                    });
-                }
-            });
+            if (!weavy.isLoading) {
+                weavy.isLoading = true;
+                weavy.connection.init(true).then(function () {
+                    weavy.options.href = window.location.href;
+                    if (notify !== false) {
+
+                        weavy.connection.invoke("client", "init", weavy.options).then(function (clientData) {
+                            weavy.triggerEvent("clientdata", clientData);
+                        }).catch(function (error) {
+                            weavy.error("Weavy connectAndLoad client init", error.message, error);
+                        });
+                    }
+                });
+            }
 
             return weavy.whenLoaded;
         }
@@ -621,7 +632,6 @@
          * @param {string} [panelId] - If the frame is a panel, the panelId may also be provided.
          */
         weavy.sendWindowId = function (contentWindow, windowName) {
-            weavy.log("sendWindowId", windowName);
             try {
                 wvy.postal.registerContentWindow(contentWindow, windowName, weavy.getId());
             } catch (e) {
@@ -1144,6 +1154,8 @@
                     */
                 weavy.triggerEvent("load");
             }
+
+            weavy.isLoading = false;
             weavy.triggerEvent("processed:load");
 
         });

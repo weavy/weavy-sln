@@ -2474,7 +2474,7 @@ wvy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
                             pinchScaling = true;
                         }
                     }
-                });
+                }, { passive: true });
 
                 // REVIEW: Consider marking event handler as 'passive' to make the page more responsive. See https://www.chromestatus.com/feature/5745543795965952
                 viewerContainer.addEventListener('touchmove', function (e) {
@@ -2487,7 +2487,7 @@ wvy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
 
                         viewerContainer.style.transform = "scale(" + pinchCurrentDistance / pinchStartDistance + ")";
                     }
-                });
+                }, { passive: true });
 
                 // REVIEW: Consider marking event handler as 'passive' to make the page more responsive. See https://www.chromestatus.com/feature/5745543795965952
                 viewerContainer.addEventListener('touchend', function (e) {

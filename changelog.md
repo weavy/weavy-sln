@@ -5,6 +5,11 @@
 Weavy 5.0 has new and improved Client and Mobile SDKs, improved handling of configuration settings, 
 and adds the ability to store files in Azure Blob storage.
 
+### 5.0.2 (2020-03-02)
+* Added thumbnail preview when uploading images to posts and comments
+* Fixed problem with the license reported as invalid in some cases
+* Weavy Filebrowser is now loading only when needed
+
 ### 5.0.1 (2020-02-25)
 
 * Fixed a scaling issue with profile images in notification emails.

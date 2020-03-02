@@ -4,6 +4,32 @@ wvy.filebrowser = (function ($) {
 
     var fileBrowserUrl = "https://filebrowser.weavycloud.com";
 
+    var whenFilebrowserLoaded = $.Deferred();
+    var loadingStarted = false;
+
+    var loadFilebrowser = function () {
+        if (!loadingStarted) {
+            loadingStarted = true;
+
+            fileBrowserUrl = wvy.config != null ? (wvy.config.fileBrowser || fileBrowserUrl) : fileBrowserUrl;
+            console.debug("Using filebrowser: ", fileBrowserUrl);
+
+            if (!wvy.browser.framed) {
+                $("#filebrowser").attr("src", fileBrowserUrl + "?origin=" + window.location.origin);
+            } else {
+                // request current origin from Weavy()
+                wvy.postal.postToParent({ name: 'request:origin' })
+            }
+
+            $("#filebrowser").one("load", function () {
+                console.log("filebrowser loaded");
+                whenFilebrowserLoaded.resolve();
+            });
+        }
+
+        return whenFilebrowserLoaded.promise();
+    }
+
     var attach = function (links, provider, open) {
 
         var $overlaySpinner = $("#filebrowser-modal-spinner");
@@ -114,15 +140,7 @@ wvy.filebrowser = (function ($) {
 
     document.addEventListener("turbolinks:load", function () {
         
-        fileBrowserUrl = wvy.config != null ? (wvy.config.fileBrowser || fileBrowserUrl) : fileBrowserUrl;
-        console.debug("Using filebrowser: ", fileBrowserUrl);
 
-        if (!wvy.browser.framed) {
-            $("#filebrowser").attr("src", fileBrowserUrl + "?origin=" + window.location.origin);
-        } else {
-            // request current origin from Weavy()
-            wvy.postal.postToParent({ name: 'request:origin' })
-        }
     });
 
     // submit new google drive doc to filebrowser.weavycloud.com
@@ -133,7 +151,9 @@ wvy.filebrowser = (function ($) {
         var title = $("#google-create-modal input.doctitle").val() || "New Google " + type;
         $(this).prop("disabled", true);
 
-        $("#filebrowser")[0].contentWindow.postMessage({ name: 'create', title: title, type: type, guid: guid }, "*");
+        loadFilebrowser().then(function () {
+            $("#filebrowser")[0].contentWindow.postMessage({ name: 'create', title: title, type: type, guid: guid }, "*");
+        })
 
         return false;
     });
@@ -155,12 +175,16 @@ wvy.filebrowser = (function ($) {
             default:
                 // maximize window if Google Drive picker
                 if (provider === "google-drive") {
-                    $("#filebrowser").show();
-                    wvy.postal.postToParent({ name: 'maximize' })
+                    loadFilebrowser().then(function () {
+                        $("#filebrowser").show();
+                        wvy.postal.postToParent({ name: 'maximize' })
+                    });
                 }
 
-                // send message to filebrowser.weavycloud.com to open up correct picker
-                $("#filebrowser")[0].contentWindow.postMessage({ name: 'open', provider: provider, guid: guid }, "*");
+                loadFilebrowser().then(function () {
+                    // send message to filebrowser.weavycloud.com to open up correct picker
+                    $("#filebrowser")[0].contentWindow.postMessage({ name: 'open', provider: provider, guid: guid }, "*");
+                });
         }
 
         return false;

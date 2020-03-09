@@ -168,7 +168,10 @@ wvy.posts = (function ($) {
             type: "GET",
             url: wvy.url.resolve((wvy.context.embedded ? "/e": "") + "/posts/" + post.id)
         }).then(function (post) {
-            $(post).prependTo($posts);
+            var $post = $(".post[data-post-id=" + post.id + "]", $(".posts"));
+            if ($post.length === 0) {
+                $(post).prependTo($posts);
+            }
         });
 
     });

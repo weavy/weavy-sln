@@ -70,8 +70,8 @@
     <Reference Include="Autofac, Version=4.9.4.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.4.9.4\lib\net45\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Azure.Core, Version=1.0.2.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Azure.Core.1.0.2\lib\netstandard2.0\Azure.Core.dll</HintPath>
+    <Reference Include="Azure.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Azure.Core.1.1.0\lib\netstandard2.0\Azure.Core.dll</HintPath>
     </Reference>
     <Reference Include="Azure.Storage.Blobs, Version=12.3.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Azure.Storage.Blobs.12.3.0\lib\netstandard2.0\Azure.Storage.Blobs.dll</HintPath>
@@ -88,14 +88,14 @@
     <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.2.0.30\lib\net461\Dapper.dll</HintPath>
     </Reference>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.10.0.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
-      <HintPath>..\packages\DocumentFormat.OpenXml.2.10.0\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.10.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.10.1\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
     <Reference Include="Fizzler, Version=1.2.0.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
       <HintPath>..\packages\Fizzler.1.2.0\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.18.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.18\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.21.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.21\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="HtmlRenderer, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlRenderer.Core.1.5.1-beta1\lib\net45\HtmlRenderer.dll</HintPath>
@@ -173,23 +173,23 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.1\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.1\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.1\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.1\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Options, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Options.3.1.1\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Options, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Options.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.1\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.6.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
@@ -337,17 +337,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=5.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=5.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=5.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=5.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -385,6 +385,8 @@
     <Content Include="Areas\Apps\Views\Messenger\Conversations.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\Get.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\Messenger.cshtml" />
+    <Content Include="Areas\Apps\Views\Notifications\_Notification.cshtml" />
+    <Content Include="Areas\Apps\Views\Notifications\_Notifications.cshtml" />
     <Content Include="Areas\Apps\Views\Notifications\Get.cshtml" />
     <Content Include="Areas\Apps\Views\Posts\Get.cshtml" />
     <Content Include="Areas\Apps\Views\Posts\Get.Embedded.cshtml" />
@@ -3405,7 +3407,7 @@
     <Content Include="Scripts\_tinymce.bundle" />
     <Content Include="Scripts\asap.bundle" />
     <Content Include="Scripts\client.bundle" />
-    <Content Include="Scripts\client-libs.bundle" />
+    <Content Include="Scripts\client-jquery.bundle" />
     <Content Include="Scripts\ie.bundle" />
     <Content Include="Scripts\msofba.bundle" />
     <Content Include="Scripts\notification.bundle" />
@@ -3427,8 +3429,9 @@
     <Content Include="Scripts\src\button.js" />
     <Content Include="Scripts\src\client\app.js" />
     <Content Include="Scripts\src\client\authentication.js" />
-    <Content Include="Scripts\src\client\context.js" />
+    <Content Include="Scripts\src\client\console.js" />
     <Content Include="Scripts\src\client\events.js" />
+    <Content Include="Scripts\src\client\navigation.js" />
     <Content Include="Scripts\src\client\package.json" />
     <Content Include="Scripts\src\client\panels.js" />
     <Content Include="Scripts\src\client\plugins\_weavy-plugin-helloworld.js" />
@@ -3437,6 +3440,8 @@
     <Content Include="Scripts\src\client\plugins\filebrowser.js" />
     <Content Include="Scripts\src\client\plugins\preview.js" />
     <Content Include="Scripts\src\client\plugins\theme.js" />
+    <Content Include="Scripts\src\client\space.js" />
+    <Content Include="Scripts\src\client\utils.js" />
     <Content Include="Scripts\src\client\weavy.js" />
     <Content Include="Scripts\src\codesample.js" />
     <Content Include="Scripts\src\comments.js" />
@@ -3458,6 +3463,7 @@
     <Content Include="Scripts\src\infinitescroll.js" />
     <Content Include="Scripts\src\modal.js" />
     <Content Include="Scripts\src\modernizr-custom.js" />
+    <Content Include="Scripts\src\navigation.js" />
     <Content Include="Scripts\src\notifications.js" />
     <Content Include="Scripts\src\pdf.js" />
     <Content Include="Scripts\src\photoswipe.js" />
@@ -3490,27 +3496,6 @@
     <Content Include="Scripts\src\url.js" />
     <Content Include="Scripts\src\user.js" />
     <Content Include="Scripts\src\userspicker.js" />
-    <Content Include="Scripts\src\weavy\_weavy-plugin-helloworld.js" />
-    <Content Include="Scripts\src\weavy\_weavy-plugin-template.js" />
-    <Content Include="Scripts\src\weavy\alert.js" />
-    <Content Include="Scripts\src\weavy\authentication.js" />
-    <Content Include="Scripts\src\weavy\extended\badge.js" />
-    <Content Include="Scripts\src\weavy\extended\bubbles.js" />
-    <Content Include="Scripts\src\weavy\extended\context.js" />
-    <Content Include="Scripts\src\weavy\extended\dock.js" />
-    <Content Include="Scripts\src\weavy\extended\fallback.js" />
-    <Content Include="Scripts\src\weavy\extended\messenger.js" />
-    <Content Include="Scripts\src\weavy\extended\notifications.js" />
-    <Content Include="Scripts\src\weavy\extended\personal.js" />
-    <Content Include="Scripts\src\weavy\extended\position.js" />
-    <Content Include="Scripts\src\weavy\extended\start.js" />
-    <Content Include="Scripts\src\weavy\extended\upgrade.js" />
-    <Content Include="Scripts\src\weavy\filebrowser.js" />
-    <Content Include="Scripts\src\weavy\panels.js" />
-    <Content Include="Scripts\src\weavy\preview.js" />
-    <Content Include="Scripts\src\weavy\sso.js" />
-    <Content Include="Scripts\src\weavy\theme.js" />
-    <Content Include="Scripts\src\weavy\weavy.js" />
     <Content Include="Scripts\src\weavy-notifications.js" />
     <Content Include="Scripts\src\weavy-personal.js" />
     <Content Include="Scripts\vendor\bluebird\bluebird.core.min.js" />
@@ -3753,9 +3738,6 @@
     <Content Include="Scripts\vendor\twitter-text\punycode.js" />
     <Content Include="Scripts\vendor\twitter-text\twitter-text.js" />
     <Content Include="Scripts\vendor\underscore\underscore-min.js" />
-    <Content Include="Scripts\weavy.bundle" />
-    <Content Include="Scripts\weavy-extended.bundle" />
-    <Content Include="Scripts\weavy-libs.bundle" />
     <Content Include="Scripts\wvy.bundle" />
     <Content Include="Styles\_bootstrap.scss" />
     <Content Include="Styles\_core.scss" />
@@ -4334,11 +4316,8 @@
     <Content Include="Views\Star\Index.cshtml" />
     <Content Include="Views\Test\_LoremIpsum.cshtml" />
     <Content Include="Views\Test\Client.cshtml" />
-    <Content Include="Views\Test\ClientPanels.cshtml" />
-    <Content Include="Views\Test\Dock.cshtml" />
     <Content Include="Views\Test\Email.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
-    <Content Include="Views\Test\Panels.cshtml" />
     <Content Include="Views\Test\Pickers.cshtml" />
     <Content Include="Views\Test\Redirected.cshtml" />
     <Content Include="Views\Test\SSO.cshtml" />
@@ -4395,7 +4374,7 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58024</DevelopmentServerPort>
+          <DevelopmentServerPort>64704</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>https://localhost:44323/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

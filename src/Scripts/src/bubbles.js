@@ -11,7 +11,7 @@ wvy.bubbles = (function ($) {
     // * url - optional url to open up in the space
     //-------------------------------------------------------
     function open(spaceId, destination) {
-        requestOpen(spaceId, destination);
+        //requestOpen(spaceId, destination);
 
         return $.ajax({
             url: "/a/bubble",
@@ -21,15 +21,15 @@ wvy.bubbles = (function ($) {
         });
     }
 
-    function requestOpen(requestId, destination) {
-        if (wvy.browser.framed) {
-            if (typeof requestId === 'number') {
-                wvy.postal.postToParent({ name: 'request:open', spaceId: requestId, destination: destination });
-            } else {
-                wvy.postal.postToParent({ name: 'request:open', panelId: requestId, destination: destination });
-            }
-        }
-    }
+    //function requestOpen(requestId, destination) {
+    //    if (wvy.browser.framed) {
+    //        if (typeof requestId === 'number') {
+    //            wvy.postal.postToParent({ name: 'request:open', spaceId: requestId, destination: destination });
+    //        } else {
+    //            wvy.postal.postToParent({ name: 'request:open', panelId: requestId, destination: destination });
+    //        }
+    //    }
+    //}
 
     function close(bubbleId) {
         return $.ajax({
@@ -39,9 +39,9 @@ wvy.bubbles = (function ($) {
         });
     }
 
-
     document.addEventListener("turbolinks:visit", function (e) {
         visitUrl = e.data.url;
+        console.log(e.type, visitUrl);
     });
 
     document.addEventListener("turbolinks:before-render", function (e) {
@@ -68,42 +68,41 @@ wvy.bubbles = (function ($) {
             return;
         }
 
+        //    // Intercept global search
+        //    var urlBase = wvy.config.applicationPath.indexOf("http") === 0 ? wvy.config.applicationPath : document.location.origin + wvy.config.applicationPath;
+        //    var redirSpaceId = visitUrl && visitUrl.indexOf(urlBase + "search") === 0 ? -1 : newSpaceId;
 
-        // Intercept global search
-        var urlBase = wvy.config.applicationPath.indexOf("http") === 0 ? wvy.config.applicationPath : document.location.origin + wvy.config.applicationPath;
-        var redirSpaceId = visitUrl && visitUrl.indexOf(urlBase + "search") === 0 ? -1 : newSpaceId;
+        //    var wasSignedOut = wvy.context.user === -1;
+        //    if (!wasSignedOut && redirSpaceId && newSpaceId !== wvy.context.space) {
 
-        var wasSignedOut = wvy.context.user === -1;
-        if (!wasSignedOut && redirSpaceId && newSpaceId !== wvy.context.space) {
-
-            if (redirSpaceId === -1) {
-                if (wvy.context.space > 0) {
-                    requestOpen("start", visitUrl);
-                } else {
-                    requestOpen("start");
-                    return;
-                }
-            } else {
-                // restore page and open bubble 
-                open(newSpaceId, visitUrl);
-            }
+        //        if (redirSpaceId === -1) {
+        //            if (wvy.context.space > 0) {
+        //                requestOpen("start", visitUrl);
+        //            } else {
+        //                requestOpen("start");
+        //                return;
+        //            }
+        //        } else {
+        //            // restore page and open bubble 
+        //            open(newSpaceId, visitUrl);
+        //        }
 
 
-            // keep old body          
-            var $oldBody = $("body");
-            var $newBody = $(e.data.newBody);
-            $newBody.html($oldBody.html());
+        //        // keep old body          
+        //        var $oldBody = $("body");
+        //        var $newBody = $(e.data.newBody);
+        //        $newBody.html($oldBody.html());
 
-            // REVIEW: is this needed?
-            //// transfer attributes
-            //$.each($oldBody.get(0).attributes, function (i, attrib) {
-            //    $newBody.attr(attrib.name, attrib.value);
-            //});
+        //        // REVIEW: is this needed?
+        //        //// transfer attributes
+        //        //$.each($oldBody.get(0).attributes, function (i, attrib) {
+        //        //    $newBody.attr(attrib.name, attrib.value);
+        //        //});
 
-            e.data.newBody = $newBody[0];
+        //        e.data.newBody = $newBody[0];
 
-            visitUrl = null;
-        }
+        //        visitUrl = null;
+        //    }
 
     });
 
@@ -151,33 +150,33 @@ wvy.bubbles = (function ($) {
                 $dropdownItem.appendTo($activeSpaces);
             }
 
-            // Widget nav
-            if ($(".weavy-widget-nav").length) {
-                var $avatarButton = $('<div class="weavy-button" data-type="personal">')
-                    .addClass("weavy-bubble-" + data.spaceId)
-                    .css("background-image", "url(" + data.icon + ")")
-                    .attr("data-name", data.name);
+            //// Widget nav
+            //if ($(".weavy-widget-nav").length) {
+            //    var $avatarButton = $('<div class="weavy-button" data-type="personal">')
+            //        .addClass("weavy-bubble-" + data.spaceId)
+            //        .css("background-image", "url(" + data.icon + ")")
+            //        .attr("data-name", data.name);
 
-                var $closeAction = $('<div class="weavy-bubble-action weavy-bubble-close" title="Close">')
-                    .attr("data-remove-bubble", JSON.stringify({ spaceId: data.spaceId, bubbleId: data.bubbleId }))
-                    .append('<svg class="i i-close-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.53 0 10 4.47 10 10s-4.47 10-10 10-10-4.47-10-10 4.47-10 10-10m3.59 5-3.59 3.59-3.59-3.59-1.41 1.41 3.59 3.59-3.59 3.59 1.41 1.41 3.59-3.59 3.59 3.59 1.41-1.41-3.59-3.59 3.59-3.59z"/></svg>');
+            //    var $closeAction = $('<div class="weavy-bubble-action weavy-bubble-close" title="Close">')
+            //        .attr("data-remove-bubble", JSON.stringify({ spaceId: data.spaceId, bubbleId: data.bubbleId }))
+            //        .append('<svg class="i i-close-circle" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c5.53 0 10 4.47 10 10s-4.47 10-10 10-10-4.47-10-10 4.47-10 10-10m3.59 5-3.59 3.59-3.59-3.59-1.41 1.41 3.59 3.59-3.59 3.59 1.41 1.41 3.59-3.59 3.59 3.59 1.41-1.41-3.59-3.59 3.59-3.59z"/></svg>');
 
-                var $bubbleTooltip = $('<div class="weavy-bubble-tooltip">')
-                    .attr('id', "weavy-bubble-tooltip-" + data.spaceId)
-                    .append('<span class="weavy-bubble-tooltip-text"><span>' + data.name + '</span>' + (data.teamname ? '<small>&nbsp;' + data.teamname + '</small>' : '') + '</span>');
+            //    var $bubbleTooltip = $('<div class="weavy-bubble-tooltip">')
+            //        .attr('id', "weavy-bubble-tooltip-" + data.spaceId)
+            //        .append('<span class="weavy-bubble-tooltip-text"><span>' + data.name + '</span>' + (data.teamname ? '<small>&nbsp;' + data.teamname + '</small>' : '') + '</span>');
 
-                var $bubble = $('<div class="weavy-bubble-item block-link" data-type="personal">')
-                    .addClass("weavy-bubble-" + data.spaceId)
-                    .addClass(data.spaceId === wvy.context.space ? "active" : "")
-                    .attr("data-bubble-id", data.bubbleId)
-                    .attr("data-id", data.spaceId)
-                    .attr("data-href", data.url)
-                    .append($avatarButton)
-                    .append($closeAction)
-                    .append($bubbleTooltip);
+            //    var $bubble = $('<div class="weavy-bubble-item block-link" data-type="personal">')
+            //        .addClass("weavy-bubble-" + data.spaceId)
+            //        .addClass(data.spaceId === wvy.context.space ? "active" : "")
+            //        .attr("data-bubble-id", data.bubbleId)
+            //        .attr("data-id", data.spaceId)
+            //        .attr("data-href", data.url)
+            //        .append($avatarButton)
+            //        .append($closeAction)
+            //        .append($bubbleTooltip);
 
-                $bubble.appendTo(".weavy-widget-nav .weavy-bubbles-personal");
-            }
+            //    $bubble.appendTo(".weavy-widget-nav .weavy-bubbles-personal");
+            //}
         }
     }
 
@@ -233,9 +232,9 @@ wvy.bubbles = (function ($) {
             }
         })
     }
-    return {
-        open: open,
-        requestOpen: requestOpen
-    };
+    //return {
+    //    open: open,
+    //    requestOpen: requestOpen
+    //};
 
 })(jQuery);

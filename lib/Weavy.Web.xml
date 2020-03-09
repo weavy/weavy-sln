@@ -2574,8 +2574,15 @@
         </member>
         <member name="T:Weavy.Web.Api.Controllers.WeavyClientApiController">
             <summary>
-            api for adding and removing user specific bubbles 
+            Various helper methods used by client sdk.
             </summary>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.Click(System.String)">
+            <summary>
+            Called when a link is clicked to check if the target is in another app. 
+            </summary>
+            <param name="url">The url that was clicked.</param>
+            <returns>Returns info about the target.</returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.OpenBubble(Weavy.Core.Models.SpaceBubble)">
             <summary>
@@ -3231,6 +3238,14 @@
             <param name="persistent"><c>true</c> to set a persistent auth cookie, otherwise <c>false</c></param>
             <param name="update"><c>true</c> to update the local user account with claims from the specified <paramref name="identity"/>, otherwise <c>false</c>.</param>
             <returns>A <see cref="T:Weavy.Core.Models.User"/> and a <see cref="T:Weavy.Core.Models.Login"/> object.</returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.AccountController.HandleProfilePicture(Weavy.Core.Models.User,System.Security.Claims.ClaimsIdentity,System.Boolean)">
+            <summary>
+            Handle profile picture claim. Picture claim can be either an blob id (int), url (sting) or base64 encoded image (string)
+            </summary>
+            <param name="user"></param>
+            <param name="identity"></param>
+            <param name="update"></param>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignInOwin(Weavy.Core.Models.User,System.Boolean)">
             <summary>
@@ -4737,6 +4752,12 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:Weavy.Web.Controllers.TestController.Client">
+            <summary>
+            Action for the client test page.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Controllers.TestController.GetRedirect(System.String)">
             <summary>
             Test redirect from GET request.
@@ -5108,9 +5129,9 @@
             <param name="download">Trigger file download</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.WeavyScript(System.String,System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.WeavyClientController.WeavyIEScript(System.String,System.Boolean)">
             <summary>
-            Returns the weavy client script.
+            Returns the supporting IE polyfills script.
             </summary>
             <param name="options"></param>
             <param name="download">Trigger file download</param>
@@ -6139,9 +6160,9 @@
             </summary>
             <param name="options">Input options set by client.</param>
         </member>
-        <member name="M:Weavy.Web.Hubs.ClientHub.InitContext(Weavy.Web.Models.ContextOptions)">
+        <member name="M:Weavy.Web.Hubs.ClientHub.InitSpace(Weavy.Web.Models.SpaceOptions)">
             <summary>
-            Called to initialize a context (space).
+            Called to initialize a space.
             </summary>
             <param name="options">Input options set by client.</param>
         </member>
@@ -6157,7 +6178,7 @@
             </summary>
             <param name="options">Input options set by client.</param>
         </member>
-        <member name="M:Weavy.Web.Hubs.ClientHub.ConfigureContext(Weavy.Web.Models.ContextOptions)">
+        <member name="M:Weavy.Web.Hubs.ClientHub.ConfigureSpace(Weavy.Web.Models.SpaceOptions)">
             <summary>
             
             </summary>
@@ -6808,9 +6829,9 @@
             Initializes a new instance of the <see cref="T:Weavy.Web.Models.ClientData"/> class.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ClientData.Contexts">
+        <member name="P:Weavy.Web.Models.ClientData.Spaces">
             <summary>
-            Gets the configured contexts.
+            Gets the configured spaces.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.ClientData.Plugins">
@@ -7779,63 +7800,63 @@
         </member>
         <member name="P:Weavy.Web.Models.AppOptions.Id">
             <summary>
-            Sets the id of the app to configure.
+            Gets or sets the id of the app to configure.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.AppOptions.Context">
+        <member name="P:Weavy.Web.Models.AppOptions.Space">
             <summary>
-             Unique identifier (id, key, teamname, name) for the space where the app is configured.
+             Space identifier (id or key) for the space where the app is configured.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.AppOptions.Key">
             <summary>
-             Sets an identifier for the app (needs to be unique per space).
+              Gets or sets the unique identifier for the app in the the host system (needs to be unique per space).
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.AppOptions.Name">
             <summary>
-             Sets the display name.
+             Gets or sets the display name.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.AppOptions.Type">
             <summary>
-            Sets the type of app to configure. 
+            Gets or sets the type of app to configure. 
             Preferably GUID of <see cref="T:Weavy.Core.Models.App"/>, but short name or fully qualified name will also work as long as it is unique within the installation.
             </summary>
         </member>
-        <member name="T:Weavy.Web.Models.ContextOptions">
+        <member name="T:Weavy.Web.Models.SpaceOptions">
             <summary>
               An object used to configure spaces from the client script.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Models.ContextOptions.#ctor">
+        <member name="M:Weavy.Web.Models.SpaceOptions.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:Weavy.Web.Models.ContextOptions"/> class.
+            Initializes a new instance of the <see cref="T:Weavy.Web.Models.SpaceOptions"/> class.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ContextOptions.Id">
+        <member name="P:Weavy.Web.Models.SpaceOptions.Id">
             <summary>
-             Sets the id of the space.
+             Gets or sets the id of the space.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ContextOptions.Key">
+        <member name="P:Weavy.Web.Models.SpaceOptions.Key">
             <summary>
-             Sets a unique identifier for the context in the host system.
+             Gets or sets the unique identifier from the host system.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ContextOptions.Name">
+        <member name="P:Weavy.Web.Models.SpaceOptions.Name">
             <summary>
-             Sets the display name.
+             Gets or sets the display name.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ContextOptions.Description">
+        <member name="P:Weavy.Web.Models.SpaceOptions.Description">
             <summary>
-             Sets the description text.
+             Gets or sets the description text.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ContextOptions.Apps">
+        <member name="P:Weavy.Web.Models.SpaceOptions.Apps">
             <summary>
-            Sets the apps to configure for this client context.
+            Gets or sets the apps to configure for this space.
             </summary>
         </member>
         <member name="T:Weavy.Web.Models.ClientOptions">
@@ -7848,9 +7869,9 @@
             Initializes a new instance of the <see cref="T:Weavy.Web.Models.WeavyClientOptions"/> class.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.ClientOptions.Contexts">
+        <member name="P:Weavy.Web.Models.ClientOptions.Spaces">
             <summary>
-            Sets the context(s) to configure.
+            Sets the space(s) to configure.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.ClientOptions.Plugins">
@@ -7934,14 +7955,14 @@
             </summary>
             <param name="options"></param>
         </member>
-        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Bundle">
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.JQuery">
             <summary>
             Gets or sets a value indicating whether the script should exclude required libs jquery.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Extended">
+        <member name="P:Weavy.Web.Models.WeavyLoaderOptions.IE">
             <summary>
-            Include all plugins to use the dock.
+            Gets or sets a value indicating whether the script should add polyfills for IE.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.WeavyLoaderOptions.Minified">
@@ -7960,21 +7981,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WeavyScript(System.Boolean)">
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.IEUrl(System.Boolean)">
             <summary>
             Returns the script url.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WeavyLoader(System.Boolean)">
+        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.WeavyScript(System.Boolean)">
             <summary>
-            Returns the loader script.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Models.WeavyLoaderOptions.ToString">
-            <summary>
-            Returns the loader script.
+            Returns the script url.
             </summary>
             <returns></returns>
         </member>

@@ -5,22 +5,20 @@
 
 <header class="navbar navbar-light sticky-top">
     <h6 class="navbar-title mr-auto px-1">Notifications</h6>
-    <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" data-parent-id="@(Model.Parent?.Id)" data-parent-entity="@(Model.Parent?.Type)" title="Mark all as read">@Svg.Icon("check-all")</button>
+    <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="Mark all as read">@Svg.Icon("check-all")</button>
 </header>
 
 <div>
-    @if (Model.UnreadNotifications.Count + Model.ReadNotifications.Count == 0) {
+    @if (Model.Result.Count == 0) {
         <div class="container-fluid mt-3 empty">
             <p class="text-center text-muted">All caught up :)</p>
         </div>
     }
 
-    <div class="list-group list-group-flush notifications-list" data-notifications data-parent-id="@(Model.Parent?.Id)" data-parent-entity="@(Model.Parent?.Type)">
-        @foreach (var notification in Model.UnreadNotifications) {
-            Html.RenderPartial("~/Views/Notification/_Notification.cshtml", notification);
-        }
-        @foreach (var notification in Model.ReadNotifications) {
-            Html.RenderPartial("~/Views/Notification/_Notification.cshtml", notification);
-        }
+    <div id="infinite-scroll-target" class="list-group list-group-flush notifications-list" data-notifications>
+        @Html.Partial("_Notifications", Model.Result)
     </div>
+
+    @Html.ScrollMore(Model.Result)
+
 </div>

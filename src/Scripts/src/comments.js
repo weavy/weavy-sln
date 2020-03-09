@@ -25,7 +25,7 @@ wvy.comments = (function ($) {
         });
 
         // any visible comment editors
-        initCommentEditor($("textarea.comments-form:visible"));
+        initCommentEditor($("body.controller-posts textarea.comments-form:visible, body:not(.controller-posts) textarea.comments-form"));
     }
 
     // init comment editor

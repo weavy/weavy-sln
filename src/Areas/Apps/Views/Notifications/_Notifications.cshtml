@@ -1,0 +1,6 @@
+﻿@model NotificationSearchResult
+
+@foreach (var notification in Model) {
+    @Html.Partial("_Notification", notification)
+}
+@Html.ScrollNext(Model)

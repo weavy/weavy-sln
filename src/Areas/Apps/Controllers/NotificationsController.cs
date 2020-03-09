@@ -13,39 +13,21 @@ namespace Weavy.Areas.Apps.Controllers {
     public class NotificationsController : AppController<Notifications> {
 
         /// <summary>
-        /// Display notifications for the <see cref="Notifications"/>.
+        /// Displays notifications.
         /// </summary>
-        /// <param name="app">Id of app</param>
+        /// <param name="app">The Notifications app.</param>
+        /// <param name="query">Query object for paging.</param>
         public override ActionResult Get(Notifications app, Query query) {
 
-            if (app.SpaceId != null && app.SpaceId != -1) {
-                app.Parent = app.Space();
-            }
-
-            // get all unread notifications
-            app.UnreadNotifications = NotificationService.Search(new NotificationQuery(query) {
+            app.Result = NotificationService.Search(new NotificationQuery(query) {
                 UserId = User.Id,
-                SearchRead = false,
+                SearchRead = null,
                 OrderBy = "Id DESC",
-                ParentId = app.SpaceId == -1 ? null : app.SpaceId,
-                ParentType = app.SpaceId == -1 ? null : EntityType.Space as EntityType?
+                Top = PageSizes.First()
             });
 
-            // fill up with some unread
-            var more = PageSizes.First() / 2 - app.UnreadNotifications.Count;
-            if (more > 0) {
-                app.ReadNotifications = NotificationService.Search(new NotificationQuery(query) {
-                    UserId = User.Id,
-                    OrderBy = "Id DESC",
-                    SearchRead = true,
-                    Top = more,
-                    ParentId = app.SpaceId == -1 ? null : app.SpaceId,
-                    ParentType = app.SpaceId == -1 ? null : EntityType.Space as EntityType?
-                });
-            }
-
             if (Request.IsAjaxRequest()) {
-                return PartialView(app);
+                return PartialView("_Notifications", app.Result);
             }
 
             return View(app);

@@ -50,49 +50,54 @@
     </script>
 }
 
-    <div class="container my-4">
-        <h1 class="display-1">@Title</h1>
-        <p>Select your preferred configuration below.</p>
-        <form action="@(Url.Action<WeavyClientController>(c => c.Index(null)))" method="post" id="weavy-wizard" data-turboform>
-            @Html.EditorsForModel()
-        </form>
+<div class="container my-4">
+    <h1 class="display-1">@Title</h1>
+    <p>Select your preferred configuration below.</p>
+    <form action="@(Url.Action<WeavyClientController>(c => c.Index(null)))" method="post" id="weavy-wizard" data-turboform>
+        @Html.EditorsForModel()
+    </form>
 
 
-        <h4 class="display-2 mt-5">Client SDK</h4>
-        <p>You can reference the url directly or download a local copy of the file to include in your app or site.</p>
+    <h4 class="display-2 mt-5">Client SDK</h4>
+    <p>You can reference the url directly or download a local copy of the file to include in your app or site.</p>
+
+    <div class="input-group mb-3">
+        <input id="scriptUrl" class="form-control bg-transparent border text-light" type="text" value="@Model.ScriptUrl(true)" readonly>
+        <div class="input-group-append">
+            <button class="btn btn-primary border btn-square" type="button" onclick="document.getElementById('scriptUrl').select(); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="URL Copied">@Svg.Icon("content-copy")</button>
+            <a href="@Model.ScriptUrl(true)?download=true" class="btn btn-primary border btn-square">@Svg.Icon("download")</a>
+        </div>
+    </div>
+
+    @if(Model.IE) {
+        <h4 class="display-2 mt-5">Internet Explorer Support</h4>
+        <p>If you need support for IE, you will need a couple of polyfills to get the weavy client running. The experience in IE may be limited compared to other browsers.</p>
 
         <div class="input-group mb-3">
-            <input id="scriptUrl" class="form-control bg-transparent border text-light" type="text" value="@Model.ScriptUrl(true)" readonly>
+            <input id="ieUrl" class="form-control bg-transparent border text-light" type="text" value="@Model.IEUrl(true)" readonly>
             <div class="input-group-append">
-                <button class="btn btn-primary border btn-square" type="button" onclick="document.getElementById('scriptUrl').select(); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="URL Copied">@Svg.Icon("content-copy")</button>
-                <a href="@Model.ScriptUrl(true)?download=true" class="btn btn-primary border btn-square">@Svg.Icon("download")</a>
+                <button class="btn btn-primary border btn-square" type="button" onclick="document.getElementById('ieUrl').select(); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="URL Copied">@Svg.Icon("content-copy")</button>
+                <a href="@Model.IEUrl(true)?download=true" class="btn btn-primary border btn-square">@Svg.Icon("download")</a>
             </div>
         </div>
+    }
 
-        <h4 class="display-2 mt-5">Embedded script</h4>
+    <h4 class="display-2 mt-5">Embedded script</h4>
 
-        <p>Choose one of the configurations below and copy the script and insert into the page(s) where you want to embed Weavy.</p>
+    <p>Choose one of the configurations below and copy the script and insert into the page(s) where you want to embed Weavy.</p>
 
-        <ul class="nav nav-tabs" id="scriptTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="html-tab" data-toggle="tab" href="#html" role="tab" aria-controls="html" aria-selected="true">Plain HTML</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#javascript" role="tab" aria-controls="javascript" aria-selected="false">Javascript loader</a>
-            </li>
-        </ul>
-        <div class="tab-content" id="scriptTabContent">
-            <div class="tab-pane show active py-3" id="html" role="tabpanel" aria-labelledby="home-tab">
-                <p>This is the common integration where you first include the script. Once the script has loaded you can create Weavy instances anywhere in your code.</p>
-                <button class="btn btn-outline-primary border-transparent btn-square float-right" type="button" onclick="window.getSelection().selectAllChildren(document.getElementById('weavy-script')); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="Script Copied">@Svg.Icon("content-copy")</button>
-                <pre id="weavy-script">@(Model.Bundle ? "" : "<script src=\"https://code.jquery.com/jquery-3.3.1.min.js\"></script>\n")@Model.ScriptUrl()@Model.WeavyScript()</pre>
-            </div>
-            <div class="tab-pane py-3" id="javascript" role="tabpanel" aria-labelledby="profile-tab">
-                <p>The javascript loader injects the weavy script from javascript. After the script has finished loading you get a load event where you can create your Weavy instances. You can place the script anywhere in your javascripts.</p>
-                <button class="btn btn-outline-primary border-transparent btn-square float-right" type="button" onclick="window.getSelection().selectAllChildren(document.getElementById('weavy-loader')); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="Script Copied">@Svg.Icon("content-copy")</button>
-                <pre id="weavy-loader">@Model.WeavyLoader(true)</pre>
-            </div>
+    <ul class="nav nav-tabs" id="scriptTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="html-tab" data-toggle="tab" href="#html" role="tab" aria-controls="html" aria-selected="true">Plain HTML</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="scriptTabContent">
+        <div class="tab-pane show active py-3" id="html" role="tabpanel" aria-labelledby="home-tab">
+            <p>This is the common integration where you first include the script. Once the script has loaded you can create Weavy instances anywhere in your code.</p>
+            <button class="btn btn-outline-primary border-transparent btn-square float-right" type="button" onclick="window.getSelection().selectAllChildren(document.getElementById('weavy-script')); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="Script Copied">@Svg.Icon("content-copy")</button>
+            <pre id="weavy-script">@(Model.JQuery ? "" : "<script src=\"https://code.jquery.com/jquery-3.3.1.min.js\"></script>\n")@(Model.IE ? Model.IEUrl() : "")@Model.ScriptUrl()@Model.WeavyScript()</pre>
         </div>
-
-
     </div>
+
+
+</div>

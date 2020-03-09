@@ -21,6 +21,29 @@
 
     console.debug("postal.js");
 
+    function eqObjects(a, b, skipLength) {
+        if (!$.isPlainObject(a) || !$.isPlainObject(b)) {
+            return false;
+        }
+
+        var aProps = Object.getOwnPropertyNames(a);
+        var bProps = Object.getOwnPropertyNames(b);
+
+        if (!skipLength && aProps.length !== bProps.length) {
+            return false;
+        }
+
+        for (var i = 0; i < aProps.length; i++) {
+            var propName = aProps[i];
+
+            if (a[propName] !== b[propName]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     var WeavyPostal = function () {
         /**
          *  Reference to this instance
@@ -56,7 +79,7 @@
             var fromFrame = contentWindowOrigins.has(e.source) && e.origin === contentWindowOrigins.get(e.source);
 
             if (fromSelf || fromParent || fromFrame) {
-                console.debug("wvy.postal: message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame", e.data.name);
+                console.debug("wvy.postal: message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
 
                 var genericDistribution = !e.data.weavyId || e.data.weavyId === true;
 
@@ -71,15 +94,16 @@
 
                 messageListeners.forEach(function (listener) {
                     var matchingName = listener.name === messageName || listener.name === "message";
-                    var genericListener = listener.weavyId === null;
-                    var matchingWeavyId = listener.weavyId === e.data.weavyId;
+                    var genericListener = listener.selector === null;
+                    var matchingWeavyId = listener.selector === e.data.weavyId;
+                    var matchingDataSelector = $.isPlainObject(listener.selector) && eqObjects(listener.selector, e.data, true);
 
-                    if (matchingName && (genericDistribution || genericListener || matchingWeavyId)) {
+                    if (matchingName && (genericDistribution || genericListener || matchingWeavyId || matchingDataSelector)) {
 
                         listener.handler(e);
 
                         if (listener.once) {
-                            off(listener.name, listener.weavyId, listener.handler);
+                            off(listener.name, listener.selector, listener.handler);
                         }
                     }
                 });
@@ -92,6 +116,7 @@
                     case "register-child":
                         if (!_parentWindow) {
                             if (!contentWindowWeavyIds.has(e.source)) {
+                                console.debug("wvy.postal: child contentwindow not found, registering frame");
                                 // get the real frame window
                                 var frameWindow = Array.from(window.frames).filter(function (frame) {
                                     return frame === e.source;
@@ -115,7 +140,7 @@
                                 e.source.postMessage({
                                     name: "register-window",
                                     windowName: contentWindowName,
-                                    weavyId: weavyId,
+                                    weavyId: weavyId || true,
                                 }, "*");
                             } catch (e) {
                                 console.error("wvy.postal: Could not register frame window", weavyId, contentWindowName, e);
@@ -124,7 +149,7 @@
                         break;
                     case "register-window":
                         if (!_parentWindow) {
-                            console.debug("wvy.postal: registering frame window", e.data.weavyId, e.data.windowName);
+                            console.debug("wvy.postal: registering frame window", e.data.windowName);
                             _parentOrigin = e.origin;
                             _parentWindow = e.source;
                             _parentName = e.data.windowName;
@@ -180,32 +205,32 @@
             }
         });
 
-        function on(name, weavyId, handler) {
+        function on(name, selector, handler) {
             if (typeof arguments[1] === "function") {
                 // omit weavyId argument
                 handler = arguments[1];
-                weavyId = null;
+                selector = null;
             }
-            messageListeners.push({ name: name, handler: handler, weavyId: weavyId });
+            messageListeners.push({ name: name, handler: handler, selector: selector });
         }
 
-        function one(name, weavyId, handler) {
+        function one(name, selector, handler) {
             if (typeof arguments[1] === "function") {
                 // omit weavyId argument
                 handler = arguments[1];
-                weavyId = null;
+                selector = null;
             }
-            messageListeners.push({ name: name, handler: handler, weavyId: weavyId, once: true });
+            messageListeners.push({ name: name, handler: handler, selector: selector, once: true });
         }
 
-        function off(name, weavyId, handler) {
+        function off(name, selector, handler) {
             if (typeof arguments[1] === "function") {
                 // omit weavyId argument
                 handler = arguments[1];
-                weavyId = null;
+                selector = null;
             }
             messageListeners = messageListeners.filter(function (listener) {
-                return !(name === listener.name && handler === listener.handler && weavyId && weavyId === listener.weavyId);
+                return !(name === listener.name && handler === listener.handler && (typeof selector === "string" && selector === listener.selector || $.isPlainObject(selector) && eqObjects(selector, listener.selector)));
             });
         }
 
@@ -286,7 +311,7 @@
                 try {
                     contentWindow.postMessage(message, "*", transfer);
                 } catch (e) {
-                    console.warn("wvy.postal: postBroadcast() Could not broadcast message to " + contentWindowNames.get(contentWindow))
+                    console.warn("wvy.postal: postBroadcast() could not broadcast message to " + contentWindowNames.get(contentWindow))
                 }
             })
 

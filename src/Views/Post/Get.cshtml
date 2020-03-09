@@ -1,7 +1,7 @@
 ﻿@model Post
 @{
     Title = "Post details";
-    Back = Url.Back(WeavyContext.Space.Url<Posts>() ?? Url.Action<HomeController>(c => c.Index()));
+    Back = Model.App().Url();
 }
 
 <div class="container my-3">

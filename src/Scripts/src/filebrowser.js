@@ -5,7 +5,9 @@ wvy.filebrowser = (function ($) {
     var fileBrowserUrl = "https://filebrowser.weavycloud.com";
 
     var whenFilebrowserLoaded = $.Deferred();
+    var whenGoogleInitComplete = $.Deferred();
     var loadingStarted = false;
+    var googleSubmitButton = "#google-create-modal button[type='submit']";
 
     var loadFilebrowser = function () {
         if (!loadingStarted) {
@@ -54,15 +56,9 @@ wvy.filebrowser = (function ($) {
                 if (response.skipped.length === 1) {
                     wvy.alert.warning('There is already an item named ' + response.skipped[0].name + '.' +
                         '<div>' +
-                        '<button type="button" class="btn btn-icon insert-content-keep"><svg class="i">' +
-                        '<svg class="i i-check-all" height="24" viewBox="0 0 24 24" width="24"><path d="m.41 13.41 5.59 5.59 1.41-1.42-5.58-5.58m20.41-6.42-10.58 10.59-4.16-4.17-1.43 1.41 5.59 5.59 12-12m-5.66 0-1.41-1.42-6.35 6.35 1.42 1.41z"/></svg> Keep both' +
-                        '</button > ' +
-                        '<button type="button" class="btn btn-icon insert-content-replace"><svg class="i">' +
-                        '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the item' +
-                        '</button > ' +
-                        '<button type="button" class="btn btn-icon insert-content-skip">' +
-                        '<svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this item' +
-                        '</button></div>');
+                        '<button type="button" class="btn btn-icon insert-content-keep"><svg class="i i-check-all" height="24" viewBox="0 0 24 24" width="24"><path d="m.41 13.41 5.59 5.59 1.41-1.42-5.58-5.58m20.41-6.42-10.58 10.59-4.16-4.17-1.43 1.41 5.59 5.59 12-12m-5.66 0-1.41-1.42-6.35 6.35 1.42 1.41z"/></svg> Keep both</button> ' +
+                        '<button type="button" class="btn btn-icon insert-content-replace"><svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the item</button> ' +
+                        '<button type="button" class="btn btn-icon insert-content-skip"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg> Skip this item</button></div>');
                 } else {
                     wvy.alert.warning('There are ' + response.skipped.length + ' items with the same names.' +
                         '<div>' +
@@ -139,12 +135,13 @@ wvy.filebrowser = (function ($) {
     }
 
     document.addEventListener("turbolinks:load", function () {
-        
-
+        whenFilebrowserLoaded = $.Deferred();
+        whenGoogleInitComplete = $.Deferred();
+        loadingStarted = false;  
     });
 
     // submit new google drive doc to filebrowser.weavycloud.com
-    $(document).on("click", "#google-create-modal button[type='submit']", function (e) {
+    $(document).on("click", googleSubmitButton, function (e) {
 
         var guid = $(this).data("guid");
         var type = $(this).data("type");
@@ -152,8 +149,10 @@ wvy.filebrowser = (function ($) {
         $(this).prop("disabled", true);
 
         loadFilebrowser().then(function () {
-            $("#filebrowser")[0].contentWindow.postMessage({ name: 'create', title: title, type: type, guid: guid }, "*");
-        })
+            whenGoogleInitComplete.then(function () {                
+                $("#filebrowser")[0].contentWindow.postMessage({ name: 'create', title: title, type: type, guid: guid }, "*");
+            });
+        });
 
         return false;
     });
@@ -178,13 +177,19 @@ wvy.filebrowser = (function ($) {
                     loadFilebrowser().then(function () {
                         $("#filebrowser").show();
                         wvy.postal.postToParent({ name: 'maximize' })
+
+                        whenGoogleInitComplete.then(function () {                            
+                            // send message to filebrowser.weavycloud.com to open up correct picker
+                            $("#filebrowser")[0].contentWindow.postMessage({ name: 'open', provider: provider, guid: guid }, "*");
+                        });
+                    });
+                } else {
+                    loadFilebrowser().then(function () {
+                        // send message to filebrowser.weavycloud.com to open up correct picker
+                        $("#filebrowser")[0].contentWindow.postMessage({ name: 'open', provider: provider, guid: guid }, "*");
                     });
                 }
 
-                loadFilebrowser().then(function () {
-                    // send message to filebrowser.weavycloud.com to open up correct picker
-                    $("#filebrowser")[0].contentWindow.postMessage({ name: 'open', provider: provider, guid: guid }, "*");
-                });
         }
 
         return false;
@@ -239,6 +244,10 @@ wvy.filebrowser = (function ($) {
             } else if (e.data.name === "closePicker") {
                 // close Google Drive picker
                 $("#filebrowser").hide();
+            } else if (e.data.name === "google-init-complete") {
+                whenGoogleInitComplete.resolve();
+            } else if (e.data.name === "google-cancelled") {
+                $(googleSubmitButton).prop("disabled", false);
             }
         }
     });

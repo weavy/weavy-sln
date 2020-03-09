@@ -1,120 +1,221 @@
-﻿@{
+﻿@model Tuple<Space, App>
+@{
     Layout = null;
-
-    
-
-
-    // create token valid for 60 seconds
-    var token = JwtUtils.Encode(new Dictionary<string, string> {
-                        { "iss", "SSO TEST"}, // required
-                        { "sub", User.Id.ToString()}, // required
-                        { "email", User.Email}, // required
-                        { "username", User.Username},
-                        { "name", User.Profile.Name}
-                    }, 60);
-
+    Space space = Model.Item1;
+    App app = Model.Item2;
 }
+
+<!DOCTYPE html>
 <html>
 <head>
-    @Bundler.Scripts(
-    "~/scripts/vendor/jquery/jquery.min.js",
-    "~/scripts/src/signalr/jquery.signalR.js"
-    )
-    <script>
-        var connection = $.hubConnection();
-        connection.logging = true;
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Weavy Client Test</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="~/javascript/weavy.js"></script>
 
-        var clientHubProxy = connection.createHubProxy('client');
+    <style>
+        html, body {
+            overflow-x: hidden;
+            background: #666;
+        }
 
-        connection.start().done(function () {
-            console.log('Connection = ' + connection.id + ", Transport = " + connection.transport.name);
-        }).fail(function () {
-            console.log('Could not connect');
-        });
+        .i {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: currentColor;
+        }
 
+        svg.i:not(.text-native) * {
+            fill: currentColor;
+        }
 
-        $(document).on("click", "#init0", function (e) {
-            clientHubProxy.invoke('init', null).done(function (json) {
-                var data = JSON.parse(json);
-                console.log(data);
-            });
-        });
+        .navbar {
+            height: 3.5rem;
+        }
 
-        $(document).on("click", "#init1", function (e) {
-            clientHubProxy.invoke('init', {
-                contexts: {
-                    key: "test-index"
-                },
-                plugins: {
-                    sso: {
-                        jwt: "@token"
-                    },
-                    theme: ""
-                }
-            }).done(function (json) {
-                var data = JSON.parse(json);
-                console.log(data);
-            });
-        });
+        .navbar-brand img {
+            width: 2rem;
+            height: 2rem;
+        }
 
-        $(document).on("click", "#init2", function (e) {
-            clientHubProxy.invoke('init', {
-                contexts: [
-                    {
-                        key: "global"
-                    },
-                    {
-                        key: "test-index"
-                    }
-                ]
-            }).done(function (json) {
-                var data = JSON.parse(json);
-                console.log(data);
-            });
-        });
+        .weavy-drawer {
+            position: fixed;
+            top: 3.5rem;
+            bottom: 0;
+            z-index: 1039;
+            transition: transform, opacity;
+            transition-duration: 0.2s;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            right: 0;
+            width: 20rem;
+            transform: translateX(20rem);
+            pointer-events: none;
+            border-left: 1px solid #333;
+        }
 
-        $(document).on("click", "#init-context", function (e) {
-            clientHubProxy.invoke('initContext', {
-                key: "test-index",
-                apps: [{
-                    type: "posts"
-                }]
-            }).done(function (json) {
-                var data = JSON.parse(json);
-                console.log(data);
-            });
+        .weavy-drawer.weavy-drawer-in {
+            transform: none;
+        }
 
-        });
+        .weavy-panel-block {
+            width: 320px;
+            height: 472px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            display: none;
+        }
 
-        $(document).on("click", "#init-app", function (e) {
-            clientHubProxy.invoke('initApp', {
-                    context: "test-index",
-                    type: "posts"
-                }).done(function (json) {
-                var data = JSON.parse(json);
-                console.log(data);
-            });
-        });
+        .weavy-panel-tile {
+            width: 320px;
+            height: 472px;
+        }
+    </style>
 
-    </script>
 </head>
 <body>
+    <nav class="navbar navbar-dark bg-dark text-light">
+        <a class="navbar-brand mr-auto" href="~/test/client">@Html.IconImg(24) Client Test</a>
+        <a id="weavyRightButtonPosts" class="nav-link p-2">@Svg.Icon("weavy")</a>
+        <a id="weavyRightButtonPersonal" class="nav-link p-2">@Svg.Icon("bell")</a>
+        <a id="weavyRightButtonMessenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
+    </nav>
 
-    <div class="container">
-        <section>
-            <h1 class="display-3 mt-4">Init client</h1>
-            <button id="init0" class="btn btn-primary">Init with no context</button>
-            <button id="init1" class="btn btn-primary">Init with context</button>
-            <button id="init2" class="btn btn-primary">Init with 2 contexts</button>
-            <br /><br />
-            <button id="init-context" class="btn btn-primary">Init context and app</button>
-            <button id="init-app" class="btn btn-primary">Init app</button>
-        </section>
+    <div class="container-fluid py-3">
+        <div class="py-3">
+            <button id="weavySignOut" class="btn btn-primary">Sign out</button>
+            <button id="weavySignIn" class="btn btn-primary">Sign in</button>
+        </div>
+        <div>
+            <button id="weavyPanelBlockToggle" class="btn btn-danger">Toggle @app.Name</button>
+            <div id="weavyPanelBlock" class="weavy-panel-block"></div>
+        </div>
+        <div class="weavy-panel-right">
+            <div id="weavyPanelRight" class="weavy-drawer"></div>
+        </div>
 
-        <p>token = @token</p>
     </div>
 
+    <div class="container-fluid py-3">
+        <div id="weavyPanelTile" class="weavy-panel-tile card"></div>
+    </div>
+
+    <section id="weavyOverlay"></section>
+
+    <script>
+        (function ($) {
+
+            var weavy = window.weavy = new Weavy({
+                id: "ctx",
+                spaces: [
+                    {
+                        key: "client-test-hub",
+                        name: "Client Test Hub",
+                        container: $("#weavyPanelRight"),
+                        toggled: true,
+                        apps: [
+                            { key: "posts", type: "posts" },
+                            { key: "notifications", type: "notifications" },
+                            { key: "messenger", type: "messenger" }
+                        ]
+                    },
+                    {
+                        id: @space.Id,
+                        apps: [
+                            {
+                                id: @app.Id,
+                                open: false,
+                                container: $("#weavyPanelBlock")
+                            },
+                            {
+                                key: "files",
+                                type: "files",
+                                container: $("#weavyPanelTile")
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            $("#weavySignOut").on("click", function () {
+                console.log("click signOut");
+                weavy.authentication.signOut();
+            });
+
+            $("#weavySignIn").on("click", function () {
+                console.log("click signIn");
+                weavy.authentication.signIn();
+            });
+
+            $("#weavyRightButtonPosts").on("click", function () {
+                console.log("click hub posts");
+                weavy.space("client-test-hub").toggle({ key: "posts" });
+            });
+
+            $("#weavyRightButtonPersonal").on("click", function () {
+                console.log("click hub notifications");
+                weavy.space("client-test-hub").toggle({ key: "notifications" });
+            });
+
+            $("#weavyRightButtonMessenger").on("click", function () {
+                console.log("click hub messenger");
+                weavy.space("client-test-hub").toggle({ key: "messenger" });
+            });
+
+            $("#weavyPanelBlockToggle").on("click", function () {
+                console.log("click block");
+                weavy.space(@space.Id).toggle({ id: @app.Id });
+            });
 
 
+            weavy.on("badge", function (e, badge) {
+                setBadge("#weavyRightButtonPersonal", badge.notifications);
+                setBadge("#weavyRightButtonMessenger", badge.conversations);
+            });
+
+            weavy.on("open", function (e, open) {
+                if (open.space.options.key === "client-test-hub") {
+                    weavy.log("on:open (hub)", open);
+                    $("#weavyPanelRight").addClass("weavy-drawer-in");
+                }
+
+                if (open.space.id === @space.Id && open.app.id === @app.Id) {
+                    weavy.log("on:open (block)", open);
+                    $("#weavyPanelBlock").slideDown();
+                }
+            });
+
+            weavy.on("close", function (e, close) {
+                if (close.space.options.key === "client-test-hub") {
+                    weavy.log("on:close (hub)", open);
+                    $("#weavyPanelRight").removeClass("weavy-drawer-in");
+                    if (weavy.nodes.panels) {
+                        weavy.nodes.panels.classList.remove("weavy-wide");
+                    }
+                }
+
+                if (close.space.id === @space.Id && close.app.id === @app.Id) {
+                    $("#weavyPanelBlock").slideUp();
+                }
+            });
+
+            function setBadge(selector, count) {
+                if (count > 0) {
+                    var $badge = $(selector + " .badge");
+                    if ($badge.length) {
+                        $badge.text(count);
+                    } else {
+                        $('<span class="badge badge-info">' + count + '</span>').appendTo(selector);
+                    }
+                } else {
+                    $(selector + " .badge").remove();
+                }
+            }
+
+        })(jQuery);
+    </script>
 </body>
 </html>

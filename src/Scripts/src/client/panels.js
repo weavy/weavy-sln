@@ -28,13 +28,14 @@
         function registerLoading(panelId) {
             var frame = $(_panels.get(panelId)).find("iframe").get(0);
             if (frame && !frame.registered) {
-                weavy.sendWindowId(frame.contentWindow, frame.name, panelId);
-                var onload = function () {
+                weavy.registerWindowId(frame.contentWindow, frame.name, panelId);
+                var onready = function (e) {
+                    weavy.debug("panel ready", panelId);
                     setPanelLoading.call(weavy, panelId, false);
                     delete frame.dataset.src;
                     frame.loaded = true;
                 };
-                weavy.on(frame, "load", onload);
+                weavy.on(wvy.postal, "ready", { weavyId: weavy.getId(), windowName: frame.name }, onready);
                 frame.registered = true;
             }
         }
@@ -64,7 +65,7 @@
         }
 
         /**
-         * Set the loading indicator on the specified panel. The loading indicatior is automatically removed on loading. It also makes sure the panel is registered and [sends frame id]{@link Weavy#sendWindowId} when loaded.
+         * Set the loading indicator on the specified panel. The loading indicatior is automatically removed on loading. It also makes sure the panel is registered and [sends frame id]{@link Weavy#registerWindowId} when loaded.
          * 
          * @category panels
          * @param {string} panelId - The id of the panel that is loading.
@@ -75,13 +76,16 @@
         function setPanelLoading(panelId, isLoading, fillBackground) {
             if (isLoading) {
                 registerLoading(panelId);
-                loadingTimeout[panelId] = weavy.timeout(15000).then(setPanelLoading.bind(weavy, panelId, false));
+                loadingTimeout[panelId] = weavy.timeout(15000);
+                loadingTimeout[panelId].then(setPanelLoading.bind(weavy, panelId, false));
             } else {
                 if (loadingTimeout[panelId]) {
                     loadingTimeout[panelId].reject();
                     delete loadingTimeout[panelId];
                 }
             }
+
+            var panel = _panels.get(panelId);
 
             /**
              * Event triggered when panel is starting to load or stops loading.
@@ -93,7 +97,7 @@
              * @property {boolean} isLoading - Indicating wheter the panel is loading or not.
              * @property {boolean} fillBackground - True if the panel has an opaque background during loading.
              */
-            weavy.triggerEvent("panel-loading", { panelId: panelId, isLoading: isLoading, fillBackground: fillBackground });
+            panel.triggerEvent("panel-loading", { panelId: panelId, isLoading: isLoading, fillBackground: fillBackground });
         }
 
         /**
@@ -107,8 +111,8 @@
 
             setPanelLoading.call(weavy, panelId, true);
 
-            var $target = $(_panels.get(panelId));
-            var frame = $target.find("iframe");
+            var panel = _panels.get(panelId);
+            var frame = $(panel).find("iframe");
 
             wvy.postal.postToFrame(frame[0].name, weavy.getId(), { "name": "reload" });
 
@@ -120,7 +124,7 @@
              * @returns {Object}
              * @property {string} panelId - The id of the panel being refreshed.
              */
-            weavy.triggerEvent("panel-reload", { panelId: panelId });
+            panel.triggerEvent("panel-reload", { panelId: panelId });
         }
 
         /**
@@ -134,7 +138,7 @@
          * @returns {external:Promise}
          */
         function openPanel(panelId, destination) {
-            weavy.info("openPanel", panelId);
+            weavy.info("openPanel", panelId + (destination ? " " + destination : ""));
 
             var panelsRoot = this instanceof HTMLElement ? this : weavy.nodes.panels;
             var panel = _panels.get(panelId);
@@ -152,7 +156,7 @@
                  * @property {string} panelId - The id of the panel being openened.
                  * @property {string} [destination] - Any url being requested to open in the panel.
                  */
-                var openResult = weavy.triggerEvent("panel-open", { panelId: panelId, destination: destination, panels: panelsRoot });
+                var openResult = panel.triggerEvent("panel-open", { panelId: panelId, destination: destination, panels: panelsRoot });
 
                 if (openResult !== false && openResult.panelId === panelId) {
                     return Promise.resolve(openResult);
@@ -185,7 +189,7 @@
                  * @category events
                  * @event Weavy#close
                  */
-                weavy.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
+                panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
 
                 // Return timeout promise
                 return weavy.whenClosed = weavy.timeout(250);
@@ -219,7 +223,7 @@
                  * @property {string} panelId - The id of the panel toggled.
                  * @property {boolean} closed - True if the panel is closed.
                  */
-                weavy.triggerEvent("panel-toggle", { panelId: panelId, closed: shouldClose });
+                panel.triggerEvent("panel-toggle", { panelId: panelId, closed: shouldClose });
 
                 if (shouldClose) {
                     return root.close(panelId);
@@ -297,6 +301,13 @@
             panels.load = loadPanel.bind(panels);
             panels.close = closePanel.bind(panels);
             panels.toggle = togglePanel.bind(panels);
+
+            // Events
+            panels.on = weavy.events.on.bind(panels);
+            panels.one = weavy.events.one.bind(panels);
+            panels.off = weavy.events.off.bind(panels);
+            panels.triggerEvent = weavy.events.triggerEvent.bind(panels);
+
             _panelsContainers.set(containerId, panels);
             return panels;
         }
@@ -351,6 +362,13 @@
             frame.allowFullscreen = 1;
 
             frame.dataset.weavyId = weavy.getId();
+
+            // Events
+            panel.eventParent = panelRoot;
+            panel.on = weavy.events.on.bind(panel);
+            panel.one = weavy.events.one.bind(panel);
+            panel.off = weavy.events.off.bind(panel);
+            panel.triggerEvent = weavy.events.triggerEvent.bind(panel);
 
             if (url) {
                 frame.dataset.src = weavy.httpsUrl(url, weavy.options.url);
@@ -422,7 +440,7 @@
              * @property {string} attributes.type - Type of the panel.
              * @property {boolean} attributes.persistent - Will the panel remain when {@link panels#removePanel} or {@link panels#clearPanels} are called?
              */
-            weavy.triggerEvent("panel-added", { panel: panel, panelId: panelId, url: url, attributes: attributes });
+            panelRoot.triggerEvent("panel-added", { panel: panel, panelId: panelId, url: url, attributes: attributes });
 
             return panel;
         }
@@ -469,11 +487,11 @@
          */
         function removePanel(panelId, force) {
             var panel = _panels.get(panelId);
+            var panelRoot = (this instanceof HTMLElement) ? this : weavy.nodes.panels;
+
             if (panel) {
                 var $panel = $(panel);
                 if (!$panel.data("persistent") || force) {
-                    var frame = $panel.find("iframe")[0];
-
                     if ($panel.hasClass("weavy-open")) {
                         $panel[0].id = weavy.getId("weavy-panel-removed-" + panelId);
                         weavy.timeout(0).then(function () {
@@ -493,7 +511,7 @@
                          * @returns {Object}
                          * @property {string} panelId - Id of the removed panel
                          */
-                        weavy.triggerEvent("panel-removed", { panelId: panelId });
+                        panelRoot.triggerEvent("panel-removed", { panelId: panelId });
                     }
                 }
             }

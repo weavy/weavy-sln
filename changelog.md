@@ -1,11 +1,24 @@
 # Changelog for Weavy
 
+## Weavy 6.0
+
+Weavy 6.0 contains additional improvements to the client SDK.
+
+### 6.0.0 (2020-03-09)
+
+* Client SDK requires key when initializing spaces and apps.
+* Fixed issue that prevented client SDK from creating spaces and apps with same names.
+* Added "navigate" event to client SDK for handling navigation across apps.
+* Added infinite scroll to notifications app.
+* Filebrowser is loaded on demand.
+
 ## Weavy 5.0
 
 Weavy 5.0 has new and improved Client and Mobile SDKs, improved handling of configuration settings, 
 and adds the ability to store files in Azure Blob storage.
 
 ### 5.0.2 (2020-03-02)
+
 * Added thumbnail preview when uploading images to posts and comments
 * Fixed problem with the license reported as invalid in some cases
 * Weavy Filebrowser is now loading only when needed

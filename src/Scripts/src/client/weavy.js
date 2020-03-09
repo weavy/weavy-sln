@@ -10,8 +10,11 @@
             'jquery',
             './events',
             './panels',
-            './context',
-            './authentication'
+            './space',
+            './authentication',
+            './navigation',
+            './utils',
+            './console'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -21,8 +24,11 @@
             require('jquery'),
             require('./events'),
             require('./panels'),
-            require('./context'),
-            require('./authentication')
+            require('./space'),
+            require('./authentication'),
+            require('./navigation'),
+            require('./utils'),
+            require('./console')
         );
     } else {
         // Browser globals (root is window)
@@ -30,11 +36,14 @@
             jQuery,
             root.WeavyEvents,
             root.WeavyPanels,
-            root.WeavyContext,
-            root.WeavyAuthentication
+            root.WeavySpace,
+            root.WeavyAuthentication,
+            root.WeavyNavigation,
+            root.WeavyUtils,
+            root.WeavyConsole
         );
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavyContext, WeavyAuthentication) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavySpace, WeavyAuthentication, WeavyNavigation, utils, WeavyConsole) {
     console.debug("weavy.js");
 
     var _weavyIds = [];
@@ -97,16 +106,12 @@
             }
         }
 
-        function S4() {
-            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-        }
-
         function generateId(id) {
-            id = "wy-" + (id ? id.replace(/^wy-/, '') : S4() + S4());
+            id = "wy-" + (id ? id.replace(/^wy-/, '') : utils.S4() + utils.S4());
 
             // Make sure id is unique
             if (_weavyIds.indexOf(id) !== -1) {
-                id = generateId(id + S4());
+                id = generateId(id + utils.S4());
             }
 
             return id;
@@ -115,13 +120,15 @@
         weavy.options.id = generateId(weavy.options.id);
         _weavyIds.push(weavy.options.id);
 
-        /**
-         * The unique instance color used by console logging.
-         * 
-         * @category properties
-         * @type {string}
-         */
-        weavy.logColor = weavy.options.logColor || "#" + (S4() + S4()).substr(-6).replace(/^([8-9a-f].).{2}/, "$100").replace(/^(.{2})[8-9a-f](.).{2}/, "$1a$200").replace(/.{2}([8-9a-f].)$/, "00$1");
+        // Logging
+
+        this.console = new WeavyConsole(weavy.options.id, weavy.options.loggingColor, weavy.options.logging);
+
+        this.log = this.console.log;
+        this.debug = this.console.debug;
+        this.warn = this.console.warn;
+        this.error = this.console.error;
+        this.info = this.console.info;
 
         /**
          * The hardcoded semver version of the weavy-script.
@@ -216,13 +223,12 @@
         weavy.connection = wvy.connection.get(weavy.options.url);
 
         // EVENT HANDLING
-        var events = new WeavyEvents(weavy);
+        weavy.events = new WeavyEvents(weavy);
 
-        weavy.on = events.on;
-        weavy.one = events.one;
-        weavy.off = events.off;
-        weavy.eventNamespaces = events.eventNamespaces;
-        weavy.triggerEvent = events.triggerEvent;
+        weavy.on = weavy.events.on;
+        weavy.one = weavy.events.one;
+        weavy.off = weavy.events.off;
+        weavy.triggerEvent = weavy.events.triggerEvent;
 
 
         // PANELS
@@ -253,41 +259,42 @@
 
         // AUTHENTICATION
         weavy.authentication = new WeavyAuthentication(weavy, { jwt: weavy.options.jwt });
-        
+
 
         // CONTEXTS
 
-        var _contexts = new Array();
+        weavy.spaces = new Array();
+
         /**
-         * Set up weavy contexts
+         * Set up weavy spaces
          */
-        weavy.context = function (options) {
-            var context;
+        weavy.space = function (options) {
+            var space;
 
-            var isContextId = Number.isInteger(options);
-            var isContextKey = typeof options === "string";
-            var isContextConfig = $.isPlainObject(options);
-            var contextSelector = isContextConfig && options || isContextId && { id: options } || isContextKey && { key: options };
+            var isSpaceId = Number.isInteger(options);
+            var isSpaceKey = typeof options === "string";
+            var isSpaceConfig = $.isPlainObject(options);
+            var spaceSelector = isSpaceConfig && options || isSpaceId && { id: options } || isSpaceKey && { key: options };
 
-            if (contextSelector) {
+            if (spaceSelector) {
                 try {
-                    context = _contexts.filter(function (ctx) { return ctx.match(contextSelector) }).pop();
+                    space = weavy.spaces.filter(function (ctx) { return ctx.match(spaceSelector) }).pop();
                 } catch (e) {}
 
-                if (!context) {
-                    if (isContextConfig) {
-                        context = new WeavyContext(weavy, options);
-                        _contexts.push(context);
+                if (!space) {
+                    if (isSpaceConfig) {
+                        space = new WeavySpace(weavy, options);
+                        weavy.spaces.push(space);
                         $.when(weavy.authentication.whenAuthenticated, weavy.whenLoaded).then(function () {
-                            context.init();
+                            space.fetchOrCreate();
                         });
                     } else {
-                        weavy.warn("Context " + (isContextConfig ? JSON.stringify(contextSelector) : options) + " does not exist. Use weavy.context(" + JSON.stringify(contextSelector) + ") to create the context.")
+                        weavy.warn("Space " + (isSpaceConfig ? JSON.stringify(spaceSelector) : options) + " does not exist." + (isSpaceId ? "" : " \n Use weavy.space(" + JSON.stringify(spaceSelector) + ") to create the space."))
                     }
                 }
             }
 
-            return context;
+            return space;
         };
 
         // TIMEOUT HANDLING 
@@ -312,72 +319,16 @@
          * @returns {external:Promise}
          */
         weavy.timeout = function (time) {
-            var timeoutId, timeoutResolve, timeoutReject;
-            var timeoutPromise = new Promise(function (resolve, reject) {
-                _timeouts.push(timeoutId = setTimeout(function () { resolve(); }, time));
-                timeoutResolve = resolve;
-                timeoutReject = reject;
-            }).catch(function () {
+            var timeoutId;
+            var whenTimeout = $.Deferred();
+
+            _timeouts.push(timeoutId = setTimeout(function () { whenTimeout.resolve(); }, time));
+
+            whenTimeout.catch(function () {
                 clearTimeout(timeoutId);
-                return Promise.reject();
             });
 
-            /**
-             * Create promise shim with .resolve() and .reject() included
-             * @lends Weavy#timeout
-             */
-            var timeout = {
-                /**
-                 * Register callbacks for when the timout is resolved or rejected (cancelled)
-                 * 
-                 * @ignore
-                 * @param {function} onResolved - Called on timeout
-                 * @param {function} onRejected - Called when timeout is cancelled
-                 * @returns {external:Promise}
-                 */
-                then: function (onResolved, onRejected) {
-                    timeoutPromise = timeoutPromise.then(onResolved, onRejected || function () { });
-                    return timeout;
-                },
-
-                /**
-                 * Register callbacks for when the timeout is rejected (cancelled).
-                 * 
-                 * @ignore
-                 * @param {function} onRejected - Called when timout is cancelled
-                 * @returns {external:Promise}
-                 */
-                catch: function (onRejected) {
-                    timeoutPromise = timeoutPromise.catch(onRejected);
-                    return timeout;
-                },
-
-                /**
-                 * Register a callback that is called on both reject and resolve.
-                 * 
-                 * @ignore
-                 * @param {function} onFinally - Always called
-                 * @returns {external:Promise}
-                 */
-                finally: function (onFinally) {
-                    timeoutPromise = timeoutPromise.finally(onFinally);
-                    return timeout;
-                },
-
-                /**
-                 * Additional {@link external:Promise} method for resolving the timeout before it has finished.
-                 * @method
-                 */
-                resolve: timeoutResolve,
-
-                /**
-                 * Additional {@link external:Promise} method for cancelling the timout and reject the promise before it has finished.
-                 * @method
-                 */
-                reject: timeoutReject
-            };
-
-            return timeout;
+            return whenTimeout;
         };
 
         // PROMISES
@@ -540,27 +491,6 @@
                 weavy.nodes.statusFrame.id = weavy.getId("weavy-status-check");
                 weavy.nodes.statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
 
-                /**
-                 * Event triggered when frame blocking check has finished. You may also use the {@link Weavy#whenBlockChecked} promise to make sure the blocked check has finished.
-                 *
-                 * @category events
-                 * @event Weavy#frame-check
-                 * @returns {object}
-                 * @property {boolean} blocked - Indicates if frames are blocked.
-                 */
-
-                weavy.on(weavy.nodes.statusFrame, "load", function () {
-                    // start testing for blocked iframe             
-                    weavy.isBlocked = true;
-                    try {
-                        wvy.postal.registerContentWindow(this.contentWindow, weavy.getId("weavy-status-check"), weavy.getId("weavy-status-check"));
-                    } catch (e) {
-                        weavy.warn("Frame postMessage is blocked", e);
-                        weavy.triggerEvent("frame-check", { blocked: true });
-                    }
-
-                });
-
                 weavy.one(wvy.postal, "ready", weavy.getId("weavy-status-check"), function () {
                     weavy.isBlocked = false;
                     weavy.triggerEvent("frame-check", { blocked: false });
@@ -569,6 +499,14 @@
                 weavy.nodes.container.appendChild(weavy.nodes.statusFrame);
                 weavy.timeout(1).then(function () {
                     weavy.nodes.statusFrame.src = weavy.data.statusUrl;
+                    weavy.isBlocked = true;
+                    try {
+                        wvy.postal.registerContentWindow(weavy.nodes.statusFrame.contentWindow, weavy.getId("weavy-status-check"), weavy.getId("weavy-status-check"));
+                    } catch (e) {
+                        weavy.warn("Frame postMessage is blocked", e);
+                        weavy.triggerEvent("frame-check", { blocked: true });
+                    }
+
                 });
             }
 
@@ -631,7 +569,7 @@
          * @param {string} windowName - The frame name attribute.
          * @param {string} [panelId] - If the frame is a panel, the panelId may also be provided.
          */
-        weavy.sendWindowId = function (contentWindow, windowName) {
+        weavy.registerWindowId = function (contentWindow, windowName) {
             try {
                 wvy.postal.registerContentWindow(contentWindow, windowName, weavy.getId());
             } catch (e) {
@@ -864,7 +802,7 @@
              */
             weavy.triggerEvent("destroy", null);
 
-            events.clear();
+            weavy.events.clear();
             clearTimeouts();
 
             _weavyIds.splice(_weavyIds.indexOf(weavy.getId()), 1);
@@ -888,18 +826,16 @@
 
         // Register init before any plugins do
         weavy.on("init", function () {
-            if (weavy.options.context) {
-                weavy.options.contexts = weavy.options.context;
-                weavy.warn("Using new Weavy({ context: ... }) is deprecated. Use new Weavy({ contexts: [...]}) instead.");
+            if (weavy.options.space) {
+                weavy.options.spaces = weavy.options.space;
+                weavy.warn("Using new Weavy({ space: ... }) is deprecated. Use new Weavy({ spaces: [...]}) instead.");
             }
-            if (weavy.options.contexts) {
-                weavy.debug("init: contexts");
+            if (weavy.options.spaces) {
+                var spaces = utils.asArray(weavy.options.spaces);
 
-                var contexts = asArray(weavy.options.contexts);
-
-                contexts.forEach(function (ctxOptions) {
-                    if (_contexts.filter(function (ctx) { return ctx.match(ctxOptions); }).length === 0) {
-                        _contexts.push(new WeavyContext(weavy, ctxOptions));
+                spaces.forEach(function (spaceOptions) {
+                    if (weavy.spaces.filter(function (space) { return space.match(spaceOptions); }).length === 0) {
+                        weavy.spaces.push(new WeavySpace(weavy, spaceOptions));
                     }
                 });
             }
@@ -950,7 +886,7 @@
         });
 
 
-        weavy.on(wvy.postal, "message", function (e) {
+        weavy.on(wvy.postal, "message", function (message) {
             /**
                 * THIS IS DEPRECATED. Use the weavy.on(wvy.postal, "message-name", function(e) { ... }); instead
                 * 
@@ -965,8 +901,8 @@
                 * @returns {Object.<string, data>}
                 * @property {string} name - The name of the message
                 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
-                */
-            weavy.triggerEvent("message", e.data, e);
+            */
+            weavy.triggerEvent("message", message.data, message);
         });
 
         weavy.on(wvy.postal, "reload", weavy.getId(), function (message) {
@@ -1069,27 +1005,21 @@
             weavy.triggerEvent("badge", { conversations: 0, notifications: 0, total: 0});
         })
 
-        function asArray(maybeArray) {
-            return maybeArray && ($.isArray(maybeArray) ? maybeArray : [maybeArray]) || [];
-        }
-
         weavy.on("clientdata", function (e, clientData) {
 
             // Merge options
             //weavy.data = weavy.extendDefaults(weavy.data, clientData, true);
             weavy.data = clientData;
 
-            if (weavy.isAuthenticated() && clientData.contexts) {
-                var contexts = asArray(clientData.contexts);
+            if (weavy.isAuthenticated() && clientData.spaces) {
+                var spaces = utils.asArray(clientData.spaces);
 
-                weavy.debug("Received contexts data");
-
-                contexts.forEach(function (contextData) {
-                     var foundContext = _contexts.filter(function (ctx) { return ctx.match(contextData) }).pop();
-                    if (foundContext) {
-                        weavy.debug("Populating context data", contextData.id);
-                        foundContext.data = contextData;
-                        foundContext.configure();
+                spaces.forEach(function (spaceData) {
+                     var foundSpace = weavy.spaces.filter(function (ctx) { return ctx.match(spaceData) }).pop();
+                    if (foundSpace) {
+                        weavy.debug("Populating space data", spaceData.id);
+                        foundSpace.data = spaceData;
+                        foundSpace.configure();
                     }
                 })
             }
@@ -1160,6 +1090,8 @@
 
         });
 
+        // NAVIGATION
+        weavy.navigation = new WeavyNavigation(weavy);
 
         // RUN PLUGINS
 
@@ -1363,107 +1295,7 @@
     });
 
 
-    // Logging functions
-    var isIE = /; MSIE|Trident\//.test(navigator.userAgent);
-
-    function colorLog(logMethod, id, color, logArguments) {
-        // Binding needed for console.log.apply to work in IE
-        var log = Function.prototype.bind.call(logMethod, console);
-
-        if (isIE) {
-            if (id) {
-                log.apply(this, ["Weavy " + id].concat($.makeArray(logArguments)));
-            } else {
-                log.apply(this, $.makeArray(logArguments));
-            }
-        } else {
-            if (id) {
-                log.apply(this, ["%cWeavy %s", "color: " + color, id].concat($.makeArray(logArguments)));
-            } else {
-                log.apply(this, ["%cWeavy", "color: gray"].concat($.makeArray(logArguments)));
-            }
-        }
-    }
-
     // PROTOTYPE METHODS
-
-    /**
-     * Wrapper for `console.debug()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using the {@link Weavy#logColor}. 
-     * @category logging
-     * @type {console.debug}
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/debug}
-     */
-    Weavy.prototype.debug = function () {
-        colorLog(console.debug, this.options.id, this.logColor, arguments);
-    };
-
-    /**
-     * Wrapper for `console.error()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using the {@link Weavy#logColor}. 
-     * @category logging
-     * @type {console.error}
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/error}
-     */
-    Weavy.prototype.error = function () {
-        colorLog(console.error, this.options.id, this.logColor, arguments);
-    };
-
-    /**
-     * Wrapper for `console.info()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using the {@link Weavy#logColor}. 
-     * @category logging
-     * @type {console.info}
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/info}
-     */
-    Weavy.prototype.info = function () {
-        colorLog(console.info, this.options.id, this.logColor, arguments);
-    };
-
-    /**
-     * Wrapper for `console.log()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using the {@link Weavy#logColor}. 
-     * @category logging
-     * @type {console.log}
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/log}
-     */
-    Weavy.prototype.log = function () {
-        colorLog(console.log, this.options.id, this.logColor, arguments);
-    };
-
-    /**
-     * Wrapper for `console.warn()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using the {@link Weavy#logColor}. 
-     * @category logging
-     * @type {console.warn}
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Console/warn}
-     */
-    Weavy.prototype.warn = function () {
-        colorLog(console.warn, this.options.id, this.logColor, arguments);
-    };
-
-    /**
-     * Stores data for the current domain in the weavy namespace.
-     * 
-     * @category options
-     * @param {string} key - The name of the data
-     * @param {data} value - Data to store
-     * @param {boolean} [asJson=false] - True if the data in value should be stored as JSON
-     */
-    Weavy.prototype.storeItem = function (key, value, asJson) {
-        localStorage.setItem('weavy_' + window.location.hostname + "_" + key, asJson ? JSON.stringify(value) : value);
-    };
-
-    /**
-     * Retrieves data for the current domain from the weavy namespace.
-     * 
-     * @category options
-     * @param {string} key - The name of the data to retrieve
-     * @param {boolean} [isJson=false] - True if the data shoul be decoded from JSON
-     */
-    Weavy.prototype.retrieveItem = function (key, isJson) {
-        var value = localStorage.getItem('weavy_' + window.location.hostname + "_" + key);
-        if (value && isJson) {
-            return JSON.parse(value)
-        }
-
-        return value;
-    };
 
     /**
      * Method for extending options. It merges together options. If the recursive setting is applied it will merge any plain object children. Note that Arrays are treated as data and not as tree structure when merging. 

@@ -186,25 +186,31 @@ wvy.editor = (function ($) {
                     var top = 5;
                     _emojiarea.editor.textcomplete([{
                         // link strategy
-                        match: /\[([^\]]+)$/,
-                        search: function (term, callback) {
+                        match: /\[(\w*)$/, // /\[([^\]]+)$/    
+                        search: function (term, callback) {                                                        
                             var url = wvy.url.resolve("/a/autocomplete");
                             if (wvy.context.space > 0) {
                                 url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete");
                             }
-                            $.getJSON(url, { q: term, top: top }).done(function (resp) {
+
+                            var data = { top: top };
+                            if (term !== "") {
+                                data.q = term;
+                            }
+
+                            $.getJSON(url, data).done(function (resp) {
                                 callback(resp);
                             }).fail(function () {
                                 callback([]);
                             });
                         },
                         index: 1,
-                        template: function (item) {
+                        template: function (item) {                            
                             var icon = '<svg class="i i-link-variant" height="24" viewBox="0 0 24 24" width="24"><path d="m10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0-1.95-1.95-1.95-5.12 0-7.07l3.54-3.54c1.95-1.95 5.12-1.95 7.07 0s1.95 5.12 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48c1.18-1.17 1.18-3.07 0-4.24-1.17-1.18-3.07-1.18-4.24 0l-3.53 3.53c-1.18 1.17-1.18 3.07 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0 1.95 1.95 1.95 5.12 0 7.07l-3.54 3.54c-1.95 1.95-5.12 1.95-7.07 0s-1.95-5.12 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47c-1.18 1.17-1.18 3.07 0 4.24 1.17 1.18 3.07 1.18 4.24 0l3.53-3.53c1.18-1.17 1.18-3.07 0-4.24-.41-.39-.41-1.03 0-1.42z"/></svg>'
-                            return icon + '<span>' + item.title + ' <small class="text-muted">' + item.kind + '</small></span>';
+                            return icon + '<span>' + item.name + ' <small class="text-muted">' + item.kind + '</small></span>';
                         },
                         replace: function (item) {
-                            return "[" + item.title + "](" + item.url + ") ";
+                            return "[" + item.name + "](" + item.url + ") ";
                         },
                         cache: false
                     }], {

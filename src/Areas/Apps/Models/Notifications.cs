@@ -16,19 +16,9 @@ namespace Weavy.Areas.Apps.Models {
     public class Notifications : App {
 
         /// <summary>
-        /// Gets or sets the unread notifcations.
+        /// Gets or sets the notifcations.
         /// </summary>
-        public IList<Notification> UnreadNotifications { get; set; }
-
-        /// <summary>
-        /// Gets or sets the read notifcations.
-        /// </summary>
-        public IList<Notification> ReadNotifications { get; set; }
-
-        /// <summary>
-        /// Gets or sets the parent item to get notifications for.
-        /// </summary>
-        public IEntity Parent { get; set; }
+        public NotificationSearchResult Result { get; set; }
 
     }
 }

@@ -18,7 +18,7 @@
         <div class="media-body">
             <h6 class="media-title">@creator.Link() <small>@@@creator.Username</small></h6>
             <small class="text-muted">
-                @Html.Time(Model.CreatedAt) @if (details) {<text>in</text> @Model.Space().Link()}
+                @Html.Time(Model.CreatedAt) 
                 @if (Model.ModifiedAt != Model.CreatedAt) {<text>&middot;</text> @Html.Time(Model.ModifiedAt, @"e\di\te\d")}
             </small>
         </div>

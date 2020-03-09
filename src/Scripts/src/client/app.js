@@ -6,27 +6,35 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery', './panels'], factory);
+        define([
+            'jquery',
+            './panels',
+            './utils'
+        ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('jquery'), require('./panels'));
+        module.exports = factory(
+            require('jquery'),
+            require('./panels'),
+            require('./utils')
+        );
     } else {
         // Browser globals (root is window)
-        root.WeavyApp = factory(jQuery, root.WeavyPanels);
+        root.WeavyApp = factory(jQuery, root.WeavyPanels, root.WeavyUtils);
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyPanels) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyPanels, utils) {
     console.debug("app.js");
 
-    var WeavyApp = function (weavy, context, options, data) {
+    var WeavyApp = function (weavy, space, options, data) {
 
         if (weavy.__proto__.constructor.name !== "Weavy") {
             throw new Error("WeavyApp instance error: No valid Weavy instance provided.");
         }
 
-        if (context.__proto__.constructor.name !== "WeavyContext") {
-            throw new Error("WeavyApp instance error: No valid weavy context provided.");
+        if (space.__proto__.constructor.name !== "WeavySpace") {
+            throw new Error("WeavyApp instance error: No valid weavy space provided.");
         }
 
         weavy.log("new WeavyApp", options);
@@ -37,43 +45,45 @@
          */
         var app = this;
 
-        Object.defineProperty(app, "isOpen", {
+        this.container = null;
+        this.root = null;
+        this.panel = null;
+        this.url = null;
+
+        this.id = null;
+        this.name = null;
+        this.key = null;
+        this.guid = null;
+        this.type = null;
+        this.typeName = null;
+
+        this.autoOpen = null;
+
+        this.weavy = weavy;
+        this.space = space;
+        this.options = options;
+        this.data = data;
+
+        // Event handlers
+        this.eventParent = space;
+        this.on = weavy.events.on.bind(app);
+        this.one = weavy.events.one.bind(app);
+        this.off = weavy.events.off.bind(app);
+        this.triggerEvent = weavy.events.triggerEvent.bind(app);
+
+        Object.defineProperty(this, "isOpen", {
             get: function () {
                 weavy.log("isOpen", app.panel, app.panel && app.panel.isOpen);
                 return app.panel ? app.panel.isOpen : false;
             }
-        })
-
-        app.container = null;
-        app.root = null;
-        app.panel = null;
-        app.url = null;
-
-        app.id = null;
-        app.name = null;
-        app.key = null;
-        app.guid = null;
-        app.type = null;
-        app.typeName = null;
-
-        app.autoOpen = null;
-
-        app.weavy = weavy;
-        app.context = context;
-        app.options = options;
-        app.data = data;
-
-        Object.defineProperty(app, "isInitialized", {
-            get: function () {
-                return app.options && typeof app.options === "object" || app.data && typeof app.data === "object";
-            }
         });
 
-        app.isBuilt = false;
+        this.isLoaded = false;
+        this.isBuilt = false;
 
-        var _whenInitialized = $.Deferred();
-        Object.defineProperty(app, "whenInitialized", {
-            get: _whenInitialized.promise
+        var _whenLoaded = $.Deferred();
+        Object.defineProperty(app, "whenLoaded", {
+            get: _whenLoaded.promise
         });
 
         var _whenBuilt = $.Deferred();
@@ -93,7 +103,7 @@
 
             if (app.options && typeof app.options === "object") {
                 if (app.autoOpen === null || app.container === null) {
-                    app.autoOpen = app.options && app.options.open !== undefined ? app.options.open : (context && context.options && context.options.open !== undefined ? context.options.open : (context && !context.toggled || false));
+                    app.autoOpen = app.options && app.options.open !== undefined ? app.options.open : (space && space.options && space.options.open !== undefined ? space.options.open : (space && !space.toggled || false));
                     app.container = app.options.container;
                 }
 
@@ -122,13 +132,27 @@
 
                 app.url = app.data.url;
 
+                // Check if app.data needs to be added in space.data.apps
+                if (app.space.data && app.space.data.apps) {
+                    var dataApps = utils.asArray(app.space.data.apps);
+
+                    var foundAppData = dataApps.filter(function (appData) { return app.match(appData) }).pop();
+                    if (!foundAppData) {
+                        // Add to space data
+                        app.space.data.apps.push(app.data);
+                    }
+                }
+
+                app.isLoaded = true;
+                _whenLoaded.resolve(app.data);
+
                 if (!app.isBuilt && app.weavy.isLoaded) {
                     app.build();
                 }
             }
         }
 
-        this.init = function (options) {
+        this.fetchOrCreate = function (options) {
 
             if (options && typeof options === "object") {
                 app.options = options;
@@ -136,19 +160,18 @@
 
             if (app.options && typeof app.options === "object") {
 
-                weavy.connection.invoke("client", "initApp", setContext(app.options, app.context)).then(function (data) {
+                weavy.connection.invoke("client", "initApp", setSpace(app.options, app.space)).then(function (data) {
                     app.data = data;
                     app.configure.call(app);
-                    _whenInitialized.resolve(data);
                 }).catch(function (error) {
-                    app.weavy.error("WeavyApp.init", error.message, error);
-                    _whenInitialized.reject(error);
+                    app.weavy.error("WeavyApp.fetchOrCreate()", error.message, error);
+                    _whenLoaded.reject(error);
                 });
             } else {
-                _whenInitialized.reject(new Error("App init requires options"));
+                _whenLoaded.reject(new Error("WeavyApp.fetchOrCreate() requires options"));
             }
 
-            return app.whenInitialized;
+            return app.whenLoaded;
         }
 
         function bridgePanelEvent(eventName, panelId, triggerData, e, data) {
@@ -158,7 +181,7 @@
                         triggerData[prop] = data[prop];
                     }
                 }
-                var eventResult = weavy.triggerEvent(eventName, triggerData);
+                var eventResult = app.triggerEvent(eventName, triggerData);
                 if (eventResult === false) {
                     return false;
                 } else if (eventResult) {
@@ -172,20 +195,22 @@
             }
         }
 
-        function setContext(options, context) {
-            var ctx = context.id || context.key || context.name;
-            return context.weavy.extendDefaults({ context: ctx }, options);
+        function setSpace(options, space) {
+            // TODO: This seems wrong
+            var ctx = space.id || space.key || space.name;
+            return space.weavy.extendDefaults({ space: ctx }, options);
         }
 
         this.build = function () {
             if (weavy.isLoaded && weavy.isAuthenticated()) {
-                var root = app.root || app.context && app.context.root;
+                var root = app.root || app.space && app.space.root;
 
                 if (app.options && app.data) {
                     if (!root && app.container) {
                         try {
                             app.root = root = weavy.createRoot(app.container, "app-" + app.id);
                             root.container.panels = weavy.panels.createContainer("app-container-" + app.id);
+                            root.container.panels.eventParent = app;
                             root.container.append(root.container.panels);
                         } catch (e) {
                             weavy.log("could not create app in container");
@@ -196,23 +221,23 @@
                         app.isBuilt = true;
                         weavy.debug("Building app", app.id);
                         var panelId = "app-" + app.id;
-                        var controls = app.options && app.options.controls !== undefined ? app.options.controls : (app.context.options && app.context.options.controls !== undefined ? app.context.options.controls : false);
+                        var controls = app.options && app.options.controls !== undefined ? app.options.controls : (app.space.options && app.space.options.controls !== undefined ? app.space.options.controls : false);
                         app.panel = root.container.panels.addPanel(panelId, app.url, { controls: controls });
 
                         // Move to panels?
                         weavy.one("signing-out", this.close.bind(app));
 
-                        weavy.on("panel-open", bridgePanelEvent.bind(app, "open", panelId, { context: app.context, app: app, destination: null }));
-                        weavy.on("panel-toggle", bridgePanelEvent.bind(app, "toggle", panelId, { context: app.context, app: app, destination: null }));
-                        weavy.on("panel-close", bridgePanelEvent.bind(app, "close", panelId, { context: app.context, app: app }));
+                        weavy.on("panel-open", bridgePanelEvent.bind(app, "open", panelId, { space: app.space, app: app, destination: null }));
+                        weavy.on("panel-toggle", bridgePanelEvent.bind(app, "toggle", panelId, { space: app.space, app: app, destination: null }));
+                        weavy.on("panel-close", bridgePanelEvent.bind(app, "close", panelId, { space: app.space, app: app }));
 
+                        _whenBuilt.resolve();
                     }
 
                     if (app.isBuilt && app.autoOpen) {
                         app.open();
                     }
 
-                    _whenBuilt.resolve();
                 }
             }
         };
@@ -253,62 +278,23 @@
 
     WeavyApp.prototype.clear = function () {
         var app = this;
-        var root = app.root || app.context && app.context.root;
+        var root = app.root || app.space && app.space.root;
 
         root.container.panels.removePanel("app-" + app.id);
     }
 
-    function asArray(maybeArray) {
-        return maybeArray && ($.isArray(maybeArray) ? maybeArray : [maybeArray]) || [];
-    }
-
-    function ciEq(str1, str2) {
-        return typeof str1 === "string" && typeof str2 === "string" && str1.toUpperCase() === str2.toUpperCase();
-    }
-
     WeavyApp.prototype.match = function (options) {
         if (options) {
-            return matchDataToOptions(this, options);
+            if (options.id && this.id) {
+                return options.id === this.id
+            }
+
+            if (options.key && this.key) {
+                return utils.ciEq(options.key, this.key);
+            }
         }
 
         return false;
-    };
-
-    // Finds an option set that is matching the provided app/appdata
-    function matchDataToOptions(appData, appOptions) {
-        if (appOptions.type || appOptions.guid || appOptions.name || appOptions.key || appOptions.id) {
-            var matchId = appData.id && appData.id === appOptions.id;
-            var matchKey = ciEq(appData.key, appOptions.key);
-            var matchName = ciEq(appData.name, appOptions.name);
-            var matchGuid = ciEq(appData.guid, appOptions.type);
-            var matchFullTypeName = ciEq(appData.typeName, appOptions.type);
-            var matchTypeName = appData.typeName && ciEq(appData.typeName.split(".").pop(), appOptions.type);
-            var matchType = appData.typeName && ciEq(appData.typeName.split(".").pop().split("App").shift(), appOptions.type);
-
-            var matchResult = (!appOptions.id || matchId)
-                && (!appOptions.key || matchKey)
-                && (!appOptions.name || matchName)
-                && (!appOptions.type || matchGuid || matchFullTypeName || matchTypeName || matchType);
-
-            return matchResult;
-        }
-        return false;
-    }
-
-    WeavyApp.getOptionsByData = function (appsOptions, appData) {
-        var optionsList = asArray(appsOptions);
-
-        if (!$.isPlainObject(appData)) {
-            return null;
-        }
-
-        var results = optionsList.filter(function (appOptions) { return matchDataToOptions(appData, appOptions); });
-
-        if (results.length > 1) {
-            throw new Error("App data is matching multiple options, please specify apps more in detail.")
-        }
-
-        return results.length === 1 && results.shift() || null;
     };
 
     return WeavyApp;

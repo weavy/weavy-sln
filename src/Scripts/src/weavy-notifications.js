@@ -30,7 +30,7 @@
         var spaceid = $(this).data("spaceid");
 
         if (spaceid) {
-            wvy.bubbles.open(spaceid, $(this).attr("href"));
+            //wvy.bubbles.open(spaceid, $(this).attr("href"));
         }
     });
 

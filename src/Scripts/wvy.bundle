@@ -37,6 +37,7 @@
 ~/scripts/src/alert.js
 ~/scripts/src/audio.js
 ~/scripts/src/bubbles.js
+~/scripts/src/navigation.js
 ~/scripts/src/connect.js
 ~/scripts/src/dropdown.js
 ~/scripts/src/modal.js

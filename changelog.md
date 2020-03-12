@@ -4,6 +4,13 @@
 
 Weavy 6.0 contains additional improvements to the client SDK.
 
+### 6.0.1 (2020-03-12)
+
+* Fixed sql error when validating app name on app where key is null.
+* Fixed "CreateSpace permission denied" when initializing spaces from client SDK.
+* Notification email now consolidates recent notifications.
+* Added setting for custom automcomplete api endpoint.
+
 ### 6.0.0 (2020-03-09)
 
 * Client SDK requires key when initializing spaces and apps.

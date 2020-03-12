@@ -193,6 +193,10 @@ wvy.editor = (function ($) {
                                 url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete");
                             }
 
+                            if (wvy.config && wvy.config.autocomplete) {
+                                url = wvy.url.resolve(wvy.config.autocomplete + "?id=" + wvy.context.space + "&appId=" + wvy.context.app);
+                            }
+
                             var data = { top: top };
                             if (term !== "") {
                                 data.q = term;

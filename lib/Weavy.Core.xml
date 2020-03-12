@@ -4324,17 +4324,17 @@
               An model for notifying users about an unread notification.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.NotificationEmail.#ctor(System.String,Weavy.Core.Models.User,Weavy.Core.Models.Notification)">
+        <member name="M:Weavy.Core.Models.NotificationEmail.#ctor(System.String,Weavy.Core.Models.User,System.Collections.Generic.List{Weavy.Core.Models.Notification})">
             <summary>
             
             </summary>
             <param name="subject"></param>
             <param name="to"></param>
-            <param name="notification"></param>
+            <param name="notifications"></param>
         </member>
-        <member name="P:Weavy.Core.Models.NotificationEmail.Notification">
+        <member name="P:Weavy.Core.Models.NotificationEmail.Notifications">
             <summary>
-            Gets the notification to display in the email.
+            Gets the notifications to display in the email.
             </summary>
         </member>
         <member name="T:Weavy.Core.Models.PasswordResetEmail">
@@ -19507,11 +19507,12 @@
             <param name="userId">User id</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Services.SpaceService.Insert(Weavy.Core.Models.Space)">
+        <member name="M:Weavy.Core.Services.SpaceService.Insert(Weavy.Core.Models.Space,System.Boolean)">
             <summary>
               Inserts a <see cref="T:Weavy.Core.Models.Space"/> object into the repository.
             </summary>
             <param name="space"><see cref="T:Weavy.Core.Models.Space"/> to insert.</param>
+            <param name="auth"><c>true</c> to check permissions, otherwise <c>false</c></param>
             <returns>The inserted <see cref="T:Weavy.Core.Models.Space"/></returns>
         </member>
         <member name="M:Weavy.Core.Services.SpaceService.Leave(System.Int32)">

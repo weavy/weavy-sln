@@ -143,6 +143,11 @@
             var panelsRoot = this instanceof HTMLElement ? this : weavy.nodes.panels;
             var panel = _panels.get(panelId);
 
+            if (!panel.dataset.persistent && !weavy.authentication.isAuthorized()) {
+                weavy.warn("Unathorized, can't open panel " + panelId);
+                return Promise.reject();
+            }
+
             return weavy.whenBlockChecked.then(function () {
 
                 $(panel).addClass("weavy-open");
@@ -718,7 +723,7 @@
             weavy.timeout(2000).then(weavy.preloadFrames.bind(this, "all"));
         });
 
-        weavy.on("signing-out", closePanels);
+        weavy.on("signing-out signed-out", closePanels);
         weavy.on("after:signed-out", resetPanels);
 
         // Exports

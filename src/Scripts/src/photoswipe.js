@@ -1,4 +1,6 @@
-﻿var wvy = wvy || {};
+﻿/*global PhotoSwipe, PhotoSwipeUI_Default */
+
+var wvy = wvy || {};
 
 (function ($) {
 
@@ -6,26 +8,18 @@
     $(document).on("click", "[data-photoswipe]", function (e) {
         // open weavy client preview
         if (wvy.browser.framed) {
-            document.documentElement.classList.add("pswp-transparent");
             wvy.postal.postToParent({ name: "preview-open" });
         }
 
         e.preventDefault();
-        if (wvy.browser.framed) {
-            // embedded: let weavy client apply styles before photoswipe init
-            var $that = $(this);
-            $(window).one("resize", function () { photoswipe($that, true); });
 
-        } else {
-            photoswipe($(this));
-        }
+        photoswipe($(this));
     });
 
     // cleanup before cache (needed when clicking back in the browser)
     $(document).on("turbolinks:before-cache", function () {
         // close photoswipe
         $(".pswp--open").removeClass("pswp--open pswp--animate_opacity pswp--notouch pswp--css_animation pswp--svg pswp--animated-in pswp--has_mouse");
-        document.documentElement.classList.remove("pswp-transparent");
     });
 
     function photoswipe(element, noZoomAnimation) {
@@ -85,7 +79,6 @@
             // close weavy client preview
             if (wvy.browser.framed) {
                 wvy.postal.postToParent({ name: "preview-close" });
-                $(window).one("resize", function () { requestAnimationFrame(function () { document.documentElement.classList.remove("pswp-transparent"); }) });
             }
         });
 

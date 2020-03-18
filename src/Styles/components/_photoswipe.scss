@@ -12,27 +12,3 @@ $pswp__error-text-color: $danger; // "Image not loaded" text color
 .pswp {
     @include overscroll-behavior-contain;
 }
-
-html.framed {
-    body {
-        transition: background-color $md-animation-duration $md-animation-curve-default;
-
-        > *:not(.pswp, .drawer) {
-            transition: opacity $md-animation-duration $md-animation-curve-default;
-        }
-    }
-}
-
-
-html.framed.pswp-transparent {
-    body {
-        background-color: transparent;
-        transition: none;
-
-        > *:not(.pswp) {
-            opacity: 0;
-            max-width: 24rem;
-            transition: none;
-        }
-    }
-}

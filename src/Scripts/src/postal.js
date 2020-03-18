@@ -281,7 +281,7 @@
             }
         }
 
-        function postBroadcast(message, transfer) {
+        function postBroadcast(message, transfer, onlyDownstream) {
             if (typeof message !== "object" || !message.name) {
                 console.error("wvy.postal: postBroadcast() Invalid message format", message);
                 return;
@@ -296,7 +296,7 @@
             message.name = "broadcast";
             message.weavyId = message.weavyId || true;
 
-            if (_parentWindow) {
+            if (_parentWindow && !onlyDownstream) {
                 try {
                     if (_parentWindow && _parentWindow !== window) {
                         _parentWindow.postMessage(message, _parentOrigin || "*", transfer);

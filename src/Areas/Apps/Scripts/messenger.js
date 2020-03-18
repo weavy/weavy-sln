@@ -114,6 +114,31 @@ wvy.messenger = (function ($) {
         }
     }, { threshold: 0 });
 
+    // Convert base64 encoded data to Blob 
+    function b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || '';
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, { type: contentType });
+        return blob;
+    }
+
     ////////// Document events //////////
 
     document.addEventListener("turbolinks:visit", function (e) {
@@ -324,6 +349,20 @@ wvy.messenger = (function ($) {
                     }
                 });
 
+
+                // handle pasted image
+                _textarea.on("pasteImage", function (editor, data, html) {
+                    var file = data.dataURL;
+                    var block = file.split(";");
+                    // get the content type of the image
+                    var contentType = block[0].split(":")[1];// In this case "image/gif"
+                    // get the real base64 content of the file
+                    var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
+                    // convert it to a blob to upload
+                    var blob = b64toBlob(realData, contentType);
+                    var fileOfBlob = new File([blob], data.name, { type: contentType });
+                    $(".message-form input[type=file]").fileupload('add', { files: fileOfBlob });
+                });
                 // restore pending message
                 restoreMessageForm();
             }

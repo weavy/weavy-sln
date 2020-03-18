@@ -65,19 +65,12 @@
         var initialized = false;
 
         var connectionUrl = "/signalr";
-        var connectionDomain = window.location.origin;
 
         if (url) {
-            // Add trailing slash
-            url += /\/$/.test(url) ? "" : "/";
+            // Remove trailing slash
+            url = /\/$/.test(url) ? url.slice(0,-1) : url;
 
-            connectionUrl = url + "signalr";
-
-            var origin = /^(https?:\/\/.+)\//.exec(url)[1] || null;
-
-            if (origin) {
-                connectionDomain = origin;
-            }
+            connectionUrl = url + connectionUrl;
         }
 
         // create a new hub connection
@@ -90,39 +83,27 @@
         var reconnectRetries = 0;
         var explicitlyDisconnected = false;
         var connectInProgress = false;
-        var authenticated = null;
-        var userId = null;
+
         var whenConnectionStart;
         var whenConnected = $.Deferred();
         var whenLeaderElected = $.Deferred();
+        var whenAuthenticated = $.Deferred();
 
         var states = $.signalR.connectionState;
-        var state = states.disconnected;
-        var broadcastingConnection = null;
-        var connectedAt = null;
 
         // Provide reverse readable state strings
+        // And convert strings to int
         for (var stateName in states) {
             if (states.hasOwnProperty(stateName)) {
                 states[states[stateName]] = stateName;
+                states[stateName] = parseInt(states[stateName]);
             }
         }
 
-        function initUserId() {
-            if (authenticated === null) {
-                if (wvy.context && wvy.context.user) {
-                    userId = wvy.context.user;
-                    authenticated = userId !== -1;
-                }
-            }
-        }
+        var state = parseInt(states.disconnected);
+        var broadcastingConnection = null;
+        var connectedAt = null;
 
-        function setUserId(newUserId) {
-            userId = newUserId;
-            if (wvy.context) {
-                wvy.context.user = newUserId;
-            }
-        }
 
         //----------------------------------------------------------
         // Init the connection
@@ -130,28 +111,37 @@
         // windows: initial [] of windows to post incoming events to when embedded
         // force: if to connect event if the user is not logged in
         //----------------------------------------------------------
-        function init(connectAfterInit) {
+        function init(connectAfterInit, authentication) {
             if (!initialized) {
                 initialized = true;
-                console.debug("wvy.connection: init", connectionDomain, connectAfterInit ? "and connect" : "");
-
-                initUserId();
+                console.debug("wvy.connection: init", url || "self", connectAfterInit ? "and connect" : "");
 
                 wvy.postal.whenLeader.then(function () {
                     console.log("connection postal is leader, let's go");
                     broadcastingConnection = false;
                     whenLeaderElected.resolve(true);
-                    connectionStart();
                 }, function () {
                     broadcastingConnection = true;
                     whenLeaderElected.resolve(false);
                 });
 
+                authentication = authentication || wvy.authentication.get(url);
+
+                authentication.whenAuthenticated().then(function () {
+                    whenAuthenticated.resolve();
+                });
+
+                authentication.on("user", function (e, auth) {
+                    if (auth.state !== "updated") {
+                        disconnectAndConnect();
+                    }
+                })
+
                 wvy.postal.on("broadcast", onBroadcastMessageReceived);
 
             }
 
-            if (userId || connectAfterInit) {
+            if (connectAfterInit) {
                 // connect to the server?
                 return connect();
             } else {
@@ -172,28 +162,33 @@
 
         // start the connection
         function connectionStart() {
-            explicitlyDisconnected = false;
+            return whenAuthenticated.then(function () {
+                console.log("wvy.connection: connection start")
+                explicitlyDisconnected = false;
 
-            initUserId();
+                if (status() === states.disconnected) {
+                    connectInProgress = true;
+                    state = states.connecting;
+                    triggerEvent("state-changed.connection.weavy", { state: state });
 
-            if (status() === states.disconnected) {
-                connectInProgress = true;
-                state = states.connecting;
-                triggerEvent("state-changed.connection.weavy", { state: state });
+                    whenConnectionStart = connection.start().always(function () {
+                        console.debug("wvy.connection: connection started")
+                        connectInProgress = false;
+                        whenConnected.resolve();
+                    }).catch(function (error) {
+                        console.error("wvy.connection: could not start connection")
+                    });
+                }
 
-                whenConnectionStart = connection.start().always(function () {
-                    connectInProgress = false;
-                    whenConnected.resolve();
-                });
-            }
-
-            return whenConnectionStart;
+                return whenConnectionStart;
+            });
         }
 
         // stop connection
         function disconnect(async, notify) {
             if (!broadcastingConnection && connection.state !== states.disconnected && explicitlyDisconnected === false) {
                 explicitlyDisconnected = true;
+                whenConnected = $.Deferred();
 
                 try {
                     connection.stop(async === true, notify !== false).then(function () {
@@ -219,7 +214,7 @@
         }
 
         function status() {
-            return state;
+            return parseInt(state);
         }
 
         // attach an event handler for the specified connection or server event, e.g. "presence", "typing" etc (see PushService for a list of built-in events)
@@ -305,7 +300,10 @@
         connection.logging = false;
 
         connection.stateChanged(function (connectionState) {
-            if (connectionState.newState === states.connected) {
+            // Make sure connectionState is int
+            var newState = parseInt(connectionState.newState);
+
+            if (newState === states.connected) {
                 console.debug("wvy.connection: connected " + connection.id + " (" + connection.transport.name + ")");
 
                 // clear timeouts
@@ -330,9 +328,9 @@
                 connectedAt = new Date();
             }
 
-            state = connectionState.newState;
+            state = newState;
             // trigger event
-            triggerEvent("state-changed.connection.weavy", { state: connectionState.newState });
+            triggerEvent("state-changed.connection.weavy", { state: newState });
         });
 
         connection.reconnected(function () {
@@ -410,180 +408,16 @@
             }
         }
 
-        // trigger a postMessage to the same window
-        function triggerPostMessage(name) {
-            wvy.postal.postToSelf({ name: name });
-            triggerBroadcast("post-message-event", name);
-        }
-
         // REALTIME EVENTS
 
         // generic callback used by server to notify clients that a realtime event happened
         // NOTE: we only need to hook this up in standalone, in the weavy client we wrap realtime events in the cross-frame-event and post to the frames
         function rtmEventRecieved(name, args) {
-            if (name === "request:authentication.weavy") {
-                console.debug("wvy.connection:", "rtm", "request:authentication.weavy");
-                updateAuthenticationState.call(this);
-            } else {
-                name = name.indexOf(".rtmweavy" === -1) ? name + ".rtmweavy" : name;
-                triggerEvent(name, args);
-            }
+            name = name.indexOf(".rtmweavy" === -1) ? name + ".rtmweavy" : name;
+            triggerEvent(name, args);
         }
 
         hubProxies["rtm"].on("eventReceived", rtmEventRecieved);
-
-        // AUTHENTICATION
-
-        hubProxies["client"].on("user", removeJSONbefore(function (user) {
-            console.debug("wvy.connection: client:user", user && user.id);
-            var wasAuthenticated = !!authenticated;
-            authenticated = user && user.id && user.id !== -1;
-            if (!wasAuthenticated && authenticated || authenticated && userId !== user.id) {
-                triggerEvent("user-change.connection.weavy", { state: "signed-in", user: user });
-                setUserId(user.id);
-            } else if (wasAuthenticated && !authenticated) {
-                triggerEvent("user-change.connection.weavy", { state: "signed-out", user: user });
-                setUserId(-1);
-            }
-        }));
-
-        function updateAuthenticationState() {
-            var authUrl = connectionUrl.substr(0, connectionUrl.lastIndexOf("/") + 1) + "a/users/authenticated";
-            console.debug("wvy.connection: updateAuthenticationState");
-
-            $.ajax(authUrl, {
-                crossDomain: true,
-                method: "GET",
-                xhrFields: {
-                    withCredentials: true
-                }
-            }).done(function (actualUserId) {
-                if (actualUserId !== -1) {
-                    if (!authenticated) {
-                        console.debug("wvy.connection: updateAuthenticationState -> authenticated");
-                        triggerPostMessage("signing-in");
-                        triggerEvent("signing-in.connection.weavy");
-                        disconnectAndConnect();
-                    } else if (actualUserId !== userId) {
-                        console.debug("wvy.connection: updateAuthenticationState -> authenticated as different user");
-
-                        triggerEvent("user-change.connection.weavy", { state: "signed-out", user: { id: userId } });
-                        triggerEvent("user-change.connection.weavy", { state: "signed-in", user: { id: actualUserId } });
-
-                        disconnectAndConnect();
-                    }
-                } else {
-                    if (authenticated) {
-                        console.debug("wvy.connection: updateAuthenticationState -> unauthorized");
-                        triggerPostMessage("signing-out");
-                        triggerEvent("signing-out.connection.weavy");
-                        disconnectAndConnect();
-
-                        if (wvy.alert) {
-                            wvy.alert.warning("You have been signed out. Reload to sign in again.");
-                        }
-                    }
-                    setUserId(-1);
-                }
-
-            }).fail(function () {
-                console.warn("wvy.connection: updateAuthenticationState request fail");
-                authenticated = false;
-                setUserId(-1);
-            });
-        }
-
-        // SSO
-
-        var ssoStates = {
-            /** Authentication has not started */
-            uninitialized: 0,
-            0: "uninitialized",
-            /** Currently authenticating */
-            authenticating: 1,
-            1: "authenticating",
-            /** Authentication process complete and user is authorized */
-            authorized: 2,
-            2: "authorized",
-            /** Authentication process failed and the user is unauthorized */
-            unauthorized: 3,
-            3: "unauthorized"
-        };
-
-        var ssoState = ssoStates.uninitialized;
-
-        // Set Single Sign On JWT token for the connection
-        function sso(jwt) {
-            var jwtIsNew = !connection.qs || !connection.qs.jwt || connection.qs.jwt !== jwt;
-            connection.qs = connection.qs || {};
-            connection.qs.jwt = jwt;
-            whenLeaderElected.then(function (leader) {
-                triggerBroadcast("sso-token", jwt);
-            });
-
-            if (jwtIsNew) {
-                whenConnected.then(function () {
-                    if (connection.qs.jwt) {
-                        invoke("client", "ValidateSSO", connection.qs.jwt).then(processSSO);
-                    }
-                });
-            }
-        }
-
-        // Triggered when SSO authentication is needed
-        hubProxies["client"].on("sso", removeJSONbefore(processSSO));
-
-
-        function processSSO(ssoData) {
-            var ssoUrl = connectionUrl.substr(0, connectionUrl.lastIndexOf("/") + 1) + "sign-in-token";
-            console.debug("wvy.connection: client:sso", ssoStates[ssoData.state]);
-            ssoState = ssoData.state;
-            triggerBroadcast("sso-state", ssoState);
-
-            if (ssoData.state === ssoStates.authenticating && connection.qs.jwt) {
-                console.debug("wvy.connection: signing in with JWT token");
-
-                triggerPostMessage("signing-in");
-                triggerEvent("signing-in.connection.weavy", { method: "sso" });
-
-                $.ajax(ssoUrl, {
-                    crossDomain: true,
-                    data: "jwt=" + connection.qs.jwt,
-                    method: "POST",
-                    xhrFields: {
-                        withCredentials: true
-                    }
-                }).done(function (user) {
-                    ssoState = ssoStates.authorized;
-                    console.debug("wvy.connection: signed in with JWT token", user.id);
-                    triggerBroadcast("sso-state", ssoState);
-                    triggerPostMessage("signed-in");
-                    triggerEvent("signed-in.connection.weavy", { method: "sso" });
-                }).fail(function () {
-                    ssoState = ssoStates.unauthorized;
-                    console.warn("wvy.connection: sign in with JWT token failed");
-                    triggerBroadcast("sso-state", ssoState);
-                    triggerPostMessage("authentication-error");
-                    triggerEvent("authentication-error.connection.weavy", { method: "sso" });
-                });
-            }
-
-            // Clear connection query string JWT to reset SSO
-            triggerBroadcast("sso-clear");
-            if (connection.qs && connection.qs.jwt) {
-                delete connection.qs.jwt;
-            }
-        }
-
-
-        // LEGACY CLIENT
-
-        // callback from weavy client onload
-        function weavyLoaded(args) {
-            var name = "loaded.rtmweavy.weavy";
-            triggerEvent(name, args);
-        }
-        hubProxies["client"].on("loaded", weavyLoaded);
 
         // REALTIME CROSS WINDOW MESSAGE
         // handle cross frame events from rtm
@@ -641,9 +475,6 @@
                         }
                     });
                     break;
-                case "post-message-event":
-                    wvy.postal.postToSelf({ name: msg.eventName });
-                    break;
                 case "broadcast-event":
                     var name = msg.eventName;
                     var event = $.Event(name);
@@ -654,19 +485,8 @@
                         data = data[0];
                     }
 
-                    if (name === "user-change.connection.weavy") {
-                        if (data.state === "signed-in") {
-                            authenticated = true;
-                            setUserId(data.user.id);
-                        }
-                        if (data.state === "signed-out") {
-                            authenticated = false;
-                            setUserId(-1);
-                        }
-                    }
-
                     if (name === "state-changed.connection.weavy") {
-                        state = data.state;
+                        state = parseInt(data.state);
                         if (state === states.connected) {
                             whenConnected.resolve();
                         }
@@ -674,18 +494,6 @@
 
                     console.debug("wvy.connection: triggering received broadcast-event", name);
                     $(weavyConnection).triggerHandler(event, msg.data);
-                    break;
-                case "sso-token":
-                    connection.qs = connection.qs || {};
-                    connection.qs.jwt = msg.data;
-                    break;
-                case "sso-state":
-                    ssoState = msg.data;
-                    break;
-                case "sso-clear":
-                    if (connection.qs && connection.qs.jwt) {
-                        delete connection.qs.jwt;
-                    }
                     break;
                 case "alert":
                     if (wvy.alert) {
@@ -699,15 +507,12 @@
                 default:
                     return;
             }
-
         };
 
 
         function destroy() {
             disconnect();
 
-            authenticated = null;
-            userId = null;
             reconnecting = false;
 
             window.clearTimeout(_reconnectTimeout);
@@ -715,10 +520,6 @@
 
             try {
                 hubProxies["rtm"].off("eventReceived", rtmEventRecieved);
-            } catch (e) { /* Ignore catch */ }
-
-            try {
-                hubProxies["client"].off("loaded", weavyLoaded);
             } catch (e) { /* Ignore catch */ }
 
             _events.forEach(function (eventHandler) {
@@ -732,12 +533,11 @@
             connect: connect,
             destroy: destroy,
             disconnect: disconnect,
+            disconnectAndConnect: disconnectAndConnect,
             init: init,
             invoke: invoke,
-            isAuthenticated: function () { return authenticated; },
             on: on,
             proxies: hubProxies,
-            sso: sso,
             states: states,
             status: status,
             transport: function () { return connection.transport.name; }
@@ -745,7 +545,11 @@
     };
 
     connections.get = function (url) {
-        var sameOrigin = url ? window.location.origin === (/^(https?:\/\/.+)\//.exec(url)[1] || null) : false;
+        var sameOrigin = false;
+        var urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
+        if (urlExtract) {
+            sameOrigin = window.location.origin === urlExtract[1]
+        }
         url = (sameOrigin ? "" : url) || "";
         if (_connections.has(url)) {
             return _connections.get(url);
@@ -780,8 +584,7 @@
                 $(function () {
                     setTimeout(function () {
                         if (_connections.size === 1) {
-                            console.debug("wvy.connection self init");
-                            connection.init();
+                            connection.init(wvy.authentication.default);
                         }
                     }, 1);
                 });

@@ -99,8 +99,9 @@
 
     </div>
 
-    <div class="container-fluid py-3">
-        <div id="weavyPanelTile" class="weavy-panel-tile card"></div>
+    <div class="container-fluid py-3 d-flex">
+        <div id="weavyPanelTile" class="weavy-panel-tile card mr-3"></div>
+        <div id="weavyPanelTilePosts" class="weavy-panel-tile card"></div>
     </div>
 
     <section id="weavyOverlay"></section>
@@ -139,6 +140,9 @@
                     }
                 ]
             });
+
+            var space = weavy.space({ key: "client-test-demo" });
+            var app = space.app({ key: "posts", type: "posts", container: "#weavyPanelTilePosts"});
 
             $("#weavySignOut").on("click", function () {
                 console.log("click signOut");

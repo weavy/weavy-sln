@@ -175,7 +175,7 @@
         this.build = function (e, build) {
             var space = this;
             var weavy = this.weavy;
-            if (weavy.isAuthenticated() && space.data && typeof space.data === "object") {
+            if (weavy.authentication.isAuthorized() && space.data && typeof space.data === "object") {
                 weavy.debug("Building space", space.id);
 
                 if (!space.root && space.container) {
@@ -213,7 +213,7 @@
                 if (isAppConfig) {
                     app = new WeavyApp(weavy, space, appOptions);
                     space.apps.push(app);
-                    $.when(weavy.authentication.whenAuthenticated, weavy.whenLoaded).then(function () {
+                    $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded).then(function () {
                         app.fetchOrCreate();
                     });
                 } else {

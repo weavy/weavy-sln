@@ -19,6 +19,7 @@
 ~/scripts/src/emoji.js
 ~/scripts/src/guid.js
 ~/scripts/src/scroll.js
+~/scripts/src/authentication.js
 ~/scripts/src/connection.js
 ~/scripts/src/presence.js
 ~/scripts/src/api.js
@@ -36,7 +37,6 @@
 ~/scripts/src/discuss.js
 ~/scripts/src/alert.js
 ~/scripts/src/audio.js
-~/scripts/src/bubbles.js
 ~/scripts/src/navigation.js
 ~/scripts/src/connect.js
 ~/scripts/src/dropdown.js

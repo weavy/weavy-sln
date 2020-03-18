@@ -1,10 +1,10 @@
 ﻿~/scripts/src/postal.js
+~/scripts/src/authentication.js
 ~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/src/connection.js
 ~/scripts/src/client/utils.js
 ~/scripts/src/client/console.js
 ~/scripts/src/client/events.js
-~/scripts/src/client/authentication.js
 ~/scripts/src/client/panels.js
 ~/scripts/src/client/app.js
 ~/scripts/src/client/space.js
@@ -17,4 +17,5 @@
 ~/scripts/src/client/plugins/alert.js
 ~/scripts/src/client/plugins/filebrowser.js
 ~/scripts/src/client/plugins/preview.js
+~/scripts/src/client/plugins/sign-in.js
 ~/scripts/src/client/plugins/theme.js

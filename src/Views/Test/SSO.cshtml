@@ -29,60 +29,56 @@
         console.log("button-scripts");
         $(document).on("click", "#status", function () {
             console.info("checking authentication status using AJAX");
-             $.ajax({
-                 url: '/a/users/me',
-                 method: "GET"
-             }).done(function (data) {
-                 // display result
-                 $("#result").text(JSON.stringify(data, null, 2));
-             }).fail(function (xhr,status,error) {
-                 // display result
-                 $("#result").text(status + ": " + error);
-             });
+            $.ajax({
+                url: '/client/user',
+                method: "GET"
+            }).done(function (data) {
+                // display result
+                $("#result").text(JSON.stringify(data, null, 2));
+            }).fail(function (xhr, status, error) {
+                // display result
+                $("#result").text(status + ": " + error);
+            });
         });
 
         $(document).on("click", "#signout", function () {
             console.info("signing out using ajax");
-             $.ajax({
-                 url: '/sign-out',
-                 method: "GET"
-             }).done(function (data) {
-                 // display result
-                 $("#result").text("signed-out");
-             }).fail(function (xhr,status,error) {
-                 // display result
-                 $("#result").text(error);
-             });
+            $.ajax({
+                url: '/sign-out',
+                method: "GET"
+            }).done(function (data) {
+                // display result
+                $("#result").text("signed-out");
+            }).fail(function (xhr, status, error) {
+                // display result
+                $("#result").text(error);
+            });
         });
 
         $(document).on("click", "#ajax", function () {
             console.info("signing in with token using AJAX");
-             $.ajax({
-                 url: '@(Url.Action<AccountController>(x => x.SignInToken(null)))',
-                 method: "POST",
-                 data: 'jwt=' + token
-             }).done(function (data) {
-                 // display result
-                 $("#result").text(JSON.stringify(data, null, 2));
-             }).fail(function (xhr,status,error) {
-                 // display result
-                 $("#result").text(error);
-             });
+            $.ajax({
+                url: '/client/sign-in',
+                contentType: "application/json",
+                data: JSON.stringify({ jwt: token }),
+                method: "POST",
+                xhrFields: {
+                    withCredentials: true
+                }
+            }).done(function (data) {
+                // display result
+                $("#result").text(JSON.stringify(data, null, 2));
+            }).fail(function (xhr, status, error) {
+                // display result
+                $("#result").text(status + ": " + error);
+            });
         });
 
-        $(document).on("click", "#signalr", function () {
-            console.info("signing in with token using signalR");
-            wvy.connection.default.sso(token);
-            wvy.connection.default.connect().then(function () {
+        $(document).on("click", "#authentication", function () {
+            console.info("signing in with token using wvy.authentication");
+            wvy.authentication.default.sso(token).then(function () {
                 $("#result").text("signalR signed-in " + wvy.connection.default.isAuthenticated());
-            })
-        });
-
-        $(document).on("click", "#signalr-disconnect", function () {
-            console.info("disconnecting signalR");
-            wvy.connection.default.disconnect().then(function () {
-                $("#result").text("signalR disconnected");
-            })
+            });
         });
 
         $(document).on("click", "#turbolinks-reload", function () {
@@ -94,20 +90,9 @@
         });
 
         $(() => {
-            wvy.connection.default.on("user-change.connection", (e, data) => {
-                console.log("user-change.connection", e, data);
+            wvy.authentication.default.on("user", (e, data) => {
+                console.log("wvy.authentication user", e, data);
                 $("#result").text(JSON.stringify(data, null, 2));
-            });
-
-            wvy.connection.default.on("signed-in.connection", (e, data) => {
-                console.log("signed-in.connection", e, data);
-                Turbolinks.visit(window.location.toString(), { action: 'replace' });
-                $("#result").text("signed-in.connection");
-            });
-
-            wvy.connection.default.on("authentication-error.connection", (e, data) => {
-                console.log("authentication-error.connection", e, data);
-                $("#result").text("signalR authentication failed");
             });
         })
 
@@ -123,8 +108,7 @@
     <button type="button" class="btn btn-primary" id="status">Status check</button>
     <button type="button" class="btn btn-primary" id="signout">Sign out</button>
     <button type="button" class="btn btn-primary" id="ajax">Sign in with JWT Token AJAX</button>
-    <button type="button" class="btn btn-primary" id="signalr">Sign in with JWT Token signalR</button>
-    <button type="button" class="btn btn-primary" id="signalr-disconnect">Disconnect signalR</button>
+    <button type="button" class="btn btn-primary" id="authentication">Sign in with JWT Token wvy</button>
     <button type="button" class="btn btn-primary" id="turbolinks-reload">Turbolinks reload</button>
     <pre class="line-numbers language-js"><code class="language-js" id="result" data-turbolinks-permanent>Token: @token</code></pre>
 </div>

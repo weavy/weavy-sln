@@ -242,6 +242,16 @@
             <param name="formatters">The set of MediaTypeFormatter objects from which to choose.</param>
             <returns></returns>
         </member>
+        <member name="T:Weavy.Web.Api.Models.ClientSignInModel">
+            <summary>
+            Model used when signing in with JWT from clint SDK
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Api.Models.ClientSignInModel.Jwt">
+            <summary>
+            Tke JSON Web Token.
+            </summary>
+        </member>
         <member name="T:Weavy.Web.Api.Models.CommentIn">
             <summary>
             Comment input model.
@@ -275,16 +285,6 @@
         <member name="P:Weavy.Web.Api.Models.CommentUp.Text">
             <summary>
             Gets or sets the comment text.
-            </summary>
-        </member>
-        <member name="T:Weavy.Web.Api.Models.ConnectBubbleIn">
-            <summary>
-            Model for connecting bubble.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Api.Models.ConnectBubbleIn.Url">
-            <summary>
-            Gets or sets the url to connect the bubble with.
             </summary>
         </member>
         <member name="T:Weavy.Web.Api.Models.ContentIn">
@@ -2572,53 +2572,54 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:Weavy.Web.Api.Controllers.WeavyClientApiController">
+        <member name="T:Weavy.Web.Api.Controllers.ClientController">
             <summary>
-            Various helper methods used by client sdk.
+            Api endpoints used by client sdk. Uses <see cref="F:Weavy.Core.Utils.SerializationUtils.JavascriptSerializerSettings"/> for json serialization and formatting.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.Click(System.String)">
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.InitClient">
+            <summary>
+            Init client.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.InitSpace">
+            <summary>
+            Get or create space.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.InitApp">
+            <summary>
+            Get or create app.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.SignIn(Weavy.Web.Api.Models.ClientSignInModel)">
+            <summary>
+            Sign in with JSON Web Token. Called from client SDK to get auth cookie.
+            </summary>
+            <param name="model"></param>        
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.SignOut">
+            <summary>
+            Sign out, i.e. clear auth cookie.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.GetUser">
+            <summary>
+            Get the current user. Used to check authentication status etc.
+            </summary>
+            <returns>Returns a <see cref="T:Weavy.Core.Models.User"/> object.</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ClientController.Click(System.String)">
             <summary>
             Called when a link is clicked to check if the target is in another app. 
             </summary>
             <param name="url">The url that was clicked.</param>
             <returns>Returns info about the target.</returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.OpenBubble(Weavy.Core.Models.SpaceBubble)">
-            <summary>
-            Open a bubble. Adds it to the bubbles repo as personal or global if it does not exist.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.ConnectBubble(System.Int32,Weavy.Web.Api.Models.ConnectBubbleIn)">
-            <summary>
-            Connects a bubble with a specific url.
-            </summary>
-            <param name="id">Id of the bubble to connect.</param>
-            <param name="model">Contains the url to connect the bubble to.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.ConnectSpace(System.Int32,Weavy.Web.Api.Models.ConnectBubbleIn)">
-            <summary>
-            Creates and connects a bubble to a space.
-            </summary>
-            <param name="id">Id of the space to connect.</param>
-            <param name="model">Contains the url to connect with.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.RemoveBubble(System.Int32)">
-            <summary>
-            Removes a bubble.
-            </summary>
-            <param name="id">Id of bubble to remove.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers.WeavyClientApiController.GetConfiguration">
-            <summary>
-            Returns the panel configuration with script to load the weavy client from the Weavy browser extension.
-            </summary>
-            <remarks>Anonymous access is allowed.</remarks>
-            <returns>The weavy client configuration.</returns>
         </member>
         <member name="T:Weavy.Web.ApiConfig">
             <summary>
@@ -3018,6 +3019,14 @@
             <param name="path">The url to redirect to after sign in.</param>
             <returns></returns>
         </member>
+        <member name="M:Weavy.Web.Controllers.AccountController.SignIn(Weavy.Web.Models.SignInModel,System.String)">
+            <summary>
+            Sign in with forms authentication against local or AD account.
+            </summary>
+            <param name="model"></param>
+            <param name="path">The url to redirect to after sign in.</param>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignInExternal(System.String,System.String)">
             <summary>
             Request a redirect to the external login provider.
@@ -3033,25 +3042,10 @@
             <param name="path">The url to redirect to after sign in.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.SignInToken(Weavy.Web.Models.SignInTokenModel)">
-            <summary>
-            Sign in with JSON Web Token. Called by client SDK to get auth cookie.
-            </summary>
-            <param name="model"></param>        
-            <returns></returns>
-        </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignInEmbedded">
             <summary>
             Redirects to this action after provider based sign in from iframe
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.SignIn(Weavy.Web.Models.SignInModel,System.String)">
-            <summary>
-            Sign in with forms authentication against local or AD account.
-            </summary>
-            <param name="model"></param>
-            <param name="path">The url to redirect to after sign in.</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.MSOFBA">
@@ -3228,31 +3222,6 @@
             Helper method for returning correct sign in view.
             </summary>
             <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.SignInIdentity(System.Security.Claims.ClaimsIdentity,System.Boolean,System.Boolean)">
-            <summary>
-            Sign in with an external identity.
-            </summary>
-            <param name="identity">An externally authenticated identity.</param>
-            <param name="persistent"><c>true</c> to set a persistent auth cookie, otherwise <c>false</c></param>
-            <param name="update"><c>true</c> to update the local user account with claims from the specified <paramref name="identity"/>, otherwise <c>false</c>.</param>
-            <returns>A <see cref="T:Weavy.Core.Models.User"/> and a <see cref="T:Weavy.Core.Models.Login"/> object.</returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.HandleProfilePicture(Weavy.Core.Models.User,System.Security.Claims.ClaimsIdentity,System.Boolean)">
-            <summary>
-            Handle profile picture claim. Picture claim can be either an blob id (int), url (sting) or base64 encoded image (string)
-            </summary>
-            <param name="user"></param>
-            <param name="identity"></param>
-            <param name="update"></param>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.SignInOwin(Weavy.Core.Models.User,System.Boolean)">
-            <summary>
-             Sign in via the Owin authentication middleware.
-            </summary>
-            <param name="user"></param>
-            <param name="persistent"></param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.RedirectToLocal(System.String)">
@@ -4673,7 +4642,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.SpaceController.Insert(Weavy.Core.Models.Space,System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.SpaceController.Insert(Weavy.Core.Models.Space)">
             <summary>
             Create a new space.
             </summary>
@@ -5108,13 +5077,6 @@
             <param name="options"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.ConnectModal(System.String)">
-            <summary>
-            Get partial for connecting bubble to url modal.
-            </summary>
-            <param name="url">The url to connect the bubble with.</param>
-            <returns></returns>
-        </member>
         <member name="M:Weavy.Web.Controllers.WeavyClientController.Ping">
             <summary>
             Ping view for weavy client script.
@@ -5148,43 +5110,6 @@
             
             </summary>
             <returns></returns>
-        </member>
-        <member name="T:Weavy.Web.Controllers.CreateSpaceModel">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Controllers.CreateSpaceModel.Name">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Controllers.CreateSpaceModel.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
-            <summary>
-            
-            </summary>
-            <param name="validationContext"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Web.Controllers.ConnectSpaceModel">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Controllers.ConnectSpaceModel.SearchTerm">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Controllers.ConnectSpaceModel.Spaces">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Controllers.ConnectSpaceModel.Content">
-            <summary>
-            
-            </summary>
         </member>
         <member name="T:Weavy.Web.Utils.ControllerUtils">
             <summary>
@@ -6143,17 +6068,6 @@
             <summary>
             </summary>
         </member>
-        <member name="M:Weavy.Web.Hubs.ClientHub.OnConnected">
-            <summary>
-            Called when the hub is connected.
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Hubs.ClientHub.ValidateSSO(System.String)">
-            <summary>
-            Called to check SSO authorization.
-            </summary>
-            <param name="jwt">JWT token to validate</param>
-        </member>
         <member name="M:Weavy.Web.Hubs.ClientHub.Init(Weavy.Web.Models.ClientOptions)">
             <summary>
             Called to initialize the Weavy client.
@@ -6192,13 +6106,6 @@
             <param name="options"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Hubs.ClientHub.ConfigureSSO(System.Object)">
-            <summary>
-            Configure the SSO plugin.
-            </summary>
-            <param name="options">Options for the SSO plugin</param>
-            <returns>The configured plugin data</returns>
-        </member>
         <member name="M:Weavy.Web.Hubs.ClientHub.ConfigureTheme(System.Object)">
             <summary>
             Configure the Theme plugin.
@@ -6212,12 +6119,6 @@
             </summary>
             <param name="type"></param>
             <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Hubs.ClientHub.Load(Weavy.Web.Models.WeavyClientOptions)">
-            <summary>
-            Called by client to get weavy options.
-            </summary>
-            <param name="options">Input options set by client.</param>
         </member>
         <member name="M:Weavy.Web.Hubs.ClientHub.Json(System.Object)">
             <summary>
@@ -6367,21 +6268,6 @@
         <member name="P:Weavy.Web.Models.SignInModel.AuthenticationTypes">
             <summary>
             Gets the external authentication types.
-            </summary>
-        </member>
-        <member name="T:Weavy.Web.Models.SignInTokenModel">
-            <summary>
-            SSO Sign in model with jwt
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.SignInTokenModel.Jwt">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.SignInTokenModel.Path">
-            <summary>
-            
             </summary>
         </member>
         <member name="T:Weavy.Web.Models.PasswordModel">
@@ -8311,19 +8197,19 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="T:Weavy.Web.Owin.WeavyExtensions">
+        <member name="T:Weavy.Web.Owin.OwinUtils">
             <summary>
             Various Owin extension methods.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsAjax(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsAjax(Microsoft.Owin.IOwinRequest)">
             <summary>
              Checks if the request was requested with XMLHttpRequest.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsApi(Microsoft.Owin.IOwinRequest,System.String)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsApi(Microsoft.Owin.IOwinRequest,System.String)">
             <summary>
             Checks if the request is for the api.
             </summary>
@@ -8331,7 +8217,7 @@
             <param name="path">Specific path to check for, e.g. "status".</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsManage(Microsoft.Owin.IOwinRequest,System.String)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsManage(Microsoft.Owin.IOwinRequest,System.String)">
             <summary>
             Checks if the request is for the manage area.
             </summary>
@@ -8339,84 +8225,84 @@
             <param name="path">Specific path to check for, e.g. "license".</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsBrowser(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsBrowser(Microsoft.Owin.IOwinRequest)">
             <summary>
              Checks if the request was made from a web browser, i.e. has the string "Mozilla" in the user agent.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsEmbedded(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsEmbedded(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is for an embedded action/view.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsError(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsError(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is for an error page.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsSignalR(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsSignalR(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is for SignalR.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsLocal(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsLocal(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is local (from localhost, 127.0.0.1, ::1).
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsValidWhenLicenseError(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsValidWhenLicenseError(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is valid when the license has errors.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsValidWhenLicenseInvalid(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsValidWhenLicenseInvalid(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is valid when license is invalid.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsValidDuringSetup(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsValidDuringSetup(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is valid during setup.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsPrivate(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsPrivate(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is for managed code and needs authentication.
             </summary>
             <param name="request"></param>
             <returns><c>true</c> for files served by managed code, otherwise <c>true</c></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsPublic(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsPublic(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is for a "static" file served by managed code that does not need authentication.
             </summary>
             <param name="request"></param>
             <returns><c>true</c> for files served by managed code, otherwise <c>false</c></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsRegisterWindows(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsRegisterWindows(Microsoft.Owin.IOwinRequest)">
             <summary>
             Checks if the request is for the register-windows action.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsSetup(Microsoft.Owin.IOwinRequest,System.String)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsSetup(Microsoft.Owin.IOwinRequest,System.String)">
             <summary>
             Checks if the request is for the setup wizard.
             </summary>
@@ -8424,32 +8310,48 @@
             <param name="path"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsTurbolinks(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsTurbolinks(Microsoft.Owin.IOwinRequest)">
             <summary>
              Checks if the request was requested with Turbolinks.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsWebDAV(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsWebDAV(Microsoft.Owin.IOwinRequest)">
             <summary>
              Checks if the request is a WebDAV request.
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.IsWebSocketsEnabled(Microsoft.Owin.IOwinContext)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsWebSocketsEnabled(Microsoft.Owin.IOwinContext)">
             <summary>
              Checks if web sockets are enabled on the server.
             </summary>
             <param name="context"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyExtensions.UseWeavy(Owin.IAppBuilder)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.UseWeavy(Owin.IAppBuilder)">
             <summary>
             Configure Weavy and insert the <see cref="T:Weavy.Web.Owin.WeavyMiddleware"/> into the Owin pipeline.
             </summary>
             <param name="app"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Owin.OwinUtils.SignIn(Microsoft.Owin.IOwinContext,Weavy.Core.Models.User,System.Boolean)">
+            <summary>
+             Sign in the specified user, i.e. set user and auth cookie.
+            </summary>
+            <param name="context"></param>
+            <param name="user"></param>
+            <param name="persistent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Owin.OwinUtils.SignOut(Microsoft.Owin.IOwinContext)">
+            <summary>
+             Sign out the currently logged in user, i.e. remove the auth cookie.
+            </summary>
+            <param name="context"></param>
             <returns></returns>
         </member>
         <member name="T:Weavy.Web.Owin.WeavyMiddleware">
@@ -8613,20 +8515,6 @@
         <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterUnstarEntity)">
             <summary>
             Push unstarred enitity back to the user that unstarred.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterOpenBubble)">
-            <summary>
-            Push opened bubble to user.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterRemoveBubble)">
-            <summary>
-            Push closed bubbles to user.
             </summary>
             <param name="e"></param>
             <returns></returns>

@@ -10,7 +10,6 @@
     &.preview {
         margin: 1rem auto;
         max-width: map-get($container-max-widths, lg);
-        
         // plain text document
         .document {
             background: #fff;
@@ -20,7 +19,6 @@
             white-space: pre-wrap;
             overflow: hidden;
         }
-
         // thumbnail image
         .figure {
             margin: 0;
@@ -101,5 +99,9 @@
     border: 0;
     display: block;
     width: 100%;
-    height: calc(100vh - #{3 * $navbar-height});
+    height: calc(100vh - #{3 * $navbar-height} - #{$border-width});
+
+    body.embedded & {
+        height: calc(100vh - #{$navbar-height} - #{$border-width});
+    }
 }

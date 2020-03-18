@@ -4,6 +4,18 @@
 
 Weavy 6.0 contains additional improvements to the client SDK.
 
+### 6.0.2 (2020-03-18)
+
+* Fixed some issues with authenticating from client SDK.
+* Fixed layout of embedded google doc.
+* Fixed issue in WevDAV server that prevented some files from being opened in Microsft Office.
+* Added download of non-previewable attachments. 
+* Added config for CORS origins.
+* Added paste as image to Messenger.
+* Added user setting for Daily Digest email.
+* Added comments section on files
+* Increased key length for Apps and Spaces to 128 bytes.
+
 ### 6.0.1 (2020-03-12)
 
 * Fixed sql error when validating app name on app where key is null.

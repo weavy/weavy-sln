@@ -219,9 +219,6 @@
          */
         weavy.nodes.panels = null;
 
-        // WEAVY REALTIME CONNECTION
-        weavy.connection = wvy.connection.get(weavy.options.url);
-
         // EVENT HANDLING
         weavy.events = new WeavyEvents(weavy);
 
@@ -230,6 +227,55 @@
         weavy.off = weavy.events.off;
         weavy.triggerEvent = weavy.events.triggerEvent;
 
+        // AUTHENTICATION
+        weavy.authentication = wvy.authentication.get(weavy.options.url);
+        weavy.authentication.init(weavy.options.jwt);
+
+        weavy.on(weavy.authentication, "user", function (e, auth) {
+            weavy.user = auth.user;
+
+            if (/^signed-in|signed-out|changed-user$/.test(auth.state)) {
+
+                if (auth.state === "changed-user") {
+                    weavy.triggerEvent("signed-out", { id: -1 });
+                    weavy.triggerEvent("signed-in", auth);
+                } else {
+                    weavy.triggerEvent(auth.state, auth);
+                }
+
+                // TODO: Refreshing data after user change should be done here when data has been moved from clienthub to api endpoints
+            }
+        });
+
+        weavy.on(weavy.authentication, "signing-in", function (e) {
+            weavy.triggerEvent("signing-in");
+        });
+
+        weavy.on(weavy.authentication, "signing-out", function (e) {
+            weavy.triggerEvent("signing-out");
+        });
+
+        // WEAVY REALTIME CONNECTION
+        weavy.connection = wvy.connection.get(weavy.options.url);
+
+        // signalR connection state has changed
+        weavy.on(weavy.connection, "state-changed.connection", function (e, data) {
+            if (disconnected && data.state === weavy.connection.states.connected && weavy.authentication.isAuthenticated()) {
+                disconnected = false;
+
+                weavy.debug("Connection state changed: connected and signed in => weavy.connection.reload()?")
+                // reload weavy                
+                weavy.reload();
+            }
+        });
+
+        // signalR connection disconnected
+        weavy.on(weavy.connection, "disconnected.connection", function (e, data) {
+            weavy.log("disconneced", data);
+            if (data.explicitlyDisconnected) {
+                disconnected = true;
+            }
+        });
 
         // PANELS
         weavy.panels = new WeavyPanels(weavy);
@@ -257,8 +303,6 @@
             }
         });
 
-        // AUTHENTICATION
-        weavy.authentication = new WeavyAuthentication(weavy, { jwt: weavy.options.jwt });
 
 
         // CONTEXTS
@@ -285,7 +329,7 @@
                     if (isSpaceConfig) {
                         space = new WeavySpace(weavy, options);
                         weavy.spaces.push(space);
-                        $.when(weavy.authentication.whenAuthenticated, weavy.whenLoaded).then(function () {
+                        $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded).then(function () {
                             space.fetchOrCreate();
                         });
                     } else {
@@ -365,7 +409,7 @@
 
         var loadPromise = function () {
             return new Promise(function (resolve) {
-                weavy.one("processed:load", function () {
+                weavy.on("processed:load", function () {
                     resolve();
                 });
             })
@@ -419,15 +463,17 @@
 
             if (!weavy.isLoading) {
                 weavy.isLoading = true;
-                weavy.connection.init(true).then(function () {
+                weavy.connection.init(true, weavy.authentication).then(function () {
                     weavy.options.href = window.location.href;
                     if (notify !== false) {
 
-                        weavy.connection.invoke("client", "init", weavy.options).then(function (clientData) {
-                            weavy.triggerEvent("clientdata", clientData);
-                        }).catch(function (error) {
-                            weavy.error("Weavy connectAndLoad client init", error.message, error);
-                        });
+                        weavy.authentication.whenAuthenticated().then(function () {
+                            weavy.connection.invoke("client", "init", weavy.options).then(function (clientData) {
+                                weavy.triggerEvent("clientdata", clientData);
+                            }).catch(function (error) {
+                                weavy.error("Weavy connectAndLoad client init", error.message, error);
+                            });
+                        })
                     }
                 });
             }
@@ -550,15 +596,6 @@
             return id ? String(id).replace(new RegExp("-" + weavy.getId() + "$"), '') : id;
         };
 
-        /**
-         * Checks if the user is signed in. May chack against any optional provided data.
-         * 
-         * @category authentication
-         * @returns {boolean} True if the user is signed in
-         */
-        weavy.isAuthenticated = function () {
-            return weavy.authentication.userId && weavy.authentication.userId !== -1 ? true : false;
-        }
 
         /**
          * Sends the id of a frame to the frame content scripts, so that the frame gets aware of which id it has.
@@ -624,7 +661,8 @@
         weavy.reload = function (options) {
             weavy.log("weavy.reload()")
             weavy.options = weavy.extendDefaults(weavy.options, options);
-            connectAndLoad();
+
+            connectAndLoad(true);
 
             /**
              * Triggered when weavy is reloaded with any new data. Current options are provided as event data.
@@ -765,19 +803,12 @@
             if (!skipAuthenticationCheck) {
                 // Wait for load to get auth state
                 return weavy.whenLoaded.then(function () {
-                    if (weavy.isAuthenticated()) {
-                        // If signed in do ajax
+                    return weavy.authentication.whenAuthorized().then(function () {
+                        // When signed-in, do ajax
                         return $.ajax(settings);
-                    } else if (weavy.authentication) {
-                        // If authentication plugin is active, show sign-in panel
-                        return weavy.authentication.whenAuthenticated.then(function () {
-                            // When signed-in, do ajax
-                            return $.ajax(settings);
-                        });
-                    } else {
-                        // Give up if not signed in and authentication plugin disabled (no sign-in panel)
+                    }).catch(function () {
                         return Promise.reject();
-                    }
+                    });                        // Give up if not signed in and authentication plugin disabled (no sign-in panel)
                 });
             } else {
                 // Skip the auth check and try ajax anyway
@@ -846,46 +877,6 @@
         // MESSAGE EVENTS
 
         // listen for dispatched messages from weavy (close/resize etc.)
-        weavy.on(wvy.postal, "signing-in", function (e) {
-            var message = e.data;
-            /**
-             * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link Weavy#event:signed-in} or {@link Weavy#event:authentication-error}.
-             * This event may be triggered from anywhere, not only the Weavy instance.
-             * 
-             * @category events
-             * @event Weavy#signing-in
-             * @returns {Object}
-             * @property {boolean} isLocal - Is the origin of the event from this weavy instance
-             */
-            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (message.weavyId === true || message.weavyId === weavy.getId()) }));
-        });
-
-        weavy.on(wvy.postal, "signing-out", function (e) {
-            var message = e.data;
-            /**
-             * Event triggered when signing out process has begun. Use this event to do signing out animations and eventually clean up your elements. It will be followed by {@link Weavy#event:signed-out}
-             * This event may be triggered from anywhere, not only the Weavy instance.
-             * 
-             * @category events
-             * @event Weavy#signing-out
-             * @returns {Object}
-             * @property {boolean} isLocal - Is the origin of the event from this weavy instance
-             */
-            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-out", { isLocal: typeof e.source !== "undefined" && (message.weavyId === true || message.weavyId === weavy.getId()) }));
-        });
-
-        weavy.on(wvy.postal, "authentication-error", function (e) {
-            /**
-             * Event triggered when a sign-in attempt was unsuccessful.
-             * This event may be triggered from anywhere, not only the Weavy instance.
-             * 
-             * @category events
-             * @event Weavy#authentication-error
-             */
-            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "authentication-error"));
-        });
-
-
         weavy.on(wvy.postal, "message", function (message) {
             /**
                 * THIS IS DEPRECATED. Use the weavy.on(wvy.postal, "message-name", function(e) { ... }); instead
@@ -948,37 +939,6 @@
 
         // REALTIME EVENTS
 
-        // signalR connection state has changed
-        weavy.on(weavy.connection, "state-changed.connection", function (e, data) {
-            if (disconnected && data.state === weavy.connection.states.connected && weavy.isAuthenticated()) {
-                disconnected = false;
-
-                weavy.debug("Connection state changed: connected and signed in => weavy.connection.reload()?")
-                // reload weavy                
-                //weavy.connection.reload();
-            }
-        });
-
-        // signalR connection disconnected
-        weavy.on(weavy.connection, "disconnected.connection", function (e, data) {
-            if (!data.explicitlyDisconnected) {
-                disconnected = true;
-            }
-        });
-
-        weavy.on(weavy.connection, "user-change.connection", function (e, data) {
-            weavy.log("user-change", data.state, "reconnecting and loading");
-
-            weavy.user = data.user;
-
-            // Connnect then trigger signed-in or signed-out
-            var eventResult = weavy.triggerEvent("before:" + data.state);
-            eventResult = eventResult !== false && weavy.triggerEvent("on:" + data.state);
-
-            eventResult !== false && connectAndLoad(true).then(function () {
-                weavy.triggerEvent("after:" + data.state);
-            });
-        });
 
         weavy.on(weavy.connection, "badge.weavy", function (e, data) {
 
@@ -1011,7 +971,7 @@
             //weavy.data = weavy.extendDefaults(weavy.data, clientData, true);
             weavy.data = clientData;
 
-            if (weavy.isAuthenticated() && clientData.spaces) {
+            if (weavy.authentication.isAuthorized() && clientData.spaces) {
                 var spaces = utils.asArray(clientData.spaces);
 
                 spaces.forEach(function (spaceData) {
@@ -1045,13 +1005,13 @@
                  *
                  * @example
                  * weavy.on("build", function(e, root) {
-                 *     if (weavy.isAuthenticated()) {
+                 *     if (weavy.authentication.isAuthorized()) {
                  *         weavy.nodes.myElement = document.createElement("DIV");
                  *     }
                  * });
                  * 
                  * weavy.on("after:build", function(e, root) {
-                 *     if (weavy.isAuthenticated()) {
+                 *     if (weavy.authentication.isAuthorized()) {
                  *         if (weavy.nodes.dock) {
                  *             weavy.nodes.dock.appendChild(weavy.nodes.myElement);
                  *         }
@@ -1074,7 +1034,7 @@
                     * 
                     * @example
                     * weavy.on("load", function() {
-                    *     if (weavy.isAuthenticated()) {
+                    *     if (weavy.authentication.isAuthorized()) {
                     *         weavy.alert("Widget successfully loaded");
                     *     }
                     * });

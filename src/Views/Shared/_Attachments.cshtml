@@ -1,13 +1,17 @@
 ﻿@model IEnumerable<Attachment>
 @{
     var parent = ViewBag.Parent as IEntity ?? (IEntity)WeavyContext.Content ?? (IEntity)WeavyContext.App ?? (IEntity)WeavyContext.Space;
- }
+}
 <div class="list-group">
     @foreach (var attachment in Model) {
         var attrs = Html.PreviewAttributes(parent, attachment);
-        <a class="list-group-item list-group-item-action" href="@attachment.ContentUrl()" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
+        if (attrs.Count ==0) {
+            attrs.Add("download", "");
+        }
+
+        <a class="list-group-item list-group-item-action" href="@attachment.ContentUrl(download: true)" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
             <div class="media">
-                @Svg.Icon(attachment, size:48)
+                @Svg.Icon(attachment, size: 48)
                 <div class="media-body">
                     <h6 class="media-title">@attachment.Blob.Name</h6>
                     <small class="text-muted">
@@ -27,7 +31,7 @@
                                 @Svg.Icon("dots-vertical")
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <button type="button" data-trash="attachment" data-id="@attachment.Id" class="dropdown-item">@Svg.Icon("delete","danger") Trash</button>
+                                <button type="button" data-trash="attachment" data-id="@attachment.Id" class="dropdown-item">@Svg.Icon("delete", "danger") Trash</button>
                             </div>
                         </div>
                     </div>

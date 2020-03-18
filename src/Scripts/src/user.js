@@ -6,7 +6,7 @@ wvy.user = (function ($) {
     var _href = null;
 
     // regex for matching link to user profile
-    var _re = new RegExp("^/people/\\d+$")
+    var _re = new RegExp("^/people/\\-?d+$")
 
     // trash user
     $(document).on("click", "[data-trash=user][data-id]", function (e) {

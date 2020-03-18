@@ -202,7 +202,7 @@
         }
 
         this.build = function () {
-            if (weavy.isLoaded && weavy.isAuthenticated()) {
+            if (weavy.isLoaded && weavy.authentication.isAuthorized()) {
                 var root = app.root || app.space && app.space.root;
 
                 if (app.options && app.data) {

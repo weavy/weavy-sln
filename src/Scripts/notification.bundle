@@ -17,7 +17,6 @@
 ~/scripts/src/star.js
 ~/scripts/src/editor.js
 ~/scripts/src/alert.js
-~/scripts/src/bubbles.js
 ~/scripts/src/weavy-notifications.js
 ~/scripts/src/weavy-personal.js
 ~/scripts/_fileupload.bundle

@@ -13,13 +13,9 @@ wvy.navigation = (function ($) {
                 // cancel event to prevent navigation
                 e.preventDefault();
 
-                $.get(wvy.url.resolve("/a/click?url=" + encodeURIComponent(url))).done(function (route) {
+                $.get(wvy.url.resolve("/client/click?url=" + encodeURIComponent(url))).done(function (route) {
                     var noApp = wvy.context.app && !route.app;
                     var noAppMatch = route.app && wvy.context.app !== route.app.id;
-                    //var noSpace = wvy.context.space && !route.space;
-                    //var noSpaceMatch = route.space && wvy.context.space !== route.space.id;
-
-                    //if (noApp || noAppMatch || noSpace || noSpaceMatch) {
                     if (noApp || noAppMatch) {
                         currentUrl = null;
                         wvy.postal.postToParent({ name: "navigation-open", route: route });

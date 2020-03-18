@@ -87,7 +87,7 @@
     @{
         if (current) {
             Html.RenderPartial("~/Views/Content/_ContentAttachments.cshtml");
-            Html.RenderPartial("_Comments" , new ViewDataDictionary { { "Parent", Model } });
+            Html.RenderPartial("_Comments");
             Html.RenderPartial("_Subscribers");
         } else {
             @Html.Partial("_Meta")

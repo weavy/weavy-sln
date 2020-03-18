@@ -16,6 +16,7 @@
 ~/scripts/src/turbolinks.js 
 ~/scripts/src/url.js
 ~/scripts/src/emoji.js
+~/scripts/src/authentication.js
 ~/scripts/src/connection.js
 ~/scripts/src/presence.js
 ~/scripts/vendor/blueimp-file-upload/jquery.ui.widget.js

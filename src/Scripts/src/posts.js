@@ -139,41 +139,38 @@ wvy.posts = (function ($) {
 
     // rtm post
     wvy.connection.default.on("post-inserted.weavy", function (e, post) {
+        // check that app of post is loaded
+        if (wvy.context.app && wvy.context.app === post.appId) {
 
-        // do nothing of we are displaying another space
-        if (wvy.context.space !== post.spaceId) {
-            return;
-        }
-
-        // do nothing if no posts on page
-        var $posts = $(".posts");
-        if (!$posts.length) {
-            return;
-        }
-
-        // do nothing if .sending
-        if ($(".post-form").hasClass("sending")) {
-            return;
-        }
-
-        // do nothing if already exists
-        var $post = $(".post[data-post-id=" + post.id + "]", $posts);
-        if ($post.length) {
-            return;
-        }
-
-        // fetch and display partial post 
-        $.ajax({
-            contentType: "application/json; charset=utf-8",
-            type: "GET",
-            url: wvy.url.resolve((wvy.context.embedded ? "/e": "") + "/posts/" + post.id)
-        }).then(function (post) {
-            var $post = $(".post[data-post-id=" + post.id + "]", $(".posts"));
-            if ($post.length === 0) {
-                $(post).prependTo($posts);
+            // do nothing if no posts on page
+            var $posts = $(".posts");
+            if (!$posts.length) {
+                return;
             }
-        });
 
+            // do nothing if .sending
+            if ($(".post-form").hasClass("sending")) {
+                return;
+            }
+
+            // do nothing if already exists
+            var $post = $(".post[data-post-id=" + post.id + "]", $posts);
+            if ($post.length) {
+                return;
+            }
+
+            // fetch and display partial post 
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                type: "GET",
+                url: wvy.url.resolve((wvy.context.embedded ? "/e" : "") + "/posts/" + post.id)
+            }).then(function (post) {
+                var $post = $(".post[data-post-id=" + post.id + "]", $(".posts"));
+                if ($post.length === 0) {
+                    $(post).prependTo($posts);
+                }
+            });
+        }
     });
 
     // rtm like post

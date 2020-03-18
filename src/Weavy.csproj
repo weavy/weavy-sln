@@ -335,17 +335,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=6.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=6.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=6.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=6.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=6.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=6.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=6.0.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=6.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -4137,6 +4137,8 @@
     <Content Include="Views\App\New.cshtml" />
     <Content Include="Views\Apps\Get.cshtml" />
     <Content Include="Views\Apps\Index.cshtml" />
+    <Content Include="Views\ClientScript\Index.cshtml" />
+    <Content Include="Views\ClientScript\Ping.cshtml" />
     <Content Include="Views\Comment\_Edit.cshtml" />
     <Content Include="Views\Content\_Card.cshtml" />
     <Content Include="Views\Content\_Cards.cshtml" />
@@ -4325,8 +4327,6 @@
     <Content Include="Views\UI\_SearchResult.cshtml" />
     <Content Include="Views\UI\InsertImage.cshtml" />
     <Content Include="Views\UI\InsertLink.cshtml" />
-    <Content Include="Views\WeavyClient\Index.cshtml" />
-    <Content Include="Views\WeavyClient\Ping.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Web.config" />
   </ItemGroup>

@@ -53,7 +53,7 @@
 <div class="container my-4">
     <h1 class="display-1">@Title</h1>
     <p>Select your preferred configuration below.</p>
-    <form action="@(Url.Action<WeavyClientController>(c => c.Index(null)))" method="post" id="weavy-wizard" data-turboform>
+    <form action="@(Url.Action<ClientScriptController>(c => c.Index(null)))" method="post" id="weavy-wizard" data-turboform>
         @Html.EditorsForModel()
     </form>
 

@@ -4,7 +4,7 @@
 
 Weavy 6.0 contains additional improvements to the client SDK.
 
-### 6.0.2 (2020-03-18)
+### 6.1.0 (2020-03-18)
 
 * Fixed some issues with authenticating from client SDK.
 * Fixed layout of embedded google doc.

@@ -5065,25 +5065,25 @@
             <param name="contentType">Value to set in the Content-Type header. When not set, content type will be inferred from the file name.</param>
             <param name="downloadName">Name to use in Content-Disposition header when downloading the file.</param>
         </member>
-        <member name="T:Weavy.Web.Controllers.WeavyClientController">
+        <member name="T:Weavy.Web.Controllers.ClientScriptController">
             <summary>
-            Controller for weavy client actions.
+            Controller for generating and returning the weavy client script.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.Index(Weavy.Web.Models.WeavyLoaderOptions)">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.Index(Weavy.Web.Models.WeavyLoaderOptions)">
             <summary>
-            Display page for configuring the weavy client loader script.
+            Display page for configuring the weavy client script.
             </summary>
             <param name="options"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.Ping">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.Ping">
             <summary>
             Ping view for weavy client script.
             </summary>        
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.WeavyClientScript(System.String,System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.WeavyClientScript(System.String,System.Boolean)">
             <summary>
             Returns the weavy client script.
             </summary>
@@ -5091,7 +5091,7 @@
             <param name="download">Trigger file download</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.WeavyIEScript(System.String,System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.WeavyIEScript(System.String,System.Boolean)">
             <summary>
             Returns the supporting IE polyfills script.
             </summary>
@@ -5099,13 +5099,13 @@
             <param name="download">Trigger file download</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.GetClientVersionFile">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.GetClientVersionFile">
             <summary>
             
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.WeavyClientController.GetClientLocationFile">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.GetClientLocationFile">
             <summary>
             
             </summary>

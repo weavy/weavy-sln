@@ -549,6 +549,7 @@
         var urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
         if (urlExtract) {
             sameOrigin = window.location.origin === urlExtract[1]
+            url = urlExtract[1];
         }
         url = (sameOrigin ? "" : url) || "";
         if (_connections.has(url)) {

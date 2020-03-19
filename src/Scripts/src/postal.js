@@ -156,7 +156,7 @@
                             _parentWeavyId = e.data.weavyId;
                         }
 
-                        console.debug("wvy.postal: is not leader");
+                        console.debug("wvy.postal: is not leader", window.name);
                         _isLeader = false;
                         _whenLeader.reject({ parentName: _parentName, parentWeavyId: _parentWeavyId, parentOrigin: _parentOrigin });
 

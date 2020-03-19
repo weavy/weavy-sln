@@ -658,7 +658,7 @@ wvy.messenger = (function ($) {
     // intercept links to user profiles and open modal instead
     $(document).on("click", "a[href^='/people/']", function (e) {
         // verify that href matches /people/{id}
-        var match = $(this).attr("href").match(/^\/people\/(\d+)$/i);
+        var match = $(this).attr("href").match(/^\/people\/(-?\d+)$/i);
         if (match) {
             // stop navigation
             e.preventDefault();

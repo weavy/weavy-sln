@@ -29,14 +29,6 @@
 
     var WeavyApp = function (weavy, space, options, data) {
 
-        if (weavy.__proto__.constructor.name !== "Weavy") {
-            throw new Error("WeavyApp instance error: No valid Weavy instance provided.");
-        }
-
-        if (space.__proto__.constructor.name !== "WeavySpace") {
-            throw new Error("WeavyApp instance error: No valid weavy space provided.");
-        }
-
         weavy.log("new WeavyApp", options);
 
         /** 

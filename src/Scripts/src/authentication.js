@@ -252,7 +252,7 @@
 
         function update() {
             wvy.postal.whenLeader.then(function () {
-                console.debug("wvy.authentication: update");
+                console.debug("wvy.authentication: whenLeader => update");
                 var authUrl = resolveUrl(userUrl);
 
                 $.ajax(authUrl, {
@@ -390,7 +390,8 @@
         var sameOrigin = false;
         var urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
         if (urlExtract) {
-            sameOrigin = window.location.origin === urlExtract[1]
+            sameOrigin = window.location.origin === urlExtract[1];
+            url = urlExtract[1];
         }
         url = (sameOrigin ? "" : url) || "";
         if (_authentications.has(url)) {

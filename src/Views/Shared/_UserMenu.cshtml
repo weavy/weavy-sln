@@ -13,7 +13,7 @@
             <button type="submit" class="btn btn-icon" title="Restore user">@Svg.Icon("backup-restore", "success")</button>
         </form>
     }
-} else {
+} else if (hasEdit || hasDeleteAndTrash) {
     <div class="dropdown @(isOther && !hasEdit && !hasDeleteAndTrash ? "d-desktop" : "")" prevent-modal>
         <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
             @Svg.Icon("dots-vertical")

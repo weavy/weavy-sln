@@ -19,7 +19,7 @@
     }
 }(typeof self !== 'undefined' ? self : this, function ($) {
 
-    console.debug("postal.js");
+    console.debug("postal.js", window.name);
 
     function eqObjects(a, b, skipLength) {
         if (!$.isPlainObject(a) || !$.isPlainObject(b)) {
@@ -79,7 +79,6 @@
             var fromFrame = contentWindowOrigins.has(e.source) && e.origin === contentWindowOrigins.get(e.source);
 
             if (fromSelf || fromParent || fromFrame) {
-                console.debug("wvy.postal: message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
 
                 var genericDistribution = !e.data.weavyId || e.data.weavyId === true;
 
@@ -88,9 +87,14 @@
                 }
 
                 var messageName = e.data.name;
-                if (messageName === "broadcast") {
-                    e.data.name = e.data.broadcastName;
+                if (messageName === "distribute") {
+                    if (_isLeader) {
+                        return;
+                    }
+                    e.data.name = e.data.distributeName;
                 }
+
+                console.debug("wvy.postal:" + (window.name ? " " + window.name : "") + " message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
 
                 messageListeners.forEach(function (listener) {
                     var matchingName = listener.name === messageName || listener.name === "message";
@@ -281,9 +285,9 @@
             }
         }
 
-        function postBroadcast(message, transfer, onlyDownstream) {
+        function postToChildren(message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("wvy.postal: postBroadcast() Invalid message format", message);
+                console.error("wvy.postal: postToChildren() Invalid message format", message);
                 return;
             }
 
@@ -292,26 +296,15 @@
                 transfer = undefined;
             }
 
-            message.broadcastName = message.name;
-            message.name = "broadcast";
+            message.distributeName = message.name;
+            message.name = "distribute";
             message.weavyId = message.weavyId || true;
-
-            if (_parentWindow && !onlyDownstream) {
-                try {
-                    if (_parentWindow && _parentWindow !== window) {
-                        _parentWindow.postMessage(message, _parentOrigin || "*", transfer);
-                        console.debug("wvy.postal: postBroadcast() Posted upstream broadcast message", message.name, message.broadcastName);
-                    }
-                } catch (e) {
-                    console.error("wvy.postal: postBroadcast() Error posting message", message.name, e);
-                }
-            }
 
             contentWindows.forEach(function (contentWindow) {
                 try {
                     contentWindow.postMessage(message, "*", transfer);
                 } catch (e) {
-                    console.warn("wvy.postal: postBroadcast() could not broadcast message to " + contentWindowNames.get(contentWindow))
+                    console.warn("wvy.postal: postToChildren() could not distribute message to " + contentWindowNames.get(contentWindow))
                 }
             })
 
@@ -463,7 +456,7 @@
                         _isLeader = true;
                         _whenLeader.resolve();
                     }
-                }, 100);
+                }, parents.length ? 2000 : 100);
             });
         }
 
@@ -496,7 +489,7 @@
         this.postToParent = postToParent;
         this.postToSelf = postToSelf;
         this.postToSource = postToSource;
-        this.postBroadcast = postBroadcast;
+        this.postToChildren = postToChildren;
         this.extractOrigin = extractOrigin;
         this.whenLeader = _whenLeader.promise();
 

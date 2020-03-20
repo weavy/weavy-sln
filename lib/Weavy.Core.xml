@@ -15321,7 +15321,7 @@
         </member>
         <member name="T:Weavy.Core.Services.PushService">
             <summary>
-              Service class for pushing realtime events to connected clients. They can subscribe to these events with wvy.realtime.on("event.weavy")
+              Service class for pushing realtime events to connected clients. They can subscribe to these events with wvy.connection.default.on("event.weavy")
             </summary>
         </member>
         <member name="F:Weavy.Core.Services.PushService.CLIENT_CALLBACK">

@@ -18,7 +18,8 @@
         root.wvy.authentication = root.wvy.authentication || new factory(jQuery);
     }
 }(typeof self !== 'undefined' ? self : this, function ($) {
-    console.debug("authentication.js");
+
+    console.debug("authentication.js", window.name);
 
     var userUrl = "/client/user";
     var ssoUrl = "/client/sign-in";
@@ -121,18 +122,20 @@
                 }
 
                 // Listen on messages from parent?
-                wvy.postal.on("broadcast", onBroadcastMessageReceived);
+                wvy.postal.on("message", onChildMessageReceived);
+                wvy.postal.on("distribute", onParentMessageReceived);
                 
-                console.log("wvy.authentication: init")
+                console.log("wvy.authentication: init", baseUrl || window.name || "self");
+
                 wvy.connection.get(baseUrl).on("authenticate.weavy.rtmweavy", function () {
-                    console.log("wvy.authentication: authenticate.weavy -> update");
+                    console.log("wvy.authentication:" + (window.name ? " " + window.name : "") + " authenticate.weavy -> update");
                     update();
                 });
             }
         }
 
         function setUser(user) {
-            console.debug("wvy.authentication: setUser", user.id);
+            console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " setUser", user.id);
             _user = user;
             if (wvy.context) {
                 wvy.context.user = user.id;
@@ -173,23 +176,22 @@
                     try {
                         return JSON.parse(a);
                     } catch (e) {
-                        console.warn("wvy.authentication: could not parse event data;", name);
+                        console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " could not parse event data;", name);
                     }
                 }
                 return a;
             });
 
             $(weavyAuthentication).triggerHandler(event, data);
-            triggerBroadcast("broadcast-authentication-event", name, data);
+            triggerToChildren("distribute-authentication-event", name, data);
         }
 
-        // trigger a message broadcast
-        function triggerBroadcast(name, eventName, data) {
+        // trigger a message distribute
+        function triggerToChildren(name, eventName, data) {
             try {
-                var onlyDownstream = true;
-                wvy.postal.postBroadcast({ name: name, eventName: eventName, data: data }, null, onlyDownstream);
+                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data }, null);
             } catch (e) {
-                console.error("wvy.authentication: could not broadcast authentication message", { name: name, eventName: eventName }, e);
+                console.error("wvy.authentication:" + (window.name ? " " + window.name : "") + " could not distribute authentication message to children", { name: name, eventName: eventName }, e);
             }
         }
 
@@ -207,7 +209,7 @@
                     withCredentials: true
                 }
             }).catch(function () {
-                console.warn("wvy.authentication: signOut request fail");
+                console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " signOut request fail");
             }).always(function () {
                 processUser({ id: -1 });
             });
@@ -225,12 +227,12 @@
 
                      if (user && user.id === -1) {
                          console.log("wvy.authentication: signed-out");
-                         alert("You have been signed out, reload to sign in again." + reloadLink);
+                         alert("You have been signed out." + reloadLink);
                         // User signed out
                         state = "signed-out";
                      } else if (user && user.id !== _user.id) {
                          console.log("wvy.authentication: changed-user");
-                         alert("The signed in user has changed, please reload the page." + reloadLink)
+                         alert("The signed in user has changed." + reloadLink)
                          // User changed
                          state = "changed-user";
                      }
@@ -239,7 +241,7 @@
 
                     if (user && user.id !== -1) {
                         console.log("wvy.authentication: signed-in")
-                        alert("You have been signed in, please reload." + reloadLink)
+                        alert("You have signed in." + reloadLink)
                         // User signed in
                         state = "signed-in";
                     }
@@ -252,7 +254,7 @@
 
         function update() {
             wvy.postal.whenLeader.then(function () {
-                console.debug("wvy.authentication: whenLeader => update");
+                console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " whenLeader => update");
                 var authUrl = resolveUrl(userUrl);
 
                 $.ajax(authUrl, {
@@ -264,7 +266,7 @@
                 }).then(function (actualUser) {
                     processUser(actualUser);
                 }).catch(function () {
-                    console.warn("wvy.authentication: update request fail");
+                    console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " update request fail");
                     processUser({ id: -1 });
                 });
             }).catch(function () {
@@ -302,12 +304,12 @@
                         processUser(ssoUser);
                         whenSSO.resolve(ssoUser);
                     }).catch(function (xhr, status, error) {
-                        console.warn("wvy.authentication: sign in with JWT token failed", xhr.statusText, status);
+                        console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " sign in with JWT token failed", xhr.statusText, status);
                         processUser({ id: -1 });
                         whenSSO.reject({ id: -1 });
                     });
                 } else {
-                    console.warn("wvy.authentication: JWT token already used");
+                    console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " JWT token already used");
                     whenSSO.reject(_user);
                 }
 
@@ -320,17 +322,25 @@
 
         // REALTIME CROSS WINDOW MESSAGE
         // handle cross frame events from rtm
-        var onBroadcastMessageReceived = function (e) {
+        var onChildMessageReceived = function (e) {
             var msg = e.data;
-            //console.debug("wvy.authentication: broadcast received", msg.name, msg.eventName || "");
-            switch (msg.name) {
+             switch (msg.name) {
                 case "request:user":
                     wvy.postal.postToSource(e, { name: "user", user: _user });
                     break;
+                default:
+                    return;
+            }
+
+        };
+
+        var onParentMessageReceived = function (e) {
+            var msg = e.data;
+             switch (msg.name) {
                 case "user":
                     processUser(msg.user);
                     break;
-                case "broadcast-authentication-event":
+                case "distribute-authentication-event":
                     var name = msg.eventName;
                     var event = $.Event(name);
                     var data = msg.data;
@@ -343,7 +353,7 @@
                     if (name === "user") {
                         processUser(data.user);
                     } else {
-                        console.debug("wvy.authentication: triggering received broadcast-event", name);
+                        console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " triggering received distribute-event", name);
                         $(weavyAuthentication).triggerHandler(event, msg.data);
                     }
 
@@ -427,7 +437,6 @@
                 $(function () {
                     setTimeout(function () {
                         if (_authentications.size === 1) {
-                            console.debug("wvy.authentication self init");
                             authentication.init();
                         }
                     }, 1);

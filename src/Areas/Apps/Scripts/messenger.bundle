@@ -1,4 +1,5 @@
-﻿~/scripts/vendor/jquery/jquery.min.js
+﻿~/scripts/src/browser.js
+~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/src/postal.js
 ~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/vendor/turbolinks/turbolinks.js

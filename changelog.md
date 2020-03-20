@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 6.1.2 (2020-03-20)
+
+* Realtime connection improvements.
+* Fixed bug when dropping files in File app.
+
 ## 6.1.1 (2020-03-19)
 
 * Fixed minification error in weavy.min.js.

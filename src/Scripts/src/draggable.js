@@ -4,7 +4,7 @@
 
 (function ($) {
 
-    var dragData;
+    var _draggedItem;
 
     if (wvy.turbolinks.enabled) {
         // init
@@ -57,56 +57,64 @@
         e.dataTransfer.dropEffect = "move";
         e.dataTransfer.effectAllowed = "move";
 
-        dragData = { id: $(e.target).data("id"), guid: $(e.target).data("item-guid") };
-        e.dataTransfer.setData("application/json", JSON.stringify(dragData));
+        _draggedItem = { id: $(e.target).data("id"), guid: $(e.target).data("item-guid") };
+        e.dataTransfer.setData("application/json", JSON.stringify(_draggedItem));
         e.dataTransfer.setData("text/uri-list", document.location.origin + $(e.target).data("href"));
         e.dataTransfer.setData("text/plain", $(e.target).data("id"));
     }
 
     function dragEnter(e) {
-        e.dataTransfer.dropEffect = "move";
+        if (_draggedItem != null) {
+            e.dataTransfer.dropEffect = "move";
+        }
     }
 
     function dragOver(e) {
-        var allowed = $(e.currentTarget).data("allowed-children");
+        if (_draggedItem != null) {
+            var allowed = $(e.currentTarget).data("allowed-children");
 
-        if (allowed != null && $(e.currentTarget).data("id") !== dragData.id && (allowed === "*" || allowed.includes(dragData.guid))) {
-            this.classList.add("dragging-over");
-            e.dataTransfer.dropEffect = "move";            
-            e.preventDefault();
+            if (allowed != null && $(e.currentTarget).data("id") !== _draggedItem.id && (allowed === "*" || allowed.includes(_draggedItem.guid))) {
+                this.classList.add("dragging-over");
+                e.dataTransfer.dropEffect = "move";
+                e.preventDefault();
+            }
         }
     }
 
     function dragLeave(e) {
-        e.preventDefault();
-        this.classList.remove("dragging-over");
+        if (_draggedItem != null) {
+            e.preventDefault();
+            this.classList.remove("dragging-over");
+        }
     }
 
     function drop(e) {
-        var data = JSON.parse(e.dataTransfer.getData("application/json"));
-        var source = $("[data-id='" + data.id + "']");
-        var targetContent = e.target.getAttribute("data-id") != null ? $(e.target) : $(e.target).closest("[data-id]");
-        var targetApp = e.target.getAttribute("data-app") != null ? $(e.target) : $(e.target).closest("a[data-app]");
+        if (_draggedItem != null) {
+            var data = JSON.parse(e.dataTransfer.getData("application/json"));
+            var source = $("[data-id='" + data.id + "']");
+            var targetContent = e.target.getAttribute("data-id") != null ? $(e.target) : $(e.target).closest("[data-id]");
+            var targetApp = e.target.getAttribute("data-app") != null ? $(e.target) : $(e.target).closest("a[data-app]");
 
-        if (source.length && (targetContent.length || targetApp)) {
-            source.hide();
-            var url = "/a/content/" + data.id + "/move?" + (targetContent.length ? "contentid=" + targetContent.data("id") : "appid=" + targetApp.data("app"));
+            if (source.length && (targetContent.length || targetApp)) {
+                source.hide();
+                var url = "/a/content/" + data.id + "/move?" + (targetContent.length ? "contentid=" + targetContent.data("id") : "appid=" + targetApp.data("app"));
 
-            $.ajax({
-                url: wvy.url.resolve(url),
-                type: "POST"
-            }).done(function () {
-                source.remove();
-            }).fail(function (xhr) {
-                source.show();
-                var json = JSON.parse(xhr.responseText);
-                wvy.alert.warning(json.message);
-            });
+                $.ajax({
+                    url: wvy.url.resolve(url),
+                    type: "POST"
+                }).done(function () {
+                    source.remove();
+                }).fail(function (xhr) {
+                    source.show();
+                    var json = JSON.parse(xhr.responseText);
+                    wvy.alert.warning(json.message);
+                });
+            }
         }
     }
 
     function dragEnd(e) {
-        dragData = null;
+        _draggedItem = null;
         $("body").removeClass("dragging");
     }
 

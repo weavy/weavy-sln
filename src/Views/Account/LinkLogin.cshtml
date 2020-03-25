@@ -13,7 +13,6 @@
             <p>There is already a local account for <strong>@Model.Login.Email</strong> on @Theme.Name. To verify that you want to link your your <strong>@Model.Login.Type</strong> login to this account we need you to provide your password.</p>
 
             @using (Html.BeginForm(nameof(AccountController.LinkLogin), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
-                @Html.AntiForgeryToken()
                 @Html.EditorsForModel()
                 <div class="form-buttons">
                     <button type="submit" class="btn btn-primary btn-load">Sign in</button>

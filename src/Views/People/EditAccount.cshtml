@@ -15,7 +15,6 @@
 
     @using (Html.BeginForm(nameof(PeopleController.UpdateAccount), typeof(PeopleController).ControllerName(), FormMethod.Post, new { id = "update-account-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
         @Html.HttpMethodOverride(HttpVerbs.Put)
-        @Html.AntiForgeryToken()
         @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsExternal), nameof(Model.IsSuspended) })
 
         <div class="form-group">

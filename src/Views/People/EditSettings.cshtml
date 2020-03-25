@@ -12,7 +12,6 @@
 <div class="container my-3">
     @using (Html.BeginForm(nameof(PeopleController.UpdateSettings), typeof(PeopleController).ControllerName(), new { id = user.Id }, FormMethod.Post, new { id = "update-settings-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
         @Html.HttpMethodOverride(HttpVerbs.Put)
-        @Html.AntiForgeryToken()
         
         <h5 class="mb-3">Date and time</h5>
         @Html.EditorsForModel(Model, group: "settings")

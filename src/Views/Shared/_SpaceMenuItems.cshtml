@@ -43,7 +43,6 @@
         if (User.IsAdmin && !Model.HasPermission(Permission.Admin)) {
             // admins can take admin control of any space
             <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
-                @Html.AntiForgeryToken()
                 @Html.HttpMethodOverride(HttpVerbs.Put)
                 <button type="submit" class="dropdown-item">@Svg.Icon("account-key", "warning") Make me admin</button>
             </form>
@@ -74,7 +73,6 @@
         if (User.IsAdmin) {
             // admins can take admin control of any space
             <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
-                @Html.AntiForgeryToken()
                 @Html.HttpMethodOverride(HttpVerbs.Put)
                 <button type="submit" class="dropdown-item">@Svg.Icon("account-key", "warning") Join as admin</button>
             </form>
@@ -84,7 +82,6 @@
     if (Model.HasPermission(Permission.Delete) && !Model.IsTrashed()) {
         <div class="dropdown-divider"></div>
         <form action="@(Url.Action<SpaceController>(c => c.Trash(Model.Id)))" method="post">
-            @Html.AntiForgeryToken()
             @Html.HttpMethodOverride(HttpVerbs.Delete)
             <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Trash</button>
         </form>

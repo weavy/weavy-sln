@@ -22,7 +22,6 @@
 
 <div class="container my-3">
     @using (Html.BeginForm(nameof(SpaceController.Insert), typeof(SpaceController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "", id = "new-space" })) {
-        @Html.AntiForgeryToken()
         @Html.Hidden("client", false)
 
         <div class="text-center">

@@ -985,6 +985,12 @@
             }
 
             if (weavy.isLoaded === false) {
+
+                // Do a script version mismatch check
+                if (Weavy.version !== weavy.data.version) {
+                    weavy.error("Weavy client/server version mismatch! \nclient: " + Weavy.version + " \nserver: " + weavy.data.version);
+                }
+
                 initRoot.call(weavy);
 
                 frameStatusCheck.call(weavy);

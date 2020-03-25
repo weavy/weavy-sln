@@ -30,7 +30,6 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 @using (Html.BeginForm(nameof(RolesController.AddMembers), null, new { id = Model.Role.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "" })) {
-                    @Html.AntiForgeryToken()
                     <div class="modal-header">
                         <h5 class="modal-title">Add members</h5>
                         <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Svg.Icon("close")</button>

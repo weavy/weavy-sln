@@ -22,7 +22,6 @@
 
     @using (Html.BeginForm(nameof(AccountController.UpdateAccount), typeof(AccountController).ControllerName(), FormMethod.Post, new { id = "update-account-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
         @Html.HttpMethodOverride(HttpVerbs.Put)
-        @Html.AntiForgeryToken()
         @Html.EditorsForModel(Model)
         <div class="form-buttons">
             <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>

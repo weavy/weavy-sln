@@ -16,7 +16,6 @@
 <div class="container-fluid mt-3">
     @using (Html.BeginForm(nameof(PeopleController.Insert), typeof(PeopleController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
         @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsExternal), nameof(Model.IsSuspended) })
-        @Html.AntiForgeryToken()
 
         <div class="form-group">
             @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })

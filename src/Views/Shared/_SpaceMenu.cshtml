@@ -23,7 +23,6 @@
         </button>
         <div class="dropdown-menu dropdown-menu-right">
             <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
-                @Html.AntiForgeryToken()
                 @Html.HttpMethodOverride(HttpVerbs.Put)
                 <button type="submit" class="dropdown-item">@Svg.Icon("account-key", "warning") Join as admin</button>
             </form>

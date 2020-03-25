@@ -19,7 +19,6 @@
 <div class="container my-3">
     @using (Html.BeginForm(nameof(AccountController.UpdateProfile), typeof(AccountController).ControllerName(), FormMethod.Post, new { id = "update-profile-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
         @Html.HttpMethodOverride(HttpVerbs.Put)
-        @Html.AntiForgeryToken()
 
         <div class="text-center">
             @Html.EditorFor(x => Model.Avatar)

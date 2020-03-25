@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 6.1.3 (2020-03-25)
+
+* Added warning if client and server have different versions.
+* Added before:navigate event.
+* Fixed "anti forgery cookie is not present" error.
+* Corrected click API endpoint url.
+
 ## 6.1.2 (2020-03-20)
 
 * Realtime connection improvements.

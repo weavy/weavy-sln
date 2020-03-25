@@ -20,7 +20,6 @@
                             </form>
                         } else {
                             <form action="@(Url.Action<RolesController>(c => c.Trash(role.Id)))" method="post" data-turboform>
-                                @Html.AntiForgeryToken()
                                 @Html.HttpMethodOverride(HttpVerbs.Delete)
                                 <button class="dropdown-item" type="submit">@Svg.Icon("delete", "danger") Trash</button>
                             </form>

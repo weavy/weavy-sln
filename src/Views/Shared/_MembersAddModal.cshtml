@@ -2,7 +2,6 @@
     <div class="modal-dialog">
         <div class="modal-content">
             @using (Html.BeginForm(nameof(SpaceController.InsertMembers), typeof(SpaceController).ControllerName(), new { id = WeavyContext.Space.Id, area = "" }, FormMethod.Post, new { autocomplete = "off", data_turboform = "" })) {
-                @Html.AntiForgeryToken()
                 <div class="modal-header">
                     <h5 class="modal-title">@(PermissionService.HasSystemPermission(Permission.Invite) ? "Add or invite members" : "Add members")</h5>
                     <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Svg.Icon("close")</button>

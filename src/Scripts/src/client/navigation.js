@@ -87,7 +87,7 @@
             var isNavigationRequest = $.isPlainObject(request) && request.url;
 
             if (isUrl) {
-                return weavy.ajax("/a/click?url=" + encodeURIComponent(request)).then(openRequest);
+                return weavy.ajax("/client/click?url=" + encodeURIComponent(request)).then(openRequest);
             } else if (isNavigationRequest) {
                 return openRequest(request);
             }
@@ -101,10 +101,16 @@
              * @property {NavigationRequest} route - Data about the requested navigation
              * 
              */
-            var eventResult = weavy.triggerEvent("navigate", e.data.route);
+            var eventResult = weavy.triggerEvent("before:navigate", e.data.route);
             if (eventResult !== false) {
                 weavy.info("navigate: trying internal auto navigation");
-                navigation.open(eventResult);
+                navigation.open(eventResult).catch(function () {
+                    // Only trigger on: and after: if .open was unsuccessful
+                    eventResult = weavy.triggerEvent("on:navigate", eventResult);
+                    if (eventResult !== false) {
+                        weavy.triggerEvent("after:navigate", eventResult);
+                    }
+                });
             }
         })
 

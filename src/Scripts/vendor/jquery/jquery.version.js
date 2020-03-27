@@ -1,0 +1,1 @@
+var jQueryVersion = {"options":{"loose":false,"includePrerelease":false},"loose":false,"raw":"3.3.1","major":3,"minor":3,"patch":1,"prerelease":[],"build":[],"version":"3.3.1"};

@@ -58,7 +58,6 @@
 ~/scripts/src/autosave.js
 ~/scripts/src/filebrowser.js
 ~/scripts/src/recycle-bin.js
-~/scripts/src/auth.js
 ~/scripts/_fileupload.bundle
 ~/scripts/_button.bundle
 ~/scripts/_preview.bundle

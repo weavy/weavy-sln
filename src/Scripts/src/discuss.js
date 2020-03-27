@@ -10,8 +10,8 @@ wvy.discuss = (function ($) {
                 var $form = $editor.closest("form");
 
                 // simpe check to see that post contains any data
-                var json = $form.serializeObject(false);
-                if (json.text || json.blobs || json.embeds) {
+                var json = $form.serializeObject(false);                
+                if (json.text || json.html || json.blobs || json.embeds) {
 
                     // remove .is-invalid
                     $form.removeClass("is-invalid");

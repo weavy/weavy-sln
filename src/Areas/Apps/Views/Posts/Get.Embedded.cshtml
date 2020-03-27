@@ -2,10 +2,17 @@
 @{
     Title = Model.App.Name;
 }
+@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)
+{
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
 <div class="container my-3">
-    @if (Model.App.HasPermission(Permission.Post)) {
+    @if (Model.App.HasPermission(Permission.Post))
+    {
         <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform>
-            <textarea id="text" class="form-control" name="text" data-editor-location="discuss"></textarea>
+            <textarea id="@(ConfigurationService.HtmlPosts ? "html" : "text")" class="form-control" name="@(ConfigurationService.HtmlPosts ? "html" : "text")" data-editor-location="discuss"></textarea>
         </form>
         <div class="card post fake-post">
             <div class="card-header media">
@@ -23,7 +30,8 @@
         </div>
     }
 
-    @if (WeavyContext.Space.HasPermission(Permission.List)) {
+    @if (WeavyContext.Space.HasPermission(Permission.List))
+    {
         <div id="infinite-scroll-target" class="posts">
             @Html.Partial("_Posts", Model.Posts)
         </div>

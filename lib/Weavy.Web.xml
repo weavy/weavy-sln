@@ -262,6 +262,11 @@
             Gets or sets the comment text.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Api.Models.CommentIn.Html">
+            <summary>
+            Gets or sets the post html.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Api.Models.CommentIn.Blobs">
             <summary>
             Gets or sets ids of blobs to attach.
@@ -285,6 +290,16 @@
         <member name="P:Weavy.Web.Api.Models.CommentUp.Text">
             <summary>
             Gets or sets the comment text.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Api.Models.CommentUp.Html">
+            <summary>
+            Gets or sets the comment html.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Api.Models.CommentUp.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Performs custom validation.
             </summary>
         </member>
         <member name="T:Weavy.Web.Api.Models.ContentIn">
@@ -637,6 +652,11 @@
             Gets or sets the post text.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Api.Models.PostIn.Html">
+            <summary>
+            Gets or sets the post html.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Api.Models.PostIn.Blobs">
             <summary>
             Gets or sets ids of blobs to attach.
@@ -665,6 +685,11 @@
         <member name="P:Weavy.Web.Api.Models.PostUp.Text">
             <summary>
             Gets or sets the post text.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Api.Models.PostUp.Html">
+            <summary>
+            Gets or sets the post html.
             </summary>
         </member>
         <member name="M:Weavy.Web.Api.Models.PostUp.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
@@ -6841,6 +6866,11 @@
             Gets or sets the comment text.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.CommentUpdateModel.Html">
+            <summary>
+            Gets or sets the comment html.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.CommentUpdateModel.Blobs">
             <summary>
             Gets or sets the blob ids.
@@ -7212,6 +7242,11 @@
             Gets or sets the embed ids.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.PostInsertModel.Html">
+            <summary>
+            Gets or sets the post html.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.PostInsertModel.Text">
             <summary>
             Gets or sets the post text.
@@ -7298,11 +7333,15 @@
             Gets or sets the post id
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.PostUpdateModel.Html">
+            <summary>
+            Gets or sets the post html.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.PostUpdateModel.Text">
             <summary>
             Gets or sets the post text.
             </summary>
-            <remarks>Decorated with AllowHtml attribute to supress "a potentially dangerous value was detected" validation exception.</remarks>
         </member>
         <member name="P:Weavy.Web.Models.PostUpdateModel.Blobs">
             <summary>

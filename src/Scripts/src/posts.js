@@ -211,6 +211,10 @@ wvy.posts = (function ($) {
         });
     });
 
+    $(document).on("hide.bs.modal", "#edit-post-modal", function (e) {
+        $("[data-editor-location='post-edit']").weavyEditor("destroy");
+    })
+
     // load edit form
     $(document).on("show.bs.modal", "#edit-post-modal", function (e) {
 
@@ -245,7 +249,7 @@ wvy.posts = (function ($) {
             $div.addClass("d-none");
         }).always(function () {
             // stop spinner
-            $spinner.removeClass("spin");
+            $spinner.removeClass("spin");            
         });
     });
 
@@ -274,14 +278,14 @@ wvy.posts = (function ($) {
             });
             delete data["options.Index"];
         }
-
+                
         // fetch modal content from server
         $.ajax({
             contentType: "application/json; charset=utf-8",
             url: $form.attr("action"),
             type: "PUT",
             data: JSON.stringify(data)
-        }).then(function (html) {
+        }).then(function (html) {            
             if (typeof (html) === "string") {
                 $form.replaceWith(html);
 

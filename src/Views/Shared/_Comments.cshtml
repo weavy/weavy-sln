@@ -13,8 +13,7 @@
         <div class="media">
             @creator.AvatarLink(32, htmlAttributes: new { @class = "mr-2" })
             <div class="media-body">
-                <p class="mb-1">@creator.Link() @Html.Raw(comment.Html)</p>
-
+                <div class="comment-body">@creator.Link() @Html.Raw(comment.Html)</div>
 
                 @if (images.Any()) {
                     Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", parent } });

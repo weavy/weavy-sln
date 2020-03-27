@@ -1,5 +1,11 @@
 # Changelog for Weavy
 
+## 6.1.4 (2020-03-27)
+
+* Fixed some issues when signing in when in embedded mode.
+* Updated tinyMCE to latest version (v5.2.0).
+* Experimental html enabled text editor in post and comments. Enable by adding weavy.html-posts = true and weavy.html-comments = true to your app settings.
+
 ## 6.1.3 (2020-03-25)
 
 * Added warning if client and server have different versions.

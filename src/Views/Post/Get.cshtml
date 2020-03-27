@@ -3,7 +3,12 @@
     Title = "Post details";
     Back = Model.App().Url();
 }
-
+@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)
+{
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
 <div class="container my-3">
     @Html.Partial("_Post", Model, new ViewDataDictionary { { "details", true } })
 </div>

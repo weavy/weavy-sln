@@ -59,10 +59,14 @@ body.controller-post.action-get {
         margin-bottom: $card-spacer-y;
         padding-top: 0;
         padding-bottom: 0;
+
+        table {
+            @extend .table, .table-bordered, .table-sm;
+        }
     }
 
-    .card-text {
-        margin-bottom: $card-spacer-y;
+    .card-poll {
+        padding: 0 $card-spacer-x;
     }
 
     .card-files {

@@ -5,24 +5,64 @@ tinymce.PluginManager.add("weavy_link", function (editor, url) {
 
     var bookmark;
 
-    editor.addMenuItem("weavy_link", {
+    editor.ui.registry.addMenuItem("weavy_link", {
         icon: "link",
         text: "Insert/edit link",
         context: "insert",
-        cmd: "weavy_link"
+        onAction: function () { weavyLink() },
     });
 
-    editor.addButton("weavy_link", {
+    editor.ui.registry.addButton("weavy_link", {
         tooltip: "Insert/edit link",
         icon: "link",
-        cmd: "weavy_link"
+        onAction: function () { weavyLink() },
     });
 
-    editor.addShortcut("Meta+k, Meta+Shift+k", "Insert link", function () {
-        editor.execCommand("weavy_link");
-    });
+    var insertLink = function (url, text, external) {
+        editor.selection.moveToBookmark(bookmark);
 
-    editor.addCommand("weavy_link", function () {
+        var elm = getNode();
+        var dom = editor.dom;
+
+        if (external === true && !/(^(https|http|file|ftp|mailto)\:)/.test(url)) {
+            url = "http://" + url;
+        }
+
+        // update existing anchor
+        if (elm != null && elm.nodeName == "A") {
+            editor.focus();
+
+            dom.setAttrib(elm, "href", url);
+
+            if (external === true) {
+                dom.setAttrib(elm, "target", "_blank");
+            } else {
+                dom.setAttrib(elm, "target", null);
+            }
+
+        } else {
+            // create anchor
+            var linkText = editor.selection.getContent({ format: 'text' });
+
+            if (linkText.length == 0) {
+                linkText = text;
+            }
+
+            if (isOnlyTextSelected(elm)) {
+                editor.insertContent(dom.createHTML('a', {
+                    href: url,
+                    target: external === true ? "_blank" : null
+                }, dom.encode(linkText)));
+            } else {
+                editor.execCommand('mceInsertLink', false, {
+                    href: url,
+                    target: external === true ? "_blank" : null
+                });
+            }
+        }
+    }
+
+    var weavyLink = function () {
         bookmark = editor.selection.getBookmark(1, true);
 
         var url = "";
@@ -56,71 +96,30 @@ tinymce.PluginManager.add("weavy_link", function (editor, url) {
         }
 
         var params = "";
-
-        var itemid = $("#ItemId").val();
-        if (itemid) {
-            params = "&id=" + itemid;
-        }
+        params = "&id=" + wvy.context.content;
+        
 
         // get attachments
         $("#attachments input[type='hidden']").each(function (i, item) {
             params += "&att=" + $(item).val();
         });
 
-        editor.windowManager.open({
+        editor.windowManager.openUrl({
             title: "Insert/edit link",
-            file: wvy.url.resolve("ui/insertlink?q=" + textSelection + "&url=" + encodeURIComponent(url) + params),
-            width: 'auto',
+            url: wvy.url.resolve("ui/insertlink?q=" + textSelection + "&url=" + encodeURIComponent(url) + params),
+            width: 800,
             height: 600,
             resizable: true,
             maximizable: true,
-            inline: 1
-        }, {
-            insertLink: function (url, text, external) {
-                editor.selection.moveToBookmark(bookmark);
-
-                var elm = getNode();
-                var dom = editor.dom;
-
-                if (external === true && !/(^(https|http|file|ftp|mailto)\:)/.test(url)) {
-                    url = "http://" + url;
-                }
-
-                // update existing anchor
-                if (elm != null && elm.nodeName == "A") {
-                    editor.focus();
-
-                    dom.setAttrib(elm, "href", url);
-
-                    if (external === true) {
-                        dom.setAttrib(elm, "target", "_blank");
-                    } else {
-                        dom.setAttrib(elm, "target", null);
-                    }
-
-                } else {
-                    // create anchor
-                    var linkText = editor.selection.getContent({ format: 'text' });
-
-                    if (linkText.length == 0) {
-                        linkText = text;
-                    }
-
-                    if (isOnlyTextSelected(elm)) {
-                        editor.insertContent(dom.createHTML('a', {
-                            href: url,
-                            target: external === true ? "_blank" : null
-                        }, dom.encode(linkText)));
-                    } else {
-                        editor.execCommand('mceInsertLink', false, {
-                            href: url,
-                            target: external === true ? "_blank" : null
-                        });
-                    }
+            inline: 1,
+            onMessage: function (api, data) {
+                if (data.mceAction === 'insertLink') {
+                    insertLink(data.url, data.text, data.external);
+                    api.close();
                 }
             }
         });
-    });
+    };
 
     // returns an anchor node if selected
     function getNode() {

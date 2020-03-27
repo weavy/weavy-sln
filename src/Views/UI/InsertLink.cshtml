@@ -4,20 +4,89 @@
     Layout = "_Layout.cshtml";
     var propsActive = string.IsNullOrEmpty(Model.Query.WrappedQuery.Text);
     var searchActive = !propsActive;
-    var attachments = ViewBag.Attachments as List<Weavy.Core.Models.File>;
+    var attachments = ViewBag.Attachments as List<Weavy.Core.Models.Attachment>;
     var isMarkdown = Request.QueryString["editortype"] == "markdown";
 
 }
 
 @section scripts {
-<script>
+    <script>
     var editorType = "@ViewBag.EditorType";
-</script>
+
+    $(function () {
+         /* Insert link - TinyMCE
+        **************************************************************/
+        // link to value in url field
+        $(".ui-insertlink form.properties").on("submit", function (e) {
+            if (editorType === "html") {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var form = $(this);
+                var field = form.find(".form-control");
+                var url = field.val();
+                if (url.length > 0) {
+                    var external = true;
+                    if (url.indexOf("/") === 0) {
+                        external = false;
+                    }
+
+                    window.parent.postMessage({
+                    mceAction: 'insertLink',
+                    url: url,
+                    text: url,
+                    external:external
+                }, '*');
+            }
+
+            return false;
+            }
+        });
+
+        // cancel button
+        $(".ui-insertlink form.properties .btn-secondary").on("click", function () {
+            if (editorType === "html") {
+                parent.tinymce.activeEditor.windowManager.close();
+                return false;
+            }
+
+        });
+
+        // link to attachment
+        $(".ui-insertlink #nav-attachments div.card").on("click", function (e) {
+            if (editorType === "html") {
+                 window.parent.postMessage({
+                    mceAction: 'insertLink',
+                    url: $(this).data("url"),
+                    text: $(this).data("text"),
+                    external:false
+                 }, '*');
+                                
+            }
+        });
+
+        // link to serch result
+        $(".ui-insertlink .result a").on("click", function (e) {
+            if (editorType === "html") {
+                e.preventDefault();
+                e.stopPropagation();
+
+                window.parent.postMessage({
+                    mceAction: 'insertLink',
+                    url: $(this).attr("href"),
+                    text: $(this).data("text"),
+                    external:false
+                }, '*');
+            }
+        });
+    });
+    </script>
 }
 
 <div class="container-fluid">
     <header class="page-header">
-        @if (isMarkdown) {
+        @if (isMarkdown)
+        {
             <button type="button" class="btn btn-transparent pull-right" data-close title="Close">✕</button>
             <div class="page-title">Insert link</div>
         }
@@ -49,28 +118,23 @@
 
         </div>
         <div class="tab-pane" id="nav-attachments" role="tabpanel" aria-labelledby="nav-attachments-tab">
-
-            @if (!attachments.IsNullOrEmpty()) {
-                <section class="attachments d-flex flex-wrap">
-
-                    @foreach (var file in attachments) {
-                        <div class="card mr-1 mb-1" style="width: 96px;" data-url="@file.ContentUrl()" data-text="@file.Name">
-                            <a href="javascript:;"><img alt="" src="@file.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" /></a>
-                            <div class="card-block p-1">
-                                <a href="javascript:;" title="@file.Name"><small>@file.Name.Ellipsis(10)</small></a>
-                                <div class="meta">
-                                    @file.Description
+            <div class="row p-3">
+                @foreach (var file in attachments)
+                {
+                    if (FileUtils.IsWebImage(file.Blob.Name))
+                    {
+                        <div class="card mr-1" style="width: 96px;" data-url="@file.ContentUrl()" data-text="@file.GetTitle()">
+                            <a href="javascript:;" data-name="@file.Blob.Name" data-file-url="@file.ContentUrl()" data-thumb-url="@file.ThumbPlaceholderUrl().LeftBefore("?")" data-width="@file.Blob.Width" data-height="@file.Blob.Height" title="@file.Blob.Name">
+                                <img alt="" src="@file.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" />
+                                <div class="card-block p-1">
+                                    <small>@file.Blob.Name.Ellipsis(10)</small>
+                                    <div class="meta"><small>@FileUtils.FileSizeAsString(file.Blob.Size)</small></div>
                                 </div>
-                                <div class="meta"><small>@FileUtils.FileSizeAsString(file.Blob.Size)</small></div>
-                            </div>
+                            </a>
                         </div>
                     }
-
-                </section>
-            } else {
-                <p>No attachments here.</p>
-            }
-
+                }
+            </div>
         </div>
 
         <div class="tab-pane @(searchActive ? "active" : "")" id="nav-search" role="tabpanel" aria-labelledby="nav-search-tab">
@@ -81,14 +145,18 @@
                 @Html.Hidden("url", Request.QueryString["url"])
                 @Html.Hidden("editortype", Request.QueryString["editortype"])
 
-                @if (Model.Query.WrappedQuery.Text.IsNullOrWhiteSpace()) {
+                @if (Model.Query.WrappedQuery.Text.IsNullOrWhiteSpace())
+                {
                     <button type="submit" class="btn btn-icon" title="Search">@Svg.Icon("magnify")</button>
-                } else {
+                }
+                else
+                {
                     <a class="btn btn-icon" href="@Url.Action(ActionName, new { id = Request.QueryString["id"], url = Request.QueryString["url"], editortype = Request.QueryString["editortype"], area = "" })" title="Clear search">@Svg.Icon("close")</a>
                 }
             </form>
             <div class="result">
-                @if (!Model.Query.WrappedQuery.Text.IsNullOrEmpty()) {
+                @if (!Model.Query.WrappedQuery.Text.IsNullOrEmpty())
+                {
                     <p>@Model.Description()</p>
                 }
                 @Html.Partial("_SearchResult", Model)

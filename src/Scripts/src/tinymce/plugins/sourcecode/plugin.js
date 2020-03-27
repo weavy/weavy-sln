@@ -10,13 +10,12 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
 
     function showSourceEditor() {
 
-        //Container references
-        var contentAreaContainer = editor.contentAreaContainer;
+        //Container references        
         var editorContainer = editor.editorContainer;
-        var editorStatusBar = $(editorContainer).find(".mce-statusbar");
+        
         var menuItems = $(editorContainer).find(".mce-menubtn");
-        var toolbarButtons = $(editorContainer).find(".mce-toolbar .mce-btn[aria-label!='Source code']");
-        var sourceCodeButton = $(editorContainer).find(".mce-toolbar .mce-btn[aria-label='Source code']");
+        var toolbarButtons = $(editorContainer).find(".tox-toolbar__primary .tox-tbtn[aria-label!='Source code']");
+        var sourceCodeButton = $(editorContainer).find(".tox-toolbar__primary .tox-tbtn[aria-label='Source code']");
 
         //If already in source mode, then submit to TinyMCE
         if (sourceCodeMode) {
@@ -42,12 +41,13 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
         //Create code mirror from textarea
         codeMirror = CodeMirror.fromTextArea(textarea[0], {
             mode: 'htmlmixed',
-            //lineNumbers: false,
+            lineNumbers: true,
             lineWrapping: true,
             indentUnit: 2,
+            tabMode: "indent",
             tabSize: 2,
-            //matchBrackets: true,
-            //styleActiveLine: false,
+            matchBrackets: true,
+            styleActiveLine: false,
             theme: 'weavy'
         });
 
@@ -55,32 +55,33 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
         toggleVisibility(false);
 
         function toggleVisibility(showTinyMCE) {
-
+            var editorHeight = 500;
             if (showTinyMCE) {
-                $(contentAreaContainer).show();
-                $(editorStatusBar).show();
+                
+                $(editorContainer).css("height", editorHeight + "px");
 
-                $(menuItems).removeClass("mce-disabled");
+                $(menuItems).removeClass("tox-tbtn--disabled");
                 $(menuItems).off("click", disableClick)
 
-                $(toolbarButtons).removeClass("mce-disabled");
+                $(toolbarButtons).removeClass("tox-tbtn--disabled");
                 $(toolbarButtons).off("click", disableClick);
 
-                $(sourceCodeButton).removeClass("mce-active");
+                $(sourceCodeButton).removeClass("tox-tbtn--enabled");
 
                 //Remove codemirror reference
                 $(textareaContainer).remove();
             } else {
-                $(contentAreaContainer).hide();
-                $(editorStatusBar).hide();
+                
+                editorHeight = $(editorContainer).css("height");
+                $(editorContainer).css("height", "auto");
 
-                $(menuItems).addClass("mce-disabled");
+                $(menuItems).addClass("tox-tbtn--disabled");
                 $(menuItems).on("click", disableClick);
 
-                $(toolbarButtons).addClass("mce-disabled");
+                $(toolbarButtons).addClass("tox-tbtn--disabled");
                 $(toolbarButtons).on("click", disableClick);
 
-                $(sourceCodeButton).addClass("mce-active");
+                $(sourceCodeButton).addClass("tox-tbtn--enabled");
             }
 
             sourceCodeMode = !showTinyMCE;
@@ -89,8 +90,11 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
         //Submit content to TinyMCE editor and hide source editor
         function submit() {
             var isDirty = codeMirror.isDirty;
-
+            
             editor.setContent(codeMirror.getValue());
+            editor.fire("change");
+
+            
             editor.isNotDirty = !isDirty;
             if (isDirty) {
                 editor.nodeChanged();
@@ -102,17 +106,17 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
     };
 
     // Add a button to the button bar
-    editor.addButton('code', {
-        title: 'Source code',
-        icon: 'code',
-        onclick: showSourceEditor
+    editor.ui.registry.addButton('code', {
+        tooltip: 'Source code',
+        icon: 'sourcecode',
+        onAction: showSourceEditor
     });
 
     // Add a menu item to the tools menu
-    editor.addMenuItem('code', {
-        icon: 'code',
+    editor.ui.registry.addMenuItem('code', {
+        icon: 'sourcecode',
         text: 'Source code',
         context: 'tools',
-        onclick: showSourceEditor
+        onAction: showSourceEditor
     });
 });

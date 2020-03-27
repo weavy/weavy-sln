@@ -3881,7 +3881,7 @@
         </member>
         <member name="P:Weavy.Core.Models.Comment.Html">
             <summary>
-             Gets the html version of the <see cref="T:Weavy.Core.Models.Comment"/> text.
+             Gets the <see cref="T:Weavy.Core.Models.Comment"/> html.
             </summary>
         </member>
         <member name="P:Weavy.Core.Models.Comment.CreatedAt">
@@ -5314,7 +5314,7 @@
         </member>
         <member name="P:Weavy.Core.Models.Message.Html">
             <summary>
-             Gets the message text as html.
+             Gets or sets the message html.
             </summary>
         </member>
         <member name="P:Weavy.Core.Models.Message.CreatedAt">
@@ -16755,6 +16755,16 @@
         <member name="P:Weavy.Core.Services.ConfigurationService.Daemons">
             <summary>
             Gets a value indicating if daemons are enabled <code>weavy.daemons</code>.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.HtmlComments">
+            <summary>
+            Gets a value indicating whether comments should be edited in html or plain text.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.HtmlPosts">
+            <summary>
+            Gets a value indicating whether posts should be edited in html or plain text.
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Https">

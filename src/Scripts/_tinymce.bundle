@@ -10,7 +10,7 @@
 ~/scripts/vendor/tinymce/tinymce.min.js                    
 
 # theme
-~/scripts/vendor/tinymce/themes/modern/theme.min.js        
+~/scripts/src/tinymce/themes/silver/theme.min.js        
 
 # standard plugins
 ~/scripts/vendor/tinymce/plugins/anchor/plugin.min.js      
@@ -27,7 +27,7 @@
 ~/scripts/vendor/tinymce/plugins/wordcount/plugin.min.js   
 
 # custom plugins
-~/scripts/src/tinymce/plugins/paste/plugin.js                                 
+~/scripts/src/tinymce/plugins/paste/plugin.js                                       
 ~/scripts/src/tinymce/plugins/sourcecode/plugin.js                            
 ~/scripts/src/tinymce/plugins/autocomplete/plugin.js                          
 ~/scripts/src/tinymce/plugins/image/plugin.js                                 

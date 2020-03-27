@@ -12,8 +12,23 @@
         resize: none;
         height: calc(6.125rem + 2px);
         box-shadow: none;
+    }
+
+    #text {
         pointer-events: none;
     }
+}
+
+.post-form {
+    .tox-tinymce {
+        border: 0 !important;
+        border-bottom: 1px solid $card-border-color !important;
+    }
+}
+
+
+.weavy_tiny_body{
+    color:red;
 }
 
 .weavy-editor {

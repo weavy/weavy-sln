@@ -56,9 +56,13 @@ wvy.comments = (function ($) {
         var entityId = $form.data("entity-id");
         var $commentsContainer = $form.parent().find($form.data("comments-container"));
 
-        var data = $form.serializeObject(true);
-        data["text"] = d.text;
-
+        var data = $form.serializeObject(true);        
+        if (!wvy.config.htmlComments) {
+            data["text"] = d.text;
+            delete data.html;
+        }
+        
+        
         var method = "POST";
         var url = wvy.url.resolve($form.attr("action"));
 
@@ -92,7 +96,7 @@ wvy.comments = (function ($) {
 
         // reset form
         $editor.weavyEditor('reset');
-
+        
         // insert comment
         $.ajax({
             contentType: "application/json; charset=utf-8",
@@ -337,6 +341,10 @@ wvy.comments = (function ($) {
             $spinner.removeClass("spin");
         });
     });
+
+    $(document).on("hide.bs.modal", "#edit-comment-modal", function (e) {
+        $("[data-editor-location='comment-edit']").weavyEditor("destroy");
+    })
 
     return {
         on: on,

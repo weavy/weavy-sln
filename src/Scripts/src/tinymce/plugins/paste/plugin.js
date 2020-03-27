@@ -565,7 +565,12 @@ var wvy = wvy || {};
              * @return {Boolean} true/false if the image data was found or not.
              */
             function pasteImageData(e, rng) {
+                
                 var dataTransfer = e.clipboardData || e.dataTransfer;
+
+
+                // If more than image data in clipboard, do not paste as image
+                if (e.clipboardData.types.length > 1) return;
                 
                 function processItems(items) {
                     var i, item, reader, hadImage = false;
@@ -584,8 +589,7 @@ var wvy = wvy || {};
                         pasteHtml('<a href="' + reader.result + '" data-photoswipe="document"' + pswpSize + '><img src="' + reader.result + '"></a>');
                     }
 
-                    if (items) {
-
+                    if (items) {                        
                         //Check that we're only pasting image data
                         for (i = 0; i < items.length; i++) {
                             if (!/^image\/(jpg|jpeg|png|gif|bmp)$/.test(items[i].type)) {
@@ -633,9 +637,10 @@ var wvy = wvy || {};
 
                                         success: function (data, textStatus, jqXHR) {
                                             var response = JSON.parse(data).data[0];
+                                            
                                             if (response && response.file_url) {
-                                                var attachmentsRoot = $("#attachments", window.document);
-                                                attachmentsRoot.append($("<input type='hidden' name='attachmentids' value='" + response.id + "' />"));
+                                                var attachmentsRoot = $("#blobs", window.document);                                                
+                                                attachmentsRoot.append($("<input type='hidden' name='blobs' value='" + response.id + "' />"));
                                                 pasteImage({ result: response.file_url, width: response.width, height: response.height });
                                             }
                                         },
@@ -1626,11 +1631,11 @@ var wvy = wvy || {};
 
             function togglePlainTextPaste() {
                 if (clipboard.pasteFormat === "text") {
-                    this.active(false);
+                    //this.active(false);
                     clipboard.pasteFormat = "html";
                 } else {
                     clipboard.pasteFormat = "text";
-                    this.active(true);
+                    //this.active(true);
 
                     if (!userIsInformed) {
                         editor.windowManager.alert(
@@ -1696,18 +1701,18 @@ var wvy = wvy || {};
                 $("body").append("<div class='progress progress-fixed'></div>")
             }
 
-            editor.addButton('pastetext', {
-                icon: 'pastetext',
+            editor.ui.registry.addButton('pastetext', {
+                icon: 'paste',
                 tooltip: 'Paste as text',
-                onclick: togglePlainTextPaste,
+                onAction: togglePlainTextPaste,
                 active: self.clipboard.pasteFormat === "text"
             });
 
-            editor.addMenuItem('pastetext', {
+            editor.ui.registry.addMenuItem('pastetext', {
                 text: 'Paste as text',
                 selectable: true,
                 active: clipboard.pasteFormat,
-                onclick: togglePlainTextPaste
+                onAction: togglePlainTextPaste
             });
         });
     });

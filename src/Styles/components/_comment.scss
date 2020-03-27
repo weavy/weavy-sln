@@ -11,6 +11,13 @@
         line-height: $line-height-base;
     }
 
+    .comment-body {
+        table {
+            @extend .table, .table-bordered, .table-sm;
+            margin-bottom: $card-spacer-y !important;
+        }
+    }
+
     .image-grid {
         margin: $card-spacer-y 0;
     }
@@ -22,12 +29,11 @@
             font-size: $font-size-sm;
         }
     }
-
 }
 
 .comment-feedback {
     .btn {
-        position:relative;
+        position: relative;
         bottom: .125rem;
     }
 }

@@ -59,6 +59,33 @@
                     }
                 </div>
 
+                <script>
+                    if (wvy.browser.framed) {
+                        // catch the submit and open in new window to enable provider based sign in from iframes
+                        $('form#embedded-providers').on('submit', function (e) {
+                            var form = $(this);
+                            form.attr('target', 'auth-window');
+                            var win = window.open('about:blank', 'auth-window', 'width=400,height=600');
+
+                            // listen for distributed user event (user signed in) and then close to window
+                            var winClose = function (e) {
+                                var msg = e.data;
+                                if (msg.name === "distribute-authentication-event" && msg.eventName === "user") {
+                                    var authorized = msg.data && ($.isArray(msg.data) ? msg.data[0].authorized : msg.data.authorized);
+                                    if (authorized) {
+                                        if (win && !win.closed) {
+                                            console.debug("Authorized; closing auth window");
+                                            win.close();
+                                        }
+                                        wvy.postal.off("distribute", winClose);
+                                    }
+                                }
+                            };
+
+                            wvy.postal.on("distribute", winClose);
+                        });
+                    }
+                </script>
             }
         </div>
     </div>

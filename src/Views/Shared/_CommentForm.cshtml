@@ -7,9 +7,9 @@
 }
 
 @if (Model.HasPermission(Permission.Comment)) {
-<form action="@url" method="post" id="comment-form-@id" data-type="@type" data-id="@id" data-comments-container="@commentsContainer">
-  <textarea class="comments-form" name="text"></textarea>
-</form>
+    <form action="@url" method="post" id="comment-form-@id" data-type="@type" data-id="@id" data-comments-container="@commentsContainer">
+        <textarea class="comments-form" data-editor-location="comments" name="@(ConfigurationService.HtmlComments ? "html" : "text")"></textarea>
+    </form>
 
 } else if (!Model.CommentIds.Any()) {
     <span class="text-muted">No comments yet...</span>

@@ -8,11 +8,22 @@
         <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
     </div>
     <div class="modal-body">
-        <textarea id="text" class="form-control" name="text" data-editor-location="post-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Text</textarea>
-        @Html.ValidationMessageFor(x=>x.Text)
+        @if (ConfigurationService.HtmlPosts)
+        {
+            <textarea id="html_@Model.Id" class="form-control" name="html" data-editor-location="post-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Html</textarea>
+            <input type="hidden" name="text" value="@Model.Text" />
+        }
+        else
+        {
+            <textarea id="text" class="form-control" name="text" data-editor-location="post-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Text</textarea>
+            <input type="hidden" name="html" value="@Model.Html" />
+        }
+
+        @Html.ValidationMessageFor(x => x.Text)
         <div class="attachments">
             <table class="table table-attachments">
-                @foreach (var file in Model.Files) {
+                @foreach (var file in Model.Files)
+                {
                     <tr>
                         <td class="table-icon">@Svg.Icon(file)</td>
                         <td>@file.GetTitle()</td>

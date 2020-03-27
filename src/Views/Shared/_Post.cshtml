@@ -8,7 +8,7 @@
     var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
     var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
 
-    var embeds = Model.EmbedIds.Any() ? Model.Embeds(): new List<Embed>();
+    var embeds = Model.EmbedIds.Any() ? Model.Embeds() : new List<Embed>();
     var embed = embeds.FirstOrDefault(x => !x.IsLink);
 }
 <div class="card post" data-type="post" data-id="@Model.Id" data-post-id="@Model.Id">
@@ -18,7 +18,7 @@
         <div class="media-body">
             <h6 class="media-title">@creator.Link() <small>@@@creator.Username</small></h6>
             <small class="text-muted">
-                @Html.Time(Model.CreatedAt) 
+                @Html.Time(Model.CreatedAt)
                 @if (Model.ModifiedAt != Model.CreatedAt) {<text>&middot;</text> @Html.Time(Model.ModifiedAt, @"e\di\te\d")}
             </small>
         </div>
@@ -40,16 +40,17 @@
         </div>
     }
 
-    @if (!Model.Html.IsNullOrEmpty() || Model.Poll != null) {
+    @if (!Model.Html.IsNullOrEmpty()) {
         <div class="card-body">
-            <p class="card-text">@Html.Raw(Model.Html)</p>
-            
-            @if (Model.Poll != null) {
-                Html.RenderPartial("_Poll", Model);
-            }
+            @Html.Raw(Model.Html)
         </div>
     }
 
+    @if (Model.Poll != null) {
+        <div class="card-poll">
+            @{ Html.RenderPartial("_Poll", Model); }
+        </div>
+    }
 
     @if (files.Any()) {
         <div class="card-files">

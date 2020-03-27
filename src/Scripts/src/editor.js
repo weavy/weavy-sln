@@ -47,6 +47,388 @@ wvy.editor = (function ($) {
         }
 
         /**
+        * Initialize plugin (tinyMCE).
+        */
+        function initHtmlEditor() {
+            // Add any initialization logic here...
+            $wrapper = $("<div class='weavy-editor'/>");
+            $wrapper.insertAfter($el);
+            var $editor = null;
+            
+            var handleEmbeds = function () {
+                if (!embedAdded) {
+
+                    var text = tinymce.get($editor.id).getContent();
+                    var urls = twttr.txt.extractUrls(text);
+
+                    if (urls.length) {
+                        var url = null;
+
+                        // get an url
+                        for (var i = 0; i < urls.length; i++) {
+                            var currentUrl = urls[i];
+
+                            // add protocol if missing
+                            if (!/^(?:f|ht)tps?:\/\//.test(currentUrl)) {
+                                currentUrl = "http://" + currentUrl;
+                            }
+
+                            if (removedEmbeds.indexOf(currentUrl) === -1) {
+                                url = currentUrl;
+                                break;
+                            }
+                        }
+
+                        if (url) {
+
+                            var data = { url: url };
+
+                            $.ajax({
+                                contentType: "application/json; charset=utf-8",
+                                url: wvy.url.resolve("/embeds"),
+                                type: "POST",
+                                data: JSON.stringify(data),
+                                beforeSend: function (xhr, settings) {
+                                    // show loading...
+
+                                    // temporarily disable parsing while we fetch an url
+                                    embedAdded = true;
+                                },
+                                success: function (html, status, xhr) {
+                                    // set html of embedded url                                            
+                                    $embeds.html(html).show();
+
+                                    // disable embed once an url has been embedded
+                                    embedAdded = true;
+                                },
+                                error: function (xhr, status, error) {
+                                    // re-enable embeds if we got an error
+                                    embedAdded = false;
+                                },
+                                complete: function (xhr, status) {
+                                    // hide loading                                            
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            var handlePaste = function (e) {                
+                var imageDataOnly = true;
+                var dataTransfer = e.clipboardData || e.dataTransfer;
+
+                if (dataTransfer) {
+                    var items = dataTransfer.items;
+
+                    //Check that we're only pasting image data
+                    for (i = 0; i < items.length; i++) {
+                        if (!/^image\/(jpg|jpeg|png|gif|bmp)$/.test(items[i].type)) {
+                            imageDataOnly = false;
+                        }
+                    }
+                    if (imageDataOnly) {
+                        for (i = 0; i < items.length; i++) {
+                            var item = items[i];
+                            var file = (item.getAsFile ? item.getAsFile() : item);
+
+                            var type = item.type.split("/")[1];
+
+                            if (type === 'jpg' || type === 'jpeg') {
+                                type = ".jpg";
+                            } else {
+                                type = "." + type;
+                            }
+
+                            var fileOfBlob = new File([file], "image-" + wvy.guid.get() + type, { type: item.type });
+                            $wrapper.fileupload('add', { files: fileOfBlob });
+                        }
+                    }
+                   
+                }
+            }
+
+            tinymce.init({
+                target: $el[0],
+                min_height: 20,                
+                autoresize_bottom_margin: 0,
+                skin_url: window.tinymceSkinURL,
+                content_css: window.tinymceContentURL,
+                body_class: 'weavy_tiny_body',
+                convert_urls: false,
+                statusbar: false,
+                placeholder: options.placeholder,
+                paste_data_images: false,
+                upload_paste_data_images: false,
+                entity_encoding: "raw",                
+                plugins: 'autoresize codesample table link media weavy_autocomplete lists',
+                menubar: false,
+                extended_valid_elements: 'em,i[class|title]',
+                contextmenu: false,
+                toolbar: false,
+                setup: function (editor) {
+                    try {
+                        document.dispatchEvent(new CustomEvent("tinymce.setup", { detail: editor }));
+                    } catch (e) {
+                        // Deprecated, used in IE
+                        var setupEvent = document.createEvent("CustomEvent");
+                        setupEvent.initCustomEvent("tinymce.setup", true, true, editor);
+                        document.dispatchEvent(setupEvent);
+                    }
+
+                    editor.on('change', function () {
+                        editor.save();
+                    });
+
+                    editor.on('keyup', function (e) {
+                        handleEmbeds();
+                    });
+
+                    editor.on('paste', function (e) {
+                        handlePaste(e);
+                    });
+
+                    editor.on('drop', function (e) {
+                        handlePaste(e);
+                        return false;
+                    });
+
+                }
+            }).then(function (editors) {                
+                $editor = editors[0];
+            });
+
+            // add button container
+            var $buttoncontainer = $("<div class='emojionearea-button-container'></div>").appendTo($wrapper);
+            if (options.mode === 'fixed') {
+                $buttoncontainer.addClass("footer fixed-bottom");
+            }
+
+            if (!options.textonly) {
+                // polls
+                if (options.polls) {
+
+                    // add options button
+                    var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
+                    $optionsbutton.prependTo($buttoncontainer);
+
+                    // add options container
+                    var $options = $('<div class="poll-options"></div>');
+                    $options.insertBefore($buttoncontainer);
+
+                    // init existing poll
+                    var pollId = $el.data("editor-poll-id");
+                    if (pollId) {
+                        $.ajax({
+                            url: wvy.url.resolve("/a/posts/" + pollId),
+                            method: "GET"
+                        }).then(function (post) {
+                            if (post.poll) {
+                                post.poll.options.map(function (option, index) {
+                                    var optIndexer = "opt_" + index;
+                                    var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
+                                        "<input type='hidden' name='options[" + optIndexer + "].Id'  value='" + option.id + "'/>" +
+                                        "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='+add an option' />" +
+                                        "</div>");
+                                    $options.append(opt);
+                                });
+                                $options.show();
+                            }
+                        });
+
+                    }
+
+
+                    // show options
+                    $wrapper.on("click", ".btn-poll", function (evt) {
+                        evt.preventDefault();
+
+                        // expand if minimized
+                        toggleMore(false);
+
+                        var options = $wrapper.find(".poll-options");
+
+                        if (!options.is(":visible")) {
+                            if (!options.find(".form-group").length) {
+                                var optIndexer = "opt_" + randomNumber();
+                                var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
+                                    "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
+                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                    "</div>");
+                                options.append(opt);
+                            }
+                            options.show();
+                            options.find("input:first").focus();
+
+                        } else {
+                            options.hide();
+                        }
+                    });
+
+                    // add option
+                    $wrapper.on("focus", ".poll-options input:last", function (evt) {
+                        var options = $(this).closest(".poll-options");
+                        var count = options.find(".form-group").length;
+                        if (count < 10) {
+                            var optIndexer = "opt_" + randomNumber();
+                            var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
+                                "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
+                                "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                "</div>");
+                            options.append(opt);
+                        }
+                    });
+                }
+
+                // file upload
+                if (options.fileupload) {
+                    // add file button
+                    var $file = $('<div class="btn-file btn btn-icon" title="Add files">' +
+                        //'<svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg>' +
+                        '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>' +
+                        '<input type="file" name="files" accept="' + options.accept + '" multiple /></div>');
+                    $file.prependTo($buttoncontainer);
+
+                    // add upload container
+                    var $uploads = $("<div class='uploads'><table class='table table-attachments'></table><div class='progress d-none'></div></div>");
+                    $uploads.appendTo($wrapper);
+
+                    // init file upload                
+                    $wrapper.fileupload({
+                        url: wvy.url.resolve("/a/blobs"),
+                        dropZone: $wrapper,
+                        dataType: "json",
+                        paramName: "blobs",
+                        singleFileUploads: false,
+                        add: function (e, data) {
+                            // check if we allow the added file(s) to be uploaded
+                            var errors = [];
+                            $.each(data.files, function (index, file) {
+                                // accepted file types for this field
+
+                                if (errors.length === 0 && options.accept && options.accept.length && file["name"].length) {
+                                    var pattern = options.accept.split(",").join("|");
+                                    var rx = new RegExp("(" + pattern + ")$", "i");
+                                    if (!rx.test(file["name"])) {
+                                        errors.push("File type is not allowed.");
+                                    }
+                                }
+
+                                // maximum file size (global)
+                                if (errors.length === 0 && wvy.config.maxUploadSize) {
+                                    var fs = parseInt(file["size"]);
+                                    if (fs > parseInt(wvy.config.maxUploadSize)) {
+                                        errors.push("The file is too big.");
+                                    }
+                                }
+                            });
+
+                            if (errors.length > 0) {
+                                console.error(errors.join("\n"));
+                            } else {
+                                data.submit();
+                            }
+                        },
+                        start: function (e) {
+                            // disable submit button while upload in progress
+                            $wrapper.find(".uploads").show();
+                            $wrapper.find("button[type=submit]").attr("disabled", true);
+                        },
+                        progressall: function (e, data) {
+                            // update progress bar
+                            var percentage = parseInt(data.loaded / data.total * 100, 10);
+                            $wrapper.find(".progress").css("width", percentage + "%").removeClass("d-none");
+                        },
+                        done: function (e, data) {
+                            var blobs = data.result;
+                            $.each(blobs.data, function (index, blob) {
+                                $wrapper.find(".uploads .table-attachments").append('<tr>' +
+                                    '<td class="table-icon">' + (blob.kind === 'image' ? '<img class="img-24" src="' + wvy.url.thumb(blob.thumb_url, "48-crop") + '"/>' : '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>') + '</td>' +
+                                    '<td>' + blob.name + '</td>' +
+                                    '<td class="table-icon"><a class="btn btn-icon remove"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg></a><input type="hidden" name="blobs" value="' + blob.id + '" /></td>' +
+                                    '</tr>');
+                            });
+
+                            toggleMore(false);
+                        },
+                        fail: function (e, data) {
+                            console.error(data);
+                        },
+                        always: function (e, data) {
+
+                            // reset and hide progress bar
+                            $wrapper.find(".progress").css("width", "0%").addClass("d-none");
+
+                            // enable submit button
+                            $wrapper.find("button[type=submit]").attr("disabled", false);
+
+                        }
+                    });
+
+                    $wrapper.on("click", ".table-attachments .remove", function (e) {
+                        e.preventDefault();
+                        $(this).closest("tr").remove();
+                    });
+
+                   
+
+                }
+
+                // embeds            
+                // init existing embeds
+                var embedIds = $el.data("editor-embed-ids");
+
+                if (embedIds || options.embeds) {
+                    var $embeds = $("<div class='embeds'/>");
+                    $embeds.appendTo($wrapper);
+
+                    if (embedIds) {
+                        var ids = embedIds.toString().split(",");
+
+                        // TODO: endpoint that takes array of embedid
+                        $.each(ids, function (i, id) {
+                            $.ajax({
+                                url: wvy.url.resolve("/embeds/" + id),
+                                method: "GET"
+                            }).done(function (html) {
+                                $embeds.append(html).show();
+                                embedAdded = true;
+                            }).fail(function () {
+                                // add embedid if we fail to load embed
+                                $embeds.append("<input type='hidden' name='embeds' value='" + id + "' />")
+                            });
+                        });
+                    }
+
+                    // remove embed
+                    $wrapper.on("click", ".close-embed", function (e) {
+                        e.preventDefault();
+                        $(this).closest(".embed").remove();
+
+                        // get the embed url and add it to the blacklist
+                        var url = $(this).data("url");
+                        removedEmbeds.push(url);
+                        embedAdded = false;
+                    })
+                }
+            }
+
+            // add submit button
+            var $submit = $('<button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"/></svg></button>');
+            if (options.submitButton) {
+                $submit = options.submitButton;
+            } else {
+                $submit.appendTo($buttoncontainer);
+            }
+
+            $submit.on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();                                
+                hook("onSubmit", e, { html: tinymce.get($editor.id).getContent(), wrapper: $wrapper, editor: _emojiarea });
+            });
+        }
+
+        /**
          * Initialize plugin.
          */
         function init() {
@@ -567,6 +949,10 @@ wvy.editor = (function ($) {
             if (_emojiarea) {
                 _emojiarea.setText("");
             }
+
+            if (tinymce && tinymce.editors[$el.attr("id")]) {                
+                tinymce.editors[$el.attr("id")].resetContent();                                    
+            }
         }
 
         /**
@@ -590,7 +976,9 @@ wvy.editor = (function ($) {
             // Iterate over each matching element.            
             $el.each(function () {
                 var $el = $(this);
-
+                if (tinymce) {                    
+                    tinymce.remove("#" + $el.attr("id"));
+                }
                 // Code to restore the element to its original state...                
                 $el.css("display", "");
                 _emojiarea = null;
@@ -632,9 +1020,18 @@ wvy.editor = (function ($) {
                 $wrapper.removeClass("minimized");
             }
         }
-
+        
         // Initialize the plugin instance.
-        init();
+        var location = $el.data("editor-location");
+        
+        if (((location === "discuss" || location == "post-edit") && wvy.config.htmlPosts) || ((location === "comments" || location === "comment-edit") && wvy.config.htmlComments)) {
+            initHtmlEditor();
+        } else {
+            init();
+        }
+        
+
+        
 
         // Expose methods of WeavyEditor we wish to be public.
         return {

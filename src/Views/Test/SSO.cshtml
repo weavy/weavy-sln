@@ -1,14 +1,14 @@
 ﻿@{
     // create token valid for 60 seconds
-    var token = JwtUtils.Encode(new Dictionary<string, string> {
-        { "iss", "SSO TEST"}, // required
-        { "sub", "ssotest-sub"}, // required
-        { "email", "ssotest2@weavy.com"}, // required
-        { "username", "ssotest2"},
-        { "name", "SSO Test 2"},
-        { "picture", "https://image.freepik.com/free-vector/businessman-profile-cartoon_18591-58479.jpg" }
-    }, 60);
-
+    var token = JwtUtils.Encode(new Dictionary<string, object> {
+        { "iss", "SSO.cshtml"}, // required
+        { "sub", "testsub"}, // required
+        //{ "email", "sso.test@weavy.com"},
+        //{ "username", "ssotest"},
+        //{ "name", "SSO Test"},
+        { "picture", "https://image.freepik.com/free-vector/businessman-profile-cartoon_18591-58479.jpg" },
+        { "exp", DateTime.UtcNow.AddSeconds(60).ToUnixTime()} // required}
+    });
 }
 
 @section scripts {
@@ -77,7 +77,7 @@
         $(document).on("click", "#authentication", function () {
             console.info("signing in with token using wvy.authentication");
             wvy.authentication.default.sso(token).then(function () {
-                $("#result").text("signalR signed-in " + wvy.connection.default.isAuthenticated());
+                $("#result").text("signalR signed-in " + wvy.authentication.default.isAuthenticated());
             });
         });
 

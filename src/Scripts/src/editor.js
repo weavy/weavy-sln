@@ -147,7 +147,7 @@ wvy.editor = (function ($) {
                    
                 }
             }
-
+            
             tinymce.init({
                 target: $el[0],
                 min_height: 20,                

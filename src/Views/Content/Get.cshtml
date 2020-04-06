@@ -2,32 +2,44 @@
 @{
     Title = Model.Name ?? "Untitled";
     var current = Model is IVersionable versionable ? versionable.IsCurrent() : true;
-    if (!current) {
+    if (!current)
+    {
         Layout = "~/Views/Shared/_Layout.cshtml";
         Back = Url.Action<ContentController>(c => c.Versions(Model.Id));
     }
 }
 
-@if (current) {
+@if (current)
+{
     @section navbar_content {
         @{Html.RenderPartial("_Navbar", Model); }
     }
 }
 
+@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)
+{
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
+
+
 <article class="container my-3" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
     @{
-        <div class="content-dropzone">            
+        <div class="content-dropzone">
             <section class="content-section properties">
                 @Html.DisplayGroups(exclude: new string[] { nameof(Model.Name) })
             </section>
 
             @{Html.RenderPartial("_Meta"); }
 
-            @if (current) {
-                Html.RenderPartial("_ContentAttachments");            
+            @if (current)
+            {
+                Html.RenderPartial("_ContentAttachments");
             }
-        </div>        
-        if (current) {        
+        </div>
+        if (current)
+        {
             Html.RenderPartial("_Comments");
             Html.RenderPartial("_Subscribers");
         }

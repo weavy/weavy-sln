@@ -117,6 +117,26 @@ wvy.content = (function ($) {
         return false;
     });
 
+    // intercept office links and update url with token for SSO
+    $(document).on("click", "a[href^='ms-']", function (e) {
+        e.preventDefault();
+
+        var type = $(this).data("type");
+        var id = $(this).data("id");
+
+        $.ajax({
+            url: wvy.url.api(type) + id + "/officeurl",
+            method: "GET",
+            ContentType: "application/json"
+        }).then(function (url) {
+            if (url) {
+                location.href = url;
+            } else {
+                location.href = $(this).attr("href");
+            }
+        });
+    });
+
     var submitModalFormData = function ($form, data, $submit) {
         var $modal = $form.closest(".modal");
         var $body = $(".modal-body", $modal);

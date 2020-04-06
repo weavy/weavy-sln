@@ -1,5 +1,13 @@
 # Changelog for Weavy
 
+## 6.2.0 (2020-04-06)
+
+* Added setting for disabling forms authentication.
+* Added support for validating JWT with RS256, RS384 and RS512.
+* Added support for JWT without email claim.
+* Fixed some issues with the Note editor.
+* Single Sign-On when opening webdav (MS Office) links from within Weavy.
+
 ## 6.1.4 (2020-03-27)
 
 * Fixed some issues when signing in when in embedded mode.

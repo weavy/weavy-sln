@@ -11787,7 +11787,7 @@
         </member>
         <member name="F:Weavy.Core.Utils.ClaimsUtils.AUTHENTICATION_TYPE">
             <summary>
-            Name of the authentication type claim
+            Name of the claim that tells us which authentication type was used to sign in
             </summary>
         </member>
         <member name="M:Weavy.Core.Utils.ClaimsUtils.GetIdClaim(System.Security.Claims.ClaimsIdentity)">
@@ -11882,20 +11882,68 @@
             Provides helper methids for working with JWT tokens. See https://tools.ietf.org/html/rfc7519 and https://www.iana.org/assignments/jwt/jwt.xhtml.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Utils.JwtUtils.Decode(System.String)">
+        <member name="M:Weavy.Core.Utils.JwtUtils.Encode(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Encode a JSON web token using the configured algorithm and secret.
+            </summary>
+            <param name="payload">The payload to encode</param>
+            <returns>The encoded JWT token string.</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.JwtUtils.Encode(System.Collections.Generic.IDictionary{System.String,System.Object},Jose.JwsAlgorithm,System.String)">
+            <summary>
+            Encode a JSON web token with the specified shared secret.
+            </summary>
+            <param name="payload">The claims to add to the token</param>
+            <param name="alg">The algorithm to use.</param>
+            <param name="secret">Shared secret or private key (depending on algoritm).</param>
+            <returns>The encoded JWT token string.</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.JwtUtils.Decode(System.String,System.Boolean)">
+            <summary>
+            Decodes a JSON web token and validates it with the configured secret.
+            </summary>
+            <param name="token">The JSON web token to decode.</param>
+            <param name="validate"><c>true</c> to validate exp, nbf etc.</param>
+            <returns>A dictionary with claims fron the token.</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.JwtUtils.Decode(System.String,System.String,System.Boolean)">
             <summary>
             Decodes a JSON web token.
             </summary>
-            <param name="token"></param>
-            <returns>A dictionary with the JWT token claims.</returns>
+            <param name="token">The JSON web token to decode.</param>
+            <param name="secret">Shared secret or public key for validating signature.</param>
+            <param name="validate"><c>true</c> to validate exp, nbf etc.</param>
+            <returns>A dictionary with claims from the token.</returns>
         </member>
-        <member name="M:Weavy.Core.Utils.JwtUtils.Encode(System.Collections.Generic.IDictionary{System.String,System.String},System.Nullable{System.Int32})">
+        <member name="M:Weavy.Core.Utils.JwtUtils.GetRSACryptoServiceProvider(System.String,System.Boolean)">
             <summary>
-            Encode a JSON web token.
+            
             </summary>
-            <param name="claims">The claims to add to the token</param>
-            <param name="exp">Number of seconds until the token expires.</param>
-            <returns>The encoded JWT token string.</returns>
+            <param name="key"></param>
+            <param name="isPrivate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.JwtUtils.GetRsaParams(System.String,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="key"></param>
+            <param name="isPrivate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.JwtUtils.ValidateExp(System.Collections.Generic.IReadOnlyDictionary{System.String,System.Object})">
+            <summary>
+            Verifies the exp claim.
+            </summary>
+            <remarks>See https://tools.ietf.org/html/rfc7515#section-4.1.4</remarks>        
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+        </member>
+        <member name="M:Weavy.Core.Utils.JwtUtils.ValidateNbf(System.Collections.Generic.IReadOnlyDictionary{System.String,System.Object})">
+            <summary>
+            Verifies the nbf claim.
+            </summary>
+            <remarks>See https://tools.ietf.org/html/rfc7515#section-4.1.4</remarks>        
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
         </member>
         <member name="T:Weavy.Core.Utils.CryptoUtils">
             <summary>
@@ -12443,6 +12491,11 @@
         <member name="T:Weavy.Core.Utils.DateUtils">
             <summary>
             Provides extension and helper methods for working with dates and times.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.DateUtils.UnixEpoch">
+            <summary>
+            The value of this constant is equivalent to 00:00:00.0000000 UTC, January 1, 1970, in the Gregorian calendar. UnixEpoch defines the point in time when Unix time is equal to 0.
             </summary>
         </member>
         <member name="M:Weavy.Core.Utils.DateUtils.ToStringRelative(System.TimeSpan,System.Boolean)">
@@ -14886,26 +14939,29 @@
             <param name="download"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.Attachment)">
+        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.Attachment,System.Boolean)">
             <summary>
             Returns an url that can be used to open an Office document in Microsoft Word, Excel or Powerpoint using the Office URI Schemes.
             </summary>
             <param name="attachment">The attachment to open</param>
+            <param name="withToken">True to include a JWT token in the path for SSO from Office.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.IFile)">
+        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.IFile,System.Boolean)">
             <summary>
             Returns an url that can be used to open an Office document in Microsoft Word, Excel or Powerpoint using the Office URI Schemes.
             </summary>
             <param name="file">The file to open</param>
+            <param name="withToken">True to include a JWT token in the path for SSO from Office.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.UrlUtils.DavUrl(Weavy.Core.Models.IEntity,System.Boolean)">
+        <member name="M:Weavy.Core.Utils.UrlUtils.DavUrl(Weavy.Core.Models.IEntity,System.Boolean,System.Boolean)">
             <summary>
             Returns an url that can be used by WebDAV clients.
             </summary>
             <param name="entity">The entity</param>
             <param name="absolute"><c>false</c> to return a relative url or <c>true</c> to return an absolute url.</param>
+            <param name="withToken">True to include a JWT token in the path for SSO from Office.</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Core.Utils.UrlUtils.AsDefinitionString(Weavy.Core.Models.IEntity)">
@@ -16757,6 +16813,11 @@
             Gets a value indicating if daemons are enabled <code>weavy.daemons</code>.
             </summary>
         </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.FormsAuthentication">
+            <summary>
+            Gets a value indicating whether forms authentication ia enabled.
+            </summary>
+        </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.HtmlComments">
             <summary>
             Gets a value indicating whether comments should be edited in html or plain text.
@@ -17660,10 +17721,17 @@
         </member>
         <member name="M:Weavy.Core.Services.DavService.GetEntityFromSegment(System.String,System.Boolean)">
             <summary>
-            Parse strings like space-12, app-42 etc. and return the actual entity.
+            Parse strings like s-12, a-42 etc. and return the actual entity.
             </summary>
             <param name="segment"></param>
             <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Services.DavService.EntityTypeFromCode(System.String)">
+            <summary>
+            Gets the full entity name from a shorter variant.
+            </summary>
+            <param name="code"></param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Core.Services.DavService.GetHierarchy(Weavy.Core.Models.IEntity,System.Boolean)">
@@ -19629,11 +19697,11 @@
             <param name="filter"></param>
             <returns>Returns an instance of the <see cref="T:Weavy.Core.Models.User"/> class.</returns>
         </member>
-        <member name="M:Weavy.Core.Services.UserService.MakeUniqueUsername(System.String)">
+        <member name="M:Weavy.Core.Services.UserService.MakeUniqueUsername(System.String[])">
             <summary>
-            Helper method for making the specified username unique among users and spaces.
+            Helper method for getting a unique username among users and spaces.
             </summary>
-            <param name="username"></param>
+            <param name="input">A list of strings that can be used as input when generating unique names, e.g "nickname", "Name", "Firstname Lastname", "Lastname, Firstname", "name@example.com", "firstname.lastname@example.com"</param>
         </member>
         <member name="M:Weavy.Core.Services.UserService.GetByEmail(System.String,System.Boolean)">
             <summary>

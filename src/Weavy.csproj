@@ -71,11 +71,14 @@
     <Reference Include="Azure.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Azure.Core.1.1.0\lib\netstandard2.0\Azure.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Azure.Storage.Blobs, Version=12.3.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Azure.Storage.Blobs.12.3.0\lib\netstandard2.0\Azure.Storage.Blobs.dll</HintPath>
+    <Reference Include="Azure.Storage.Blobs, Version=12.4.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Azure.Storage.Blobs.12.4.0\lib\netstandard2.0\Azure.Storage.Blobs.dll</HintPath>
     </Reference>
-    <Reference Include="Azure.Storage.Common, Version=12.2.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Azure.Storage.Common.12.2.0\lib\netstandard2.0\Azure.Storage.Common.dll</HintPath>
+    <Reference Include="Azure.Storage.Common, Version=12.3.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Azure.Storage.Common.12.3.0\lib\netstandard2.0\Azure.Storage.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="ClearScript, Version=5.6.0.0, Culture=neutral, PublicKeyToken=935d0c957da47c73, processorArchitecture=MSIL">
       <HintPath>..\packages\JavaScriptEngineSwitcher.V8.3.1.6\lib\net45\ClearScript.dll</HintPath>
@@ -92,8 +95,8 @@
     <Reference Include="Fizzler, Version=1.2.0.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
       <HintPath>..\packages\Fizzler.1.2.0\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.21.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.21\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.23.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.23\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="HtmlRenderer, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlRenderer.Core.1.5.1-beta1\lib\net45\HtmlRenderer.dll</HintPath>
@@ -113,8 +116,8 @@
     <Reference Include="JavaScriptEngineSwitcher.V8, Version=3.1.6.0, Culture=neutral, PublicKeyToken=c608b2a8cc9e4472, processorArchitecture=MSIL">
       <HintPath>..\packages\JavaScriptEngineSwitcher.V8.3.1.6\lib\net45\JavaScriptEngineSwitcher.V8.dll</HintPath>
     </Reference>
-    <Reference Include="JWT, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\JWT.5.3.1\lib\net472\JWT.dll</HintPath>
+    <Reference Include="jose-jwt, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\jose-jwt.2.5.0\lib\net461\jose-jwt.dll</HintPath>
     </Reference>
     <Reference Include="LibSass.NET, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\libsassnet.3.3.7\lib\net40\LibSass.NET.dll</HintPath>
@@ -171,32 +174,32 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.3\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.3\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.3\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.3\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Options, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Options.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Options, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Options.3.1.3\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.3\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.6.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.6.5.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.6.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.6.5.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.6.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.6.5.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -223,10 +226,10 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.7.0\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="NUglify, Version=1.5.13.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUglify.1.5.13\lib\net40\NUglify.dll</HintPath>
+    <Reference Include="NUglify, Version=1.5.14.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUglify.1.5.14\lib\net40\NUglify.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -240,7 +243,7 @@
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ComponentModel.Annotations.4.7.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
@@ -259,8 +262,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.6.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.6.5.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
@@ -272,7 +275,7 @@
       <HintPath>..\packages\System.IO.Packaging.4.7.0\lib\net46\System.IO.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -285,14 +288,14 @@
     </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
@@ -335,17 +338,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=6.1.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=6.2.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=6.1.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=6.2.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=6.1.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=6.2.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=6.1.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=6.2.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -3490,7 +3493,7 @@
     <Content Include="Scripts\src\tinymce\plugins\shortcuts\plugin.js" />
     <Content Include="Scripts\src\tinymce\plugins\sourcecode\plugin.js" />
     <Content Include="Scripts\src\tinymce\plugins\toolbar\plugin.js" />
-    <Content Include="Scripts\src\tinymce\themes\silver\theme.min.js" />
+    <Content Include="Scripts\src\tinymce\themes\silver\theme.js" />
     <Content Include="Scripts\src\tinymce\tiny.js" />
     <Content Include="Scripts\src\turbolinks.js" />
     <Content Include="Scripts\src\url.js" />
@@ -3735,7 +3738,6 @@
     <Content Include="Scripts\vendor\tinymce\plugins\table\plugin.min.js" />
     <Content Include="Scripts\vendor\tinymce\plugins\textcolor\plugin.min.js" />
     <Content Include="Scripts\vendor\tinymce\plugins\wordcount\plugin.min.js" />
-    <Content Include="Scripts\vendor\tinymce\themes\modern\theme.min.js" />
     <Content Include="Scripts\vendor\turbolinks\turbolinks.js" />
     <Content Include="Scripts\vendor\twitter-text\punycode.js" />
     <Content Include="Scripts\vendor\twitter-text\twitter-text.js" />
@@ -3808,83 +3810,8 @@
     <Content Include="Styles\components\_togglers.scss" />
     <Content Include="Styles\components\_turbolinks.scss" />
     <Content Include="Styles\components\_type.scss" />
-    <Content Include="Styles\components\tinymce\skins\default\content.min.css" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\AbsoluteLayout.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Animations.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Arrows.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\BrowseButton.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Button.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ButtonGroup.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Checkbox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ColorBox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ColorButton.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ColorPicker.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ComboBox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Container.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Content.Inline.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Content.Objects.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Content.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\CropRect.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\DropZone.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\FieldSet.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\FitLayout.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\FloatPanel.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\FlowLayout.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Icons.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Iframe.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ImagePanel.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\InfoBox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Label.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ListBox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Menu.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\MenuBar.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\MenuButton.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\MenuItem.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Mixins.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Notification.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Panel.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Path.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Progress.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Radio.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\README.md" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Reset.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ResizeHandle.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Scrollable.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\SelectBox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Sidebar.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Skin.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Slider.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Spacer.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\SplitButton.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\StackLayout.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\TabPanel.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\TextBox.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Throbber.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\TinyMCE.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\ToolTip.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Variables.less" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Variables.scss" />
-    <Content Include="Styles\components\tinymce\skins\lightgray\Window.scss" />
-    <Content Include="Styles\components\tinymce\skins\ui\oxide\_core.scss" />
-    <Content Include="Styles\components\tinymce\skins\ui\oxide\content.scss" />
-    <Content Include="Styles\components\tinymce\skins\ui\oxide\skin.scss" />
-    <Content Include="Styles\components\tinymce\skins\weavy\_core.scss" />
-    <Content Include="Styles\components\tinymce\skins\weavy\Content.Inline.scss" />
-    <Content Include="Styles\components\tinymce\skins\weavy\Content.scss" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce.eot" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce.svg" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce.ttf" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce.woff" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce-mobile.woff" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce-small.eot" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce-small.svg" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce-small.ttf" />
-    <Content Include="Styles\components\tinymce\skins\weavy\fonts\tinymce-small.woff" />
-    <Content Include="Styles\components\tinymce\skins\weavy\img\anchor.gif" />
-    <Content Include="Styles\components\tinymce\skins\weavy\img\loader.gif" />
-    <Content Include="Styles\components\tinymce\skins\weavy\img\object.gif" />
-    <Content Include="Styles\components\tinymce\skins\weavy\img\trans.gif" />
-    <Content Include="Styles\components\tinymce\skins\weavy\Skin.scss" />
+    <Content Include="Styles\components\tinymce\skins\weavy\content.less" />
+    <Content Include="Styles\components\tinymce\skins\weavy\skin.less" />
     <Content Include="Styles\mixins\_animation.scss" />
     <Content Include="Styles\mixins\_divider.scss" />
     <Content Include="Styles\mixins\_dot.scss" />
@@ -4096,6 +4023,8 @@
     <Content Include="Styles\vendor\select2\theme\default\layout.scss" />
     <Content Include="Styles\vendor\select2\theme\default\_multiple.scss" />
     <Content Include="Styles\vendor\select2\theme\default\_single.scss" />
+    <Content Include="Styles\vendor\tinymce\content.css" />
+    <Content Include="Styles\vendor\tinymce\skin.css" />
     <Content Include="Styles\weavy.scss" />
     <Content Include="Styles\widget.scss" />
     <Content Include="Styles\widget\_alert.scss" />

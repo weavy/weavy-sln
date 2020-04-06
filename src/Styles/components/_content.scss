@@ -3,9 +3,12 @@
 .content-section {
     margin-bottom: 1rem;
 
-    h4 {
-        @include divider();
+    &:not(.properties) {
+        h4 {
+            @include divider();
+        }
     }
+
 
     &.preview {
         margin: 1rem auto;

@@ -1643,6 +1643,20 @@
             <param name="id">The item id.</param>
             <returns>The starred item.</returns>
         </member>
+        <member name="M:Weavy.Web.Api.Controllers.ContentController.AttachmentOfficeUrl(System.Int32)">
+            <summary>
+            Get a url that will open the attachment in an office app and append a JWT token that facilitates SSO with Weavy. 
+            </summary>
+            <param name="id">The attachment id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers.ContentController.ContentOfficeUrl(System.Int32)">
+            <summary>
+            Get a url that will open the file in an office app and append a JWT token that facilitates SSO with Weavy. 
+            </summary>
+            <param name="id">The content (IFile) id.</param>
+            <returns></returns>
+        </member>
         <member name="T:Weavy.Web.Api.Controllers.EmbedsController">
             <summary>
             The Embeds API converts standard URLs into embedded videos, images and rich article previews. The api returns data in the oEmbed format. 
@@ -3046,11 +3060,19 @@
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignIn(Weavy.Web.Models.SignInModel,System.String)">
             <summary>
-            Sign in with forms authentication against local or AD account.
+            Sign in with forms authentication against AD, custom auth endpoint or local account.
             </summary>
             <param name="model"></param>
             <param name="path">The url to redirect to after sign in.</param>
             <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.AccountController.SignInToken(Weavy.Web.Models.SignInModel)">
+            <summary>
+            "SSO" using JWT token after opening webdav url with token from within Weavy.
+            </summary>
+            <param name="model"></param>
+            <remarks>Signs in the user if the token checks out; otherwise returns the user to the username/password flow.</remarks>
+            <returns></returns>        
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignInExternal(System.String,System.String)">
             <summary>
@@ -3242,8 +3264,15 @@
             </summary>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.GetSignInViewName(System.String)">
+        <member name="M:Weavy.Web.Controllers.AccountController.GetTokenFromPath(System.String)">
             <summary>
+            Returns the value of the name token from the query string of the path if the request is for msofba.
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.AccountController.GetSignInViewName(System.String)">
+            <summary>   
             Helper method for returning correct sign in view.
             </summary>
             <param name="path"></param>
@@ -6290,6 +6319,11 @@
             Gets or sets the path where to redirect after successful sign-in.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.SignInModel.Token">
+            <summary>
+            Gets or sets the JWT token to sign in with. Utilized for webdav SSO sign-in:s.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.SignInModel.AuthenticationTypes">
             <summary>
             Gets the external authentication types.
@@ -8377,13 +8411,13 @@
             <param name="app"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.OwinUtils.SignIn(Microsoft.Owin.IOwinContext,Weavy.Core.Models.User,System.Boolean)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.SignIn(Microsoft.Owin.IOwinContext,Weavy.Core.Models.User,Microsoft.Owin.Security.AuthenticationProperties)">
             <summary>
              Sign in the specified user, i.e. set user and auth cookie.
             </summary>
             <param name="context"></param>
-            <param name="user"></param>
-            <param name="persistent"></param>
+            <param name="user">The user to sign in.</param>
+            <param name="properties">Optional properties to persist along with the claims, e.g. IsPersistent etc..</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Owin.OwinUtils.SignOut(Microsoft.Owin.IOwinContext)">

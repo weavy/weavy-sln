@@ -10,7 +10,7 @@
 ~/scripts/vendor/tinymce/tinymce.min.js                    
 
 # theme
-~/scripts/src/tinymce/themes/silver/theme.min.js        
+~/scripts/src/tinymce/themes/silver/theme.js        
 
 # standard plugins
 ~/scripts/vendor/tinymce/plugins/anchor/plugin.min.js      

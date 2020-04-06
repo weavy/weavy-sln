@@ -1,11 +1,15 @@
 /* BASICS */
-
+.codemirror-container {
+    border-left: $border-width solid #ccc;
+    border-right: $border-width solid #ccc;
+    border-bottom: $border-width solid #ccc;
+}
 .CodeMirror {
-  /* Set height, width, borders, and global font properties here */
-  font-family: monospace;
-  height: 20rem;
-  color: black;
-  font-size:1rem !important;
+    /* Set height, width, borders, and global font properties here */
+    font-family: monospace;
+    height: 20rem;
+    color: black;
+    font-size: 1rem !important;
 }
 
 /* PADDING */

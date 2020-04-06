@@ -14,6 +14,7 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
         var editorContainer = editor.editorContainer;
         
         var menuItems = $(editorContainer).find(".mce-menubtn");
+        var statusBar = $(editorContainer).find(".tox-statusbar");
         var toolbarButtons = $(editorContainer).find(".tox-toolbar__primary .tox-tbtn[aria-label!='Source code']");
         var sourceCodeButton = $(editorContainer).find(".tox-toolbar__primary .tox-tbtn[aria-label='Source code']");
 
@@ -59,6 +60,9 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
             if (showTinyMCE) {
                 
                 $(editorContainer).css("height", editorHeight + "px");
+                $(editorContainer).css("border-bottom", "1px solid #ccc");
+
+                statusBar.show();
 
                 $(menuItems).removeClass("tox-tbtn--disabled");
                 $(menuItems).off("click", disableClick)
@@ -74,6 +78,9 @@ tinymce.PluginManager.add('weavy_sourcecode', function (editor, url) {
                 
                 editorHeight = $(editorContainer).css("height");
                 $(editorContainer).css("height", "auto");
+                $(editorContainer).css("border-bottom", "0");
+
+                statusBar.hide();
 
                 $(menuItems).addClass("tox-tbtn--disabled");
                 $(menuItems).on("click", disableClick);

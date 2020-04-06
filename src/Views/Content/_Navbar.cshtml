@@ -11,7 +11,7 @@
     <div class="navbar-icons">
         @if (versionable == null || versionable.IsCurrent()) {
             if (Model is IFile file && FileUtils.IsOfficeDocument(file.Name)) {
-                <a class="btn btn-icon" href="@file.OfficeUrl()" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model, "icon")</a>
+                <a class="btn btn-icon" href="@file.OfficeUrl()" data-type="content" data-id="@file.Id" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model, "icon")</a>
             }
             Html.RenderPartial("_ContentMenu", Model);
         } else if (Model.HasPermission(Permission.Edit)) {

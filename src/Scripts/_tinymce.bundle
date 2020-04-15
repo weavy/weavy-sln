@@ -20,6 +20,7 @@
 ~/scripts/vendor/tinymce/plugins/hr/plugin.min.js          
 ~/scripts/vendor/tinymce/plugins/link/plugin.min.js        
 ~/scripts/vendor/tinymce/plugins/lists/plugin.min.js       
+~/scripts/vendor/tinymce/plugins/paste/plugin.min.js      
 ~/scripts/vendor/tinymce/plugins/media/plugin.min.js     
 ~/scripts/vendor/tinymce/plugins/preview/plugin.min.js     
 ~/scripts/vendor/tinymce/plugins/table/plugin.min.js       

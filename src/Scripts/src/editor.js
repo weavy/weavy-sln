@@ -143,14 +143,14 @@ wvy.editor = (function ($) {
                             var fileOfBlob = new File([file], "image-" + wvy.guid.get() + type, { type: item.type });
                             $wrapper.fileupload('add', { files: fileOfBlob });
                         }
-                    }
-                   
-                }
+                    } 
+                } 
             }
             
             tinymce.init({
                 target: $el[0],
-                min_height: 20,                
+                min_height: 20,      
+                max_height: 350,      
                 autoresize_bottom_margin: 0,
                 skin_url: window.tinymceSkinURL,
                 content_css: window.tinymceContentURL,
@@ -160,12 +160,23 @@ wvy.editor = (function ($) {
                 placeholder: options.placeholder,
                 paste_data_images: false,
                 upload_paste_data_images: false,
-                entity_encoding: "raw",                
-                plugins: 'autoresize codesample table link media weavy_autocomplete lists',
+                entity_encoding: "raw",                            
+                plugins: 'paste autoresize codesample table link media weavy_autocomplete lists',
                 menubar: false,
                 extended_valid_elements: 'em,i[class|title]',
                 contextmenu: false,
                 toolbar: false,
+                paste_retain_style_properties: "color font-size background background-color",
+                paste_preprocess: function (plugin, args) {
+                    var isTable = false;
+                    try {
+                        isTable = $(args.content).is("table");
+                    } catch (err) { }
+                    
+                    if (isTable) {
+                        args.content += '<br/>';
+                    }
+                },
                 setup: function (editor) {
                     try {
                         document.dispatchEvent(new CustomEvent("tinymce.setup", { detail: editor }));
@@ -184,8 +195,8 @@ wvy.editor = (function ($) {
                         handleEmbeds();
                     });
 
-                    editor.on('paste', function (e) {
-                        handlePaste(e);
+                    editor.on('paste', function (e) {                        
+                        handlePaste(e);                        
                     });
 
                     editor.on('drop', function (e) {

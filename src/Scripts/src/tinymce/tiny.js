@@ -22,13 +22,24 @@ wvy.tiny = (function ($) {
             entity_encoding: "raw",
             paste_data_images: true,
             upload_paste_data_images: true,
-            plugins: 'weavy_paste weavy_link weavy_sourcecode codesample table link media weavy_autocomplete weavy_image lists',
+            plugins: 'weavy_paste weavy_link weavy_sourcecode codesample table link media weavy_autocomplete weavy_image lists',      
+            paste_retain_style_properties: "color font-size background background-color",
             resize: true,
             menubar: false,
             statusbar: true,
             branding: false,
             elementpath: false,
             extended_valid_elements: 'em,i[class|title]',
+            paste_preprocess: function (plugin, args) {
+                var isTable = false;
+                try {
+                    isTable = $(args.content).is("table");
+                } catch (err) { }
+
+                if (isTable) {
+                    args.content += '<br/>';
+                }
+            },
             toolbar: 'undo redo | bold italic underline strikethrough | weavy_link weavy_image media codesample | formatselect blockformats fontformats fontsizes align | bullist numlist | forecolor backcolor | removeformat | inserttable | cell row column | table tableprops deletetable | code',            
             setup: function (editor) {
                 try {

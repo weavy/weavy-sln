@@ -9061,6 +9061,21 @@
             Gets the invite that was approved.
             </summary>
         </member>
+        <member name="T:Weavy.Core.Events.AfterMentionUser">
+            <summary>
+            Runs just after a user was mentioned.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.AfterMentionUser.Entity">
+            <summary>
+            Gets the entity where the user was mentioned.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.AfterMentionUser.UserId">
+            <summary>
+            Id of the mentioned user.
+            </summary>
+        </member>
         <member name="T:Weavy.Core.Events.AfterUnstarEntity">
             <summary>
             Runs just after an entity was unstarred.

@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 6.3.0 (2020-04-15)
+
+* Added event AfterMentionUser.
+* Fixed issue with cursor position after paste in html editor.
+
 ## 6.2.0 (2020-04-06)
 
 * Added setting for disabling forms authentication.

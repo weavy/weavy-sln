@@ -85,10 +85,10 @@ wvy.notifications = (function ($) {
             });
         }
 
-        $("#tab-notifications .empty").remove();
+        $("[data-notifications] .empty").remove();
 
         get(data.id).then(function (html) {
-            $(html).prependTo("#tab-notifications .list-group");
+            $(html).prependTo("[data-notifications] .list-group");
         });
     });
 

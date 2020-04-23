@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 6.3.1 (2020-04-23)
+
+* Fixed issue with notifications app not receiving new notifications.
+
 ## 6.3.0 (2020-04-15)
 
 * Added event AfterMentionUser.

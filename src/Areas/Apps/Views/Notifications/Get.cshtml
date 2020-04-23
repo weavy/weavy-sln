@@ -8,14 +8,14 @@
     <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="Mark all as read">@Svg.Icon("check-all")</button>
 </header>
 
-<div>
+<div data-notifications>
     @if (Model.Result.Count == 0) {
         <div class="container-fluid mt-3 empty">
             <p class="text-center text-muted">All caught up :)</p>
         </div>
     }
 
-    <div id="infinite-scroll-target" class="list-group list-group-flush notifications-list" data-notifications>
+    <div id="infinite-scroll-target" class="list-group list-group-flush notifications-list">
         @Html.Partial("_Notifications", Model.Result)
     </div>
 

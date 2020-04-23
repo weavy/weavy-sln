@@ -7,7 +7,7 @@
     <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="Mark all as read">@Svg.Icon("check-all")</button>
 </header>
 
-<div id="tab-notifications">
+<div id="tab-notifications" data-notifications>
     <div class="tab-loading d-none">@Svg.Spinner()</div>
     <div class="tab-remote loaded" data-url="@(Url.Action<NotificationController>(c => c.Index()))"> @{ Html.RenderPartial("_Index"); }</div>   
 </div>

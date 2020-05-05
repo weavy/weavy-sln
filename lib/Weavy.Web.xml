@@ -2336,17 +2336,11 @@
             </summary>
             <returns>Returns user claims.</returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers.UsersController.AuthenticationStatus">
-            <summary>
-            Api to check authentication status for current user.
-            </summary>
-            <returns>true or false</returns>
-        </member>
         <member name="M:Weavy.Web.Api.Controllers.UsersController.GetMe">
             <summary>
             Retrieves the current user.
             </summary>
-            <returns>Returns a user.</returns>
+            <returns>Returns a user.</returns>        
         </member>
         <member name="M:Weavy.Web.Api.Controllers.UsersController.GetPresence(System.Int32)">
             <summary>

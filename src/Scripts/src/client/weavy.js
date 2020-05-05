@@ -538,6 +538,7 @@
                 weavy.nodes.statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
 
                 weavy.one(wvy.postal, "ready", weavy.getId("weavy-status-check"), function () {
+                    weavy.log("Status check", "√")
                     weavy.isBlocked = false;
                     weavy.triggerEvent("frame-check", { blocked: false });
                 });
@@ -984,75 +985,78 @@
                 })
             }
 
-            if (weavy.isLoaded === false) {
-
-                // Do a script version mismatch check
-                if (Weavy.version !== weavy.data.version) {
-                    weavy.error("Weavy client/server version mismatch! \nclient: " + Weavy.version + " \nserver: " + weavy.data.version);
-                }
-
-                initRoot.call(weavy);
-
-                frameStatusCheck.call(weavy);
-
-                /**
-                 * Event triggered when weavy is building up the DOM elements.
-                 * 
-                 * Use this event to build all your elements and attach them to weavy.
-                 * At this point you may safely assume that weavy.nodes.container is built.
-                 * 
-                 * Good practice is to build all elements in the build event and store them as properties on weavy.
-                 * Then you can attach them to other Elements in the after:build event.
-                 * This ensures that all Elements are built before they are attached to each other.
-                 *
-                 * If you have dependencies to Elements built by plugins you should also check that they actually exist before attaching to them.
-                 *
-                 * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
-                 *
-                 * @example
-                 * weavy.on("build", function(e, root) {
-                 *     if (weavy.authentication.isAuthorized()) {
-                 *         weavy.nodes.myElement = document.createElement("DIV");
-                 *     }
-                 * });
-                 * 
-                 * weavy.on("after:build", function(e, root) {
-                 *     if (weavy.authentication.isAuthorized()) {
-                 *         if (weavy.nodes.dock) {
-                 *             weavy.nodes.dock.appendChild(weavy.nodes.myElement);
-                 *         }
-                 *     }
-                 * })
-                 *
-                 * @category events
-                 * @event Weavy#build
-                 */
-
-                weavy.isLoaded = true;
-                weavy.triggerEvent("build", { container: weavy.nodes.container, overlay: weavy.nodes.overlay });
-
-
-                /**
-                    * Event triggered when weavy has initialized, connected to the server and recieved and processed options, and built all components.
-                    * Use this event to do stuff when everything is loaded.
-                    * 
-                    * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
-                    * 
-                    * @example
-                    * weavy.on("load", function() {
-                    *     if (weavy.authentication.isAuthorized()) {
-                    *         weavy.alert("Widget successfully loaded");
-                    *     }
-                    * });
-                    * 
-                    * @category events
-                    * @event Weavy#load
-                    */
-                weavy.triggerEvent("load");
+            // Do a script version mismatch check
+            if (Weavy.version !== weavy.data.version) {
+                weavy.error("Weavy client/server version mismatch! \nclient: " + Weavy.version + " \nserver: " + weavy.data.version);
             }
 
-            weavy.isLoading = false;
-            weavy.triggerEvent("processed:load");
+            initRoot.call(weavy);
+
+            frameStatusCheck.call(weavy);
+
+            weavy.whenBlockChecked.then(function () {
+                if (weavy.isLoaded === false) {
+
+                    /**
+                        * Event triggered when weavy is building up the DOM elements.
+                        * 
+                        * Use this event to build all your elements and attach them to weavy.
+                        * At this point you may safely assume that weavy.nodes.container is built.
+                        * 
+                        * Good practice is to build all elements in the build event and store them as properties on weavy.
+                        * Then you can attach them to other Elements in the after:build event.
+                        * This ensures that all Elements are built before they are attached to each other.
+                        *
+                        * If you have dependencies to Elements built by plugins you should also check that they actually exist before attaching to them.
+                        *
+                        * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
+                        *
+                        * @example
+                        * weavy.on("build", function(e, root) {
+                        *     if (weavy.authentication.isAuthorized()) {
+                        *         weavy.nodes.myElement = document.createElement("DIV");
+                        *     }
+                        * });
+                        * 
+                        * weavy.on("after:build", function(e, root) {
+                        *     if (weavy.authentication.isAuthorized()) {
+                        *         if (weavy.nodes.dock) {
+                        *             weavy.nodes.dock.appendChild(weavy.nodes.myElement);
+                        *         }
+                        *     }
+                        * })
+                        *
+                        * @category events
+                        * @event Weavy#build
+                        */
+
+                    weavy.isLoaded = true;
+                    weavy.triggerEvent("build", { container: weavy.nodes.container, overlay: weavy.nodes.overlay });
+
+
+                    /**
+                        * Event triggered when weavy has initialized, connected to the server and recieved and processed options, and built all components.
+                        * Use this event to do stuff when everything is loaded.
+                        * 
+                        * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
+                        * 
+                        * @example
+                        * weavy.on("load", function() {
+                        *     if (weavy.authentication.isAuthorized()) {
+                        *         weavy.alert("Widget successfully loaded");
+                        *     }
+                        * });
+                        * 
+                        * @category events
+                        * @event Weavy#load
+                        */
+                    weavy.triggerEvent("load");
+                }
+
+                weavy.isLoading = false;
+                weavy.triggerEvent("processed:load");
+            });
+
 
         });
 

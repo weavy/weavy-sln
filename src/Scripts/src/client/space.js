@@ -69,12 +69,16 @@
 
         var _whenLoaded = $.Deferred();
         Object.defineProperty(this, "whenLoaded", {
-            get: _whenLoaded.promise
+            get: function () {
+                return _whenLoaded.promise;
+            }
         });
 
         var _whenBuilt = $.Deferred();
         Object.defineProperty(this, "whenBuilt", {
-            get: _whenBuilt.promise
+            get: function () {
+                return _whenBuilt.promise;
+            }
         });
 
         // Use toggled option or check for container otherwise false.
@@ -169,7 +173,7 @@
                 _whenLoaded.reject(new Error("WeavySpace.fetchOrCreate() requires options"));
             }
 
-            return space.whenLoaded;
+            return space.whenLoaded();
         }
 
         this.build = function (e, build) {

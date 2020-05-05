@@ -30192,7 +30192,7 @@
       return ModalDialog.parts().body(bodySpec);
     };
 
-    var isTouch = global$8.deviceType.isTouch();
+    var isTouch = detect$3().deviceType.isTouch();
     var hiddenHeader = function (title, close) {
       return {
         dom: {

@@ -1,5 +1,11 @@
 # Changelog for Weavy
 
+## 6.3.2 (2020-05-05)
+
+* Fixed issue with push notifications in mobile.
+* Fixed touch error in TinyMCE
+* Fixed loading issues for client apps 
+
 ## 6.3.1 (2020-04-23)
 
 * Fixed issue with notifications app not receiving new notifications.

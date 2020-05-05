@@ -183,24 +183,27 @@
             weavy.info("closePanel", panelId);
 
             var panelsRoot = this instanceof HTMLElement ? this : weavy.nodes.panels;
+            var panel = _panels.get(panelId);
 
-            if (panelId && $(_panels.get(panelId)).hasClass("weavy-open")) {
-                var panel = _panels.get(panelId);
-                $(panel).removeClass("weavy-open");
+            return weavy.whenBlockChecked.then(function () {
+                if (panel && $(panel).hasClass("weavy-open")) {
+                    $(panel).removeClass("weavy-open");
 
-                /**
-                 * Event triggered when weavy closes all panels. Wait for the {@link Weavy#whenClosed} Promise to do additional things when weavy has finished closing.
-                 * 
-                 * @category events
-                 * @event Weavy#close
-                 */
-                panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
+                    /**
+                     * Event triggered when weavy closes all panels. Wait for the {@link Weavy#whenClosed} Promise to do additional things when weavy has finished closing.
+                     * 
+                     * @category events
+                     * @event Weavy#close
+                     */
+                    panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
 
-                // Return timeout promise
-                return weavy.whenClosed = weavy.timeout(250);
-            } else {
-                return weavy.whenClosed || Promise.resolve();
-            }
+                    // Return timeout promise
+                    return weavy.whenClosed = weavy.timeout(250);
+                } else {
+                    return weavy.whenClosed || Promise.resolve();
+                }
+
+            });
         }
 
         /**

@@ -75,12 +75,16 @@
 
         var _whenLoaded = $.Deferred();
         Object.defineProperty(app, "whenLoaded", {
-            get: _whenLoaded.promise
+            get: function () {
+                return _whenLoaded.promise;
+            }
         });
 
         var _whenBuilt = $.Deferred();
         Object.defineProperty(app, "whenBuilt", {
-            get: _whenBuilt.promise
+            get: function () {
+                return _whenBuilt.promise;
+            }
         });
 
 
@@ -163,13 +167,13 @@
                 _whenLoaded.reject(new Error("WeavyApp.fetchOrCreate() requires options"));
             }
 
-            return app.whenLoaded;
+            return app.whenLoaded();
         }
 
         function bridgePanelEvent(eventName, panelId, triggerData, e, data) {
             if (data.panelId === panelId) {
                 for (const prop in triggerData) {
-                    if (data.hasOwnProperty(prop)) {
+                    if (Object.prototype.hasOwnProperty.call(data, prop)) {
                         triggerData[prop] = data[prop];
                     }
                 }
@@ -178,7 +182,7 @@
                     return false;
                 } else if (eventResult) {
                     for (const prop in data) {
-                        if (eventResult.hasOwnProperty(prop)) {
+                        if (Object.prototype.hasOwnProperty.call(eventResult, prop)) {
                             data[prop] = eventResult[prop];
                         }
                     }
@@ -194,7 +198,7 @@
         }
 
         this.build = function () {
-            if (weavy.isLoaded && weavy.authentication.isAuthorized()) {
+            weavy.authentication.whenAuthorized().then(function () {
                 var root = app.root || app.space && app.space.root;
 
                 if (app.options && app.data) {
@@ -225,16 +229,18 @@
 
                         _whenBuilt.resolve();
                     }
-
-                    if (app.isBuilt && app.autoOpen) {
-                        app.open();
-                    }
-
                 }
-            }
+
+            })
         };
 
         weavy.on("build", app.build.bind(app));
+
+        app.whenBuilt().then(function () {
+            if (app.autoOpen) {
+                app.open();
+            }
+        });
 
         weavy.on("signed-in", function () {
             if (app.autoOpen) {
@@ -249,21 +255,22 @@
 
     WeavyApp.prototype.open = function (destination) {
         var app = this;
-        return app.whenBuilt.then(function () {
+        return app.whenBuilt().then(function () {
             return app.panel.open(destination);
         });
     }
 
     WeavyApp.prototype.close = function () {
         var app = this;
-        return app.whenBuilt.then(function () {
+        app.autoOpen = false;
+        return app.whenBuilt().then(function () {
             return app.panel.close();
         });
     }
 
     WeavyApp.prototype.toggle = function (destination) {
         var app = this;
-        return app.whenBuilt.then(function () {
+        return app.whenBuilt().then(function () {
             return app.panel.toggle(destination);
         });
     }

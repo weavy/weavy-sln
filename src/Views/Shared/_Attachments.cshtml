@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Attachment>
 @{
-    var parent = ViewBag.Parent as IEntity ?? (IEntity)WeavyContext.Content ?? (IEntity)WeavyContext.App ?? (IEntity)WeavyContext.Space;
+    var parent = ViewBag.Parent as IEntity;
 }
 <div class="list-group">
     @foreach (var attachment in Model) {

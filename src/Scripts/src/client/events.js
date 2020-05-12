@@ -39,11 +39,11 @@
         var _events = [];
 
         function registerEventHandler(event, handler, context, selector, wrappingHandler) {
-            _events.push(arguments);
+            _events.push(Array.from(arguments || []));
         }
 
         function getEventHandler(event, handler, context, selector) {
-            var getHandler = arguments;
+            var getHandler = Array.from(arguments || []);
             var eventHandler = _events.filter(function (eventHandler) {
                 for (var i = 0; i < getHandler.length; i++) {
                     if (eventHandler[i] === getHandler[i] || utils.eqObjects(eventHandler[i], getHandler[i])) {
@@ -57,7 +57,7 @@
         }
 
         function unregisterEventHandler(event, handler, context, selector) {
-            var removeHandler = arguments;
+            var removeHandler = Array.from(arguments || []);
             _events = _events.filter(function (eventHandler) {
                 for (var i = 0; i < removeHandler.length; i++) {
                     if (eventHandler[i] !== removeHandler[i] && !utils.eqObjects(eventHandler[i], removeHandler[i])) {
@@ -157,12 +157,22 @@
          * @see The underlying jQuery.on: {@link http://api.jquery.com/on/}
          */
         weavyEvents.on = function (context, events, selector, handler) {
-            var args = getEventArguments(this, Array.from(arguments));
-            var once = arguments[4];
+            var argumentsArray = Array.from(arguments || []);
+            var args = getEventArguments(this, argumentsArray);
+            var once = argumentsArray[4];
 
             if (once) {
                 var attachedHandler = function () {
-                    args.handler.apply(this, arguments);
+                    var attachedArguments = Array.from(arguments || []);
+                    try {
+                        args.handler.apply(this, attachedArguments);
+                    } catch (e) {
+                        try {
+                            args.handler();
+                        } catch (e) {
+                            console.warn("Could not invoke one handler:", e);
+                        }
+                    }
                     unregisterEventHandler(args.events, args.handler, args.context, args.selector);
                 };
 
@@ -210,7 +220,7 @@
          * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
          */
         weavyEvents.off = function (context, events, selector, handler) {
-            var args = getEventArguments(this, Array.from(arguments));
+            var args = getEventArguments(this, Array.from(arguments || []));
 
             var offHandler = getEventHandler(args.events, args.handler, args.context, args.selector);
 

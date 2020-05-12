@@ -1,10 +1,18 @@
 # Changelog for Weavy
 
+## 6.4.0 (2020-05-12)
+
+* Fixed null reference exception introduced with AfterMentionUser event.
+* Fixed open/toggle behavior in toggled client spaces. Now supports tabs correctly. Added space option { tabbed: true } as a new name for { toggled: true } which now is deprecated.
+* Fixed an issue with signed in message being displayed after sign in.
+* Fixed an issue with attachments for comments.
+* Adjusted the main nav menu in mobile and standalone.
+
 ## 6.3.2 (2020-05-05)
 
 * Fixed issue with push notifications in mobile.
-* Fixed touch error in TinyMCE
-* Fixed loading issues for client apps 
+* Fixed touch error in TinyMCE.
+* Fixed loading issues for client apps.
 
 ## 6.3.1 (2020-04-23)
 

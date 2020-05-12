@@ -99,7 +99,7 @@
 
             if (app.options && typeof app.options === "object") {
                 if (app.autoOpen === null || app.container === null) {
-                    app.autoOpen = app.options && app.options.open !== undefined ? app.options.open : (space && space.options && space.options.open !== undefined ? space.options.open : (space && !space.toggled || false));
+                    app.autoOpen = app.options && app.options.open !== undefined ? app.options.open : (space && space.options && space.options.open !== undefined ? space.options.open : (space && !space.tabbed || false));
                     app.container = app.options.container;
                 }
 
@@ -256,7 +256,18 @@
     WeavyApp.prototype.open = function (destination) {
         var app = this;
         return app.whenBuilt().then(function () {
-            return app.panel.open(destination);
+            var openPromises = [app.panel.open(destination)];
+
+            // Sibling apps should be closed if the space is a tabbed space
+            if (app.space && app.space.tabbed) {
+                Array.from(app.space.apps || []).forEach(function (spaceApp) {
+                    if (spaceApp !== app) {
+                        openPromises.push(spaceApp.panel.close(true));
+                    }
+                });
+            }
+
+            return Promise.all(openPromises);
         });
     }
 
@@ -270,8 +281,21 @@
 
     WeavyApp.prototype.toggle = function (destination) {
         var app = this;
+
         return app.whenBuilt().then(function () {
-            return app.panel.toggle(destination);
+            var isOpen = app.panel.isOpen;
+            var togglePromises = [app.panel.toggle(destination)];
+
+            // Sibling apps should be closed if the space is a tabbed space
+            if (!isOpen && app.space && app.space.tabbed) {
+                Array.from(app.space.apps || []).forEach(function (spaceApp) {
+                    if (spaceApp !== app) {
+                        togglePromises.push(spaceApp.panel.close(true));
+                    }
+                });
+            }
+
+            return Promise.all(togglePromises);
         });
     }
 

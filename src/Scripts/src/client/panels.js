@@ -179,23 +179,25 @@
          * @returns {external:Promise} {@link Weavy#whenClosed}
          * @emits Weavy#close
          */
-        function closePanel (panelId) {
+        function closePanel (panelId, silent) {
             weavy.info("closePanel", panelId);
 
             var panelsRoot = this instanceof HTMLElement ? this : weavy.nodes.panels;
             var panel = _panels.get(panelId);
 
             return weavy.whenBlockChecked.then(function () {
-                if (panel && $(panel).hasClass("weavy-open")) {
+                if (panel && panel.isOpen) {
                     $(panel).removeClass("weavy-open");
 
-                    /**
-                     * Event triggered when weavy closes all panels. Wait for the {@link Weavy#whenClosed} Promise to do additional things when weavy has finished closing.
-                     * 
-                     * @category events
-                     * @event Weavy#close
-                     */
-                    panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
+                    if (!silent) {
+                        /**
+                         * Event triggered when weavy closes all panels. Wait for the {@link Weavy#whenClosed} Promise to do additional things when weavy has finished closing.
+                         * 
+                         * @category events
+                         * @event Weavy#close
+                         */
+                        panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
+                    }
 
                     // Return timeout promise
                     return weavy.whenClosed = weavy.timeout(250);
@@ -221,7 +223,7 @@
             var panel = _panels.get(panelId);
 
             return weavy.whenBlockChecked.then(function () {
-                 var shouldClose = $(panel).hasClass("weavy-open");
+                 var shouldClose = panel.isOpen;
                 /**
                  * Event triggered when a panel is toggled open or closed.
                  * 
@@ -236,13 +238,6 @@
                 if (shouldClose) {
                     return root.close(panelId);
                 } else {
-                    if (root.children && root.children.length) {
-                        Array.from(root.children).forEach(function (panel) {
-                            if (panel.panelId !== panelId && panel.close) {
-                                panel.close();
-                            }
-                        })
-                    }
                     return root.open(panelId, typeof (destination) === "string" ? destination : null);
                 }
             });
@@ -500,7 +495,7 @@
             if (panel) {
                 var $panel = $(panel);
                 if (!$panel.data("persistent") || force) {
-                    if ($panel.hasClass("weavy-open")) {
+                    if (panel.isOpen) {
                         $panel[0].id = weavy.getId("weavy-panel-removed-" + panelId);
                         weavy.timeout(0).then(function () {
                             panel.close().then(function () {

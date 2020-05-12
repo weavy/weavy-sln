@@ -3,7 +3,7 @@
     if (WeavyContext.Space != null) {
         EntityService.Visit(WeavyContext.Space);
     }
-    var visited = SpaceService.GetVisited(4);
+    var visited = SpaceService.GetVisited(6);
 }
 
 <div class="navbar-middle d-framed">
@@ -17,8 +17,8 @@
 </div>
 
 <div class="navbar-middle d-standalone">
+    @Html.StarToggle(WeavyContext.Space)
     <div class="dropdown navbar-menu dropdown-backdrop">
-        @Html.StarToggle(WeavyContext.Space)
         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="navbar-text">@navtitle</span>
             @Svg.Icon("menu-down")

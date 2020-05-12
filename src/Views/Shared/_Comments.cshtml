@@ -1,7 +1,4 @@
 ﻿@model IEnumerable<Comment>
-@{ 
-    var parent = ViewBag.Parent as IEntity;
-}
 
 @foreach (var comment in Model) {
     var creator = comment.CreatedBy();
@@ -16,11 +13,11 @@
                 <div class="comment-body">@creator.Link() @Html.Raw(comment.Html)</div>
 
                 @if (images.Any()) {
-                    Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", parent } });
+                    Html.RenderPartial("_ImageGrid", images, new ViewDataDictionary { { "Parent", comment } });
                 }
 
                 @if (files.Any()) {
-                    Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", parent } });
+                    Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", comment } });
                 }
 
                 <div class="text-muted">

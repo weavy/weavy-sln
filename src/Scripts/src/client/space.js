@@ -49,7 +49,7 @@
          * @member {Object} space.options
          * @property {} space.options.apps
          * @property {} space.options.container
-         * @property {boolean} space.options.toggled
+         * @property {boolean} space.options.tabbed
          */
         this.options = options;
         this.data = data;
@@ -81,8 +81,14 @@
             }
         });
 
-        // Use toggled option or check for container otherwise false.
-        this.toggled = options.toggled !== undefined ? options.toggled : (!!options.container || false);
+        // DEPRECATED
+        if (options.toggled !== undefined) {
+            weavy.warn("space: { toggled: " + options.toggled + " } option is deprecated, use { tabbed: " + options.toggled + " } instead")
+            options.tabbed = options.toggled;
+        }
+
+        // Use tabbed option otherwise false.
+        this.tabbed = options.tabbed !== undefined ? options.tabbed : false;
 
         this.configure = function (options, data) {
 

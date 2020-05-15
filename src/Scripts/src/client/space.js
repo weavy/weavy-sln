@@ -68,6 +68,7 @@
         this.isBuilt = false;
 
         var _whenLoaded = $.Deferred();
+        // app.whenLoaded().then(...)
         Object.defineProperty(this, "whenLoaded", {
             get: function () {
                 return _whenLoaded.promise;
@@ -75,6 +76,7 @@
         });
 
         var _whenBuilt = $.Deferred();
+        // app.whenBuilt().then(...)
         Object.defineProperty(this, "whenBuilt", {
             get: function () {
                 return _whenBuilt.promise;

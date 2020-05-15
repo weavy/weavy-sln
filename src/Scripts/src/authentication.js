@@ -97,7 +97,7 @@
 
             // If the user was changed on page load, process the user instantly
             if (_user && wvy.context && wvy.context.user && _user.id !== wvy.context.user) {
-                processUser(wvy.context.user);
+                processUser({ id: wvy.context.user });
             }
         });
 

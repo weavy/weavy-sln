@@ -51,10 +51,10 @@
                 }
 
                 weavy.spaces.forEach(function (space) {
-                    space.whenLoaded.then(function () {
+                    space.whenLoaded().then(function () {
                         if (request.space.id && space.id === request.space.id || request.space.key && space.key === request.space.key) {
                             space.apps.forEach(function (app) {
-                                app.whenLoaded.then(function () {
+                                app.whenLoaded().then(function () {
                                     if (request.app.id && app.id === request.app.id || request.app.key && app.key === request.app.key) {
                                         weavy.log("navigation: app " + (request.app.key || request.app.id) + " open " + request.url);
                                         app.open(request.url).then(function (open) {

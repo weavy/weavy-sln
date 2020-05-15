@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 6.4.1 (2020-05-14)
+
+* Fixed regression bug in client navigation introduced in 6.4.0.
+* Fixed regression bug in panel closing introduced in 6.4.0.
+* Fixed an issue with signed in message being displayed after sign in.
+* Added * (star) as email domain white listing option to allow all domains.
+
 ## 6.4.0 (2020-05-12)
 
 * Fixed null reference exception introduced with AfterMentionUser event.

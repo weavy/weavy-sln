@@ -180,7 +180,7 @@
          * @emits Weavy#close
          */
         function closePanel (panelId, silent) {
-            weavy.info("closePanel", panelId);
+            weavy.info("closePanel", panelId, silent === true ? "(silent)" : "");
 
             var panelsRoot = this instanceof HTMLElement ? this : weavy.nodes.panels;
             var panel = _panels.get(panelId);
@@ -189,7 +189,7 @@
                 if (panel && panel.isOpen) {
                     $(panel).removeClass("weavy-open");
 
-                    if (!silent) {
+                    if (silent !== true) {
                         /**
                          * Event triggered when weavy closes all panels. Wait for the {@link Weavy#whenClosed} Promise to do additional things when weavy has finished closing.
                          * 

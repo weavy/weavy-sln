@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 6.4.2 (2020-05-20)
+
+* Redirect to /sign-in with relative url.
+
 ## 6.4.1 (2020-05-14)
 
 * Fixed regression bug in client navigation introduced in 6.4.0.

@@ -128,11 +128,28 @@
 
                                 if (frameWindow) {
                                     // get the frame element
-                                    var frameElement = frameWindow.parent.document.getElementsByName(frameWindow.name)[0]
-                                    if (frameElement) {
-                                        var frameName = frameWindow.name;
+                                    var frameElement, frameName;
+
+                                    try {
+                                        // get iframe by name, name may be blocked by cors
+                                        frameElement = frameWindow.parent.document.getElementsByName(frameWindow.name)[0];
+                                        frameName = frameWindow.name;
+                                    } catch (e) {
+                                        // get iframe by comparison
+                                        frameElement = Array.from(frameWindow.parent.document.getElementsByTagName("iframe")).filter(function (iframe) {
+                                            return iframe.contentWindow === frameWindow;
+                                        }).pop();
+
+                                        if (frameElement) {
+                                            frameName = frameElement.getAttribute("name");
+                                        }
+                                    }
+
+                                    if (frameElement && frameName) {
                                         var frameWeavyId = frameElement.dataset.weavyId;
                                         registerContentWindow(frameWindow, frameName, frameWeavyId);
+                                    } else {
+                                        console.error("wvy.postal: could not register frame", frameWindow);
                                     }
                                 }
                             }

@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 6.4.3 (2020-05-29)
+
+* Fixed CORS block for window registration in client.
+
 ## 6.4.2 (2020-05-20)
 
 * Redirect to /sign-in with relative url.

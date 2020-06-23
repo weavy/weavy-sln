@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 6.4.4 (2020-06-23)
+
+* WebDAV urls are generated with hostname configured in weavy.application-url.
+
 ## 6.4.3 (2020-05-29)
 
 * Fixed CORS block for window registration in client.

@@ -174,18 +174,18 @@
 
         function bridgePanelEvent(eventName, panelId, triggerData, e, data) {
             if (data.panelId === panelId) {
-                for (const prop in triggerData) {
-                    if (Object.prototype.hasOwnProperty.call(data, prop)) {
-                        triggerData[prop] = data[prop];
+                for (var tProp in triggerData) {
+                    if (Object.prototype.hasOwnProperty.call(data, tProp)) {
+                        triggerData[tProp] = data[tProp];
                     }
                 }
                 var eventResult = app.triggerEvent(eventName, triggerData);
                 if (eventResult === false) {
                     return false;
                 } else if (eventResult) {
-                    for (const prop in data) {
-                        if (Object.prototype.hasOwnProperty.call(eventResult, prop)) {
-                            data[prop] = eventResult[prop];
+                    for (var dProp in data) {
+                        if (Object.prototype.hasOwnProperty.call(eventResult, dProp)) {
+                            data[dProp] = eventResult[dProp];
                         }
                     }
                     return data;
@@ -209,7 +209,7 @@
                             app.root = root = weavy.createRoot(app.container, "app-" + app.id);
                             root.container.panels = weavy.panels.createContainer("app-container-" + app.id);
                             root.container.panels.eventParent = app;
-                            root.container.append(root.container.panels);
+                            root.container.appendChild(root.container.panels);
                         } catch (e) {
                             weavy.log("could not create app in container");
                         }
@@ -303,9 +303,32 @@
 
     WeavyApp.prototype.clear = function () {
         var app = this;
-        var root = app.root || app.space && app.space.root;
+        if (app.panel) {
+            return app.panel.remove();
+        }
 
-        root.container.panels.removePanel("app-" + app.id);
+        return Promise.resolve();
+    }
+
+    WeavyApp.prototype.remove = function () {
+        var app = this;
+        var space = this.space;
+        var weavy = this.weavy;
+
+        weavy.debug("Removing app", app.id);
+
+        var whenPanelRemoved = app.panel ? app.panel.remove() : Promise.resolve();
+
+        var whenRemoved = whenPanelRemoved.then(function () {
+            var appRoot = weavy.getRoot("app-" + app.id);
+            if (appRoot) {
+                appRoot.remove();
+            }
+        });
+
+        space.apps = space.apps.filter(function (a) { return !a.match(app) });
+
+        return whenRemoved;
     }
 
     WeavyApp.prototype.match = function (options) {

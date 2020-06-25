@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 6.5.0 (2020-06-25)
+
+* Added space.remove() and app.remove().
+* Improved client destroy.
+* Client now allows multiple instances/spaces/apps in the same container.
+* Improved cross-browser support.
+
 ## 6.4.4 (2020-06-23)
 
 * WebDAV urls are generated with hostname configured in weavy.application-url.

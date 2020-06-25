@@ -192,9 +192,9 @@
 
                 if (!space.root && space.container) {
                     space.isBuilt = true;
-                    space.root = weavy.createRoot(space.container, space.id);
+                    space.root = weavy.createRoot(space.container, "space-" + space.id);
                     space.root.container.panels = weavy.panels.createContainer();
-                    space.root.container.append(space.root.container.panels);
+                    space.root.container.appendChild(space.root.container.panels);
                     _whenBuilt.resolve();
                 }
             }
@@ -206,36 +206,42 @@
 
     };
 
+    function getAppSelector(appOptions) {
+        var isId = Number.isInteger(appOptions);
+        var isKey = typeof appOptions === "string";
+        var isConfig = $.isPlainObject(appOptions);
+        var selector = isConfig && appOptions || isId && { id: appOptions } || isKey && { key: appOptions };
+
+        return { isId: isId, isKey: isKey, isConfig: isConfig, selector: selector };
+    }
+
     WeavySpace.prototype.app = function (appOptions) {
         var space = this;
         var weavy = this.weavy;
         var app;
 
-        var isAppId = Number.isInteger(appOptions);
-        var isAppKey = typeof appOptions === "string";
-        var isAppConfig = $.isPlainObject(appOptions);
-        var appSelector = isAppConfig && appOptions || isAppId && { id: appOptions } || isAppKey && { key: appOptions };
+        var appSelector = getAppSelector(appOptions);
 
-        if (appSelector) {
+        if (appSelector.selector) {
             try {
-                app = space.apps.filter(function (a) { return a.match(appSelector) }).pop();
+                app = space.apps.filter(function (a) { return a.match(appSelector.selector) }).pop();
             } catch (e) { }
 
             if (!app) {
-                if (isAppConfig) {
+                if (appSelector.isConfig) {
                     app = new WeavyApp(weavy, space, appOptions);
                     space.apps.push(app);
                     $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded).then(function () {
                         app.fetchOrCreate();
                     });
                 } else {
-                    weavy.warn("App " + (isAppConfig ? JSON.stringify(appSelector) : appOptions) + " does not exist." + (isAppId ? "" : " \n Use weavy.space(" + (space.key && "\"" + space.key + "\"" || space.id || "...") + ").app(" + JSON.stringify(appSelector) + ") to create the app."))
+                    weavy.warn("App " + (appSelector.isConfig ? JSON.stringify(appSelector) : appOptions) + " does not exist." + (appSelector.isId ? "" : " \n Use weavy.space(" + (space.key && "\"" + space.key + "\"" || space.id || "...") + ").app(" + JSON.stringify(appSelector.selector) + ") to create the app."))
                 }
             }
         }
 
         return app;
-    } 
+    }
 
     WeavySpace.prototype.open = function (appOptions, destination) {
         return this.app(appOptions).open(destination);
@@ -250,8 +256,36 @@
     }
 
     WeavySpace.prototype.clear = function () {
+        var clearPromises = [];
+
         this.apps.forEach(function (app) {
-            app.clear();
+            clearPromises.push(app.clear());
+        });
+
+        this.apps = new Array();
+
+        return Promise.all(clearPromises);
+    }
+
+    WeavySpace.prototype.remove = function () {
+        var space = this;
+        var weavy = this.weavy;
+
+        weavy.debug("Removing space", space.id);
+
+        var whenAllRemoved = [];
+
+        this.apps.forEach(function (app) {
+            whenAllRemoved.push(app.remove());
+        })
+
+        weavy.spaces = weavy.spaces.filter(function (s) { return !s.match(space) });
+
+        return Promise.all(whenAllRemoved).then(function () {
+            var spaceRoot = weavy.getRoot("space-" + space.id);
+            if (spaceRoot) {
+                spaceRoot.remove();
+            }
         });
     }
 

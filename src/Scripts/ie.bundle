@@ -1,2 +1,4 @@
 ﻿~/scripts/vendor/bluebird/bluebird.core.min.js
 ~/scripts/vendor/classlist-polyfill/index.js
+~/scripts/vendor/array-from/Array.from.js
+~/scripts/src/_ie.js

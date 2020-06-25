@@ -43,8 +43,35 @@
             root.WeavyConsole
         );
     }
+
+
 }(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavySpace, WeavyAuthentication, WeavyNavigation, utils, WeavyConsole) {
     console.debug("weavy.js");
+
+    if ('customElements' in window) {
+        try {
+            window.customElements.define('weavy-root', HTMLElement.prototype);
+            window.customElements.define('weavy-container', HTMLElement.prototype);
+        } catch(e) { }
+    } 
+
+    var weavyElementCSS = 'weavy, weavy-root { display: contents; }';
+
+    if (!('CSS' in window && CSS.supports('display', 'contents'))) {
+        weavyElementCSS = 'weavy, weavy-root { display: flex; position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }';
+    }
+
+    if (document.adoptedStyleSheets) {
+        var sheet = new CSSStyleSheet();
+        sheet.replaceSync(weavyElementCSS);
+        document.adoptedStyleSheets = Array.prototype.concat.call(document.adoptedStyleSheets, [sheet]);
+    } else {
+        var elementStyleSheet = document.createElement("style");
+        elementStyleSheet.type = "text/css";
+        elementStyleSheet.styleSheet ? elementStyleSheet.styleSheet.cssText = weavyElementCSS : elementStyleSheet.appendChild(document.createTextNode(weavyElementCSS));
+
+        document.getElementsByTagName("head")[0].appendChild(elementStyleSheet);
+    }
 
     var _weavyIds = [];
 
@@ -322,7 +349,7 @@
 
             if (spaceSelector) {
                 try {
-                    space = weavy.spaces.filter(function (ctx) { return ctx.match(spaceSelector) }).pop();
+                    space = weavy.spaces.filter(function (s) { return s.match(spaceSelector) }).pop();
                 } catch (e) {}
 
                 if (!space) {
@@ -484,11 +511,11 @@
 
         var _roots = new Map();
 
-        weavy.createRoot = function (container, id) {
+        weavy.createRoot = function (parentSelector, id) {
             var rootId = weavy.getId(id);
 
-            if (!container) {
-                weavy.error("No container defined for createRoot", rootId);
+            if (!parentSelector) {
+                weavy.error("No parent container defined for createRoot", rootId);
                 return;
             }
             if (_roots.has(rootId)) {
@@ -496,32 +523,53 @@
                 return _roots.get(rootId);
             }
 
-            var target = $(container)[0];
-            target.classList.add("weavy");
+            var parentElement = $(parentSelector)[0];
 
+            var rootSection = document.createElement("weavy");
 
-            var rootContainer = document.createElement("div");
+            rootSection.id = rootId;
+            //rootSection.classList.add("weavy");
+            //rootSection.style.display = "contents";
+
+            var rootDom = document.createElement("weavy-root");
+            rootDom.setAttribute("data-version", weavy.options.version);
+
+            var rootContainer = document.createElement("weavy-container");
             rootContainer.className = "weavy-container " + weavy.options.className;
-            rootContainer.setAttribute("data-version", weavy.options.version);
             rootContainer.id = weavy.getId("weavy-container-" + weavy.removeId(rootId));     
 
-            var root = rootContainer;
+            var root = { parent: parentElement, section: rootSection, root: rootDom, container: rootContainer, id: rootId };
 
-            weavy.triggerEvent("before:create-root", { target: target, root: root, container: rootContainer, id: rootId });
+            weavy.triggerEvent("before:create-root", root);
+
+            parentElement.appendChild(rootSection);
+            rootSection.appendChild(rootDom);
 
             if (weavy.supportsShadowDOM) {
-                target.classList.add("weavy-shadow");
-                root = target.attachShadow({ mode: "closed" });
+                root.root = rootDom = rootDom.attachShadow({ mode: "closed" });
             }
+            rootDom.appendChild(rootContainer);
 
-            root.appendChild(rootContainer);
+            weavy.triggerEvent("on:create-root", root);
 
-            weavy.triggerEvent("on:create-root", { target: target, root: root, container: rootContainer, id: rootId });
-            weavy.triggerEvent("after:create-root", { target: target, root: root, container: rootContainer, id: rootId });
+            root.remove = function () {
+                weavy.triggerEvent("before:remove-root", root);
 
-            _roots.set(rootId, { target: target, root: root, container: rootContainer, id: rootId });
+                $(root.container).remove();
+                $(root.section).remove();
 
-            return { target: target, root: root, container: rootContainer, id: rootId };
+                weavy.triggerEvent("on:remove-root", root);
+
+                _roots.delete(rootId);
+
+                weavy.triggerEvent("after:remove-root", root);
+            };
+
+            weavy.triggerEvent("after:create-root", root);
+
+            _roots.set(rootId, root);
+
+            return root;
         };
 
         weavy.getRoot = function (id) {
@@ -564,9 +612,9 @@
             // add container
             if (!weavy.getRoot()) {
                 // append container to target element || html
-                var rootSection = $(weavy.options.container)[0] || document.documentElement.appendChild(document.createElement("section"));
+                var rootParent = $(weavy.options.container)[0] || document.documentElement;
 
-                var root = weavy.createRoot.call(weavy, rootSection);
+                var root = weavy.createRoot.call(weavy, rootParent);
                 weavy.nodes.container = root.root;
                 weavy.nodes.overlay = root.container;
 
@@ -843,15 +891,16 @@
                 disconnect();
             }
 
-            var root = weavy.getRoot();
-            if (root) {
-                $(root.container).remove();
-                $(root.root).remove();
-            }
-            weavy.nodes.container = null;
-            weavy.nodes.overlay = null;
+            _roots.forEach(function (root) {
+                root.remove();
+            });
 
-            weavy.isLoaded = false;
+            // Delete everything in the instance
+            for (var prop in weavy) {
+                if (Object.prototype.hasOwnProperty.call(weavy, prop)) {
+                    delete weavy[prop];
+                }
+            }
         }
 
         // EVENTS
@@ -1091,7 +1140,7 @@
                     sortByDependencies(plugin);
                 }
             } else {
-                if (_unsortedDependencies.hasOwnProperty(pluginName)) {
+                if (Object.prototype.hasOwnProperty.call(_unsortedDependencies, pluginName)) {
                     var plugin = _unsortedDependencies[pluginName];
                     if (plugin.dependencies.length) {
                         plugin.dependencies.forEach(function (dep) {
@@ -1111,7 +1160,7 @@
                         });
                     }
 
-                    if (_unsortedDependencies.hasOwnProperty(pluginName)) {
+                    if (Object.prototype.hasOwnProperty.call(_unsortedDependencies, pluginName)) {
                         _sortedDependencies.push(_unsortedDependencies[pluginName]);
                         delete _unsortedDependencies[pluginName];
                         _checkedDependencies = [];
@@ -1288,14 +1337,14 @@
         // Make a copy
         var copy = {};
         for (property in source) {
-            if (source.hasOwnProperty(property)) {
+            if (Object.prototype.hasOwnProperty.call(source, property)) {
                 copy[property] = source[property];
             }
         }
 
         // Apply properties to copy
         for (property in properties) {
-            if (properties.hasOwnProperty(property)) {
+            if (Object.prototype.hasOwnProperty.call(properties, property)) {
                 if (recursive && copy[property] && $.isPlainObject(copy[property]) && $.isPlainObject(properties[property])) {
                     copy[property] = this.extendDefaults(copy[property], properties[property], recursive);
                 } else {

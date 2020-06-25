@@ -208,6 +208,54 @@
             $(weavyConnection).on(event, null, null, handler);
         }
 
+        function off(event, handler) {
+            if (event.indexOf(".connection") !== -1) {
+                // .connection.weavy (connection events)
+                event = event.indexOf(".weavy") === -1 ? event + ".weavy" : event;
+            } else {
+                // .rtmweavy (realtime events)
+                event = event.indexOf(".rtmweavy") === -1 ? event + ".rtmweavy" : event;
+            }
+
+            _events = _events.filter(function (eventHandler) {
+                if (eventHandler[0] === event && eventHandler[1] === handler) {
+                    $(weavyConnection).off(event, null, handler);
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+        }
+
+        function triggerEvent(name) {
+            var event = $.Event(name);
+
+            // trigger event (with json object instead of string), handle any number of json objects passed from hub (args)
+            var argumentArray = [].slice.call(arguments, 1);
+            var data = argumentArray.map(function (a) {
+                if (a && !$.isArray(a) && !$.isPlainObject(a)) {
+                    try {
+                        return JSON.parse(a);
+                    } catch (e) {
+                        console.warn("wvy.connection" + (childConnection ? " " + (window.name || "[child]") : "") + " could not parse event data;", name);
+                    }
+                }
+                return a;
+            });
+
+            $(weavyConnection).triggerHandler(event, data);
+            triggerToChildren("distribute-event", name, data);
+        }
+
+        // trigger a message distribute
+        function triggerToChildren(name, eventName, data) {
+            try {
+                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data });
+            } catch (e) {
+                console.error("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " could not distribute relay realtime message", { name: name, eventName: eventName }, e);
+            }
+        }
+
         // invoke a method on a server hub, e.g. "SetActive" on the RealTimeHub (rtm) or "Typing" on the MessengerHub (messenger).
         function invoke(hub, method, data) {
             var args = data ? [method, sanitizeObject(data)] : [method];
@@ -356,35 +404,6 @@
 
         });
 
-        function triggerEvent(name) {
-
-            var event = $.Event(name);
-
-            // trigger event (with json object instead of string), handle any number of json objects passed from hub (args)
-            var argumentArray = [].slice.call(arguments, 1);
-            var data = argumentArray.map(function (a) {
-                if (a && !$.isArray(a) && !$.isPlainObject(a)) {
-                    try {
-                        return JSON.parse(a);
-                    } catch (e) {
-                        console.warn("wvy.connection" + (childConnection ? " " + (window.name || "[child]") : "") + " could not parse event data;", name);
-                    }
-                }
-                return a;
-            });
-
-            $(weavyConnection).triggerHandler(event, data);
-            triggerToChildren("distribute-event", name, data);
-        }
-
-        // trigger a message distribute
-        function triggerToChildren(name, eventName, data) {
-            try {
-                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data });
-            } catch (e) {
-                console.error("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " could not distribute relay realtime message", { name: name, eventName: eventName }, e);
-            }
-        }
 
         // REALTIME EVENTS
 
@@ -530,6 +549,7 @@
             init: init,
             invoke: invoke,
             on: on,
+            off: off,
             proxies: hubProxies,
             states: states,
             status: status,

@@ -12,6 +12,10 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Weavy Client Test</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    @if (Request.Browser.Browser == "InternetExplorer") {
+        <script src="~/javascript/ie.js"></script>
+    }
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
@@ -37,10 +41,10 @@
             height: 3.5rem;
         }
 
-        .navbar-brand img {
-            width: 2rem;
-            height: 2rem;
-        }
+            .navbar-brand img {
+                width: 2rem;
+                height: 2rem;
+            }
 
         .weavy-drawer {
             position: fixed;
@@ -67,6 +71,7 @@
             border: 1px solid #333;
             border-radius: 3px;
             display: none;
+            position: relative;
         }
 
         .weavy-panel-tile {
@@ -116,7 +121,7 @@
                         key: "client-test-hub",
                         name: "Client Test Hub",
                         container: $("#weavyPanelRight"),
-                        toggled: true,
+                        tabbed: true,
                         apps: [
                             { key: "posts", type: "posts" },
                             { key: "notifications", type: "notifications" },

@@ -79,10 +79,14 @@
                 var selector = eventHandler[3];
                 var attachedHandler = eventHandler[4];
 
-                if (typeof selector === "string") {
-                    context.off(events, selector, attachedHandler || handler);
+                if (context && typeof context.off === "function") {
+                    if (typeof selector === "string") {
+                        context.off(events, selector, attachedHandler || handler);
+                    } else {
+                        context.off(events, attachedHandler || handler);
+                    }
                 } else {
-                    context.off(events, attachedHandler || handler);
+                    console.warn("event context is missing off handler", eventHandler);
                 }
             });
             _events = [];
@@ -227,10 +231,14 @@
             unregisterEventHandler(args.events, args.handler, args.context, args.selector);
 
             if (offHandler) {
-                if (typeof args.selector === "string") {
-                    args.context.off(args.events, args.selector, offHandler);
+                if (args.context && typeof args.context.off === "function") {
+                    if (typeof args.selector === "string") {
+                        args.context.off(args.events, args.selector, offHandler);
+                    } else {
+                        args.context.off(args.events, offHandler);
+                    }
                 } else {
-                    args.context.off(args.events, offHandler);
+                    console.warn("event context is missing off handler", offHandler);
                 }
             }
         };

@@ -402,6 +402,8 @@
             panel.load = loadPanel.bind(panelRoot, panelId);
             panel.reload = reloadPanel.bind(panelRoot, panelId);
             panel.reset = resetPanel.bind(panelRoot, panelId);
+            panel.postMessage = postMessage.bind(panelRoot, panelId);
+            panel.remove = removePanel.bind(panelRoot, panelId);
 
             Object.defineProperty(panel, "isOpen", {
                 get: function () { return panel.classList.contains("weavy-open"); }
@@ -497,9 +499,9 @@
                 if (!$panel.data("persistent") || force) {
                     if (panel.isOpen) {
                         $panel[0].id = weavy.getId("weavy-panel-removed-" + panelId);
-                        weavy.timeout(0).then(function () {
-                            panel.close().then(function () {
-                                removePanel(panelId);
+                        return weavy.timeout(0).then(function () {
+                            return panel.close().then(function () {
+                                return removePanel(panelId, force);
                             });
                         });
                     } else {
@@ -515,9 +517,13 @@
                          * @property {string} panelId - Id of the removed panel
                          */
                         panelRoot.triggerEvent("panel-removed", { panelId: panelId });
+
+                        return Promise.resolve();
                     }
                 }
             }
+
+            return Promise.reject(new Error("removePanel(): Panel " + panelId + " not found"));
         }
 
         /**
@@ -531,10 +537,11 @@
 
         /**
          * Removes all panels except persistent panels.
+         * @param {boolean} force - Forces all panels to be removed including persistent panels
          */
-        function clearPanels () {
+        function clearPanels (force) {
             _panels.forEach(function (panel) {
-                removePanel(panel.dataset.id);
+               panel.remove(force);
             });
         }
 
@@ -543,7 +550,7 @@
          */
         function resetPanels () {
             _panels.forEach(function (panel) {
-                resetPanel(panel.dataset.id);
+                panel.reset();
             });
         }
 
@@ -670,18 +677,11 @@
         });
 
         // close all panels
-        weavy.on("panel-close", function (e) {
-            var panels = Array.from(_panels.values());
-            var $panels = $(panels);
-            var $openFrame = $(".weavy-panel.weavy-open iframe", $panels);
-
-            $(".weavy-panel", $panels).removeClass("weavy-open");
-
-            if ($openFrame.length && $openFrame[0].loaded) {
-                try {
-                    wvy.postal.postToFrame($openFrame[0].name, weavy.getId(), { name: 'hide' });
-                } catch (e) {
-                    weavy.debug("Could not postMessage:hide to frame");
+        weavy.on("panel-close", function (e, close) {
+            if (close.panelId) {
+                var panel = _panels.get(close.panelId);
+                if (panel) {
+                    panel.postMessage({ name: 'hide' });
                 }
             }
         });
@@ -723,6 +723,7 @@
 
         weavy.on("signing-out signed-out", closePanels);
         weavy.on("after:signed-out", resetPanels);
+        weavy.on("destroy", clearPanels.bind(this, true));
 
         // Exports
         return {

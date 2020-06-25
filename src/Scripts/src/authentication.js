@@ -174,6 +174,20 @@
             $(weavyAuthentication).on(event, null, null, handler);
         }
 
+        function off(event, handler) {
+            event = event.indexOf(".weavy") === -1 ? event + ".weavy" : event;
+
+            _events = _events.filter(function (eventHandler) {
+                if (eventHandler[0] === event && eventHandler[1] === handler) {
+                    $(weavyAuthentication).off(event, null, handler);
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+
+        }
+
         function triggerEvent(name) {
             var event = $.Event(name);
 
@@ -415,6 +429,7 @@
             whenAuthenticated: function () { return _whenAuthenticated.promise(); },
             whenAuthorized: function () { return _whenAuthorized.promise(); },
             on: on,
+            off: off,
             signOut: signOut,
             sso: sso,
             update: update,

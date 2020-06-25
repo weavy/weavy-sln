@@ -58,7 +58,7 @@
             // clientCss is set on the server
             //css = css + options.styles;
 
-            if (root.styles) {
+            if (root.weavyStyles) {
                 if (root.weavyStyles.styleSheet) {
                     root.weavyStyles.styleSheet.cssText = css;
                 } else {
@@ -68,13 +68,16 @@
             } else {
                 root.weavyStyles = document.createElement("style");
                 root.weavyStyles.type = "text/css";
-                //root.styles.id = weavy.getId("weavy-styles");
                 root.weavyStyles.styleSheet ? root.weavyStyles.styleSheet.cssText = css : root.weavyStyles.appendChild(document.createTextNode(css));
 
                 if (weavy.supportsShadowDOM) {
                     root.appendChild(root.weavyStyles);
                 } else {
-                    document.getElementsByTagName("head")[0].appendChild(weavy.weavyStyles);
+                    var styleId = weavy.getId("weavy-styles");
+                    if (!document.getElementById(styleId)) {
+                        root.weavyStyles.id = styleId;
+                        document.getElementsByTagName("head")[0].appendChild(root.weavyStyles);
+                    }
                 }
             }
 
@@ -109,6 +112,10 @@
                 // add styles
                 weavy.createStyleSheet(data.clientCss, createRoot.root);
             }
+        });
+
+        weavy.on("destroy", function (e, destroy) {
+            $("#" + weavy.getId("weavy-styles")).remove();
         });
 
         // Exports

@@ -1,25 +1,26 @@
-﻿@model CreateAccountModel
+﻿@model CreateUserModel
 @{
-    Title = "Add user";
+    Title = "People";
     Back = Url.Action<PeopleController>(c => c.Index(null, null));
 }
 
 
-@section navbar_secondary {
-    <nav class="nav nav-tabs">
-        <a class="nav-link disabled">Profile</a>
-        <a class="nav-link disabled">Settings</a>
-        <a class="nav-link active">Account</a>
-    </nav>
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
 }
 
-<div class="container-fluid mt-3">
+
+<div class="container mt-3">
     @using (Html.BeginForm(nameof(PeopleController.Insert), typeof(PeopleController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
-        @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsExternal), nameof(Model.IsSuspended) })
+    
+        <div class="text-center">
+            @Html.EditorFor(x => Model.Avatar)
+        </div>
+
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsSuspended) })
 
         <div class="form-group">
             @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })
-            @Html.EditorFor(x => Model.IsExternal, additionalViewData: new { FormGroup = false })
             @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { FormGroup = false })
         </div>
         <div class="form-buttons">

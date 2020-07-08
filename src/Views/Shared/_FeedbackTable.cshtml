@@ -1,0 +1,16 @@
+﻿@model IEnumerable<User>
+<table class="table table-name table-borderless mb-0">
+@foreach (User user in Model) {
+    <tr data-href="@user.Url()">
+        <td class="table-icon">@user.AvatarImg(32)</td>
+        <td>
+            @if (user.Username == user.GetTitle()) {
+            <a href="@user.Url()"><small class="text-muted">@@@user.Username</small></a>
+            } else {
+            <a href="@user.Url()">@user.GetTitle()</a> <small class="text-muted">@@@user.Username</small>
+            }
+            @Html.Badge(user)
+        </td>
+    </tr>
+}
+</table>

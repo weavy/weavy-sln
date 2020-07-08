@@ -28,6 +28,15 @@ wvy.api = (function ($) {
         });
     }
 
+    // delete entity
+    function deleteEntity(entityType, entityId, method) {
+        return $.ajax({
+            url: wvy.url.api(entityType) + entityId,
+            method: method || "DELETE",
+            contentType: "application/json"
+        });
+    }
+
     // like entity
     function like(entityType, entityId) {
         return $.ajax({
@@ -77,24 +86,6 @@ wvy.api = (function ($) {
     function unfollow(entityType, entityId) {
         return $.ajax({
             url: wvy.url.api(entityType) + entityId + "/follow",
-            method: "DELETE",
-            contentType: "application/json"
-        });
-    }
-
-    // join space
-    function join(spaceId) {
-        return $.ajax({
-            url: wvy.url.api("space") + spaceId + "/members",
-            method: "POST",
-            contentType: "application/json"
-        });
-    }
-
-    // leave space
-    function leave(spaceId) {
-        return $.ajax({
-            url: wvy.url.api("space") + spaceId + "/members",
             method: "DELETE",
             contentType: "application/json"
         });
@@ -171,11 +162,10 @@ wvy.api = (function ($) {
         unfollow: unfollow,
         star: star,
         unstar: unstar,
-        join: join,
-        leave: leave,
         read: read,
         trash: trash,
         restore: restore,
+        delete: deleteEntity,
         unread: unread,
         readAll: readAll,
         readAllForParent: readAllForParent,

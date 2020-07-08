@@ -1,0 +1,57 @@
+﻿@model UserSearchResult
+
+@if (Model.Any()) {
+    foreach (var user in Model) {
+        var href = Url.Action<ClientController>(c => c.Get(user.Id));
+        <tr class="@(user.IsTrashed() ? "table-trashed" : (user.IsSuspended ? "table-muted" : ""))" data-href="@href">
+            <td class="table-icon"><a class="btn btn-icon" href="@href">@Svg.Icon("access-point", user.IsSuspended ? null : "primary")</a></td>
+            <td>
+                @if (user.IsTrashed()) {
+                    @user.Profile.Name
+                } else {
+                    <a href="@href">@user.Profile.Name</a>
+                }
+            </td>
+            <td>@user.ClientId</td>
+            <td class="table-icon">
+
+                @if (user.IsTrashed()) {
+                    <form action="@(Url.Action<ClientController>(c => c.Restore(user.Id)))" method="post" data-turboform>
+                        @Html.HttpMethodOverride(HttpVerbs.Put)
+                        <button type="submit" class="btn btn-icon btn-success" title="Restore">@Svg.Icon("backup-restore")</button>
+                    </form>
+
+                } else {
+
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                            @Svg.Icon("dots-vertical")
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @if (user.IsSuspended) {
+                                <form action="@(Url.Action<ClientController>(c => c.Enable(user.Id)))" method="post" data-turboform>
+                                    @Html.HttpMethodOverride(HttpVerbs.Put)
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("checkbox-blank-outline", "success") Enable</button>
+                                </form>
+                            } else {
+                                <form action="@(Url.Action<ClientController>(c => c.Disable(user.Id)))" method="post" data-turboform>
+                                    @Html.HttpMethodOverride(HttpVerbs.Put)
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("checkbox-marked-outline", "warning") Disable</button>
+                                </form>
+                            }
+                            <form action="@(Url.Action<ClientController>(c => c.Trash(user.Id)))" method="post" data-turboform>
+                                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                <button type="submit" class="dropdown-item" >@Svg.Icon("delete", "danger") Trash</button>
+                            </form>
+
+                        </div>
+                    </div>
+                }
+            </td>
+        </tr>
+    }
+    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+        <td colspan="4"></td>
+    </tr>
+}
+

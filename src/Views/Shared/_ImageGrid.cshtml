@@ -16,7 +16,7 @@
         var svg = ext.Equals(".svg");
         var ani = gif || svg;
         var src = ani ? img.ContentUrl() : img.ThumbUrl(1920, 1920);
-        var thumbSrc = img.ThumbUrl(512, 512, rasterize: svg);
+        var thumbSrc = ani ? img.ContentUrl() : img.ThumbUrl(512, 512);
 
         var padding = (100 / img.Blob.Ratio()).ToString("0.00000", System.Globalization.CultureInfo.InvariantCulture) + "%";
         var ratio = img.Blob.Ratio().ToString("0.00000", System.Globalization.CultureInfo.InvariantCulture);
@@ -27,20 +27,9 @@
         }
         var flex = $"{ratio} {ratio} {flexBasis}";
 
-        // center small images
-        var style = "";
-        var w = img.Blob.Width;
-        var h = img.Blob.Height;
-        if (width != null && w < width/2) {
-            style = $"max-width:{w}px;max-height:{h}px;top:50%;left:50%;margin-left:-{w/2}px;margin-top:-{h/2}px;";
-        }
-
         <div class="image" style="flex: @flex;">
             <a href="@img.ContentUrl()" style="padding-bottom: @padding;" @Html.Raw(attrs.AsHtmlAttributes())>
-                <img src="@thumbSrc" style="@style" alt="" />
-                @if (ani) {
-                    <img class="img-play" src="@img.ContentUrl()" alt="" />
-                }
+                <img src="@thumbSrc" alt="" />
                 @if (count > limit && index == limit - 1) {
                     <span class="more">+@Model.Skip(limit).Count()</span>
                 }

@@ -1,41 +1,9 @@
 ﻿@model Space
-
-@if (Model.IsTrashed() && Model.HasPermission(Permission.Delete)) {
-    <div class="dropdown">
-        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-            @Svg.Icon("dots-vertical")
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-            <form action="@(Url.Action<SpaceController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
-                <button type="submit" class="dropdown-item" title="Restore space">@Svg.Icon("backup-restore", "success") Restore</button>
-            </form>
-            <form action="@(Url.Action<SpaceController>(c => c.Delete(Model.Id)))" method="post" data-turboform>
-                @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <button type="submit" class="dropdown-item" title="Permanently delete space">@Svg.Icon("delete", "danger") Delete</button>
-            </form>
-        </div>
+<div class="dropdown">
+    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+        @Svg.Icon("dots-vertical")
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @Html.Partial("_SpaceMenuItems")
     </div>
-
-} else if (Model.Privacy == Privacy.Secret && User.IsAdmin && !Model.IsMember) {
-    <div class="dropdown">
-        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-            @Svg.Icon("dots-vertical")
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-            <form action="@(Url.Action<SpaceController>(c => c.Admin(Model.Id)))" method="post" data-turboform>
-                @Html.HttpMethodOverride(HttpVerbs.Put)
-                <button type="submit" class="dropdown-item">@Svg.Icon("account-key", "warning") Join as admin</button>
-            </form>
-        </div>
-    </div>
-
-} else if (Model.HasPermission(Permission.Edit) || Model.HasPermission(Permission.Join)) {
-    <div class="dropdown">
-        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-            @Svg.Icon("dots-vertical")
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-            @Html.Partial("_SpaceMenuItems")
-        </div>
-    </div>
-}
+</div>

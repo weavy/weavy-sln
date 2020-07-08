@@ -32,6 +32,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Weavy.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +42,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Weavy.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -192,14 +194,14 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.3\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.6.5.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.6.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.6.5.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.6.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.6.5.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.6.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -215,6 +217,12 @@
     </Reference>
     <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Jwt, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Jwt.4.1.0\lib\net45\Microsoft.Owin.Security.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -262,8 +270,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.6.5.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.6.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
@@ -338,17 +346,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=6.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=7.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=6.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=6.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=6.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=7.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -362,6 +370,7 @@
     <Content Include="Areas\Apps\Styles\messenger.scss" />
     <Content Include="Areas\Apps\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Apps\Views\CloudLink\Get.cshtml" />
+    <Content Include="Areas\Apps\Views\Comments\Get.cshtml" />
     <Content Include="Areas\Apps\Views\File\Edit.cshtml" />
     <Content Include="Areas\Apps\Views\File\Get.cshtml" />
     <Content Include="Areas\Apps\Views\Files\Get.cshtml" />
@@ -371,6 +380,8 @@
     <Content Include="Areas\Apps\Views\Messenger\_Conversation.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\_Conversations.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\_InfoModal.cshtml" />
+    <Content Include="Areas\Apps\Views\Messenger\_MeetingTeams.cshtml" />
+    <Content Include="Areas\Apps\Views\Messenger\_MeetingZoom.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\_Menu.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\_Message.cshtml" />
     <Content Include="Areas\Apps\Views\Messenger\_MessageForm.cshtml" />
@@ -394,6 +405,19 @@
     <Content Include="Areas\Apps\Views\Search\Get.cshtml" />
     <Content Include="Areas\Apps\Views\Shared\_AttachModal.cshtml" />
     <Content Include="Areas\Apps\Views\Web.config" />
+    <Content Include="Areas\Docs\Scripts\docs.bundle" />
+    <Content Include="Areas\Docs\Scripts\prism.js" />
+    <Content Include="Areas\Docs\Styles\docs.scss" />
+    <Content Include="Areas\Docs\Styles\prism.css" />
+    <Content Include="Areas\Docs\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Docs\Views\Home\_Actions.cshtml" />
+    <Content Include="Areas\Docs\Views\Home\Action.cshtml" />
+    <Content Include="Areas\Docs\Views\Home\Authentication.cshtml" />
+    <Content Include="Areas\Docs\Views\Home\Controller.cshtml" />
+    <Content Include="Areas\Docs\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Docs\Views\Home\Token.cshtml" />
+    <Content Include="Areas\Docs\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Docs\Views\Web.config" />
     <Content Include="Global.asax" />
     <Content Include="img\bot.svg" />
     <Content Include="img\eo\0023-20e3.svg" />
@@ -3227,6 +3251,7 @@
     <Content Include="img\icon.svg" />
     <Content Include="img\icons\access-point.svg" />
     <Content Include="img\icons\account.svg" />
+    <Content Include="img\icons\account-box-multiple.svg" />
     <Content Include="img\icons\account-circle.svg" />
     <Content Include="img\icons\account-key.svg" />
     <Content Include="img\icons\account-minus.svg" />
@@ -3288,6 +3313,7 @@
     <Content Include="img\icons\dropbox.svg" />
     <Content Include="img\icons\email.svg" />
     <Content Include="img\icons\emoticon.svg" />
+    <Content Include="img\icons\emoticon-plus.svg" />
     <Content Include="img\icons\expand-window.svg" />
     <Content Include="img\icons\file.svg" />
     <Content Include="img\icons\file-check.svg" />
@@ -3362,11 +3388,13 @@
     <Content Include="img\icons\plus-circle-outline.svg" />
     <Content Include="img\icons\poll-box.svg" />
     <Content Include="img\icons\post-it.svg" />
+    <Content Include="img\icons\recycle.svg" />
     <Content Include="img\icons\refresh.svg" />
     <Content Include="img\icons\rss-box.svg" />
     <Content Include="img\icons\send.svg" />
     <Content Include="img\icons\settings.svg" />
     <Content Include="img\icons\share-variant.svg" />
+    <Content Include="img\icons\shield-star.svg" />
     <Content Include="img\icons\star.svg" />
     <Content Include="img\icons\star-off.svg" />
     <Content Include="img\icons\star-outline.svg" />
@@ -3389,16 +3417,14 @@
     <Content Include="img\icons\windows.svg" />
     <Content Include="img\icons\wrench.svg" />
     <Content Include="img\icons\zip-box.svg" />
+    <Content Include="img\icons\zoom.svg" />
     <Content Include="img\pixel.png" />
     <Content Include="img\role.svg" />
     <Content Include="img\space.svg" />
     <Content Include="img\spinner.svg" />
     <Content Include="img\user.svg" />
-    <Content Include="media\calling.mp3" />
-    <Content Include="media\endcall.mp3" />
     <Content Include="media\message.mp3" />
     <Content Include="media\notification.mp3" />
-    <Content Include="media\ringing.mp3" />
     <Content Include="Scripts\_bootstrap.bundle" />
     <Content Include="Scripts\_button.bundle" />
     <Content Include="Scripts\_codesample.bundle" />
@@ -3412,7 +3438,6 @@
     <Content Include="Scripts\client-jquery-check.bundle" />
     <Content Include="Scripts\ie.bundle" />
     <Content Include="Scripts\msofba.bundle" />
-    <Content Include="Scripts\notification.bundle" />
     <Content Include="Scripts\pickers.bundle" />
     <Content Include="Scripts\setup.bundle" />
     <Content Include="Scripts\src\_extensions.js" />
@@ -3439,20 +3464,19 @@
     <Content Include="Scripts\src\client\plugins\_weavy-plugin-helloworld.js" />
     <Content Include="Scripts\src\client\plugins\_weavy-plugin-template.js" />
     <Content Include="Scripts\src\client\plugins\alert.js" />
+    <Content Include="Scripts\src\client\plugins\authentication-panel.js" />
     <Content Include="Scripts\src\client\plugins\filebrowser.js" />
     <Content Include="Scripts\src\client\plugins\preview.js" />
-    <Content Include="Scripts\src\client\plugins\sign-in.js" />
     <Content Include="Scripts\src\client\plugins\theme.js" />
+    <Content Include="Scripts\src\client\promise.js" />
     <Content Include="Scripts\src\client\space.js" />
     <Content Include="Scripts\src\client\utils.js" />
     <Content Include="Scripts\src\client\weavy.js" />
     <Content Include="Scripts\src\codesample.js" />
     <Content Include="Scripts\src\comments.js" />
-    <Content Include="Scripts\src\connect.js" />
     <Content Include="Scripts\src\connection.js" />
     <Content Include="Scripts\src\content.js" />
     <Content Include="Scripts\src\desktop-notifications.js" />
-    <Content Include="Scripts\src\discuss.js" />
     <Content Include="Scripts\src\draggable.js" />
     <Content Include="Scripts\src\drawer.js" />
     <Content Include="Scripts\src\dropdown.js" />
@@ -3470,7 +3494,6 @@
     <Content Include="Scripts\src\notifications.js" />
     <Content Include="Scripts\src\pdf.js" />
     <Content Include="Scripts\src\photoswipe.js" />
-    <Content Include="Scripts\src\pincode.js" />
     <Content Include="Scripts\src\postal.js" />
     <Content Include="Scripts\src\posts.js" />
     <Content Include="Scripts\src\presence.js" />
@@ -3500,8 +3523,8 @@
     <Content Include="Scripts\src\url.js" />
     <Content Include="Scripts\src\user.js" />
     <Content Include="Scripts\src\userspicker.js" />
-    <Content Include="Scripts\src\weavy-notifications.js" />
-    <Content Include="Scripts\src\weavy-personal.js" />
+    <Content Include="Scripts\src\when-loaded.js" />
+    <Content Include="Scripts\src\when-loaded-resolve.js" />
     <Content Include="Scripts\vendor\array-from\Array.from.js" />
     <Content Include="Scripts\vendor\bluebird\bluebird.core.min.js" />
     <Content Include="Scripts\vendor\blueimp-file-upload\jquery.fileupload.js" />
@@ -3716,8 +3739,10 @@
     <Content Include="Scripts\vendor\prismjs\prism-cpp.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-csharp.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-css.min.js" />
+    <Content Include="Scripts\vendor\prismjs\prism-http.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-java.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-javascript.min.js" />
+    <Content Include="Scripts\vendor\prismjs\prism-json.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-line-numbers.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-markup-templating.min.js" />
     <Content Include="Scripts\vendor\prismjs\prism-markup.min.js" />
@@ -3753,9 +3778,7 @@
     <Content Include="Styles\client\_alert.scss" />
     <Content Include="Styles\client\_dot.scss" />
     <Content Include="Styles\client\_filebrowser.scss" />
-    <Content Include="Styles\client\_notifications.scss" />
     <Content Include="Styles\client\_panels.scss" />
-    <Content Include="Styles\client\_panels.wide.scss" />
     <Content Include="Styles\client\_preview.scss" />
     <Content Include="Styles\client\_variables.scss" />
     <Content Include="Styles\components\_alert.scss" />
@@ -3792,7 +3815,6 @@
     <Content Include="Styles\components\_navbar.scss" />
     <Content Include="Styles\components\_note.scss" />
     <Content Include="Styles\components\_notification.scss" />
-    <Content Include="Styles\components\_notifications.scss" />
     <Content Include="Styles\components\_pagination.scss" />
     <Content Include="Styles\components\_personal.scss" />
     <Content Include="Styles\components\_photoswipe.scss" />
@@ -3810,7 +3832,6 @@
     <Content Include="Styles\components\_tables.scss" />
     <Content Include="Styles\components\_tags.scss" />
     <Content Include="Styles\components\_togglers.scss" />
-    <Content Include="Styles\components\_turbolinks.scss" />
     <Content Include="Styles\components\_type.scss" />
     <Content Include="Styles\components\tinymce\skins\weavy\content.less" />
     <Content Include="Styles\components\tinymce\skins\weavy\skin.less" />
@@ -4028,42 +4049,19 @@
     <Content Include="Styles\vendor\tinymce\content.css" />
     <Content Include="Styles\vendor\tinymce\skin.css" />
     <Content Include="Styles\weavy.scss" />
-    <Content Include="Styles\widget.scss" />
-    <Content Include="Styles\widget\_alert.scss" />
-    <Content Include="Styles\widget\_avatars.scss" />
-    <Content Include="Styles\widget\_buttons.scss" />
-    <Content Include="Styles\widget\_collapsed.scss" />
-    <Content Include="Styles\widget\_dock.scss" />
-    <Content Include="Styles\widget\_dot.scss" />
-    <Content Include="Styles\widget\_drag.scss" />
-    <Content Include="Styles\widget\_filebrowser.scss" />
-    <Content Include="Styles\widget\_layout.scss" />
-    <Content Include="Styles\widget\_messenger.scss" />
-    <Content Include="Styles\widget\_notifications.scss" />
-    <Content Include="Styles\widget\_panels.scss" />
-    <Content Include="Styles\widget\_personal.scss" />
-    <Content Include="Styles\widget\_preview.scss" />
-    <Content Include="Styles\widget\_variables.scss" />
-    <Content Include="Styles\widget\_wide.scss" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\_Navbar.cshtml" />
     <Content Include="Views\Account\AddWindows.cshtml" />
-    <Content Include="Views\Account\Confirm.cshtml" />
-    <Content Include="Views\Account\EditAccount.cshtml" />
-    <Content Include="Views\Account\EditPassword.cshtml" />
-    <Content Include="Views\Account\EditProfile.cshtml" />
-    <Content Include="Views\Account\EditSettings.cshtml" />
-    <Content Include="Views\Account\LinkLogin.cshtml" />
+    <Content Include="Views\Account\Edit.cshtml" />
     <Content Include="Views\Account\MSOFBA.cshtml" />
     <Content Include="Views\Account\Notify.cshtml" />
-    <Content Include="Views\Account\Pending.cshtml" />
+    <Content Include="Views\Account\Password.cshtml" />
     <Content Include="Views\Account\RecoverPassword.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\RegisterWindows.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Account\Settings.cshtml" />
     <Content Include="Views\Account\SignIn.cshtml" />
     <Content Include="Views\Account\SignInEmbedded.cshtml" />
-    <Content Include="Views\Account\SignUp.cshtml" />
     <Content Include="Views\App\_Add.cshtml" />
     <Content Include="Views\App\_Edit.cshtml" />
     <Content Include="Views\App\_Layout.cshtml" />
@@ -4076,6 +4074,10 @@
     <Content Include="Views\App\New.cshtml" />
     <Content Include="Views\Apps\Get.cshtml" />
     <Content Include="Views\Apps\Index.cshtml" />
+    <Content Include="Views\Client\_Clients.cshtml" />
+    <Content Include="Views\Client\Get.cshtml" />
+    <Content Include="Views\Client\Index.cshtml" />
+    <Content Include="Views\Client\New.cshtml" />
     <Content Include="Views\ClientScript\Index.cshtml" />
     <Content Include="Views\ClientScript\Ping.cshtml" />
     <Content Include="Views\Comment\_Edit.cshtml" />
@@ -4105,19 +4107,20 @@
     <Content Include="Views\ContentTypes\Index.cshtml" />
     <Content Include="Views\Daemons\Get.cshtml" />
     <Content Include="Views\Daemons\Index.cshtml" />
+    <Content Include="Views\Directories\_DirectoriesTable.cshtml" />
+    <Content Include="Views\Directories\Get.cshtml" />
+    <Content Include="Views\Directories\Index.cshtml" />
+    <Content Include="Views\Directories\New.cshtml" />
+    <Content Include="Views\Directories\People.cshtml" />
     <Content Include="Views\Email\_Layout.cshtml" />
     <Content Include="Views\Email\_ViewStart.cshtml" />
     <Content Include="Views\Email\Conversation.cshtml" />
     <Content Include="Views\Email\DailyDigest.cshtml" />
-    <Content Include="Views\Email\Invite.cshtml" />
     <Content Include="Views\Email\Notification.cshtml" />
     <Content Include="Views\Email\PasswordReset.cshtml" />
-    <Content Include="Views\Email\SignupApproval.cshtml" />
-    <Content Include="Views\Email\SignupConfirmation.cshtml" />
     <Content Include="Views\Email\Test.cshtml" />
     <Content Include="Views\Email\Welcome.cshtml" />
     <Content Include="Views\Error\Error.cshtml" />
-    <Content Include="Views\Home\HQ.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Search.cshtml" />
     <Content Include="Views\Hooks\Get.cshtml" />
@@ -4129,26 +4132,25 @@
     <Content Include="Views\Manage\Routes.cshtml" />
     <Content Include="Views\Manage\Statistics.cshtml" />
     <Content Include="Views\Manage\Theme.cshtml" />
+    <Content Include="Views\Meeting\TeamsAuthorization.cshtml" />
+    <Content Include="Views\Meeting\ZoomAuthorization.cshtml" />
     <Content Include="Views\Notification\_Index.cshtml" />
     <Content Include="Views\Notification\_Notification.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
-    <Content Include="Views\Notification\Preview.cshtml" />
-    <Content Include="Views\People\_Get.cshtml" />
-    <Content Include="Views\People\_Navbar.cshtml" />
-    <Content Include="Views\People\EditAccount.cshtml" />
-    <Content Include="Views\People\EditProfile.cshtml" />
-    <Content Include="Views\People\EditSettings.cshtml" />
+    <Content Include="Views\People\Edit.cshtml" />
     <Content Include="Views\People\Get.cshtml" />
     <Content Include="Views\People\Index.cshtml" />
-    <Content Include="Views\People\Invite.cshtml" />
     <Content Include="Views\People\New.cshtml" />
-    <Content Include="Views\People\Pending.cshtml" />
+    <Content Include="Views\People\Settings.cshtml" />
     <Content Include="Views\Post\_Edit.cshtml" />
     <Content Include="Views\Post\_MoveModalContent.cshtml" />
     <Content Include="Views\Post\Get.cshtml" />
-    <Content Include="Views\RecycleBin\_UserTrash.cshtml" />
-    <Content Include="Views\RecycleBin\SpaceTrash.cshtml" />
-    <Content Include="Views\RecycleBin\UserTrash.cshtml" />
+    <Content Include="Views\Preview\_Download.cshtml" />
+    <Content Include="Views\Preview\_Layout.cshtml" />
+    <Content Include="Views\Preview\Attachment.cshtml" />
+    <Content Include="Views\Preview\Index.cshtml" />
+    <Content Include="Views\RecycleBin\_Index.cshtml" />
+    <Content Include="Views\RecycleBin\Index.cshtml" />
     <Content Include="Views\Roles\_MemberTable.cshtml" />
     <Content Include="Views\Roles\_RoleTable.cshtml" />
     <Content Include="Views\Roles\Edit.cshtml" />
@@ -4169,30 +4171,31 @@
     <Content Include="Views\Shared\_CommentForm.cshtml" />
     <Content Include="Views\Shared\_CommentMenu.cshtml" />
     <Content Include="Views\Shared\_Comments.cshtml" />
-    <Content Include="Views\Shared\_ConnectModal.cshtml" />
-    <Content Include="Views\Shared\_ConnectModalContent.cshtml" />
+    <Content Include="Views\Shared\_CommentSearchResult.cshtml" />
     <Content Include="Views\Shared\_ContentMenu.cshtml" />
     <Content Include="Views\Shared\_ContentModal.cshtml" />
     <Content Include="Views\Shared\_DrawerPersonal.cshtml" />
-    <Content Include="Views\Shared\_DrawerProfile.cshtml" />
     <Content Include="Views\Shared\_DrawerSpace.cshtml" />
     <Content Include="Views\Shared\_EditCommentModal.cshtml" />
     <Content Include="Views\Shared\_EditorMenu.cshtml" />
     <Content Include="Views\Shared\_EditPostModal.cshtml" />
     <Content Include="Views\Shared\_Embed.cshtml" />
     <Content Include="Views\Shared\_FeedbackModal.cshtml" />
+    <Content Include="Views\Shared\_FeedbackTable.cshtml" />
     <Content Include="Views\Shared\_ImageGrid.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\_Layout.Embedded.cshtml" />
     <Content Include="Views\Shared\_LayoutBasic.cshtml" />
-    <Content Include="Views\Shared\_MembersAddModal.cshtml" />
+    <Content Include="Views\Shared\_Meetings.cshtml" />
+    <Content Include="Views\Shared\_Meetings_Teams.cshtml" />
+    <Content Include="Views\Shared\_Meetings_Zoom.cshtml" />
+    <Content Include="Views\Shared\_MembersModal.cshtml" />
+    <Content Include="Views\Shared\_MembersModalContent.cshtml" />
     <Content Include="Views\Shared\_MoveModal.cshtml" />
     <Content Include="Views\Shared\_MoveModalContent.cshtml" />
     <Content Include="Views\Shared\_MovePostModal.cshtml" />
     <Content Include="Views\Shared\_NavbarMenu.cshtml" />
     <Content Include="Views\Shared\_OfficeModal.cshtml" />
-    <Content Include="Views\Shared\_PeopleTable.cshtml" />
-    <Content Include="Views\Shared\_PersonalLayout.cshtml" />
     <Content Include="Views\Shared\_PhotoSwipe.cshtml" />
     <Content Include="Views\Shared\_Poll.cshtml" />
     <Content Include="Views\Shared\_Post.cshtml" />
@@ -4218,6 +4221,7 @@
     <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\DateTime.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Decimal.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Directory.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Double.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\DropDown.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\EmailAddress.cshtml" />
@@ -4232,7 +4236,6 @@
     <Content Include="Views\Shared\EditorTemplates\NoteType.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Password.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Pincode.cshtml" />
-    <Content Include="Views\Shared\EditorTemplates\Privacy.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\SpacePicker.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\SpaceType.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
@@ -4249,17 +4252,21 @@
     <Content Include="Views\Space\Index.cshtml" />
     <Content Include="Views\Space\Members.cshtml" />
     <Content Include="Views\Space\New.cshtml" />
-    <Content Include="Views\Space\Settings.cshtml" />
+    <Content Include="Views\Space\RecycleBin.cshtml" />
     <Content Include="Views\Star\_Index.cshtml" />
     <Content Include="Views\Star\_Star.cshtml" />
     <Content Include="Views\Star\Index.cshtml" />
-    <Content Include="Views\Test\_LoremIpsum.cshtml" />
+    <Content Include="Views\Test\Api.cshtml" />
     <Content Include="Views\Test\Client.cshtml" />
     <Content Include="Views\Test\Email.cshtml" />
+    <Content Include="Views\Test\Empty.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Test\LoremIpsum.cshtml" />
     <Content Include="Views\Test\Pickers.cshtml" />
     <Content Include="Views\Test\Redirected.cshtml" />
+    <Content Include="Views\Test\scrolltest.scss" />
     <Content Include="Views\Test\SSO.cshtml" />
+    <Content Include="Views\Test\Weavy.cshtml" />
     <Content Include="Views\Tools\Get.cshtml" />
     <Content Include="Views\Tools\Index.cshtml" />
     <Content Include="Views\UI\_Layout.cshtml" />
@@ -4271,6 +4278,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="Areas\Api\Controllers\AppsController.cs" />
+    <Compile Include="Areas\Api\Controllers\SearchController.cs" />
+    <Compile Include="Areas\Api\Controllers\SpacesController.cs" />
+    <Compile Include="Areas\Api\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Api\Models\SpaceMember.cs" />
+    <Compile Include="Areas\Api\Models\UserIn.cs" />
+    <Compile Include="Areas\Apps\Controllers\CommentsController.cs" />
     <Compile Include="Areas\Apps\Controllers\FilesController.cs" />
     <Compile Include="Areas\Apps\Controllers\FolderController.cs" />
     <Compile Include="Areas\Apps\Controllers\MessengerController.cs" />

@@ -1,0 +1,32 @@
+﻿@model Comments
+@{
+    Title = Model.Name;
+    bool details = ViewData["details"] as bool? ?? false;
+}
+
+@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
+
+<div class="container my-3">
+    <div data-type="app" data-id="@Model.Id">
+        <div class="section-comments app-comments">
+            <div id="infinite-scroll-target" class="list-group comments">
+                @if (Model.SearchResult.Any()) {
+                    Html.RenderPartial("_CommentSearchResult", Model.SearchResult);
+                }
+            </div>
+            @Html.ScrollMore(Model.SearchResult)
+            @Html.Partial("_CommentForm", Model, new ViewDataDictionary() { { "container", ".comments" } })
+        </div>
+    </div>
+</div>
+
+@section footer {
+    @{
+        Html.RenderPartial("_FeedbackModal");
+        Html.RenderPartial("_EditCommentModal");
+    }
+}

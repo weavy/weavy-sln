@@ -1,32 +1,16 @@
 ﻿@model User
-@{
-    bool isEditing = ControllerName == typeof(PeopleController).ControllerName() && (ActionName == nameof(PeopleController.EditAccount) || ActionName == nameof(PeopleController.EditProfile) || ActionName == nameof(PeopleController.EditSettings));
-    bool isSelf = Model.Id == User.Id;
-    bool isOther = !isSelf;
-    bool hasDeleteAndTrash = isOther && Model.HasPermission(Permission.Delete) && !Model.IsTrashed();
-    bool hasEdit = !isEditing && Model.HasPermission(Permission.Edit);
-}
-
-@if (Model.IsTrashed()) {
-    if (Model.HasPermission(Permission.Delete)) {
-        <form action="@(Url.Action<PeopleController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
-            <button type="submit" class="btn btn-icon" title="Restore user">@Svg.Icon("backup-restore", "success")</button>
-        </form>
-    }
-} else if (hasEdit || hasDeleteAndTrash) {
-    <div class="dropdown @(isOther && !hasEdit && !hasDeleteAndTrash ? "d-desktop" : "")" prevent-modal>
+@if (Model.IsTrashed() && Model.HasPermission(Permission.Delete)) {
+    <form action="@(Url.Action<PeopleController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
+        <button type="submit" class="btn btn-icon" title="Restore user">@Svg.Icon("backup-restore", "success")</button>
+    </form>
+} else if (Model.HasPermission(Permission.Edit)) {
+    <div class="dropdown" prevent-modal>
         <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
             @Svg.Icon("dots-vertical")
         </button>
         <div class="dropdown-menu dropdown-menu-right">
-            @if (hasEdit) {
-                if (isSelf) {
-                    <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))" data-target-panel="personal">@Svg.Icon("pencil", "primary") Edit</a>
-                } else {
-                    <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.EditProfile(Model.Id)))" data-target-panel="start">@Svg.Icon("pencil", "primary") Edit</a>
-                }
-            }
-            @if (hasDeleteAndTrash) {
+            <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Edit(Model.Id)))">@Svg.Icon("pencil", "primary") Edit</a>
+            @if (Model.Id != User.Id && Model.HasPermission(Permission.Delete)) {
                 <button type="button" class="dropdown-item" data-trash="user" data-id="@Model.Id">@Svg.Icon("delete", "danger") Trash</button>
             }
         </div>

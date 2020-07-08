@@ -1,0 +1,67 @@
+﻿@{
+    Layout = null;
+    Title = "API Test";
+}
+
+<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <title>@Html.Title(Title)</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
+    <style>
+        .widget {
+            height: 500px;
+            width: 100%;
+            border: 1px solid #eee;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="@Request.QueryString["clienturl"]/javascript/weavy.js"></script>
+</head>
+<body class="@BodyClasses()" @BodyAttributes>
+    <section id="client">
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <span class="badge badge-primary" title="Current user" id="user">Loading...</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h2 class="display-4 text-center">Messenger</h2>
+                <div id="messenger" class="widget"></div>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4 text-center">Posts</h2>
+                <div id="posts" class="widget"></div>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4 text-center">Files</h2>
+                <div id="files" class="widget"></div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        var customJwt = function () {
+            return new Promise(function (resolve, reject) {
+                //reject("Failed...");
+                resolve('@Request.QueryString["jwt"]')
+            });
+        }
+
+        Weavy.defaults.url = "@Request.QueryString["clienturl"]";
+        var weavy = window.weavy = new Weavy({ jwt: customJwt });
+        var space = weavy.space({ key: "api-test" });
+        space.app({ key: "messenger", type: "messenger", container: "#messenger" });
+        space.app({ key: "posts", type: "posts", container: "#posts" });
+        space.app({ key: "files", type: "files", container: "#files" });
+
+        weavy.on("load signed-in signed-out", function () {
+            $("#user").text("@@" + weavy.user.username);
+        });
+    </script>
+</body>
+</html>

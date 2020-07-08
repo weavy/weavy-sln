@@ -7,7 +7,6 @@ wvy.comments = (function ($) {
 
         // destroy editors
         document.addEventListener("turbolinks:before-cache", function () {
-            $("[data-editor-location='comment-edit']").weavyEditor("destroy");
             $(".weavy-editor").next("textarea.comments-form").weavyEditor("destroy");
         });
     } else {
@@ -15,17 +14,13 @@ wvy.comments = (function ($) {
     }
 
     function init() {
-        $("[data-editor-location='comment-edit']").weavyEditor({
-            polls: false,            
-            mode: 'fixed',
-            onSubmit: function (e, data) {
-                e.preventDefault();
-                $(this).closest("form").submit();
-            }
-        });
+        // initializing editor is very slow so we wrap the call in setTimeout to prevent blocking rendering
+        setTimeout(function () {
+            console.log("comments.js:init");
 
-        // any visible comment editors
-        initCommentEditor($("body.controller-posts textarea.comments-form:visible, body:not(.controller-posts) textarea.comments-form"));
+            // any visible comment editors
+            initCommentEditor($("body.controller-posts textarea.comments-form:visible, body:not(.controller-posts) textarea.comments-form"));
+        }, 1);
     }
 
     // init comment editor
@@ -139,7 +134,7 @@ wvy.comments = (function ($) {
         });
     };
 
-    // get comments for an entity, i.e. post or content
+    // get comments for an entity and update ui with result
     function getComments(id, type, expand) {
 
         // check if the entity is present on the page
@@ -151,7 +146,7 @@ wvy.comments = (function ($) {
         
         var $div = $(selector + " ." + type + "-comments");
         var $spinner = $(".spinner", $div);
-
+        
         // init weavy editor (if needed)               
         if (!$(selector + " .comments-form.emojionearea").length) {
             initCommentEditor($(selector  + " .comments-form"));
@@ -170,7 +165,7 @@ wvy.comments = (function ($) {
             url: (wvy.context.embedded ? "/e" : "") + wvy.url.mvc(type) + id + "/comments",
             method: "GET",
             cache: false
-        }).then(function (html) {
+        }).then(function (html) {            
             // remove spinner
             $spinner.remove();
 
@@ -192,27 +187,6 @@ wvy.comments = (function ($) {
 
         $(document).triggerHandler(event, json);
     }
-
-
-    // get comments on a post (maybe move this post specific function to posts.js?)
-    $(document).on("click", "[data-toggle=comments]", function (e) {
-        e.preventDefault();
-
-        var $post = $(this).closest(".post");
-        var $comments = $post.find(".post-comments");
-        var id = $post.data("post-id");
-
-        if ($comments.find(".comment").length) {
-            // show/hide existing comments
-            $comments.toggleClass("d-none");
-        } else {
-            if ($comments.hasClass("d-none")) {
-                getComments(id, "post", true);
-            } else {
-                $comments.addClass("d-none");
-            }
-        }
-    });
 
     // like comment
     $(document).on("click", "[data-comment-like]", function (e) {
@@ -303,13 +277,11 @@ wvy.comments = (function ($) {
 
         var target = $(e.relatedTarget);
         var path = target.data("path");
-        var title = target.attr("title");
 
         // clear show and start spinner
         var $modal = $(this);
         var $form = $("form.modal-content", $modal).addClass("d-none");
         var $div = $("div.modal-content", $modal);
-        var $title = $(".modal-title", $div).text(title);
         var $spinner = $(".spinner", $div).addClass("spin");
         $div.removeClass("d-none");
 
@@ -322,7 +294,7 @@ wvy.comments = (function ($) {
             
             $form.replaceWith(html);
 
-            var $editor = $("[data-editor-location='comment-edit']").weavyEditor({
+            $("[data-editor=comment]").weavyEditor({
                 collapsed: true,
                 embeds: false,
                 polls: false,
@@ -343,12 +315,13 @@ wvy.comments = (function ($) {
     });
 
     $(document).on("hide.bs.modal", "#edit-comment-modal", function (e) {
-        $("[data-editor-location='comment-edit']").weavyEditor("destroy");
-    })
+        $("[data-editor=comment]").weavyEditor("destroy");
+    });
 
     return {
         on: on,
-        initCommentEditor: initCommentEditor
+        initCommentEditor: initCommentEditor,
+        getComments: getComments
     }
 
 })(jQuery)

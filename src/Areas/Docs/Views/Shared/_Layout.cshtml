@@ -1,0 +1,35 @@
+﻿@using Weavy.Web.Utils
+<!DOCTYPE html>
+<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
+    <meta name="turbolinks-cache-control" content="no-preview">
+    <title>@Title</title>
+    @Html.ThemeHead()
+    @Html.ThemeStyle("~/areas/docs/styles/docs.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @Bundler.Scripts("~/areas/docs/scripts/docs.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+</head>
+<body class="has-navbar api-docs">
+    <nav class="navbar fixed-top navbar-dark bg-dark">
+        <div class="navbar-icon">
+            @if (Back != null) {
+                <a class="btn btn-icon text-white" href="@Back" title="Back">@Svg.Icon("arrow-left", "fff")</a>
+            }
+        </div>
+        <div class="navbar-middle">
+            <a class="btn btn-icon" href="@(Url.Action<Weavy.Web.Areas.Docs.Controllers.HomeController>(x=>x.Index()))">
+                @Html.IconImg(24)
+            </a>
+        </div>
+        <div class="navbar-icon text-white">
+            <text>v</text>@Weavy.Core.Bootstrapper.Version.ToString()
+        </div>
+    </nav>
+    <main class="py-3">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+</body>
+</html>

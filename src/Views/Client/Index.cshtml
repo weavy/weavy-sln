@@ -1,0 +1,40 @@
+﻿@model UserSearchResult
+@{
+    Title = "Clients";
+    Back = Url.Action<ManageController>(c => c.Index());
+    var category = ViewContext.RouteData.Values["category"] as string;
+}
+
+@section fab {
+    <div class="fab">
+        <a class="btn btn-round btn-primary" href="@(Url.Action<ClientController>(c => c.New()))" title="Create client">@Svg.Icon("plus")</a>
+    </div>
+}
+
+<div class="container-fluid my-3">
+    @if (Model.HasItems()) {
+        <table class="table table-hover table-name-desc">
+            <thead>
+                <tr>
+                    <th class="table-icon"></th>
+                    <th>Display name</th>
+                    <th>Client Id</th>
+                    <th class="table-icon"></th>
+                </tr>
+            </thead>
+            <tbody id="infinite-scroll-target">
+                @{ Html.RenderPartial("_Clients", Model); }
+            </tbody>
+        </table>
+        @Html.ScrollMore(Model)
+
+    } else {
+        <p class="text-muted text-center pt-3">There are no clients yet. Do you want to <a href="@(Url.Action<ClientController>(c=>c.New()))">create a client</a>?</p>
+    }
+
+    @if (Model.Query.Trashed ?? false) {
+        <p class="text-muted text-center"><small>Back to <a href="@(Url.Action<ClientController>(c => c.Index(null, null)))">active</a> clients.</small></p>
+    } else if ((ViewBag.Trashed ?? false)) {
+        <p class="text-muted text-center"><small>See <a href="@(Url.Action<ClientController>(c => c.Index(null, "trashed")))">trashed</a> clients.</small></p>
+    }
+</div>

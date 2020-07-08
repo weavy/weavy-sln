@@ -1,0 +1,15 @@
+﻿@model Weavy.Core.Models.Directory
+@{
+    Title = "Add directory";
+    Back = Url.Action<DirectoriesController>(c => c.Index(null));
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(DirectoriesController.Insert), null, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.EditorsForModel()
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+        </div>
+    }
+</div>

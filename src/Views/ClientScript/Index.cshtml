@@ -1,4 +1,4 @@
-﻿@model WeavyLoaderOptions
+﻿@model ClientScriptOptions
 @{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
     Title = "Weavy Client Configurator";
@@ -56,7 +56,6 @@
     <form action="@(Url.Action<ClientScriptController>(c => c.Index(null)))" method="post" id="weavy-wizard" data-turboform>
         @Html.EditorsForModel()
     </form>
-
 
     <h4 class="display-2 mt-5">Client SDK</h4>
     <p>You can reference the url directly or download a local copy of the file to include in your app or site.</p>

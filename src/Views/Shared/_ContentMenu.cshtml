@@ -12,7 +12,7 @@
 
         @if (Model is IFile file) {
             if (FileUtils.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
-                <a class="dropdown-item" href="@file.OfficeUrl()" data-type="content" data-id="@file.Id">@Svg.Icon(Model)<span>Open in @OfficeUtils.GetProductName(file.Name)</span></a>
+                <a class="dropdown-item" href="@file.OfficeUrl(hmac: true)" target="_blank">@Svg.Icon(Model)<span>Open in @OfficeUtils.GetProductName(file.Name)</span></a>
             }
             <a class="dropdown-item" href="@file.ContentUrl(download: true)">@Svg.Icon("download", "primary")<span>Download</span></a>
         }

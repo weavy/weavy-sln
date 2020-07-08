@@ -5,7 +5,7 @@ tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
 
     // perform some things on init
     editor.on("init", function () {
-
+        
         // start autosave
         wvy.autosave.registerEditor();
         
@@ -72,17 +72,17 @@ tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
         { label: "Redo", shortcut: "+Y" }
     ];
 
-    editor.addMenuItem("help", {
+    editor.ui.registry.addMenuItem("help", {
         icon: "help",
         text: "Keyboard shortcuts",
         context: 'tools',
-        onclick: showDialog
+        onAction: showDialog
     });
 
-    editor.addButton("help", {
+    editor.ui.registry.addButton("help", {
         tooltip: "Keyboard shortcuts",
         icon: "help",
-        onclick: showDialog
+        onAction: showDialog
     });
 
     // register shortcuts

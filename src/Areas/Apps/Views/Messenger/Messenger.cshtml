@@ -38,8 +38,9 @@
             </nav>
         </div>
     </div>
-
-    @if (Model.Conversation == null) {
+    <div class="alerts">@Html.AlertMessages()</div>
+    @if (Model.Conversation == null)
+    {
         <main class="pane" id="main">
             <header class="pane-header">
                 <div class="pane-title">&nbsp;</div>
@@ -48,12 +49,15 @@
                 Welcome! Go ahead and <a href="#new-message-modal" data-toggle="modal">write your first message</a>.
             </p>
         </main>
-    } else {
+    }
+    else
+    {
         <main id="main" class="pane conversation@(Model.Conversation.IsRoom ? " room" : "")@(Model.Conversation.IsPinned ? " pinned" : "")@(Model.Conversation.IsStarred() ? " starred" : "")@(Model.Conversation.IsRead ? "" : " unread")" data-id="@Model.Conversation.Id">
             <header class="pane-header">
                 <div class="pane-actions">
                     <a href="@(Url.Action<MessengerController>(c => c.Index(null)))" class="btn btn-primary btn-icon btn-back">@Svg.Icon("arrow-left")</a>
-                    @if (WeavyContext.Browser.Mobile) {
+                    @if (WeavyContext.Browser.Mobile)
+                    {
                         <span class="badge badge-danger text-truncate">@(Model.Unread > 0 ? Model.Unread.ToString() : "")</span>
                     }
                     <a href="@(Url.Action<MessengerController>(c => c.Messenger(Model.Conversation.Id, null)))" class="btn btn-icon btn-avatar">@Model.Conversation.AvatarImg(24)</a>

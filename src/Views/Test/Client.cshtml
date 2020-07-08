@@ -37,8 +37,8 @@
             fill: currentColor;
         }
 
-        .navbar {
-            height: 3.5rem;
+        .navbar-brand {
+            padding: 0;
         }
 
             .navbar-brand img {
@@ -46,7 +46,27 @@
                 height: 2rem;
             }
 
-        .weavy-drawer {
+        .nav-link {
+            cursor: pointer;
+            position: relative;
+        }
+
+            .nav-link .badge {
+                position: absolute;
+                right: 0;
+                top: .5rem;
+                border-radius: 1rem;
+                padding: .25rem;
+                min-width: 1rem;
+                max-width: 2rem;
+                height: 1rem;
+                line-height: .5rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+        .drawer {
             position: fixed;
             top: 3.5rem;
             bottom: 0;
@@ -61,54 +81,39 @@
             border-left: 1px solid #333;
         }
 
-        .weavy-drawer.weavy-drawer-in {
-            transform: none;
+            .drawer.open {
+                transform: none;
+            }
+
+        .panel {
+            padding: 15px;
+            height: calc(100vh - 3.625rem);
         }
 
-        .weavy-panel-block {
-            width: 320px;
-            height: 472px;
-            border: 1px solid #333;
-            border-radius: 3px;
-            display: none;
-            position: relative;
-        }
-
-        .weavy-panel-tile {
-            width: 320px;
-            height: 472px;
+        .panel-close {
         }
     </style>
 
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark text-light">
-        <a class="navbar-brand mr-auto" href="~/test/client">@Html.IconImg(24) Client Test</a>
-        <a id="weavyRightButtonPosts" class="nav-link p-2">@Svg.Icon("weavy")</a>
-        <a id="weavyRightButtonPersonal" class="nav-link p-2">@Svg.Icon("bell")</a>
-        <a id="weavyRightButtonMessenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
+    <nav class="navbar  navbar-expand navbar-dark bg-dark text-light">
+        <a class="navbar-brand" href="~/test/client">@Html.IconImg(24)</a>
+        <a id="btn-sign-in" class="nav-link">Sign in</a>
+        <a id="btn-sign-out" class="nav-link">Sign out</a>
+        <a id="btn-toggle-files" class="nav-link mr-auto">Toggle Files</a>
+        <a id="notifications" class="nav-link p-2">@Svg.Icon("bell")</a>
+        <a id="messenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
     </nav>
 
-    <div class="container-fluid py-3">
-        <div class="py-3">
-            <button id="weavySignOut" class="btn btn-primary">Sign out</button>
-            <button id="weavySignIn" class="btn btn-primary">Sign in</button>
+    <div class="container-fluid">
+        <div class="row">
+            <div id="panel-files" class="col panel"></div>
+            <div id="panel-posts" class="col panel"></div>
+            <div id="panel-comments" class="col panel"></div>
         </div>
-        <div>
-            <button id="weavyPanelBlockToggle" class="btn btn-danger">Toggle @app.Name</button>
-            <div id="weavyPanelBlock" class="weavy-panel-block"></div>
-        </div>
-        <div class="weavy-panel-right">
-            <div id="weavyPanelRight" class="weavy-drawer"></div>
-        </div>
-
     </div>
 
-    <div class="container-fluid py-3 d-flex">
-        <div id="weavyPanelTile" class="weavy-panel-tile card mr-3"></div>
-        <div id="weavyPanelTilePosts" class="weavy-panel-tile card"></div>
-    </div>
-
+    <div id="drawer" class="drawer"></div>
     <section id="weavyOverlay"></section>
 
     <script>
@@ -116,14 +121,16 @@
 
             var weavy = window.weavy = new Weavy({
                 id: "ctx",
+                @if (ViewBag.Token != null) {
+                <text>jwt: "@ViewBag.Token",</text>
+                }
                 spaces: [
                     {
-                        key: "client-test-hub",
-                        name: "Client Test Hub",
-                        container: $("#weavyPanelRight"),
+                        key: "client-test-global",
+                        name: "Client Test Global",
+                        container: $("#drawer"),
                         tabbed: true,
                         apps: [
-                            { key: "posts", type: "posts" },
                             { key: "notifications", type: "notifications" },
                             { key: "messenger", type: "messenger" }
                         ]
@@ -132,14 +139,11 @@
                         id: @space.Id,
                         apps: [
                             {
-                                id: @app.Id,
-                                open: false,
-                                container: $("#weavyPanelBlock")
+                                id: @app.Id
                             },
                             {
                                 key: "files",
-                                type: "files",
-                                container: $("#weavyPanelTile")
+                                type: "files"
                             }
                         ]
                     }
@@ -147,68 +151,58 @@
             });
 
             var space = weavy.space({ key: "client-test-demo" });
-            var app = space.app({ key: "posts", type: "posts", container: "#weavyPanelTilePosts"});
+            var files = space.app({ key: "files", type: "files", container: "#panel-files"});
+            var posts = space.app({ key: "posts", type: "posts", container: "#panel-posts" });
+            var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments" });
 
-            $("#weavySignOut").on("click", function () {
+            $("#btn-sign-out").on("click", function () {
                 console.log("click signOut");
                 weavy.authentication.signOut();
             });
 
-            $("#weavySignIn").on("click", function () {
+            $("#btn-sign-in").on("click", function () {
                 console.log("click signIn");
                 weavy.authentication.signIn();
             });
 
-            $("#weavyRightButtonPosts").on("click", function () {
-                console.log("click hub posts");
-                weavy.space("client-test-hub").toggle({ key: "posts" });
+            $("#btn-toggle-files").on("click", function () {
+                console.log("toggle files");
+                weavy.space("client-test-demo").app(files).toggle();
             });
 
-            $("#weavyRightButtonPersonal").on("click", function () {
-                console.log("click hub notifications");
-                weavy.space("client-test-hub").toggle({ key: "notifications" });
+            $("#notifications").on("click", function () {
+                console.log("click notifications");
+                weavy.space("client-test-global").app("notifications").toggle();
             });
 
-            $("#weavyRightButtonMessenger").on("click", function () {
-                console.log("click hub messenger");
-                weavy.space("client-test-hub").toggle({ key: "messenger" });
-            });
-
-            $("#weavyPanelBlockToggle").on("click", function () {
-                console.log("click block");
-                weavy.space(@space.Id).toggle({ id: @app.Id });
+            $("#messenger").on("click", function () {
+                console.log("click messenger");
+                weavy.space("client-test-global").app("messenger").toggle();
             });
 
 
             weavy.on("badge", function (e, badge) {
-                setBadge("#weavyRightButtonPersonal", badge.notifications);
-                setBadge("#weavyRightButtonMessenger", badge.conversations);
+                setBadge("#notifications", badge.notifications);
+                setBadge("#messenger", badge.conversations);
             });
 
             weavy.on("open", function (e, open) {
-                if (open.space.options.key === "client-test-hub") {
+                if (open.space.options.key === "client-test-global") {
                     weavy.log("on:open (hub)", open);
-                    $("#weavyPanelRight").addClass("weavy-drawer-in");
-                }
-
-                if (open.space.id === @space.Id && open.app.id === @app.Id) {
-                    weavy.log("on:open (block)", open);
-                    $("#weavyPanelBlock").slideDown();
+                    $("#drawer").addClass("open");
                 }
             });
 
             weavy.on("close", function (e, close) {
-                if (close.space.options.key === "client-test-hub") {
-                    weavy.log("on:close (hub)", open);
-                    $("#weavyPanelRight").removeClass("weavy-drawer-in");
-                    if (weavy.nodes.panels) {
-                        weavy.nodes.panels.classList.remove("weavy-wide");
-                    }
+                if (close.space.options.key === "client-test-global") {
+                    weavy.log("on:close (hub)", close);
+                    $("#drawer").removeClass("open");
                 }
 
-                if (close.space.id === @space.Id && close.app.id === @app.Id) {
-                    $("#weavyPanelBlock").slideUp();
-                }
+            });
+
+            weavy.on("user-error", function () {
+                weavy.alert("User token is invalid. <a href='javascript:window.location.reload();'>Reload</a>", true)
             });
 
             function setBadge(selector, count) {
@@ -217,7 +211,7 @@
                     if ($badge.length) {
                         $badge.text(count);
                     } else {
-                        $('<span class="badge badge-info">' + count + '</span>').appendTo(selector);
+                        $('<span class="badge badge-danger">' + count + '</span>').appendTo(selector);
                     }
                 } else {
                     $(selector + " .badge").remove();

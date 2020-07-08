@@ -34,6 +34,12 @@
   <Target Name="Publish" DependsOnTargets="Restore">
     <Message Text="Publishing project" Importance="High" />
     <MSBuild Projects="@(SolutionFile)" Properties="Configuration=$(Configuration);DeployOnBuild=true;DeployDefaultTarget=WebPublish;WebPublishMethod=FileSystem;DeleteExistingFiles=true;publishUrl=$(MSBuildProjectDirectory)\dist\published" />
+    
+    <!-- copy xml files for web api documentation -->
+    <ItemGroup>
+      <DocFiles Include="$(MSBuildProjectDirectory)\src\bin\Weavy*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DocFiles)" DestinationFolder="$(MSBuildProjectDirectory)\dist\published\bin" SkipUnchangedFiles="false" />
   </Target>
 
   <!-- package restore -->

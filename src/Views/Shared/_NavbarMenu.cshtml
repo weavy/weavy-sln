@@ -35,6 +35,7 @@
                 @Html.IconImg(24)<span>Start</span>
             </a>
             
+            @if (visited.Any()) {
             <div class="active-spaces">
                 @foreach (var space in visited) {
                     <a href="@space.Url()" class="dropdown-item@(space.Id == WeavyContext.Space?.Id ? " active" : "")">
@@ -42,6 +43,7 @@
                     </a>
                 }
             </div>
+            }
 
             @(Html.ActionLink<SpaceController>(c => c.Index(null, null), icon: "view-grid", color: "primary", text: "Spaces", htmlAttributes: new { @class = "dropdown-item spaces" }, active: LinkActive.Action))
 

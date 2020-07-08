@@ -1,0 +1,19 @@
+﻿@model Weavy.Core.Models.Directory
+@{
+    Title = "Edit directory";
+    Back = Url.Action<DirectoriesController>(c => c.Index(null));
+}
+
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(DirectoriesController.Update), null, new { id = Model.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.EditorsForModel()
+        <div class="form-buttons">
+            <button type="submit" name="button" value="@nameof(DirectoriesController.Update)" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+
+            <button type="submit" name="button" value="@nameof(DirectoriesController.Delete)" class="btn btn-danger btn-load" title="Delete">Delete</button>
+        </div>
+    }
+</div>

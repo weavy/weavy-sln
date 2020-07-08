@@ -596,8 +596,9 @@ pre[class*="language-"] {
 }
 body {
   color: #545454;
-  font-size: 16px;
+  font-size: 1rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  padding: 0 0.5rem !important;
 }
 h1,
 h2,
@@ -657,4 +658,10 @@ table td {
 }
 img {
   max-width: 100%;
+}
+.mce-content-body:not([dir=rtl])[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  left: unset;
+}
+.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  color: #8C8C8C;
 }

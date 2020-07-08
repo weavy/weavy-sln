@@ -1,12 +1,8 @@
 ﻿var wvy = wvy || {};
 
 wvy.share = (function ($) {
-
-    document.addEventListener("turbolinks:before-cache", function () {
-        $(".weavy-editor").next("textarea[data-editor-location=share]").weavyEditor("destroy");        
-    });
-
-    // populate share modal
+    
+    // show share modal
     $(document).on("show.bs.modal", "#share-modal", function (e) {
         // first reset form
         var $modal = $(this);
@@ -20,7 +16,7 @@ wvy.share = (function ($) {
         var $textarea = $modal.find("textarea[name=Text]");
         var $submit = $modal.find("button[type=submit]");
         
-        var $editor = $("[data-editor-location='share']").weavyEditor({
+        var $editor = $("[data-editor=share]").weavyEditor({
             collapsed: true,
             pickerCss: 'collapsed-static',
             placeholder: $textarea.attr("placeholder"),
@@ -40,6 +36,11 @@ wvy.share = (function ($) {
         $editor.weavyEditor('reset');
     });
 
+    // hide share modal
+    $(document).on("hide.bs.modal", "#share-modal", function (e) {
+        $(".weavy-editor").next("textarea[data-editor-location=share]").weavyEditor("destroy");        
+    });
+
     // submit share
     $(document).on("submit", "#share-form", function (e) {
         e.preventDefault();
@@ -57,9 +58,11 @@ wvy.share = (function ($) {
             // hide modal
             $modal.modal("hide");
         }).fail(function (xhr) {
+            
+            $editor.addClass("is-invalid");
+
             var json = JSON.parse(xhr.responseText);
             $form.find(".invalid-feedback").text(json.message);
-            $editor.addClass("is-invalid");
         }).always(function () {
             // enable button 
             $form.find(".btn-load").removeAttr("disabled");

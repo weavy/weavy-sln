@@ -1,14 +1,6 @@
 ﻿@{
-    // create token valid for 60 seconds
-    var token = JwtUtils.Encode(new Dictionary<string, object> {
-        { "iss", "SSO.cshtml"}, // required
-        { "sub", "testsub"}, // required
-        //{ "email", "sso.test@weavy.com"},
-        //{ "username", "ssotest"},
-        //{ "name", "SSO Test"},
-        { "picture", "https://image.freepik.com/free-vector/businessman-profile-cartoon_18591-58479.jpg" },
-        { "exp", DateTime.UtcNow.AddSeconds(60).ToUnixTime()} // required}
-    });
+
+    var token = ViewBag.Token as string;
 }
 
 @section scripts {
@@ -31,7 +23,7 @@
             console.info("checking authentication status using AJAX");
             $.ajax({
                 url: '/client/user',
-                method: "GET"
+                method: "POST"
             }).done(function (data) {
                 // display result
                 $("#result").text(JSON.stringify(data, null, 2));
@@ -44,7 +36,7 @@
         $(document).on("click", "#signout", function () {
             console.info("signing out using ajax");
             $.ajax({
-                url: '/sign-out',
+                url: '/client/sign-out',
                 method: "GET"
             }).done(function (data) {
                 // display result
@@ -57,13 +49,17 @@
 
         $(document).on("click", "#ajax", function () {
             console.info("signing in with token using AJAX");
-            $.ajax({
-                url: '/client/sign-in',
+            $.ajax("/client/sign-in", {
+                crossDomain: true,
                 contentType: "application/json",
-                data: JSON.stringify({ jwt: token }),
-                method: "POST",
+                method: "GET",
                 xhrFields: {
                     withCredentials: true
+                },
+                // https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             }).done(function (data) {
                 // display result
@@ -76,7 +72,9 @@
 
         $(document).on("click", "#authentication", function () {
             console.info("signing in with token using wvy.authentication");
-            wvy.authentication.default.sso(token).then(function () {
+            wvy.authentication.default.setJwt(token);
+            wvy.authentication.default.signIn().then(function () {
+                
                 $("#result").text("signalR signed-in " + wvy.authentication.default.isAuthenticated());
             });
         });
@@ -117,7 +115,6 @@
 
     <script id="footer-scripts">
         console.log("footer-scripts");
-
         token = "@token";
         console.log("token", token);
         setTokenTimeout();

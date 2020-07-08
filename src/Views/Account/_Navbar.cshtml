@@ -1,9 +1,8 @@
 ﻿@model User
 <nav class="nav nav-tabs">
-    @(Html.ActionLink<AccountController>(c => c.EditProfile(), text: "Profile", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
-    @(Html.ActionLink<AccountController>(c => c.EditSettings(), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-    @(Html.ActionLink<AccountController>(c => c.EditAccount(), text: "Account", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    @(Html.ActionLink<AccountController>(c => c.Edit(), text: "Profile", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
+    @(Html.ActionLink<AccountController>(c => c.Settings(), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
     @if (ConfigurationService.FormsAuthentication && !ConfigurationService.WindowsAuthentication) {
-        @(Html.ActionLink<AccountController>(c => c.EditPassword(), text: "Password", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<AccountController>(c => c.Password(), text: "Password", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
     }
 </nav>

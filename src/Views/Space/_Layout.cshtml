@@ -36,10 +36,9 @@
 
 @section footer {
     @{
-        Html.RenderPartial("_AjaxModal");
-        Html.RenderPartial("_ConnectModal");
         Html.RenderPartial("_DrawerSpace");
-        Html.RenderPartial("_MembersAddModal");
+        Html.RenderPartial("_AjaxModal");
+        Html.RenderPartial("_MembersModal");
         @RenderSection("footer", required: false)
     }
 }

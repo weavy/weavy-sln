@@ -1,4 +1,6 @@
 ﻿@model Weavy.Core.Models.File
+@using System.Collections.Specialized
+
 @{
     Title = Model.Name ?? "Untitled";
     var current = Model is IVersionable versionable ? versionable.IsCurrent() : true;
@@ -9,6 +11,7 @@
     }
 
     var fmt = FileUtils.GetPreviewFormat(Model.Blob.Name);
+    NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(WeavyContext.App, Model) : null;
 }
 
 @if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)
@@ -36,11 +39,10 @@
 
         }
         else if (fmt == PreviewFormat.Image || fmt == PreviewFormat.Document)
-        {
-            var attrs = Html.PreviewAttributes(WeavyContext.App, Model);
+        {            
             <div class="text-center">
                 <figure class="figure">
-                    <a href="@Model.ContentUrl()" @Html.Raw(attrs.AsHtmlAttributes())><img src="@Model.ThumbUrl(480, 480)" class="figure-img img-fluid d-block mx-auto" alt="@Model.Name" /></a>
+                    <a href="@Model.ContentUrl()" @Html.Raw(attrs?.AsHtmlAttributes())><img src="@Model.ThumbUrl(480, 480)" class="figure-img img-fluid d-block mx-auto" alt="@Model.Name" /></a>
                 </figure>
             </div>
         }
@@ -51,7 +53,7 @@
         <table class="table table-bordered mx-auto">
             <tr>
                 <th>Name</th>
-                <td><a href="@Model.ContentUrl()">@Model.Name</a></td>
+                <td><a href="@Model.ContentUrl()" @(attrs != null ? Html.Raw(attrs.AsHtmlAttributes()): MvcHtmlString.Empty)>@Model.Name</a></td>
             </tr>
 
             @if (Model.GetExcerpt() != null)

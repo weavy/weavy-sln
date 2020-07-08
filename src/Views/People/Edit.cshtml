@@ -1,0 +1,57 @@
+﻿@model UserModel
+@{
+    Title = "People";
+    Back = Url.Action<PeopleController>(c => c.Index(null, Model.IsSuspended ? "suspended": null));
+}
+
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
+}
+
+@section navbar_secondary {
+<nav class="nav nav-tabs">
+    @(Html.ActionLink<PeopleController>(c => c.Edit(Model.Id), text: "Details", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
+    @(Html.ActionLink<PeopleController>(c => c.Settings(Model.Id), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+</nav>
+}
+
+<div class="container my-3">
+    @using (Html.BeginForm(nameof(PeopleController.Update), typeof(PeopleController).ControllerName(), FormMethod.Post, new { id = "update-profile-form", autocomplete = "off", data_turboform = "", novalidate = "" })) {
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+
+        <div class="text-center">
+            @Html.EditorFor(x => Model.Avatar, additionalViewData: new { PreviewImage = Model.PreviewUrl })
+        </div>
+        @Html.EditorFor(x => Model.Profile.Name)
+        @Html.EditorFor(x => Model.Email)
+        @Html.EditorFor(x => Model.Username)
+        if (ConfigurationService.FormsAuthentication && !ConfigurationService.WindowsAuthentication) {
+            @Html.EditorFor(x => Model.Password)
+        }
+
+        @Html.EditorsForModel(Model.Profile, exclude: new string[] { nameof(Model.Profile.Name)}, formText:false)
+
+        @Html.EditorFor(x => Model.Comment)
+        @Html.EditorFor(x => Model.DirectoryId)
+
+        <div class="form-group">
+            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { FormGroup = false })
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+        </div>
+    }
+
+    @if (Model.Logins.Any()) {
+        <h6>Linked accounts</h6>
+        <ul class="list-unstyled">
+            @foreach (Login login in Model.Logins) {
+                <li>@login.Type / @(login.Email ?? login.Sub)</li>
+            }
+        </ul>
+    }
+
+</div>

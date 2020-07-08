@@ -2,6 +2,7 @@
 ~/scripts/src/authentication.js
 ~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/src/connection.js
+~/scripts/src/client/promise.js
 ~/scripts/src/client/utils.js
 ~/scripts/src/client/console.js
 ~/scripts/src/client/events.js
@@ -17,5 +18,5 @@
 ~/scripts/src/client/plugins/alert.js
 ~/scripts/src/client/plugins/filebrowser.js
 ~/scripts/src/client/plugins/preview.js
-~/scripts/src/client/plugins/sign-in.js
+~/scripts/src/client/plugins/authentication-panel.js
 ~/scripts/src/client/plugins/theme.js

@@ -1,0 +1,64 @@
+﻿@model Attachment
+@{
+    Title = Model.GetTitle() ?? "Untitled";
+    Back = null;
+    Layout = WeavyContext.Current.IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+
+    var attachment = Model;
+    var parent = attachment.Parent;
+    var attrs = Html.PreviewAttributes(parent, attachment);
+}
+
+@if (attrs.AllKeys.Contains("data-photoswipe")) {
+    <script type="text/javascript" async>
+        var photoswipeOptions = {
+            slides: [{
+                id: @attrs["data-id"], // the entity id
+                type: "@attrs["data-type"]", // the entity type (attachment or content)
+                name: "@attrs["data-name"]", // name to display in header
+                href: "@attachment.Url()",
+                src: "@attrs["data-src"]" || "@attachment.Url()",
+                w: @attachment.Blob.Width,
+                h: @attachment.Blob.Height,
+                //thumb: $('<img src="@attrs["data-thumb-src"]" />').css({ position: "absolute", top: 0, left: 0, zIndex: -1000, opacity: 0, display: "none" }).appendTo("body")[0]
+                download: "@attrs["data-download"]", // url for downloading file
+                starred: @(attrs["data-starred"] == "true" ? "true" : "false"), // true|false indicating if document is starred (if starrable)
+                comments: @(attrs["data-comments"] ?? "null"), // number of comments (if commentable)
+            }],
+            index: 0
+        };
+
+        wvy.whenLoaded.then(function () {
+            wvy.photoswipe.open(photoswipeOptions, true);
+        });
+    </script>
+} else if (attrs.AllKeys.Contains("data-preview")) {
+    <script type="text/javascript" async>
+        var previewOptions = {
+            url: "@attachment.Url()",
+            src: "@attrs["data-src"]",
+            preview: "@attrs["data-preview"]", // url to pdf
+            name: "@attrs["data-name"]", // name to display in header
+            icon: "@attrs["data-icon"]", // icon of item (used for open in office)
+            download: "@attrs["data-download"]", // url for downloading file
+            office: "@attrs["data-office"]", // url for opening document in office
+            starred: @(attrs["data-starred"] == "true" ? "true" : "false"), // true|false indicating if document is starred (if starrable)
+            comments: @(attrs["data-comments"] ?? "null"), // number of comments (if commentable)
+            type: "@attrs["data-type"]", // the entity type (attachment or content)
+            id: @attrs["data-id"] // the entity id
+        };
+
+        wvy.whenLoaded.then(function () {
+            wvy.preview.open(previewOptions);
+        });
+    </script>
+} else {
+    <article class="container my-3" data-type="attachment" data-id="@Model.Id" data-content-id="@Model.Id">
+        <div>
+            @{Html.RenderPartial("_Download", Model);}
+        </div>
+    </article>
+}
+
+
+

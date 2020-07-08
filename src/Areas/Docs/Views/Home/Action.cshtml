@@ -1,0 +1,109 @@
+@model ActionDoc
+@{
+    Title = Model.Method + " " + Model.Route;
+    Back = Url.Action<HomeController>(c => c.GetControllerDocumentation(Model.ControllerId));
+}
+<h1 class="display-1">@Title</h1>
+@if (Model.Description != null) {
+    <p>@Model.Description @if (Model.Remarks != null) {<em>@Model.Remarks</em>}</p>
+}
+
+<div class="row">
+    <div class="col request">
+        <h2 class="display-2">Request</h2>
+
+        @if (!string.IsNullOrEmpty(Model.Example)) {
+            <p>Example:</p>
+            <pre><code class="language-http">@Model.Example</code></pre>
+        }
+
+        @if (Model.UrlParameters.Any()) {
+            <p>Url parameters:</p>
+            <ul class="method-params">
+                @foreach (var parameter in Model.UrlParameters) {
+                    if (parameter.Type.IsValueType) {
+                        <li>
+                            <code>@parameter.Name</code>
+                            <span>@parameter.Type.DisplayName()</span>
+                            @if (parameter.Required) {
+                                <span class="text-danger">required</span>
+                            }
+                            <p>@parameter.Description</p>
+                        </li>
+                    }
+                }
+            </ul>
+        }
+        @if (Model.QueryParameters.Any()) {
+            <p>Query string parameters:</p>
+            <ul class="method-params">
+                @foreach (var parameter in Model.QueryParameters) {
+                    if (parameter.Properties.Any()) {
+                        foreach (var prop in parameter.Properties) {
+                            <li>
+                                <code>@prop.Name</code>
+                                <span>@prop.Type.DisplayName()</span>
+                                @if (prop.Required && Model.Method != "PATCH") {
+                                    <span class="text-danger">required</span>
+                                }
+                                <p>@prop.Description</p>
+                            </li>
+                        }
+                    } else {
+                        <li>
+                            <code>@parameter.Name</code>
+                            <span>@parameter.Type.DisplayName()</span>
+                            @if (parameter.Required && Model.Method != "PATCH") {
+                                <span class="text-danger">required</span>
+                            }
+                            <p>@parameter.Description</p>
+                        </li>
+                    }
+                }
+            </ul>
+        }
+
+        @if (Model.BodyParameter != null) {
+            <p>Body parameters:</p>
+            <ul class="method-params">
+                @if (Model.BodyParameter.Properties.Any()) {
+                    foreach (var prop in Model.BodyParameter.Properties) {
+                        <li>
+                            <code>@prop.Name</code>
+                            <span>@prop.Type.DisplayName()</span>
+                            @if (prop.Required && Model.Method != "PATCH") {
+                                <span class="text-danger">required</span>
+                            }
+                            <p>@prop.Description</p>
+                        </li>
+                    }
+                } else {
+                    <li>
+                        <span>@Model.BodyParameter.Type.DisplayName()</span>
+                        @if (Model.BodyParameter.Required && Model.Method != "PATCH") {
+                            <span class="text-danger">required</span>
+                        }
+                        <p>@Model.BodyParameter.Description</p>
+                    </li>
+                }
+            </ul>
+        }
+
+    </div>
+
+    @if (Model.Response != null) {
+
+        <div class="col response">
+            <h2 class="display-2">Response</h2>
+
+            @if (Model.Response.Description != null) {
+                <p>Returns: @Model.Response.Description</p>
+            }
+
+            @if (Model.Response.Sample != null) {
+                <pre><code class="language-json">@Model.Response.Sample.SerializeToJson()</code></pre>
+            }
+
+        </div>
+    }
+</div>

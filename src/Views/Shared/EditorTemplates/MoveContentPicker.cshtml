@@ -27,7 +27,7 @@
 @if (!IsEmbedded) {
 
     // get spaces where we have content permission
-    spaces = SpaceService.Search(new SpaceQuery() { Archived = false, Filter = true, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Content));
+    spaces = SpaceService.Search(new SpaceQuery() { Archived = false, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Content));
 
     // get Files apps for each space above
     apps = spaces.Select(s => AppService.GetApps<Files>(s.Id).FirstOrDefault()).Where(a => a != null);

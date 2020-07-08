@@ -2,28 +2,15 @@
 
 var wvy = wvy || {};
 
-(function ($) {
+wvy.photoswipe = (function ($) {
+
+    var _photoswipes = new Set();
 
     // open photoswipe on click
     $(document).on("click", "[data-photoswipe]", function (e) {
-        // open weavy client preview
-        if (wvy.browser.framed) {
-            wvy.postal.postToParent({ name: "preview-open" });
-        }
-
         e.preventDefault();
 
-        photoswipe($(this));
-    });
-
-    // cleanup before cache (needed when clicking back in the browser)
-    $(document).on("turbolinks:before-cache", function () {
-        // close photoswipe
-        $(".pswp--open").removeClass("pswp--open pswp--animate_opacity pswp--notouch pswp--css_animation pswp--svg pswp--animated-in pswp--has_mouse");
-    });
-
-    function photoswipe(element, noZoomAnimation) {
-        var $element = $(element);
+        var $element = $(this);
         var photoswipeId = $element.data("photoswipe");
 
         var $elements = $("[data-photoswipe=" + photoswipeId + "]");
@@ -37,6 +24,35 @@ var wvy = wvy || {};
                 index = i;
             }
         });
+
+        var photoOptions = {
+            slides: slides,
+            index: index
+        };
+
+        wvy.postal.whenLeader.then(function () {
+            // open with options from data attributes
+            open(photoOptions);
+        }).catch(function () {
+
+            photoOptions.slides.forEach(function (slide) { delete slide.thumb; })
+            openInParent(photoOptions);
+        });
+    });
+
+    // cleanup before cache (needed when clicking back in the browser)
+    $(document).on("turbolinks:before-cache", function () {
+        // close photoswipe
+        $(".pswp--open").removeClass("pswp--open pswp--animate_opacity pswp--notouch pswp--css_animation pswp--svg pswp--animated-in pswp--has_mouse");
+    });
+
+    function openInParent(opts) {
+        wvy.postal.postToParent({ name: "photoswipe-open", options: opts });
+    }
+
+    function open(photoOptions, noZoomAnimation) {
+        var index = photoOptions.index;
+        var slides = photoOptions.slides;
 
         // define options
         var options = {
@@ -61,12 +77,7 @@ var wvy = wvy || {};
         // init and open PhotoSwipe
         var pswpelement = document.querySelectorAll('.pswp')[0];
         var pswp = new PhotoSwipe(pswpelement, PhotoSwipeUI_Default, slides, options);
-
-        //// create variable that will store real size of viewport
-        //var realViewportMax,
-        //    useLargeImages = false,
-        //    firstResize = true,
-        //    imageSrcWillChange;
+        _photoswipes.add(pswp);
 
         document.documentElement.classList.add("pswp-open");
 
@@ -82,83 +93,16 @@ var wvy = wvy || {};
             }
         });
 
-        //// beforeResize event fires each time size of gallery viewport updates
-        //pswp.listen('beforeResize', function () {
-        //    // gallery.viewportSize.x - width of PhotoSwipe viewport
-        //    // gallery.viewportSize.y - height of PhotoSwipe viewport
-        //    // window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
-        //    //                          1 (regular display), 2 (@2x, retina) ...
-
-
-        //    // calculate real pixels when size changes
-        //    realViewportMax = Math.max(pswp.viewportSize.x * window.devicePixelRatio, pswp.viewportSize.y * window.devicePixelRatio);
-
-        //    // Code below is needed if you want image to switch dynamically on window.resize
-
-        //    // Find out if current images need to be changed
-        //    if (useLargeImages && realViewportMax <= 1920) {
-        //        useLargeImages = false;
-        //        imageSrcWillChange = true;
-        //    } else if (!useLargeImages && realViewportMax > 1920) {
-        //        useLargeImages = true;
-        //        imageSrcWillChange = true;
-        //    }
-
-        //    // Invalidate items only when source is changed and when it's not the first update
-        //    if (imageSrcWillChange && !firstResize) {
-        //        // invalidateCurrItems sets a flag on slides that are in DOM,
-        //        // which will force update of content (image) on window.resize.
-        //        pswp.invalidateCurrItems();
-        //    }
-
-        //    if (firstResize) {
-        //        firstResize = false;
-        //    }
-
-        //    imageSrcWillChange = false;
-
-        //});
-
-        //// gettingData event fires each time PhotoSwipe retrieves image source & size
-        //pswp.listen('gettingData', function (index, item) {
-        //    // It doesn't really matter what will you do here, 
-        //    // as long as item.src, item.w and item.h have valid values.
-        //    // 
-        //    // Just avoid http requests in this listener, as it fires quite often
-
-        //    // Set image source & size based on real viewport width
-        //    var maxedSize, fullscreenTriggerSize = 1024;
-        //    if (useLargeImages) {
-        //        item.src = item.largeImage.src;
-        //        maxedSize = { width: item.largeImage.w, height: item.largeImage.h };
-        //        if (Math.max(item.largeImage.w, item.largeImage.h) >= fullscreenTriggerSize) {
-        //            maxedSize = resizeLimit(item.largeImage.w, item.largeImage.h, realViewportMax, realViewportMax, true);
-        //        }
-        //    } else {
-        //        item.src = item.mediumImage.src;
-        //        maxedSize = { width: item.mediumImage.w, height: item.mediumImage.h };
-        //        if (Math.max(item.mediumImage.w, item.mediumImage.h) >= fullscreenTriggerSize) {
-        //            maxedSize = resizeLimit(item.mediumImage.w, item.mediumImage.h, realViewportMax, realViewportMax, true);
-        //        }
-        //    }
-        //    item.w = maxedSize.width;
-        //    item.h = maxedSize.height;
-        //});
-
         // inject custom header
         pswp.listen('beforeChange', function () {
 
             $(".pswp .navbar-preview").remove();
             var $navbar = $("<nav class='navbar fixed-top navbar-preview' />");
+
             var $left = $('<div class="navbar-icons" />');
-            var $close = $('<button type="button" class="btn btn-icon" title="Close"><svg class="i i-arrow-left" height="24" viewBox="0 0 24 24" width="24"><path d="m20 11v2h-12l5.5 5.5-1.42 1.42-7.92-7.92 7.92-7.92 1.42 1.42-5.5 5.5z"/></svg></div>').on("click", function () {
-                pswp.close();
-            });
-            $left.append($close);    
-
-            $navbar.append($left);
-
             var $middle = $('<div class="navbar-middle" />');
+            var $right = $('<div class="navbar-icons" />');
+
             if (pswp.currItem.name) {
                 $middle.append('<span class="navbar-text">' + pswp.currItem.name + '</span>');
                 if (pswp.currItem.starred !== undefined) {
@@ -171,17 +115,25 @@ var wvy = wvy || {};
                     $middle.append($star);
                 }
             }
-            $navbar.append($middle);    
 
-            var $right = $('<div class="navbar-icons" />');
             if (pswp.currItem.download) {
                 $right.append('<a href="' + pswp.currItem.download + '" class="btn btn-icon" title="Download"><svg class="i i-download" height="24" viewBox="0 0 24 24" width="24"><path d="m5 20h14v-2h-14m14-9h-4v-6h-6v6h-4l7 7z"/></svg></a>');
             }
-            $right.appendTo($navbar);
+
+            var $close = $('<button type="button" class="btn btn-icon btn-close" title="Close"><svg class="i i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path></svg></div>').on("click", function () {
+                pswp.close();
+            });
+            $left.append($close);    
+
+            $navbar.append($left);
+            $navbar.append($middle);    
+            $navbar.append($right);
             $navbar.appendTo(".pswp");
         });
 
         pswp.init();
+
+        return pswp;
     }
 
     function getSlides($elements) {
@@ -204,7 +156,6 @@ var wvy = wvy || {};
             size[0] = parseInt(size[0]);
             size[1] = parseInt(size[1]);
 
-            //var mediumSize = resizeLimit(size[0], size[1], 1920, 1920);
             var slide = {
                 id: id,
                 type: type,
@@ -215,21 +166,12 @@ var wvy = wvy || {};
                 h: size[1],                
                 msrc: thumb,
 
-                //largeImage: {
-                //    src: src,
-                //    w: size[0],
-                //    h: size[1]
-                //},
-                //mediumImage: {
-                //    src: urlProps[2] && urlProps[3] ? src.replace(urlMatch, "/$1/$2/1920x1920/") : src,
-                //    w: mediumSize.width,
-                //    h: mediumSize.height
-                //},
+
 
                 download: $item.data("download"),
                 starred: $item.data("starred"),
                 comments: $item.data("comments"),
-                thumb: $item.find("> img")[0] || $('<img src="' + thumb + '" />').css({ position: "absolute", top: 0, left: 0, zIndex: -1000, opacity: 0, display: "none" }).appendTo(item)[0]
+                thumb: $item.find("img.pswp-thumb, > img")[0] || $('<img src="' + thumb + '" class="pswp-thumb" />').appendTo(item)[0]
             };
             slides.push(slide);
         });
@@ -237,22 +179,15 @@ var wvy = wvy || {};
         return slides;
     }
 
-    //function resizeLimit(width, height, limitWidth, limitHeight, useMinimum) {
-    //    var ratio;
-    //    if (useMinimum ? width < limitWidth : width > limitWidth) {
-    //        ratio = limitWidth / width;
-    //        width *= ratio;
-    //        height *= ratio;
-    //    }
-    //    if (useMinimum ? height < limitHeight : height > limitHeight) {
-    //        ratio = limitHeight / height;
-    //        width *= ratio;
-    //        height *= ratio;
-    //    }
-    //    return {
-    //        width: width,
-    //        height: height
-    //    };
-    //}
+    function close() {
+        _photoswipes.forEach(function (pswp) {
+            pswp.close();
+        });
+        _photoswipes.clear();
+    }
 
+    return {
+        open: open,
+        close: close
+    };
 })(jQuery);

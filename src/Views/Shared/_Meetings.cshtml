@@ -1,0 +1,7 @@
+﻿@model IEnumerable<Meeting>
+
+<div class="list-group">
+    @foreach (var meeting in Model) {
+        Html.RenderPartial($"_Meetings_{meeting.Provider}", meeting);
+    }
+</div>

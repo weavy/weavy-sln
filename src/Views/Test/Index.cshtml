@@ -21,8 +21,7 @@
 
 @section navbar_secondary {
     <nav class="nav nav-tabs">
-        <a class="nav-link active" href="@(Url.Action<TestController>(c => c.Index()))">Components</a>
-
+        <a class="nav-link active" href="@(Url.Action<TestController>(c => c.Get("LoremIpsum")))">Lorem ipsum</a>
         <div class="dropdown align-self-center ml--1">
             <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Svg.Icon("menu-down")</button>
             <div class="dropdown-menu">
@@ -42,12 +41,8 @@
                 <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">@Svg.Icon("email") Email Template</a>
                 <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.ConversationEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Conversation</a>
                 <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.DailyDigestEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Daily digest</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.InviteEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Invite</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.InviteExternalEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Invite external</a>
                 <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.NotificationEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Notification</a>
                 <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.PasswordResetEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Password reset</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.SignupApprovalEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Signup approval</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.SignupConfirmationEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Signup confirmation</a>
                 <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.WelcomeEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Welcome</a>
 
             </div>
@@ -112,15 +107,15 @@
                 @Svg.Icon("weavy", "native", 96, htmlAttributes: new { data_toggle = "tooltip", title = "color: native, size: 96" })
                 @Svg.Icon("weavy", "icon", 48, htmlAttributes: new { data_toggle = "tooltip", title = "color: icon, size: 48" })
                 @Svg.Icon("weavy", "danger", 36, htmlAttributes: new { data_toggle = "tooltip", title = "color: danger, size: 32" })
-                @Svg.Icon("weavy", "red-300", 24, htmlAttributes: new { data_toggle = "tooltip", title = "color: red-300" })
-                @Svg.Icon("weavy", size: 18, htmlAttributes: new { data_toggle = "tooltip", title = "size: 18" })
+                @Svg.Icon("weavy", "warning", 24, htmlAttributes: new { data_toggle = "tooltip", title = "color: warning" })
+                @Svg.Icon("weavy", "info", size: 18, htmlAttributes: new { data_toggle = "tooltip", title = "color: info, size: 18" })
             </div>
             <div class="mr-auto">
-                @Svg.Icon("weavy+onedrive", size: 18, htmlAttributes: new { data_toggle = "tooltip", title = "size: 18, overlay: onedrive" })
-                @Svg.Icon("weavy+onedrive", "red-300", htmlAttributes: new { data_toggle = "tooltip", title = "color: red-300, overlay: onedrive" })
-                @Svg.Icon("weavy+onedrive", "danger", 36, htmlAttributes: new { data_toggle = "tooltip", title = "color: danger, size: 32, overlay: onedrive" })
-                @Svg.Icon("weavy+onedrive", "icon", 48, htmlAttributes: new { data_toggle = "tooltip", title = "color: icon, size: 48, overlay: onedrive" })
-                @Svg.Icon("weavy+onedrive", "native", 96, htmlAttributes: new { data_toggle = "tooltip", title = "color: native, size: 96, overlay: onedrive" })
+                @Svg.Icon("weavy+onedrive", "success", size: 18, htmlAttributes: new { data_toggle = "tooltip", title = "color: success, size: 18, overlay: onedrive" })
+                @Svg.Icon("weavy+onedrive", "primary", htmlAttributes: new { data_toggle = "tooltip", title = "color: primary, overlay: onedrive" })
+                @Svg.Icon("weavy+onedrive", "secondary", 36, htmlAttributes: new { data_toggle = "tooltip", title = "color: secondary, size: 32, overlay: onedrive" })
+                @Svg.Icon("weavy+onedrive", "yellow", 48, htmlAttributes: new { data_toggle = "tooltip", title = "color: yellow, size: 48, overlay: onedrive" })
+                @Svg.Icon("weavy+onedrive", "pink-600", 96, htmlAttributes: new { data_toggle = "tooltip", title = "color: pink-600, size: 96, overlay: onedrive" })
             </div>
         </div>
     </section>
@@ -203,7 +198,7 @@
 
                 </div>
                 <div class="col">
-                    @Html.EditorFor(x => Model.Privacy)
+
                 </div>
             </div>
             <div class="row">
@@ -242,13 +237,12 @@
     <section id="tables">
         <h1 class="display-3 mt-4">Tables</h1>
         <hr />
-        <table class="table table-hover table-test">
+        <table class="table table-hover table-name-desc">
             <thead>
                 <tr>
                     <th class="table-icon"></th>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Type</th>
                     <th class="table-icon"></th>
                 </tr>
             </thead>
@@ -256,20 +250,15 @@
                 <tr data-href="@User.Url()">
                     <td class="table-icon">@User.AvatarImg(32, presence: true)</td>
                     <td>
-                        <div class="d-flex align-items-center">
-                            <div class="text-truncate">
-                                @if (User.Username == User.GetTitle()) {
-                                    <a href="@User.Url()"><small class="text-muted">@@@User.Username</small></a>
-                                } else {
-                                    <a href="@User.Url()">@User.GetTitle()</a> <small class="text-muted">@@@User.Username</small>
-                                }
-                            </div>
-                            @Html.Badge(User, htmlAttributes: new { @class = "ml-1" })
-                            <button type="button" class="btn btn-icon ml-auto">@Svg.Icon("star", "yellow")</button>
-                        </div>
+                        @if (User.Username == User.GetTitle()) {
+                            <a href="@User.Url()"><small class="text-muted">@@@User.Username</small></a>
+                        } else {
+                            <a href="@User.Url()">@User.GetTitle()</a> <small class="text-muted">@@@User.Username</small>
+                        }
+                        @Html.Badge(User)
+                        @Html.Shield(User)
                     </td>
-                    <td>@User.Profile.GetExcerpt()</td>
-                    <td>Default</td>
+                    <td>@User.Email</td>
                     <td class="table-icon">
                         <div class="dropdown">
                             <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
@@ -282,190 +271,95 @@
                                 <form>
                                     <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Form action</button>
                                 </form>
-
                             </div>
                         </div>
                     </td>
                 </tr>
 
-                <tr class="table-muted" data-href="@User.Url()">
-                    <td class="table-icon">@User.AvatarImg(32)</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="text-truncate">
-                                @if (User.Username == User.GetTitle()) {
-                                    <a href="@User.Url()"><small class="text-muted">@@@User.Username</small></a>
-                                } else {
-                                    <a href="@User.Url()">@User.GetTitle()</a> <small class="text-muted">@@@User.Username</small>
-                                }
-                            </div>
-                            <span class="badge badge-secondary ml-1">muted</span>
-                        </div>
-                    </td>
-                    <td>@User.Profile.GetExcerpt()</td>
-                    <td>Muted</td>
-                    <td class="table-icon">
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                @Svg.Icon("dots-vertical")
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#">@Svg.Icon("pencil") Link action</a>
-                                <button type="button" class="dropdown-item">@Svg.Icon("file-document-box") Button action</button>
-                                <div class="dropdown-divider"></div>
-                                <form>
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Form action</button>
-                                </form>
-
-                            </div>
-                        </div>
-                    </td>
+                <tr data-href="javascript:;">
+                    <td class="table-icon">@(new User().AvatarImg(32))</td>
+                    <td><a href="#">UserWithLongName AndEvenLongerLastName @@longname</a></td>
+                    <td>firstname.lastname@domain.test</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
                 </tr>
-
-                <tr class="table-trashed" data-href="@User.Url()">
-                    <td class="table-icon">@User.AvatarImg(32)</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="text-truncate">
-                                @if (User.Username == User.GetTitle()) {
-                                    <a href="@User.Url()"><small class="text-muted">@@@User.Username</small></a>
-                                } else {
-                                    <a href="@User.Url()">@User.GetTitle()</a> <small class="text-muted">@@@User.Username</small>
-                                }
-                            </div>
-                            <span class="badge badge-danger ml-1">trashed</span>
-                        </div>
-                    </td>
-                    <td>@User.Profile.GetExcerpt()</td>
-                    <td>Trashed</td>
-                    <td class="table-icon">
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                @Svg.Icon("dots-vertical")
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#">@Svg.Icon("pencil") Link action</a>
-                                <button type="button" class="dropdown-item">@Svg.Icon("file-document-box") Button action</button>
-                                <div class="dropdown-divider"></div>
-                                <form>
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Form action</button>
-                                </form>
-
-                            </div>
-                        </div>
-                    </td>
+                <tr c data-href="javascript:;">
+                    <td class="table-icon">@(new Space().AvatarImg(32))</td>
+                    <td><a href="#">Space</a></td>
+                    <td>Space description</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
                 </tr>
-
-                @if (WeavyContext.HQ != null) {
-                    <tr data-href="@WeavyContext.HQ.Url()">
-                        <td class="table-icon">@WeavyContext.HQ.AvatarImg(32)</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="text-truncate">
-                                    <a href="@WeavyContext.HQ.Url()">@WeavyContext.HQ.Name</a>
-                                    @if (WeavyContext.HQ.Teamname != null) {<small class="text-muted">@@@WeavyContext.HQ.Teamname</small>}
-                                </div>
-                                <span class="badge badge-info m-1">main</span>
-                                @Html.StarToggle(WeavyContext.HQ, htmlAttributes: new { @class = "ml-auto" })
-                            </div>
-                        </td>
-                        <td>@WeavyContext.HQ.Description</td>
-                        <td>Default</td>
-                        <td class="table-icon"><button type="button" class="btn btn-icon btn-success">@Svg.Icon("check")</button></td>
-                    </tr>
-                }
 
                 <tr data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("folder", "amber")</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="text-truncate">
-                                <a href="javascript:;" class="text-truncate">Folder</a>
-                            </div>
-                            <button class="btn btn-icon ml-auto">@Svg.Icon("star", "yellow")</button>
-                        </div>
-                    </td>
-                    <td>Folder description goes here...</td>
-                    <td>Default</td>
+                    <td><a href="javascript:;">Folder</a></td>
+                    <td></td>
                     <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
                 </tr>
 
                 <tr data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file-document-box", "primary")</td>
-                    <td><a href="javascript:;" class="text-truncate">Note</a></td>
-                    <td></td>
-                    <td>Default</td>
+                    <td><a href="javascript:;">Note</a> <button class="btn btn-icon">@Svg.Icon("star", "yellow")</button></td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sit amet arcu non mauris facilisis sollicitudin.</td>
                     <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
                 </tr>
 
-                <tr class="table-trashed" data-href="javascript:;">
-                    <td class="table-icon">@Svg.Icon("file-document-box", "primary")</td>
-                    <td><a href="javascript:;" class="text-truncate">Trashed note</a></td>
-                    <td></td>
-                    <td>Trashed</td>
-                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
-                </tr>
 
                 <tr class="table-primary" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file", "primary")</td>
-                    <td><a href="javascript:;">Primary</a></td>
-                    <td>Description</td>
-                    <td>Primary</td>
+                    <td><a href="javascript:;">Primary</a> <span class="badge badge-primary">badge</span></td>
+                    <td>Primary description</td>
                     <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
                 </tr>
 
                 <tr class="table-secondary" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file", "secondary")</td>
                     <td><a href="javascript:;">Secondary</a></td>
-                    <td>Description</td>
-                    <td>Secondary</td>
-                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
+                    <td>Secondary description</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("close")</button></td>
                 </tr>
 
                 <tr class="table-success" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file", "success")</td>
                     <td><a href="javascript:;">Success</a></td>
-                    <td>Description</td>
-                    <td>Success</td>
-                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
+                    <td>Success description</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("check", "success")</button></td>
                 </tr>
 
                 <tr class="table-danger" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file", "danger")</td>
                     <td><a href="javascript:;">Danger</a></td>
-                    <td>Description</td>
-                    <td>Danger</td>
-                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
+                    <td>Danger description</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("delete", "danger")</button></td>
                 </tr>
 
                 <tr class="table-warning" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file", "warning")</td>
                     <td><a href="javascript:;">Warning</a></td>
-                    <td>Description</td>
-                    <td>Warning</td>
-                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
+                    <td>Warning description</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("alert", "warning")</button></td>
                 </tr>
 
                 <tr class="table-info" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file", "info")</td>
                     <td><a href="javascript:;">Info</a></td>
-                    <td>Description</td>
-                    <td>Info</td>
-                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("dots-vertical")</button></td>
+                    <td>Info description</td>
+                    <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("information", "info")</button></td>
+                </tr>
+                
+                <tr class="table-trashed" data-href="javascript:;">
+                    <td class="table-icon">@Svg.Icon("file")</td>
+                    <td><a href="javascript:;">Trashed</a></td>
+                    <td>Trashed description</td>
+                    <td class="table-icon"></td>
                 </tr>
 
-                <tr data-href="#tables">
-                    <td class="table-icon">@(new User().AvatarImg(32))</td>
-                    <td><a href="#">firstname.lastname@domain.test</a></td>
-                    <td>Invited User</td>
-                    <td>Default</td>
-                    <td class="table-icon">
-                        <form method="get">
-                            <button type="submit" name="button" class="btn btn-icon btn-success" value="approve">@Svg.Icon("check")</button>
-                            <button type="submit" name="button" class="btn btn-icon btn-danger" value="delete">@Svg.Icon("close")</button>
-                        </form>
-                    </td>
+                <tr class="table-muted" data-href="javascript:;">
+                    <td class="table-icon">@Svg.Icon("file")</td>
+                    <td><a href="javascript:;">Muted</a></td>
+                    <td>Muted description</td>
+                    <td class="table-icon"></td>
                 </tr>
+
             </tbody>
         </table>
     </section>

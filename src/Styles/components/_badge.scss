@@ -30,9 +30,4 @@
             display: none;
         }
     }
-    // badge in table cell, e.g. space members etc.
-    td > & {
-        position: relative;
-        bottom: .0625rem;
-    }
 }

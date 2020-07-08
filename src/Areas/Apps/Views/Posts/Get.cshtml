@@ -3,8 +3,7 @@
     Title = Model.App.Name;
 }
 
-@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)
-{
+@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments) {
     @section scripts{
         @Html.InitHtmlEditor()
     }
@@ -16,66 +15,43 @@
     </div>
     <div class="facepile">
         @Model.Members.Facepile(size: 32, link: true, presence: true)
-
-        @if (WeavyContext.Space.IsMember)
-        {
-            if (WeavyContext.Space.HasPermission(Permission.AddMembers))
-            {
-                <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Svg.Icon("plus")</button>
-            }
-        }
-        else if (WeavyContext.Space.HasPermission(Permission.Join))
-        {
-            var pending = SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id);
-            if (pending)
-            {
-                <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
-                    @Html.HttpMethodOverride(HttpVerbs.Delete)
-                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Undo membership request">@Svg.Icon("account-minus")</button>
-                </form>
-            }
-            else
-            {
-                <form action="@(Url.Action<SpaceController>(c => c.Join(WeavyContext.Space.Id)))" method="post" data-turboform>
-                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Join space">@Svg.Icon("account-plus", "white")</button>
-                </form>
-            }
+        @if (WeavyContext.Space.HasPermission(Permission.Members)) {
+            <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="Add members">@Svg.Icon("plus")</button>
         }
     </div>
 </div>
 
 <div class="container my-4">
-    @if (!WeavyContext.Space.Description.IsNullOrEmpty())
-    {
+    @if (!WeavyContext.Space.Description.IsNullOrEmpty()) {
         <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
     }
     <p class="small text-center text-muted">
-        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, "all", null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
-        @if (Model.ExternalMemberCount > 0)
-        {
-            @(" · ")<a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.ExternalMemberCount + " external")</a>
-        }
-        @if (Model.InviteCount > 0)
-        {
-            @(" · ")<a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.InviteCount + " invited")</a>
-        }
-        @(" · " + WeavyContext.Space.Privacy.GetDisplayName())
+        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
     </p>
-
-    @if (!WeavyContext.Space.IsMember && SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id))
-    {
-        <div class="alert alert-info d-flex">
-            @Svg.Icon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2" })
-            <span>Your membership request is waiting for approval.</span>
-        </div>
-    }
 </div>
+
 <div class="container my-4">
 
-    @if (Model.App.HasPermission(Permission.Post))
-    {
-        <form class="card card-weavy-editor post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform>
-            <textarea id="@(ConfigurationService.HtmlPosts ? "html" : "text")" class="form-control" name="@(ConfigurationService.HtmlPosts ? "html" : "text")" data-editor-location="discuss"></textarea>
+    @if (Model.App.HasPermission(Permission.Post)) {
+        <form class="card post post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform>
+            <div class="weavy-editor weavy-editor-placeholder minimized">
+                <div class="emojionearea form-control" role="application">
+                    <div class="emojionearea-editor" contenteditable="false" placeholder="What's on your mind?" tabindex="0" dir="ltr" spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="on"></div>
+                    <div class="emojionearea-picker emojionearea-picker-position-top emojionearea-filters-position-top emojionearea-search-position-top hidden" style="display: none;">
+                        <div class="emojionearea-wrapper"></div>
+                    </div>
+                </div>
+                <div class="poll-options"></div>
+                <div class="emojionearea-button-container">
+                    <div class="btn-file btn btn-icon" title="Add files"><svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"></path></svg><input type="file" name="files" accept="" multiple=""></div>
+                    <button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"></path></svg></button>
+                    @if (!ConfigurationService.HtmlPosts) {
+                        <div class="emojionearea-button" title="Insert emoji"><div class="emojionearea-button-open"></div><div class="emojionearea-button-close"></div></div>
+                    }
+                    <button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"></path></svg></button>
+                </div>
+            </div>
+            <textarea id="@(ConfigurationService.HtmlPosts ? "html" : "text")" class="form-control" name="@(ConfigurationService.HtmlPosts ? "html" : "text")" data-editor="post" style="display: none;"></textarea>
         </form>
         <div class="card post fake-post">
             <div class="card-header media">
@@ -93,8 +69,7 @@
         </div>
     }
 
-    @if (WeavyContext.Space.HasPermission(Permission.List))
-    {
+    @if (WeavyContext.Space.HasPermission(Permission.List)) {
         <div id="infinite-scroll-target" class="posts">
             @Html.Partial("_Posts", Model.Posts)
         </div>

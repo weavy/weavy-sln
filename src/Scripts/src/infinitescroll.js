@@ -74,7 +74,7 @@ wvy.infinitescroll = (function ($) {
             // load data into div (why?)
             var $div = $("<div />").html(data);
             var $next = $(".scroll-next", $div).first();
-
+            
             if ($next.length && $next.attr("data-next")) {
                 // set $more[data-next] to url for next page of data
                 $more.attr("data-next", $next.attr("data-next"));

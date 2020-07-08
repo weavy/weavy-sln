@@ -8,6 +8,9 @@
     var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
     var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
 
+    // get meetings
+    var meetings = Model.MeetingIds.Any() ? Model.Meetings() : new List<Meeting>();
+
     // set .emoji class?
     string emoji = !attachments.Any() && !Model.Html.IsNullOrEmpty() && Regex.Replace(Model.Html, "<[^>]*>|\\s+", "").Length == 0 ? " emoji" : "";
 
@@ -65,6 +68,12 @@
                         @{ Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", Model } }); }
                     </div>
                 }
+                @if (meetings.Any()) {
+                    <div class="card-meetings">
+                        @{ Html.RenderPartial("_Meetings", meetings, new ViewDataDictionary { { "Parent", Model } }); }
+                    </div>
+                }
+
                 @if (Model.Html != null) {
                     <div class="text">@Html.Raw(Model.Html)</div>
                 }
@@ -130,6 +139,13 @@
                         @{ Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", Model } }); }
                     </div>
                 }
+
+                @if (meetings.Any()) {
+                    <div class="card-meetings">
+                        @{ Html.RenderPartial("_Meetings", meetings); }
+                    </div>
+                }
+
                 @if (Model.Html != null) {
                     <div class="text">@Html.Raw(Model.Html)</div>
                 }

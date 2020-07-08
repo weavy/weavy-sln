@@ -8,10 +8,10 @@
     &::after {
         content: '';
         position: absolute;
-        top: $widget-icon-size / 5 - rem(.0625);
-        right: $widget-icon-size / 5 - rem(.0625);
-        width: $widget-icon-size / 5 - rem(.0625);
-        height: $widget-icon-size / 5 - rem(.0625);
+        top: $client-icon-size / 5 - rem(.0625);
+        right: $client-icon-size / 5 - rem(.0625);
+        width: $client-icon-size / 5 - rem(.0625);
+        height: $client-icon-size / 5 - rem(.0625);
         background-color: $deep-orange;
         border-radius: 50%;
     }

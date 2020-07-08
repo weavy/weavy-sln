@@ -31,4 +31,10 @@ wvy.navigation = (function ($) {
             }
         }
     });
+
+    return {
+        bypassUrl: function (url) {
+            currentUrl = url;
+        }
+    };
 })(jQuery);

@@ -21,23 +21,8 @@
     </div>
     <div class="facepile">
         @Model.Members.Facepile(size: 32, link: true, presence: true)
-
-        @if (WeavyContext.Space.IsMember) {
-            if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
-                <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Svg.Icon("plus")</button>
-            }
-        } else if (WeavyContext.Space.HasPermission(Permission.Join)) {
-            var pending = SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id);
-            if (pending) {
-                <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
-                    @Html.HttpMethodOverride(HttpVerbs.Delete)
-                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Undo membership request">@Svg.Icon("account-minus")</button>
-                </form>
-            } else {
-                <form action="@(Url.Action<SpaceController>(c => c.Join(WeavyContext.Space.Id)))" method="post" data-turboform>
-                    <button type="submit" class="btn btn-round btn-primary btn-sm" style="background: radial-gradient(rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .9), rgba(@Theme.PrimaryColor().R, @Theme.PrimaryColor().G, @Theme.PrimaryColor().B, .5)), url(@User.AvatarUrl()); background-size: cover;" title="Join space">@Svg.Icon("account-plus", "white")</button>
-                </form>
-            }
+        @if (WeavyContext.Space.HasPermission(Permission.Members)) {
+            <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="Add members">@Svg.Icon("plus")</button>
         }
     </div>
 </div>
@@ -47,20 +32,10 @@
         <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
     }
     <p class="small text-center text-muted">
-        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
-        @if (Model.ExternalMembers.TotalCount > 0) {
-            @(" · ")<a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.ExternalMembers.TotalCount + " external")</a>
-        }
-        @if (Model.Invites.TotalCount > 0) {
-            @(" · ")<a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, "external", null)))">@(Model.Invites.TotalCount + " invited")</a>
-        }
-        @(" · " + WeavyContext.Space.Privacy.GetDisplayName())
+        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
     </p>
 
-    @if (!WeavyContext.Space.IsMember && SpaceService.HasPendingMembershipRequest(WeavyContext.Space.Id)) {
-        <div class="alert alert-info d-flex">
-            @Svg.Icon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2" })
-            <span>Your membership request is waiting for approval.</span>
-        </div>
+    @if (!Model.Space.IsMember) {
+        <p class="text-center text-danger">Only members have access to apps and content in the space.</p>
     }
 </div>

@@ -3,7 +3,7 @@
 @if (Model.Any()) {
     foreach (var role in Model) {
         <tr @(Html.Raw(role.IsTrashed() ? @"class=""table-trashed""" : "")) data-href="@role.Url()">
-            <td class="table-icon">@Svg.Icon("account-multiple")</td>
+            <td class="table-icon">@Svg.Icon("account-multiple", "primary")</td>
             <td><a href="@role.Url()">@role.Name</a></td>
             <td>@role.Description</td>
             <td class="text-right"><span class="badge badge-info">@role.MemberIds.Count()</span></td>

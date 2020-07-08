@@ -9,7 +9,8 @@
         define([
             'jquery',
             './panels',
-            './utils'
+            './utils',
+            './promise'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -18,13 +19,14 @@
         module.exports = factory(
             require('jquery'),
             require('./panels'),
-            require('./utils')
+            require('./utils'),
+            require('./promise')
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyApp = factory(jQuery, root.WeavyPanels, root.WeavyUtils);
+        root.WeavyApp = factory(jQuery, root.WeavyPanels, root.WeavyUtils, root.WeavyPromise);
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyPanels, utils) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyPanels, utils, WeavyPromise) {
     console.debug("app.js");
 
     var WeavyApp = function (weavy, space, options, data) {
@@ -73,22 +75,8 @@
         this.isLoaded = false;
         this.isBuilt = false;
 
-        var _whenLoaded = $.Deferred();
-        // app.whenLoaded().then(...)
-        Object.defineProperty(app, "whenLoaded", {
-            get: function () {
-                return _whenLoaded.promise;
-            }
-        });
-
-        var _whenBuilt = $.Deferred();
-        // app.whenBuilt().then(...)
-        Object.defineProperty(app, "whenBuilt", {
-            get: function () {
-                return _whenBuilt.promise;
-            }
-        });
-
+        this.whenLoaded = new WeavyPromise();
+        this.whenBuilt = new WeavyPromise();
 
         this.configure = function (options, data) {
             if (options && typeof options === "object") {
@@ -142,7 +130,7 @@
                 }
 
                 app.isLoaded = true;
-                _whenLoaded.resolve(app.data);
+                app.whenLoaded.resolve(app.data);
 
                 if (!app.isBuilt && app.weavy.isLoaded) {
                     app.build();
@@ -150,7 +138,7 @@
             }
         }
 
-        this.fetchOrCreate = function (options) {
+        this.fetchOrCreate = function (options, refresh) {
 
             if (options && typeof options === "object") {
                 app.options = options;
@@ -158,15 +146,19 @@
 
             if (app.options && typeof app.options === "object") {
 
-                weavy.connection.invoke("client", "initApp", setSpace(app.options, app.space)).then(function (data) {
-                    app.data = data;
-                    app.configure.call(app);
-                }).catch(function (error) {
-                    app.weavy.error("WeavyApp.fetchOrCreate()", error.message, error);
-                    _whenLoaded.reject(error);
-                });
+                var initAppUrl = weavy.httpsUrl("/client/app", weavy.options.url);
+
+                var optionsWithSpace = weavy.extendDefaults({ space: space.id || space.key }, app.options);
+
+                weavy.ajax(initAppUrl, optionsWithSpace, "POST").then(function (data) {
+                        app.data = data;
+                        app.configure.call(app);
+                    }).catch(function (xhr, status, error) {
+                        app.weavy.error("WeavyApp.fetchOrCreate()", xhr.responseJSON && xhr.responseJSON.message || xhr);
+                        app.whenLoaded.reject(xhr.responseJSON && xhr.responseJSON.message || xhr);
+                    });
             } else {
-                _whenLoaded.reject(new Error("WeavyApp.fetchOrCreate() requires options"));
+                app.whenLoaded.reject(new Error("WeavyApp.fetchOrCreate() requires options"));
             }
 
             return app.whenLoaded();
@@ -193,12 +185,6 @@
             }
         }
 
-        function setSpace(options, space) {
-            // TODO: This seems wrong
-            var ctx = space.id || space.key || space.name;
-            return space.weavy.extendDefaults({ space: ctx }, options);
-        }
-
         this.build = function () {
             weavy.authentication.whenAuthorized().then(function () {
                 var root = app.root || app.space && app.space.root;
@@ -222,14 +208,11 @@
                         var controls = app.options && app.options.controls !== undefined ? app.options.controls : (app.space.options && app.space.options.controls !== undefined ? app.space.options.controls : false);
                         app.panel = root.container.panels.addPanel(panelId, app.url, { controls: controls });
 
-                        // Move to panels?
-                        weavy.one("signing-out", this.close.bind(app));
-
                         weavy.on("panel-open", bridgePanelEvent.bind(app, "open", panelId, { space: app.space, app: app, destination: null }));
                         weavy.on("panel-toggle", bridgePanelEvent.bind(app, "toggle", panelId, { space: app.space, app: app, destination: null }));
                         weavy.on("panel-close", bridgePanelEvent.bind(app, "close", panelId, { space: app.space, app: app }));
 
-                        _whenBuilt.resolve();
+                        app.whenBuilt.resolve();
                     }
                 }
 
@@ -299,15 +282,6 @@
 
             return Promise.all(togglePromises);
         });
-    }
-
-    WeavyApp.prototype.clear = function () {
-        var app = this;
-        if (app.panel) {
-            return app.panel.remove();
-        }
-
-        return Promise.resolve();
     }
 
     WeavyApp.prototype.remove = function () {

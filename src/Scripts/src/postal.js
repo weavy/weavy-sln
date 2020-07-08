@@ -94,7 +94,7 @@
                     e.data.name = e.data.distributeName;
                 }
 
-                console.debug("wvy.postal:" + (window.name ? " " + window.name : "") + " message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
+                //console.debug("wvy.postal:" + (window.name ? " " + window.name : "") + " message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
 
                 messageListeners.forEach(function (listener) {
                     var matchingName = listener.name === messageName || listener.name === "message";
@@ -104,7 +104,7 @@
 
                     if (matchingName && (genericDistribution || genericListener || matchingWeavyId || matchingDataSelector)) {
 
-                        listener.handler(e);
+                        listener.handler(e, e.data);
 
                         if (listener.once) {
                             off(listener.name, listener.selector, listener.handler);
@@ -141,7 +141,14 @@
                                         }).pop();
 
                                         if (frameElement) {
-                                            frameName = frameElement.getAttribute("name");
+                                            frameWindow = frameElement.contentWindow;
+
+                                            if (frameElement.hasAttribute("name")) {
+                                                frameName = frameElement.getAttribute("name");
+                                            } else {
+                                                frameName = null;
+                                                console.warn("could not get name attribute of the iframe", frameElement)
+                                            }
                                         }
                                     }
 
@@ -149,15 +156,22 @@
                                         var frameWeavyId = frameElement.dataset.weavyId;
                                         registerContentWindow(frameWindow, frameName, frameWeavyId);
                                     } else {
-                                        console.error("wvy.postal: could not register frame", frameWindow);
+                                        var errorMsg = "wvy.postal: could not register frame"
+                                        if (!frameName) {
+                                            errorMsg += "; name attribute is missing";
+                                        }
+                                        if (!frameElement) {
+                                            errorMsg += "; frame not accessible";
+                                        }
+                                        console.error(errorMsg);
                                     }
                                 }
                             }
 
-                            var weavyId = contentWindowWeavyIds.get(e.source);
-                            var contentWindowName = contentWindowNames.get(e.source);
-
                             try {
+                                var weavyId = contentWindowWeavyIds.get(e.source);
+                                var contentWindowName = contentWindowNames.get(e.source);
+
                                 e.source.postMessage({
                                     name: "register-window",
                                     windowName: contentWindowName,
@@ -185,6 +199,12 @@
                             e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId }, e.origin);
                         } catch (e) {
                             console.error("wvy.postal: register-window could not post back ready-message to source");
+                        }
+
+                        if (wvy.whenLoaded) {
+                            wvy.whenLoaded.then(function () {
+                                e.source.postMessage({ name: "load", windowName: e.data.windowName, weavyId: e.data.weavyId }, e.origin);
+                            });
                         }
 
                         if (parentQueue.length) {
@@ -483,12 +503,6 @@
             var name = $(this).data("weavy-name");
 
             postToParent.call(postal, { name: name });
-
-            if (name === "signing-out") {
-                var url = $(this).attr("href");
-                // give weavy client a chance to disconnect from the hub
-                window.setTimeout(function () { window.location.href = url }, 500);
-            }
         });
 
         $(document).on("submit", "[data-weavy-event-notify]", function (e) {

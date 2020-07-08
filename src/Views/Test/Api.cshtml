@@ -1,0 +1,164 @@
+﻿@model TestApiModel
+@{
+    Title = $"Api Test {User.GetTitle()} @{User.Username}";
+}
+
+<style>
+    .widget {
+        height: 600px;
+        width: 100%;
+        border: 0;
+    }
+
+    .placeholder {
+        background-color: #a8a8a8;
+        color: #fff;
+    }
+
+    #client-login {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="container">
+    <section id="client">
+        <h1 class="display-3 mt-4">Client API</h1>
+        <hr />
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label>Url</label>
+                    <input class="form-control" id="clientUrl" value="@Weavy.Core.Utils.UrlUtils.ApplicationUrl(true)" />
+                    <script>
+                        var storedClientUrl = localStorage.getItem("testapi-clienturl");
+                        if (storedClientUrl) {
+                            document.getElementById("clientUrl").value = storedClientUrl;
+                        }
+                    </script>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>User</label>
+                    @Html.DropDownListFor(x => x.UserId, new SelectList(Model.Users, "Id", "Username"), new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>Client</label>
+                    @Html.DropDownListFor(x => x.ClientId, new SelectList(Model.Clients.Keys, "Id", "Username"), new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col d-flex align-items-baseline">
+                <button id="client-login" type="submit" class="btn btn-primary" disabled>Sign in</button>
+                <div class="align-self-center ml-3 mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="windowTarget" id="windowTargetFrame" value="iframe" checked>
+                        <label class="form-check-label" for="windowTargetFrame">
+                            iframe
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="windowTarget" id="windowTargetTab" value="tab">
+                        <label class="form-check-label" for="windowTargetTab">
+                            tab
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="widget placeholder d-flex justify-content-center ">
+            <div class="align-self-center" id="message">Sign in to load Weavy...</div>
+        </div>
+        <iframe class="d-none widget weavy"></iframe>
+    </section>
+    <section id="api">
+        <h1 class="display-3 mt-4">API</h1>
+        <hr />
+    </section>
+    <section id="server">
+        <h1 class="display-3 mt-4">Server</h1>
+        <hr />
+        <div class="form-group">
+            <label>Clients</label>
+            @if (Model.Clients.Any()) {
+                <div class="d-flex">
+                    @foreach (var client in Model.Clients) {
+                        <form action="@Url.Action("api")" method="post" class="mr-2">
+                            <input type="hidden" name="ClientId" value="@client.Key.ClientId" />
+                            <input type="hidden" name="ClientSecret" value="@client.Value" />
+                            <button type="submit" class="btn btn-primary">@client.Key.GetTitle()</button>
+                        </form>
+                    }
+                </div>
+                <small class="form-text text-muted">Authenticate using a client above to get a token.</small>
+            } else {
+                <input type="text" readonly class="form-control-plaintext" value="There are no clients" />
+            }
+        </div>
+        @if (Model.Token != null) {
+            @Html.EditorFor(x => x.Token)
+            <div class="form-group">
+                <label>Methods</label>
+                <div class="d-flex">
+                    <form action="@Url.Action("apimethod")" method="post" class="mr-2">
+                        <input type="hidden" name="Token" value="@Model.Token" />
+                        <input type="hidden" name="url" value="a/users/me" />
+                        <input type="hidden" name="verb" value="get" />
+                        <button type="submit" class="btn btn-success">Me</button>
+                    </form>
+                    <form action="@Url.Action("apimethod")" method="post">
+                        <input type="hidden" name="Token" value="@Model.Token" />
+                        <input type="hidden" name="url" value="a/spaces" />
+                        <input type="hidden" name="verb" value="get" />
+                        <button type="submit" class="btn btn-success">Spaces</button>
+                    </form>
+                </div>
+            </div>
+        }
+
+        @if (Model.Result != null) {
+            <pre>@Model.Result</pre>
+        }
+    </section>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+
+            if ($("#ClientId").val() != null) {
+                $("#client-login").removeAttr("disabled");
+            } else {
+                $("#message").text("You need to create a client before you can load weavy");
+            }
+
+            $(document).on("click", "#client-login", function () {
+                var data = { ClientId: $("#ClientId").val(), UserId: $("#UserId").val() };
+                var clientUrl = $("#clientUrl").val().replace(/[\/]$/, "");
+
+                localStorage.setItem("testapi-clienturl", $("#clientUrl").val());
+
+                $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    url: wvy.url.resolve("~/test/api/token"),
+                    data: JSON.stringify(data)
+                }).then(function (e) {
+                    $(".placeholder").removeClass("d-flex").addClass("d-none");
+                    if ($("input[name='windowTarget']:checked").val() === "iframe") {
+                        $(".weavy").removeClass("d-none").attr("src", clientUrl + "/test/api/weavy?jwt=" + e.token + "&clienturl=" + encodeURIComponent(clientUrl));
+                    } else {
+                        window.open(clientUrl + "/test/api/weavy?jwt=" + e.token + "&clienturl=" + encodeURIComponent(clientUrl), "weavy");
+                    }
+                }).fail(function () {
+
+                }).always(function () {
+
+                });
+            });
+        });
+    </script>
+}

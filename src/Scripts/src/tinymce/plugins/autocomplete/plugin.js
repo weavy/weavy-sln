@@ -107,8 +107,11 @@ tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
                 // mention strategy
                 match: /\B@([a-zA-Z0-9_]+)$/,
                 search: function (term, callback) {
-                    console.debug(term);
-                    $.getJSON(wvy.url.resolve("a/autocomplete/mentions"), {
+                    var url = wvy.url.resolve("/a/autocomplete/mentions");
+                    if (wvy.context.space > 0) {
+                        url = wvy.url.resolve("/a/autocomplete/" + wvy.context.space + "/mentions");
+                    }
+                    $.getJSON(url, {
                         q: term,
                         top: 5
                     }).done(function (resp) {
@@ -119,7 +122,21 @@ tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
                 },
                 index: 1,
                 template: function (item) {
-                    return '<img class="avatar-24" src="' + item.thumb_url.replace('{options}', '24') + '" alt="" /><span><span>' + (item.name || item.username) + ' <small> @' + item.username + '</small></span>'
+                    var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" />';
+                    if (item.member) {
+                        html += '<span>';
+                    } else {
+                        html += '<span class="text-muted">';
+                    }
+                    html += item.name || item.username;
+                    if (item.username) {
+                        html += ' <small>@' + item.username + '</small>';
+                    }
+                    if (item.directory) {
+                        html += ' <span class="badge badge-success">' + item.directory + '</small>';
+                    }
+                    html += "</span>";
+                    return html;
                 },
                 replace: function (mention) {
                     return '<a class="' + mention.type + '" href="' + mention.url + '">@' + mention.username + '</a>';
@@ -144,12 +161,10 @@ tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
                 // link strategy
                 match: /\[(\w*)$/, ///\B\[([^\]]+)$/,
                 search: function (term, callback) {
-
-                    var url = wvy.url.resolve("/a/autocomplete");
+                    var url = wvy.url.resolve("/a/autocomplete/content");
                     if (wvy.context.space > 0) {
-                        url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete");
+                        url = wvy.url.resolve("/a/autocomplete/" + wvy.context.space + "/content");
                     }
-
                     if (wvy.config && wvy.config.autocomplete) {
                         url = wvy.url.resolve(wvy.config.autocomplete + "?id=" + wvy.context.space + "&appId=" + wvy.context.app);
                     }

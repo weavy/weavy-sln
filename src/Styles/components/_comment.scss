@@ -1,5 +1,18 @@
 /// <reference path="../_core.scss" />
 
+body.app-88f96a08-c6c1-4eac-a0bd-5bf8fba1a3fd, // comments app
+body.controller-comments.action-get {
+    main, .cover {
+        > .container {
+            max-width: map-get($grid-breakpoints, sm);
+        }
+    }
+
+    .comment {
+        padding-top: 0;
+    }
+}
+
 .comment {
     background-color: inherit;
     border: 0;

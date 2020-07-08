@@ -64,6 +64,74 @@
     };
 
     /**
+     * Makes a replaceable returning function of a variable.
+     * 
+     * @example
+     * var myFunc = fn("hello");
+     * myFunc() // returns "hello"
+     * 
+     * myFunc.set("world");
+     * myFunc() // returns "world"
+     * 
+     * @param {any} variable
+     * @returns {Function}
+     */
+    WeavyUtils.fn = function (variable) {
+        var _variable = variable;
+
+        var returnFn = function () { return _variable };
+
+        returnFn.set = function (variable) {
+            _variable = variable;
+        }
+
+        return returnFn;
+    };
+
+    // JSON HELPERS
+
+    /**
+     * Changes a string to camelCase from PascalCase, spinal-case and snake_case
+     * @param {string} name - The string to change to camel case
+     * @returns {string} - The processed string as camelCase
+     */
+    WeavyUtils.toCamel = function (name) {
+        // from PascalCase
+        name = name[0].toLowerCase() + name.substring(1);
+
+        // from snake_case and spinal-case
+        return name.replace(/([-_][a-z])/ig, function ($1) {
+            return $1.toUpperCase()
+                .replace('-', '')
+                .replace('_', '');
+        });
+    };
+
+    /**
+     * Changes all object keys recursively to camelCase from PascalCase, spinal-case and snake_case
+     * @param {Object} obj - The object containing keys to 
+     * @returns {Object} - The processed object with any camelCase keys
+     */
+    WeavyUtils.keysToCamel = function (obj) {
+        if ($.isPlainObject(obj)) {
+            const n = {};
+
+            Object.keys(obj)
+                .forEach(function (k) {
+                    n[WeavyUtils.toCamel(k)] = WeavyUtils.keysToCamel(obj[k]);
+                });
+
+            return n;
+        } else if ($.isArray(obj)) {
+            return obj.map(function (i) {
+                return WeavyUtils.keysToCamel(i);
+            });
+        }
+
+        return obj;
+    };
+
+    /**
      * Stores data for the current domain in the weavy namespace.
      * 
      * @category options

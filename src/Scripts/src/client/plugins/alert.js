@@ -1,25 +1,45 @@
-﻿(function ($) {
+﻿/* eslint-env commonjs, amd */
 
-    var PLUGIN_NAME = "alert";
+// UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// TODO: move to ES6 and transpiler
 
-    console.debug("Registering Weavy plugin:", PLUGIN_NAME);
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([
+            'jquery',
+            'weavy'
+        ], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(
+            require('jquery'),
+            require('weavy')
+        );
+    } else {
+        // Browser globals (root is window)
+        if (typeof Weavy === 'undefined' || !Weavy.plugins) {
+            throw new Error("Weavy must be loaded before registering plugin");
+        }
 
-    if (typeof Weavy === 'undefined' || !Weavy.plugins) {
-        throw new Error("Weavy must be loaded before registering plugin: " + PLUGIN_NAME);
+        factory(jQuery, Weavy);
     }
+}(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
 
     /**
      * Plugin for displaying alert messages.
      * 
-     * @mixin alert
+     * @mixin AlertPlugin
      * @returns {Weavy.plugins.alert}
-     * @property {alert#alert} .alert()
+     * @property {AlertPlugin#alert} .alert()
      * @typicalname weavy
      */
-    Weavy.plugins[PLUGIN_NAME] = function (options) {
+    var AlertPlugin = function (options) {
         /** 
          * Reference to this instance
-         * @lends alert#
+         * @lends AlertPlugin#
          */
         var weavy = this;
         var _addMessages = [];
@@ -33,6 +53,9 @@
                     $(message).remove();
                 });
             }
+            weavy.timeout(1).then(function () {
+                message.classList.add("in");
+            });
             weavy.nodes.overlay.appendChild(message)
         }
 
@@ -78,12 +101,16 @@
      * };
      * 
      * @name defaults
-     * @memberof alert
+     * @memberof AlertPlugin
      * @type {Object}
      * @property {string} [className=weavy-alert-message fade in] - Default classes for the alerts
      */
-    Weavy.plugins[PLUGIN_NAME].defaults = {
-        className: "weavy-alert-message fade in"
+    AlertPlugin.defaults = {
+        className: "weavy-alert-message fade"
     };
 
-})(jQuery);
+    // Register and return plugin
+    console.debug("Registering Weavy plugin: alert");
+    return Weavy.plugins.alert = AlertPlugin;
+
+}));

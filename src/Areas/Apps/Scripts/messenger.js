@@ -288,6 +288,9 @@ wvy.messenger = (function ($) {
                                     if (item.username) {
                                         html += ' <small>@' + item.username + '</small>';
                                     }
+                                    if (item.directory) {
+                                        html += ' <span class="badge badge-success">' + item.directory + '</small>';
+                                    }
                                     html += "</span>";
                                     return html;
                                 },
@@ -346,6 +349,7 @@ wvy.messenger = (function ($) {
                     always: function (e, data) {
                         // enable submit button
                         $(".message-form button[type=submit]").attr("disabled", false);
+                        $(".message-form .dropdown-menu").removeClass("show");
                     }
                 });
 
@@ -415,9 +419,88 @@ wvy.messenger = (function ($) {
         saveMessageForm(true);
     });
 
+    window.addEventListener("message", function (e) {
+        
+        switch (e.data.name) {
+            case "zoom-signed-in":                                                
+                recreateMeeting("zoom");
+                break;
+
+            case "teams-signed-in":                                
+                recreateMeeting("teams");
+                break;
+        }        
+    })
+
     ////////// DOM events //////////
 
+    // add meeting
+    $(document).on("click", ".btn-add-meeting", function () {
+        var provider = $(this).data("provider");
+        createMeeting(provider);
+        
+    });
+
+    function createMeeting(provider) {
+        // check if already added
+        if ($("[data-meeting-provider='" + provider + "']").length > 0) {
+            return false;
+        }
+
+        var qs = "?provider=" + provider + "&id=" + _id;
+        $.get(wvy.url.resolve(_prefix + "/meeting" + qs), function (html) {
+            $(".table-meetings").append(html);
+
+            saveMessageForm(false);
+        });
+    }
+
+    function recreateMeeting(provider) {
+        removeMeeting($("[data-meeting-provider='" + provider + "']"));
+        createMeeting(provider);
+    }
+        
     // various click actions
+    $(document).on("click", ".btnZoomAuthentication", function (e) {
+        e.preventDefault();
+        
+        var zoomAuthUrl = wvy.config.zoomAuthUrl + "&state=" + _id;
+        
+        if (!wvy.browser.mobile) {
+            window.open(zoomAuthUrl,
+                "zoomAuthWin",
+                "height=640,width=480");
+        } else {
+            clearMeetings();
+            location.href = zoomAuthUrl;
+        }
+        
+    });
+
+    $(document).on("click", ".btnTeamsAuthentication", function (e) {
+        e.preventDefault();
+
+        var teamsAuthUrl = wvy.config.teamsAuthUrl + "&state=" + _id;
+
+        if (!wvy.browser.mobile) {
+            window.open(teamsAuthUrl,
+                "teamsAuthWin",
+                "height=640,width=480");
+        } else {
+            clearMeetings();
+            location.href = teamsAuthUrl;
+        }
+    });
+
+    // sign out from meeting providers
+    $(document).on("click", "[data-meeting-sign-out]", function () {
+        var provider = $(this).data("meeting-sign-out");
+        var qs = "?provider=" + provider + "&conversationId=" + _id;
+        $.post(wvy.url.resolve("/a/meetings/sign-out" + qs), function (response) {            
+            clearMeetings(provider);
+        });
+    });
+
     $(document).on("click", "[data-action]", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -452,6 +535,9 @@ wvy.messenger = (function ($) {
                 break;
             case "remove-blob":
                 removeBlob(this.dataset.id);
+                break;
+            case "remove-meeting":
+                removeMeeting(this);
                 break;
             case "remove-member":
                 removeMember(this.dataset.id);
@@ -761,8 +847,19 @@ wvy.messenger = (function ($) {
         // check that message is not empty
         var $form = $(this);
         var json = $form.serializeObject(false);
-        if (json.text || json.blobs || json.embeds) {
-
+        
+        if (json.text || json.blobs || json.embeds || json.meetings) {
+            
+            // check meetings authentication            
+            if (json.meetings) {                
+                var auth = $("a[data-meeting-authenticated='0']");
+                
+                if (auth.length) {
+                    wvy.alert.info("Please sign in to the meeting provider before you submit the message!", 3000)
+                    return false;
+                }
+            }
+            
             // disable send button (to avoid double click)
             $form.find("[type=submit]").prop("disabled", true);
 
@@ -796,7 +893,7 @@ wvy.messenger = (function ($) {
             // reset scroll positions so that conversation list is scrolled to top after turbolinks:render
             _b1 = 0;
             _p1 = 0;
-
+            
             // submit form with Turbolinks
             wvy.turbolinks.visit($form.attr("action"), $form.serialize(), $form.attr("method"))
         }
@@ -980,6 +1077,22 @@ wvy.messenger = (function ($) {
 
     });
 
+    // update gui because a message was updated
+    wvy.connection.default.on("message-updated.weavy", function (event, message) {
+        console.debug("received updated message " + message.id + " in conversation " + message.conversation);
+                
+        // get html for message        
+        if (message.conversation === _id && $("#main").is(":visible")) {
+            $.get({ url: wvy.url.resolve(_prefix + "/m/" + message.id), cache: false }).then(function (html) {
+                var $existing = $("div[data-message='" + message.id + "']");
+                if ($existing.length) {
+                    $existing.next(".status").remove();
+                    $existing.replaceWith(html)
+                }
+            });
+        }   
+    });
+
     // update gui because message was delivered
     wvy.connection.default.on("conversation-delivered.weavy", function (event, data) {
         console.debug("conversation " + data.conversation.id + " was delivered to user " + data.user.id);
@@ -1047,7 +1160,7 @@ wvy.messenger = (function ($) {
             load(e.data.id);
         }
     });
-
+        
     ////////// helper functions //////////
 
     function load(id) {
@@ -1154,6 +1267,11 @@ wvy.messenger = (function ($) {
 
     function removeBlob(id) {
         $(".blob[data-id=" + id + "]").remove();
+        saveMessageForm(false);
+    }
+
+    function removeMeeting(el) {
+        $(el).closest("tr").remove();
         saveMessageForm(false);
     }
 
@@ -1323,7 +1441,7 @@ wvy.messenger = (function ($) {
     // hide badge
     function hideBadge() {
         $(".pane-actions .badge").text("");
-    }
+    }      
 
     // convert emoji shortcodes and unicode to images
     function convertEmoji(str) {
@@ -1372,12 +1490,22 @@ wvy.messenger = (function ($) {
                 } else {
                     localStorage.removeItem(key);
                 }
+
+                // save meetings
+                key = "meetings:" + _id;
+                value = $(".table-meetings").html();
+                if (value && value.length) {
+                    localStorage.setItem(key, value);
+                } else {
+                    localStorage.removeItem(key);
+                }
             }
 
             // clear form after saving it
             if (clearForm) {
                 _textarea.setText("");
                 $(".table-uploads").empty();
+                $(".table-meetings").empty();
             }
 
         }
@@ -1406,6 +1534,15 @@ wvy.messenger = (function ($) {
                 } else {
                     $(".table-uploads").empty();
                 }
+
+                // restore meetings
+                key = "meetings:" + _id;
+                value = localStorage.getItem(key);
+                if (value && value.length) {
+                    $(".table-meetings").html(value);
+                } else {
+                    $(".table-meetings").empty();
+                }
             }
 
             // focus textarea
@@ -1426,16 +1563,34 @@ wvy.messenger = (function ($) {
         }
     }
 
-    // remove text and uploads from gui and local storage
+    // remove text, meetings and uploads from gui and local storage
     function clearMessageForm() {
         if (_textarea) {
             // clear form
             _textarea.setText("");
             $(".table-uploads").empty();
+            $(".table-meetings").empty();
 
             if (storageAvailable()) {
                 localStorage.removeItem("text:" + _id);
                 localStorage.removeItem("blobs:" + _id);
+                localStorage.removeItem("meetings:" + _id);
+            }
+        }
+    }
+
+    // remove meetings from gui and local storage
+    function clearMeetings(provider) {
+        if (_textarea) {
+            // clear form
+            if (provider == null) {
+                $(".table-meetings").empty();
+                if (storageAvailable()) {
+                    localStorage.removeItem("meetings:" + _id);
+                }
+            } else {
+                $(".table-meetings tr[data-meeting-provider='" + provider + "']").remove();
+                saveMessageForm();
             }
         }
     }

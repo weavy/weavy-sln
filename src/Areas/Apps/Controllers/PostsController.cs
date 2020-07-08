@@ -23,11 +23,9 @@ namespace Weavy.Areas.Apps.Controllers {
 
             if (!IsEmbedded) {
                 model.Members = SpaceService.GetMembers(WeavyContext.Current.Space.Id, new MemberQuery { Top = 6, OrderBy = "Random", Count = true });
-                model.ExternalMemberCount = SpaceService.GetMembers(WeavyContext.Current.Space.Id, new MemberQuery { External = true, CountOnly = true }).TotalCount ?? 0;
-                model.InviteCount = InviteService.Search(new InviteQuery() { Top = 6, OrderBy = "Random", SpaceId = app.SpaceId, CountOnly = true }).TotalCount ?? 0;
             }
 
-            query.Top = PageSizes[0] / 5; // NOTE: reduced number of items/page for better perf.
+            query.Top = 10; // NOTE: low number of items/page for better perf.
             model.Posts = PostService.GetPosts(app.Id, opts: query);
             if (Request.IsAjaxRequest()) {
                 // infinite scroll, return partial view                

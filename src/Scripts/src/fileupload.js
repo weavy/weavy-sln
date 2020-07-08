@@ -89,7 +89,7 @@ wvy.fileupload = (function ($) {
                 $upload.find(".clear").removeClass("d-none");
                 $upload.find(".custom-file-control").text(json.name);
                 if (json.thumb_url) {
-                    $upload.find("img").removeClass("d-none").prop("src", json.thumb_url.replace("{options}", "256"));                    
+                    $upload.find("img").removeClass("d-none").prop("src", json.thumb_url.replace("{options}", "256-crop"));                    
                 }
                 
                 $(this).focus();
@@ -108,7 +108,7 @@ wvy.fileupload = (function ($) {
             dataType: "json",
             pasteZone: null,
             add: function (e, data) {                
-                $("head").after("<div class='turbolinks-progress-bar custom'></div>");
+                $("head").after("<div class='fileupload-progress-bar'></div>");
 
                 if (e.delegatedEvent.type !== "drop") {
                     // close dropup
@@ -120,7 +120,7 @@ wvy.fileupload = (function ($) {
             },
             progressall: function (e, data) {
                 // update progress bar            
-                $("html > .turbolinks-progress-bar.custom").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
+                $("html > .fileupload-progress-bar").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
             },
             done: function (e, data) {
                 if (data.result.skipped) {
@@ -160,7 +160,7 @@ wvy.fileupload = (function ($) {
             },
             always: function () {
                 // remove progress bar
-                $("html > .turbolinks-progress-bar.custom").remove();
+                $("html > .fileupload-progress-bar").remove();
             }
         });
 
@@ -169,14 +169,14 @@ wvy.fileupload = (function ($) {
             pasteZone: null,
             dropZone: $(".content-dropzone"),
             add: function (e, data) {
-                $("head").after("<div class='turbolinks-progress-bar custom'></div>");
+                $("head").after("<div class='fileupload-progress-bar'></div>");
 
                 // upload file
                 data.submit();
             },
             progressall: function (e, data) {
                 
-                $("html > .turbolinks-progress-bar.custom").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
+                $("html > .fileupload-progress-bar").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
             },
             done: function (e, data) {
                 if (data.result.skipped) {
@@ -215,7 +215,7 @@ wvy.fileupload = (function ($) {
                 console.error(data.jqXHR.responseJSON.message);
             },
             always: function () {                
-                $("html > .turbolinks-progress-bar.custom").remove();
+                $("html > .fileupload-progress-bar").remove();
             }
         });
     });

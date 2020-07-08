@@ -1,32 +1,6 @@
 /// <reference path="../_core.scss" />
 @import '../vendor/emojionearea/emojionearea';
 
-.card.card-weavy-editor {
-    &::after {
-        //mix-blend-mode: normal;
-        z-index: 4;
-    }
-
-    textarea {
-        border: none;
-        resize: none;
-        height: calc(6.125rem + 2px);
-        box-shadow: none;
-    }
-
-    #text {
-        pointer-events: none;
-    }
-}
-
-.post-form {
-    .tox-tinymce {
-        border: 0 !important;
-        border-bottom: 1px solid $card-border-color !important;
-    }
-}
-
-
 .weavy-editor {
     display: flex;
     flex-direction: column;
@@ -284,10 +258,8 @@
 
             .emojionearea-editor {
                 min-height: 2em;
-                margin-bottom: $border-width * -1;
                 margin-right: 0;
-                border-bottom: none;
-                box-shadow: 0 $border-width 0 0 $border-color;
+                border-bottom: none;                
 
                 > div {
                     // Makes the scrollbar appear on the very right side where it should
@@ -349,7 +321,6 @@
     }
 }
 
-
 .editor.container-fluid {
     padding-right: 0;
     padding-left: 0;
@@ -386,9 +357,61 @@
     }
 }
 
+.post-form {
+    &::after {
+        //mix-blend-mode: normal;
+        z-index: 4;
+    }
+
+    .weavy-editor-placeholder {
+        pointer-events: none;
+    }
+
+    #text {
+        pointer-events: none;
+    }
+
+    .tox-tinymce {
+        border: 0 !important;
+        border-bottom: 1px solid $card-border-color !important;
+    }
+}
+
+// style the placeholder textareas to look like the finished editor to avoid unstyled flash
+textarea[data-editor=post] {
+    border: none;
+    resize: none;
+    height: calc(6.125rem + #{$border-width});
+    box-shadow: none;
+}
+
+textarea[data-editor=comment] {
+    resize: none;
+    line-height: 1;
+    padding: .8125rem .9375rem .6875rem;
+    height: 50px;
+    background: #fff;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+textarea[data-editor=share] {
+    resize: none;
+    line-height: $line-height-base;
+    padding: .8125rem .9375rem;
+    height: 49px;
+    background: #fff;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    box-shadow: none;
+    overflow:hidden;
+}
+
 @include media-breakpoint-down(xs) {
     html:not(.framed) {
-        .card-weavy-editor {
+        .card.post-form {
             .weavy-editor {
                 .emojionearea {
                     .emojionearea-editor {

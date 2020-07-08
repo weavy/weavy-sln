@@ -5,11 +5,8 @@
 <div class="list-group">
     @foreach (var attachment in Model) {
         var attrs = Html.PreviewAttributes(parent, attachment);
-        if (attrs.Count ==0) {
-            attrs.Add("download", "");
-        }
 
-        <a class="list-group-item list-group-item-action" href="@attachment.ContentUrl(download: true)" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
+        <a class="list-group-item list-group-item-action" href="@attachment.Url()" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
             <div class="media">
                 @Svg.Icon(attachment, size: 48)
                 <div class="media-body">

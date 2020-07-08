@@ -1,0 +1,65 @@
+@{
+    Title = "POST /api/auth";
+    Back = Url.Action<HomeController>(x => x.Authentication());
+}
+
+<h1 class="display-1">@Title</h1>
+<p>
+    Allows an application to obtain an Access Token, which can be used to make API requests.
+    Tokens received by this method should be cached and reused until they expire.
+    All parameters should be sent in the request body using the <code>application/x-www-form-urlencoded</code> format.
+</p>
+
+<h2 class="display-2">Request</h2>
+<p>Parameters: </p>
+<ul class="method-params">
+    <li>
+        <code>grant_type</code>
+        <span>string</span>
+        <p>Value must be set to “client_credentials”.</p>
+    </li>
+    <li>
+        <code>client_id</code>
+        <span>string</span>
+        <p>Client id of an existing Client in your Weavy installation.</p>
+    </li>
+    <li>
+        <code>client_secret</code>
+        <span>string</span>
+        <p>Client secret as it is configured on the Client that corresponds to the client_id you supply.</p>
+    </li>
+</ul>
+
+<p>Example:</p>
+<pre><code class="language-http">POST /api/auth HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 91
+
+grant_type=client_credentials&amp;client_id={your_client_id}&amp;client_secret={your_client_secret}</code></pre>
+
+<h2 class="display-2">Response</h2>
+<p>
+    Returns: If the request is valid and authorized, the authorization server issues an access token.
+</p>
+<pre><code class="language-json">{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+  "token_type": "bearer",
+  "expires_in": 3600
+}</code></pre>
+<p>
+    Once you have an access token, you can issue authorized requests to the API by sending your token in the <code>Authorization</code> header.
+</p>
+<pre><code class="language-http">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
+
+<h2 class="display-2">Basic auth</h2>
+<p>
+    An alternative way to pass in your <code>client_id</code> and <code>client_secret</code> is to base64 encode them and send them in the <code>Authorization</code> header via Basic authentication.
+</p>
+
+<pre><code class="language-http">POST /api/auth HTTP/1.1
+Authorization: Basic e3lvdXJfY2xpZW50X2lkfTp7eW91cl9jbGllbnRfc2VjcmV0fQ==
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 29
+
+grant_type=client_credentials</code></pre>
+

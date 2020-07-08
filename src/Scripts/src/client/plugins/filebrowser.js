@@ -1,11 +1,32 @@
-﻿(function ($) {
-    var PLUGIN_NAME = "filebrowser";
+﻿/* eslint-env commonjs, amd */
 
-    console.debug("Registering Weavy plugin:", PLUGIN_NAME);
+// UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// TODO: move to ES6 and transpiler
 
-    if (typeof Weavy === 'undefined' || !Weavy.plugins) {
-        throw new Error("Weavy must be loaded before registering plugin: " + PLUGIN_NAME);
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([
+            'jquery',
+            'weavy'
+        ], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(
+            require('jquery'),
+            require('weavy')
+        );
+    } else {
+        // Browser globals (root is window)
+        if (typeof Weavy === 'undefined' || !Weavy.plugins) {
+            throw new Error("Weavy must be loaded before registering plugin");
+        }
+
+        factory(jQuery, Weavy);
     }
+}(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
 
     /**
      * Filepicker plugin for attaching from Google, O365, Dropbox etc.
@@ -13,14 +34,14 @@
      * 
      * _This plugin has no exposed properties or options._
      * 
-     * @mixin filebrowser
+     * @mixin FileBrowserPlugin
      * @returns {Weavy.plugins.filebrowser}
      * @typicalname weavy
      */
-    Weavy.plugins[PLUGIN_NAME] = function (options) {
+    var FileBrowserPlugin = function (options) {
         /** 
          *  Reference to this instance
-         *  @lends filebrowser#
+         *  @lends FileBrowserPlugin#
          */
         var weavy = this;
 
@@ -43,10 +64,13 @@
      * 
      * @ignore
      * @name defaults
-     * @memberof filebrowser
+     * @memberof FileBrowserPlugin
      * @type {Object}
      */
-    Weavy.plugins[PLUGIN_NAME].defaults = {
+    FileBrowserPlugin.defaults = {
     };
 
-})(jQuery);
+    // Register and return plugin
+    console.debug("Registering Weavy plugin: filebrowser");
+    return Weavy.plugins.filebrowser = FileBrowserPlugin;
+}));

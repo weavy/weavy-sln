@@ -39,10 +39,17 @@
     if (required) {
         attrs["required"] = null;
     }
-    
+
     string placeholder = meta.Watermark ?? "Choose file";
     string placeholderImage = prop.PlaceholderImage() != null ? Url.Content(prop.PlaceholderImage()) : null;
-    string previewImage = prop.Name == nameof(IHasAvatar.Avatar) && ViewData.ModelMetadata.Container is IHasAvatar parent ? parent.AvatarUrl(size) : Model?.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both) ?? placeholderImage;
+
+    string previewImage = ViewData["PreviewImage"] as string;
+    if (previewImage == null && prop.Name == nameof(IHasAvatar.Avatar) && ViewData.ModelMetadata.Container is IHasAvatar parent) {
+        // to avoid a blank preview image for avatars we use the avatar url instead of the blob (blobs are normally only visible to the person that uploaded them)
+        previewImage = parent.AvatarUrl(size);
+    }
+    previewImage = previewImage ?? Model?.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both) ?? placeholderImage;
+
     string attributes = "";
     foreach (var attr in attrs) {
         attributes += " ";
@@ -80,11 +87,12 @@
         </div>
     }
     <div class="invalid-feedback@(feedback != null ? " d-block" : "")">@feedback</div>
-    <div class="form-text@(feedback != null ? " d-none" : "")">@description
+    <div class="form-text@(feedback != null ? " d-none" : "")">
+        @description
     @if (remove) {
         <a href="javascript:;" class="clear@(Model == null ? " d-none" : "")">Remove @displayName.ToLower().</a>
     }
-    </div>
+</div>
 </div>
 
 @if (group) {

@@ -5,12 +5,11 @@
                 @Svg.Icon("dots-vertical")
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditProfile()))">@Svg.Icon("pencil") Edit profile</a>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditSettings()))">@Svg.Icon("format-list-checks") Settings</a>
-                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditAccount()))">@Svg.Icon("account-network") Account details</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.Edit()))">@Svg.Icon("account") User profile</a>
+                <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.Settings()))">@Svg.Icon("format-list-checks") User settings</a>
                 @if (!ConfigurationService.WindowsAuthentication) {
                     if (ConfigurationService.FormsAuthentication) {
-                        <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.EditPassword()))">@Svg.Icon("account-key") Change password</a>
+                        <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.Password()))">@Svg.Icon("account-key") Change password</a>
                     }
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="@(Url.Action<AccountController>(c => c.SignOut(null)))" data-turbolinks="false">@Svg.Icon("logout") Sign out</a>
@@ -72,7 +71,7 @@
                 @*<button type="button" class="btn btn-icon btn-danger" title="Empty recycle bin">@Svg.Icon("delete")</button>*@
             </header>
             <div class="tab-loading">@Svg.Spinner()</div>
-            <div class="tab-remote" data-url="@(Url.Action<RecycleBinController>(c => c.UserTrash()))"></div>
+            <div class="tab-remote" data-url="@(Url.Action<RecycleBinController>(c => c.Index()))"></div>
         </div>
     </div>
 </aside>

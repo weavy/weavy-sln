@@ -1,0 +1,19 @@
+﻿@model ControllerDoc
+<table class="table api-methods">
+    <thead>
+        <tr>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var doc in Model.Actions) {
+            <tr>
+                <td>@doc.Method</td>
+                <td><a href="@Url.Action(nameof(HomeController.GetActionDocumentation), null, new { actionId = doc.ActionId })">@doc.Route</a></td>
+                <td>@doc.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>

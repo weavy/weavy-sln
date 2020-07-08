@@ -1,0 +1,32 @@
+@{
+    Title = "Authentication";
+    Back = Url.Action<HomeController>(x => x.Index());
+}
+
+<h1 class="display-1">@Title</h1>
+<p>
+    In order to make authorized calls your application must first request an access token by passing your <code>client_id</code> and <code>client_secret</code>
+    to the <a href="@Url.Action(nameof(HomeController.Token))">/api/auth</a> token endpoint
+    <em>(tokens that are created as part of the Client SDK authentication flow can also be used to make authenticated calls to the API).</em>
+</p>
+<p>
+    Once you have an access token, you can issue authorized requests to the API by sending your token in the <code>Authorization</code> header.
+</p>
+<pre><code class="language-http">Authorization: Bearer &lt;token&gt;</code></pre>
+
+<table class="table api-methods">
+    <thead>
+        <tr>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>POST</td>
+            <td><a href="@Url.Action(nameof(HomeController.Token))">/api/auth</a></td>
+            <td>Request an access token from the authorization server’s token endpoint.</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,50 @@
+@model IEnumerable<ControllerDoc>
+@{
+    Title = "REST API";
+    Back = WeavyContext.ApplicationPath;
+}
+
+
+<h1 class="display-1">@Title</h1>
+<p>The API contains basic endpoints for manipulating Weavy objects and allows for developers to extend the API with their own custom endpoints, depending on their requirements.</p>
+
+<h2 class="display-2">Introduction</h2>
+<p>The API is a JSON API with the following guiding principles:</p>
+<ul>
+    <li>Only available over HTTPS.</li>
+    <li>Utilizes standard HTTP methods and error codes.</li>
+    <li>Uses <code>Bearer</code> authentication with access token in the <code>Authorization</code> header.</li>
+    <li>Parameters should be sent as JSON unless stated otherwise.</li>
+    <li>Always returns JSON.</li>
+</ul>
+
+<h3 class="display-2"><a href="@Url.Action(nameof(HomeController.Authentication))">Authentication</a></h3>
+<p>
+    In order to make authorized calls your application must first obtain an access token.
+    Once you have an access token, you can issue authorized requests to the API by sending your token in the <code>Authorization</code> header.
+</p>
+<table class="table api-methods">
+    <thead>
+        <tr>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>POST</td>
+            <td><a href="@Url.Action(nameof(HomeController.Token))">/api/auth</a></td>
+            <td>Request an access token from the authorization server’s token endpoint.</td>
+        </tr>
+    </tbody>
+</table>
+
+@foreach (var doc in Model) {
+    <h3 class="display-3" id="@doc.Name"><a href="@Url.Action(nameof(HomeController.GetControllerDocumentation), null, new { controllerId = doc.ControllerId })">@doc.Name</a></h3>
+    if (doc.Description != null) {
+        <p>@doc.Description</p>
+    }
+    Html.RenderPartial("_Actions", doc);
+}
+

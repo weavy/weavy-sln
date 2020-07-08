@@ -6,55 +6,33 @@
         @Svg.Icon("dots-vertical")
     </button>
     <div class="dropdown-menu dropdown-menu-right" prevent-modal>
-        @if (Model.Id == User.Id) {
-            // menu items for current user
-            using (Html.BeginForm(nameof(SpaceController.UpdateMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
+
+        @if (WeavyContext.Space.HasPermission(Permission.Admin)) {
+            <form action="@(Url.Action<SpaceController>(c => c.UpdateMember(WeavyContext.Space.Id, Model.Id, Access.None)))" method="post" data-turboform>
                 @Html.HttpMethodOverride(HttpVerbs.Put)
-                if (Model.Access == Access.Admin) {
+                @if (Model.Access == Access.Admin) {
                     <input type="hidden" name="access" value="@Access.Write" />
-                    <button type="submit" class="dropdown-item">@Svg.Icon("account-key") Remove as admin</button>
-                } else if (User.IsAdmin || !(bool)ViewBag.HasAdmin) {
+                    <button type="submit" class="dropdown-item">@Svg.Icon("shield-star") Remove as admin</button>
+                } else {
                     <input type="hidden" name="access" value="@Access.Admin" />
-                    <button type="submit" class="dropdown-item">@Svg.Icon("account-key") Make me admin</button>
+                    <button type="submit" class="dropdown-item">@Svg.Icon("shield-star", "primary") Make admin</button>
                 }
-            }
+            </form>
+        }
+
+        @if (Model.Id == User.Id) {
             <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
                 @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <button type="submit" class="dropdown-item">@Svg.Icon("account-minus") Leave space</button>
+                <button type="submit" class="dropdown-item">@Svg.Icon("close") Leave space</button>
             </form>
-
-        } else {
-            // menu items for other space members
-
-            if (Model.IsPending && WeavyContext.Space.HasPermission(Permission.ApproveMembers)) {
-                using (Html.BeginForm(nameof(SpaceController.ApproveMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                    <button type="submit" class="dropdown-item">@Svg.Icon("check") Approve</button>
-                }
-                using (Html.BeginForm(nameof(SpaceController.DenyMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                    @Html.HttpMethodOverride(HttpVerbs.Delete)
-                    <button type="submit" class="dropdown-item">@Svg.Icon("close") Deny</button>
-                }
-            }
-
-            if (WeavyContext.Space.HasPermission(Permission.Admin)) {
-                // additional menu items for space admins
-                using (Html.BeginForm(nameof(SpaceController.UpdateMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                    @Html.HttpMethodOverride(HttpVerbs.Put)
-                    if (Model.Access == Access.Admin) {
-                        <input type="hidden" name="access" value="@Access.Write" />
-                        <button type="submit" class="dropdown-item">@Svg.Icon("account-minus") Remove as admin</button>
-                    } else if (!Model.IsPending && !Model.IsExternal) {
-                        <input type="hidden" name="access" value="@Access.Admin" />
-                        <button type="submit" class="dropdown-item">@Svg.Icon("account-key") Make admin</button>
-                    }
-                }
-
-                using (Html.BeginForm(nameof(SpaceController.RemoveMember), null, new { id = WeavyContext.Space.Id, userid = Model.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                    @Html.HttpMethodOverride(HttpVerbs.Delete)
-                    <button type="submit" class="dropdown-item">@Svg.Icon("account-minus") Remove</button>
-                }
-            }
+        } else if (WeavyContext.Space.HasPermission(Permission.Members)) {
+            <form action="@(Url.Action<SpaceController>(c => c.RemoveMember(WeavyContext.Space.Id, Model.Id )))" method="post" data-turboform>
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button type="submit" class="dropdown-item">@Svg.Icon("close") Remove from space</button>
+            </form>
         }
+
+
     </div>
 </div>
 

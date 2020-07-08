@@ -1,0 +1,30 @@
+﻿@model TrashSearchResult
+
+@if (Model.IsNullOrEmpty()) {
+    <div class="container-fluid mt-3 empty">
+        <p class="text-muted">Your recycle bin is empty!</p>
+    </div>
+}
+
+<table class="table table-hover table-name">
+    <tbody>
+        @if (Model.HasItems()) {
+            var img = new Space().AvatarImg(32);
+            foreach (var item in Model) {
+                <tr class="table-trashed">
+                    <td class="table-icon">
+                        @if (item.Type == EntityType.Space) {
+                            @img
+                        } else {
+                            @Svg.Icon(item)
+                        }
+                    </td>
+                    <td>@item.Title.Ellipsis(128)</td>
+                    <td class="table-icon">
+                        <button type="button" class="btn btn-icon btn-success btn-load" title="Restore" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore")</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

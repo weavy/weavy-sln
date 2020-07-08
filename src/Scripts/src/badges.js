@@ -35,7 +35,7 @@ wvy.badges = (function ($) {
         update(data);
     });
 
-    wvy.connection.default.on("reconnect.connection", refresh);
+    wvy.connection.default.on("reconnected.connection", refresh);
 
     return {
         refresh: refresh

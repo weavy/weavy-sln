@@ -4,12 +4,10 @@
     Back = Model.Url();
 }
 
-@section navbar_secondary {
-    <nav class="nav nav-tabs">
-        @(Html.ActionLink<SpaceController>(c => c.Edit(Model.Id), text: "Details", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-        @(Html.ActionLink<SpaceController>(c => c.Settings(Model.Id), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-    </nav>
+@section navbar_middle {
+    @Html.Partial("_NavbarMenu")
 }
+
 
 <div class="container my-3">
     @using (Html.BeginForm(nameof(SpaceController.Update), typeof(SpaceController).ControllerName(), new { id = Model.Id }, FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {

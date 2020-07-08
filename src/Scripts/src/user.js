@@ -68,14 +68,13 @@ wvy.user = (function ($) {
     });
 
     // intercept links to user profile and open modal instead
-    $(document).on("click", "a[href^='/people/']:not([data-link]), tr[data-href^='/people/'][data-modal]", function (e) {
+    $(document).on("click", "a[href^='/people/']:not([data-link]), tr[data-href^='/people/']", function (e) {
         var $target = $(e.target);
-
         if ($target.parents("[prevent-modal]").length) {
             return;
         }
 
-        // verify that href matches /people/{id}
+        // verify that href matches " /people/{id}"
         _href = $(this).attr("href") || $(this).data("href");
         if (!_re.test(_href)) {
             // not a profile link
@@ -90,6 +89,7 @@ wvy.user = (function ($) {
 
         // finally open modal with profile info
         e.preventDefault();
+        //e.stopPropagation();
         $('#profile-modal').modal();
     });
 

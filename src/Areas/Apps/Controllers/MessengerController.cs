@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Newtonsoft.Json;
 using NLog;
 using Weavy.Areas.Apps.Models;
 using Weavy.Core;
@@ -35,7 +36,9 @@ namespace Weavy.Areas.Apps.Controllers {
         // url prefix for embedded
         private static string E_PREFIX = ControllerUtils.EMBEDDED_PREFIX.RightAfter(ControllerUtils.ROOT_PREFIX);
 
-        // url prefix for messenger
+        /// <summary>
+        /// Url prefix for messenger
+        /// </summary>
         public const string MESSENGER_PREFIX = "messenger";
 
         // limit page size to 25 for messenger
@@ -86,7 +89,7 @@ namespace Weavy.Areas.Apps.Controllers {
                 }
             } else {
                 // get most recent conversation
-                model.Conversation = ConversationService.Search(new ConversationQuery { OrderBy = "PinnedAt DESC, LastMessageAt DESC", Top = 1 }).FirstOrDefault();
+                model.Conversation = ConversationService.Search(new ConversationQuery { OrderBy = "PinnedAt DESC, Messages.CreatedAt DESC", Top = 1 }).FirstOrDefault();
             }
 
             if (model.Conversation != null) {
@@ -94,21 +97,25 @@ namespace Weavy.Areas.Apps.Controllers {
                     // mark conversation as read (if needed)
                     if (model.Conversation.ReadAt == null) {
                         model.Conversation = ConversationService.SetRead(model.Conversation.Id, DateTime.UtcNow);
-                    } else if (model.Conversation.ReadAt < model.Conversation.LastMessageAt) {
+                    } else if (model.Conversation.ReadAt < model.Conversation.LastMessage?.CreatedAt) {
                         // NOTE: do not assign the read conversation to model.Conversation since that will prevent rendering of the "New messages" separator
                         ConversationService.SetRead(model.Conversation.Id, DateTime.UtcNow);
                     }
                 }
 
                 // get first page of messages (and reverse them for easier rendering in correct order)
-                model.Messages = ConversationService.GetMessages(model.Conversation.Id, null, new Query { Top = MAX_PAGE_SIZE });
+                model.Messages = ConversationService.GetMessages(model.Conversation.Id, new QueryOptions { Top = MAX_PAGE_SIZE });
                 model.Messages.Reverse();
             }
+
+            // Meetings
+            model.ZoomEnabled = ConfigurationService.ZoomMeetings;
+            model.TeamsEnabled = ConfigurationService.TeamsMeetings;
 
             // NOTE: we load conversations last so that selected conversation does not appear unread in the list
             var query = new ConversationQuery(opts);
             query.UserId = User.Id;
-            query.OrderBy = "PinnedAt DESC, LastMessageAt DESC";
+            query.OrderBy = "PinnedAt DESC, Messages.CreatedAt DESC";
             model.Conversations = ConversationService.Search(query);
 
             // make sure selected conversation is visible in conversations list
@@ -167,13 +174,13 @@ namespace Weavy.Areas.Apps.Controllers {
             // mark conversation as read (if needed)
             if (model.Conversation.ReadAt == null) {
                 model.Conversation = ConversationService.SetRead(id, DateTime.UtcNow);
-            } else if (model.Conversation.ReadAt < model.Conversation.LastMessageAt) {
+            } else if (model.Conversation.ReadAt < model.Conversation.LastMessage.CreatedAt) {
                 // NOTE: do not assign the read conversation to model.Conversation since that will prevent rendering of the "New messages" separator
                 ConversationService.SetRead(model.Conversation.Id, DateTime.UtcNow);
             }
 
             // get first page of messages (and reverse them for easier rendering in correct order)
-            model.Messages = ConversationService.GetMessages(id, null, new Query { Top = MAX_PAGE_SIZE });
+            model.Messages = ConversationService.GetMessages(id, new QueryOptions { Top = MAX_PAGE_SIZE });
             model.Messages.Reverse();
 
             return View(model);
@@ -193,7 +200,7 @@ namespace Weavy.Areas.Apps.Controllers {
 
             var cq = new ConversationQuery(query);
             cq.UserId = User.Id;
-            cq.OrderBy = "PinnedAt DESC, LastMessageAt DESC";
+            cq.OrderBy = "PinnedAt DESC, Messages.CreatedAt DESC";
 
             var model = new Messenger();
             model.IsMessenger = false;
@@ -308,7 +315,7 @@ namespace Weavy.Areas.Apps.Controllers {
 
             var model = new Messenger();
             model.Conversation = ConversationService.Get(id);
-            model.Messages = ConversationService.GetMessages(model.Conversation.Id, null, new Query(opts));
+            model.Messages = ConversationService.GetMessages(model.Conversation.Id, opts);
             model.Messages.Reverse();
             model.IsMessenger = IsMessenger(Request.Headers["Referer"]);
             return PartialView("_Messages", model);
@@ -336,6 +343,25 @@ namespace Weavy.Areas.Apps.Controllers {
         public PartialViewResult PartialBlobs(IEnumerable<int> ids) {
             var blobs = BlobService.Get(ids);
             return PartialView("_Blobs", blobs);
+        }
+
+        /// <summary>
+        /// Returns partial html for the specified meeting.
+        /// </summary>
+        /// <param name="provider">A string defining the video provider.</param>
+        /// <param name="id">The conversation id.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/meeting")]
+        public PartialViewResult PartialMeeting(string provider, int id) {
+
+            var model = new PartialMeetingModel {
+                Topic = $"{provider.ToTitleCase()} meeting",
+                Meeting = MeetingService.CreateMeeting(provider),
+                ConversationId = id
+            };
+                        
+            return PartialView($"_Meeting{provider}", model);
         }
 
         /// <summary>
@@ -552,7 +578,7 @@ namespace Weavy.Areas.Apps.Controllers {
 
             // no search criteria, try to fetch most recently contacted people instead
             if (query.Text.IsNullOrEmpty()) {
-                var conversations = ConversationService.Search(new ConversationQuery { UserId = User.Id, SearchRooms = false, OrderBy = "LastMessageAt DESC", Top = 10 });
+                var conversations = ConversationService.Search(new ConversationQuery { UserId = User.Id, SearchRooms = false, OrderBy = "Messages.CreatedAt DESC", Top = 10 });
                 List<int> ids = new List<int>();
                 foreach (var c in conversations) {
                     ids.Add(c.MemberIds.FirstOrDefault(x => x != User.Id));
@@ -592,7 +618,7 @@ namespace Weavy.Areas.Apps.Controllers {
 
             // create and insert new message
             try {
-                msg = MessageService.Insert(new Message { Text = message.Text }, conversation, blobs: message.Blobs, embeds: message.Embeds);
+                msg = MessageService.Insert(new Message { Text = message.Text }, conversation, blobs: message.Blobs, embeds: message.Embeds, meetings: message.Meetings);
             } catch (ValidationException ex) {
                 // TODO: handle some way?
                 _log.Warn(ex.Message);

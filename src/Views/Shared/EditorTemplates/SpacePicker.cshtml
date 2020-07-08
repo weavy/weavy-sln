@@ -16,8 +16,8 @@
         attrs["required"] = null;
     }
 
-    Permission? permission = ViewData["Permission"] as Permission?;
-    var spaces = SpaceService.GetByPermission(permission ?? Permission.View);
+    // get spaces that user can see
+    var spaces = SpaceService.Search(new SpaceQuery { OrderBy = "Name" });
 }
 
 @if (group) {

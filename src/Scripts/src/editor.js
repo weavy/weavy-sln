@@ -1,4 +1,4 @@
-﻿/*global twttr */
+﻿/*global twttr, tinymce */
 var wvy = wvy || {};
 
 wvy.editor = (function ($) {
@@ -20,31 +20,6 @@ wvy.editor = (function ($) {
 
         // Extend default options with those supplied by user.
         options = $.extend({}, $.fn[pluginName].defaults, options);
-
-        // Convert base64 encoded data to Blob 
-        function b64toBlob(b64Data, contentType, sliceSize) {
-            contentType = contentType || '';
-            sliceSize = sliceSize || 512;
-
-            var byteCharacters = atob(b64Data);
-            var byteArrays = [];
-
-            for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-                var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-                var byteNumbers = new Array(slice.length);
-                for (var i = 0; i < slice.length; i++) {
-                    byteNumbers[i] = slice.charCodeAt(i);
-                }
-
-                var byteArray = new Uint8Array(byteNumbers);
-
-                byteArrays.push(byteArray);
-            }
-
-            var blob = new Blob(byteArrays, { type: contentType });
-            return blob;
-        }
 
         /**
         * Initialize plugin (tinyMCE).
@@ -122,7 +97,7 @@ wvy.editor = (function ($) {
                     var items = dataTransfer.items;
 
                     //Check that we're only pasting image data
-                    for (i = 0; i < items.length; i++) {
+                    for (var i = 0; i < items.length; i++) {
                         if (!/^image\/(jpg|jpeg|png|gif|bmp)$/.test(items[i].type)) {
                             imageDataOnly = false;
                         }
@@ -207,6 +182,7 @@ wvy.editor = (function ($) {
                 }
             }).then(function (editors) {                
                 $editor = editors[0];
+                $editor.show();
             });
 
             // add button container
@@ -301,7 +277,7 @@ wvy.editor = (function ($) {
                     $file.prependTo($buttoncontainer);
 
                     // add upload container
-                    var $uploads = $("<div class='uploads'><table class='table table-attachments'></table><div class='progress d-none'></div></div>");
+                    var $uploads = $("<div class='uploads'><table class='table table-name table-attachments'></table><div class='progress d-none'></div></div>");
                     $uploads.appendTo($wrapper);
 
                     // init file upload                
@@ -542,9 +518,11 @@ wvy.editor = (function ($) {
                         // mention strategy
                         match: noPrefix ? /((@[a-zA-Z0-9_]+)|([a-zA-Z0-9_]+))$/ : /\B@([a-zA-Z0-9_]+)$/,
                         search: function (term, callback) {
-
-                            // TODO: we should probably only search users in the current space
-                            $.getJSON(wvy.url.resolve("/a/autocomplete/mentions"), {
+                            var url = wvy.url.resolve("/a/autocomplete/mentions");
+                            if (wvy.context.space > 0) {
+                                url = wvy.url.resolve("/a/autocomplete/" + wvy.context.space + "/mentions");
+                            }
+                            $.getJSON(url, {
                                 q: term,
                                 top: 5
                             }).done(function (resp) {
@@ -556,9 +534,18 @@ wvy.editor = (function ($) {
                         },
                         index: 1,
                         template: function (item) {
-                            var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" /><span>' + (item.name || item.username);
+                            var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" />';
+                            if (item.member) {
+                                html += '<span>';
+                            } else {
+                                html += '<span class="text-muted">';
+                            }
+                            html += item.name || item.username;
                             if (item.username) {
                                 html += ' <small>@' + item.username + '</small>';
+                            }
+                            if (item.directory) {
+                                html += ' <span class="badge badge-success">' + item.directory + '</small>';
                             }
                             html += "</span>";
                             return html;
@@ -581,15 +568,13 @@ wvy.editor = (function ($) {
                         // link strategy
                         match: /\[(\w*)$/, // /\[([^\]]+)$/    
                         search: function (term, callback) {
-                            var url = wvy.url.resolve("/a/autocomplete");
+                            var url = wvy.url.resolve("/a/autocomplete/content");
                             if (wvy.context.space > 0) {
-                                url = wvy.url.resolve("/a/spaces/" + wvy.context.space + "/autocomplete");
+                                url = wvy.url.resolve("/a/autocomplete/" + wvy.context.space + "/content");
                             }
-
                             if (wvy.config && wvy.config.autocomplete) {
                                 url = wvy.url.resolve(wvy.config.autocomplete + "?id=" + wvy.context.space + "&appId=" + wvy.context.app);
                             }
-
                             var data = { top: top };
                             if (term !== "") {
                                 data.q = term;
@@ -701,7 +686,7 @@ wvy.editor = (function ($) {
                         $file.prependTo($buttoncontainer);
 
                         // add upload container
-                        var $uploads = $("<div class='uploads'><table class='table table-attachments'></table><div class='progress d-none'></div></div>");
+                        var $uploads = $("<div class='uploads'><table class='table table-name table-attachments'></table><div class='progress d-none'></div></div>");
                         $uploads.appendTo($wrapper);
 
                         // init file upload                
@@ -1033,16 +1018,12 @@ wvy.editor = (function ($) {
         }
         
         // Initialize the plugin instance.
-        var location = $el.data("editor-location");
-        
-        if (((location === "discuss" || location == "post-edit") && wvy.config.htmlPosts) || ((location === "comments" || location === "comment-edit") && wvy.config.htmlComments)) {
+        var location = $el.data("editor");        
+        if ((location === "post" && wvy.config.htmlPosts) || (location === "comment"  && wvy.config.htmlComments)) {
             initHtmlEditor();
         } else {
             init();
         }
-        
-
-        
 
         // Expose methods of WeavyEditor we wish to be public.
         return {
@@ -1057,8 +1038,7 @@ wvy.editor = (function ($) {
      * WeavyEditor definition.
      */
     $.fn[pluginName] = function (options) {
-        // If the first parameter is a string, treat this as a call to
-        // a public method.
+        // If the first parameter is a string, treat this as a call to a public method.
         if (typeof arguments[0] === 'string') {
             var methodName = arguments[0];
             var args = Array.prototype.slice.call(arguments, 1);
@@ -1119,5 +1099,30 @@ wvy.editor = (function ($) {
         onDestroy: function () { },
         onClick: function () { }
     };
+
+    // convert base64 encoded data to blob 
+    function b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || '';
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, { type: contentType });
+        return blob;
+    }
 
 })(jQuery);

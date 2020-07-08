@@ -1,5 +1,32 @@
 # Changelog for Weavy
 
+## 7.0.0 (2020-07-07)
+
+* Added user directory feature for separating users from different organizations. Primarily used for multi-tenant scenarios.
+* Added fully customizable JSON REST API with functionality for getting, creating and updating Weavy resources. Developers can easily add their own API endpoints.
+* Added integration with Zoom for video meetings.
+* Added integration with Microsoft Teams for video meetings.
+* Added seamless authentication when opening documents in Microsoft Office.
+* Added Comments app for embedding rich commenting functionality to entities in your applicaton.
+* Replaced the ambigous `filter` parameter in server SDK methods with `sudo` and `trashed` properties.
+* Improved file previews. Image and file previews now open in a fullscreen overlay instead of in the app container.
+* Replaced single `weavy.jwt-secret` setting with client registration where you can add multiple clients for API authentication and JWT validation. 
+* Settings key for specifying a custom url to the File Browser is changed from weavy.client.filebrowser-url to wvy.file-browser. Check out https://docs.weavy.com/tutorials/weavyfilebrowser for more information.
+* Client SDK now requires JWT token for authentication. See https://docs.weavy.com/client/authentication
+* Client space open/close/toggle syntax has been removed. Use the equivalent app open/close/toogle syntax instead.
+* Client jQuery noconflict improvements.
+* Unified client promise naming. All promises are now used like functions `weavy.whenLoaded().then(...)`
+* Removed some undocumented/deprecated Client methods.
+
+### Upgrade instructions
+
+In addition to the [normal upgrade procedure](https://docs.weavy.com/sdk/server/updating), there are a couple additional steps that you need to perform when upgrading to 7.0.
+
+* Delete the App_Data\Index folder to force Weavy to recreate the index for fulltext search.
+* Register a client on /manage/clients with `Client ID` = `iss` in your JWT tokens, and `Client Secret` = the `shared secret` or `public key` Weavy should use when validating incoming JWT tokens.
+* Update code using the server SDK to use `sudo` and `trashed` properties instead of `filter` if applicable.
+* You must provide a JWT token when instantiating `new Weavy({ jwt: "{token}" })`.
+
 ## 6.5.0 (2020-06-25)
 
 * Added space.remove() and app.remove().

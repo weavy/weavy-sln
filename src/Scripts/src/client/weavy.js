@@ -11,10 +11,10 @@
             './events',
             './panels',
             './space',
-            './authentication',
             './navigation',
             './utils',
-            './console'
+            './console',
+            './promise'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -25,10 +25,10 @@
             require('./events'),
             require('./panels'),
             require('./space'),
-            require('./authentication'),
             require('./navigation'),
             require('./utils'),
-            require('./console')
+            require('./console'),
+            require('./promise')
         );
     } else {
         // Browser globals (root is window)
@@ -37,16 +37,16 @@
             root.WeavyEvents,
             root.WeavyPanels,
             root.WeavySpace,
-            root.WeavyAuthentication,
             root.WeavyNavigation,
             root.WeavyUtils,
-            root.WeavyConsole
+            root.WeavyConsole,
+            root.WeavyPromise
         );
     }
-
-
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavySpace, WeavyAuthentication, WeavyNavigation, utils, WeavyConsole) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavySpace, WeavyNavigation, utils, WeavyConsole, WeavyPromise) {
     console.debug("weavy.js");
+
+    // DEFINE CUSTOM ELEMENTS AND STYLES
 
     if ('customElements' in window) {
         try {
@@ -73,6 +73,8 @@
         document.getElementsByTagName("head")[0].appendChild(elementStyleSheet);
     }
 
+    // WEAVY
+
     var _weavyIds = [];
 
     /**
@@ -81,8 +83,8 @@
      * If you want to connect to a specific server use the [url option]{@link Weavy#options}.
      * 
      * These option presets are available for easy configuration
-     * * Weavy.presets.core - All plugins disabled and minimal styles applied
-     * * Weavy.presets.panel - A minimal recommended configuration for making only a panel.
+     * * Weavy.presets.noplugins - Disable all plugins
+     * * Weavy.presets.core - Use the minimal core plugin configuration without additional plugins.
      * 
      * @example
      * var weavy = new Weavy();
@@ -100,8 +102,6 @@
          *  @lends Weavy#
          */
         var weavy = this;
-
-        var disconnected = false;
 
         /**
          * Main options for Weavy. 
@@ -180,12 +180,12 @@
         weavy.user = null;
 
         /**
-         * Indicating if the browser supports using ShadowDOM
+         * Loaded data for the current user.
          * 
          * @category properties
-         * @type {boolean}
+         * @type {Object}
          */
-        weavy.supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
+        weavy.data = null;
 
         /**
          * True when frames are blocked by Content Policy or the browser
@@ -244,7 +244,7 @@
          * @alias Weavy#nodes#panels
          * @type {Element}
          */
-        weavy.nodes.panels = null;
+        weavy.nodes.panels = {};
 
         // EVENT HANDLING
         weavy.events = new WeavyEvents(weavy);
@@ -254,14 +254,20 @@
         weavy.off = weavy.events.off;
         weavy.triggerEvent = weavy.events.triggerEvent;
 
-        // AUTHENTICATION
+
+        // AUTHENTICATION & JWT
         weavy.authentication = wvy.authentication.get(weavy.options.url);
+
+        if (weavy.options.jwt === undefined) {
+            weavy.error("specify a jwt string or a provider function")
+        }
+
         weavy.authentication.init(weavy.options.jwt);
 
         weavy.on(weavy.authentication, "user", function (e, auth) {
             weavy.user = auth.user;
 
-            if (/^signed-in|signed-out|changed-user$/.test(auth.state)) {
+            if (/^signed-in|signed-out|changed-user|user-error$/.test(auth.state)) {
 
                 if (auth.state === "changed-user") {
                     weavy.triggerEvent("signed-out", { id: -1 });
@@ -270,7 +276,10 @@
                     weavy.triggerEvent(auth.state, auth);
                 }
 
-                // TODO: Refreshing data after user change should be done here when data has been moved from clienthub to api endpoints
+                weavy.data = null;
+
+                // Refresh client data
+                loadClientData();
             }
         });
 
@@ -278,61 +287,49 @@
             weavy.triggerEvent("signing-in");
         });
 
-        weavy.on(weavy.authentication, "signing-out", function (e) {
-            weavy.triggerEvent("signing-out");
+        weavy.on(weavy.authentication, "clear-user", function (e) {
+            weavy.triggerEvent("clear-user");
+        });
+
+        weavy.on(weavy.authentication, "authentication-error", function (e, error) {
+            weavy.triggerEvent("authentication-error", error);
         });
 
         // WEAVY REALTIME CONNECTION
         weavy.connection = wvy.connection.get(weavy.options.url);
 
-        // signalR connection state has changed
-        weavy.on(weavy.connection, "state-changed.connection", function (e, data) {
-            if (disconnected && data.state === weavy.connection.states.connected && weavy.authentication.isAuthenticated()) {
-                disconnected = false;
-
-                weavy.debug("Connection state changed: connected and signed in => weavy.connection.reload()?")
-                // reload weavy                
-                weavy.reload();
-            }
-        });
-
-        // signalR connection disconnected
-        weavy.on(weavy.connection, "disconnected.connection", function (e, data) {
-            weavy.log("disconneced", data);
-            if (data.explicitlyDisconnected) {
-                disconnected = true;
-            }
-        });
 
         // PANELS
         weavy.panels = new WeavyPanels(weavy);
 
         weavy.on("before:build", function () {
-            if (!weavy.nodes.panels) {
-                weavy.nodes.panels = weavy.panels.createContainer();
-                weavy.nodes.panels.classList.add("weavy-drawer")
+            if (!weavy.nodes.panels.drawer) {
+                weavy.nodes.panels.drawer = weavy.panels.createContainer();
+                weavy.nodes.panels.drawer.classList.add("weavy-drawer");
+                weavy.nodes.overlay.appendChild(weavy.nodes.panels.drawer);
+            }
+
+            if (!weavy.nodes.panels.preview) {
+                weavy.nodes.panels.preview = weavy.panels.createContainer();
+                weavy.nodes.panels.preview.classList.add("weavy-preview");
+                weavy.nodes.overlay.appendChild(weavy.nodes.panels.preview);
             }
         });
 
-        weavy.on("build", function () {
-            weavy.nodes.overlay.appendChild(weavy.nodes.panels);
-        });
-
         weavy.on("after:panel-open", function (e, open) {
-            if (open.panels === weavy.nodes.panels) {
-                weavy.nodes.panels.classList.add("weavy-drawer-in");
+            if (open.panels === weavy.nodes.panels.drawer) {
+                weavy.nodes.panels.drawer.classList.add("weavy-drawer-in");
             }
         });
 
         weavy.on("after:panel-close", function (e, close) {
-            if (close.panels === weavy.nodes.panels) {
-                weavy.nodes.panels.classList.remove("weavy-drawer-in");
+            if (close.panels === weavy.nodes.panels.drawer) {
+                weavy.nodes.panels.drawer.classList.remove("weavy-drawer-in");
             }
         });
 
 
-
-        // CONTEXTS
+        // SPACES
 
         weavy.spaces = new Array();
 
@@ -356,7 +353,7 @@
                     if (isSpaceConfig) {
                         space = new WeavySpace(weavy, options);
                         weavy.spaces.push(space);
-                        $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded).then(function () {
+                        $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded()).then(function () {
                             space.fetchOrCreate();
                         });
                     } else {
@@ -364,7 +361,6 @@
                     }
                 }
             }
-
             return space;
         };
 
@@ -377,7 +373,7 @@
             _timeouts = [];
         }
 
-        
+
         /**
          * Creates a managed timeout promise. Use this instead of window.setTimeout to get a timeout that is automatically managed and unregistered on destroy.
          * 
@@ -391,7 +387,7 @@
          */
         weavy.timeout = function (time) {
             var timeoutId;
-            var whenTimeout = $.Deferred();
+            var whenTimeout = new WeavyPromise();
 
             _timeouts.push(timeoutId = setTimeout(function () { whenTimeout.resolve(); }, time));
 
@@ -405,60 +401,47 @@
         // PROMISES
 
         /**
-         * Promise that weavy has finished transitions for closing.
-         * If weavy already is closed, the promise is resolved instantly.
-         * 
-         * @example
-         * weavy.whenClosed.then(function() { ... })
-         * 
-         * @category promises
-         * @type {external:Promise}
-         * @resolved when weavy is closed
-         */
-        weavy.whenClosed = Promise.resolve();
-
-        /**
          * Promise that the blocking check has finished. Resolves when {@link Weavy#event:frame-check} is triggered.
          *
          * @example
-         * weavy.whenBlockChecked.then(function() { ... })
+         * weavy.whenReady().then(function() { ... })
          *
          * @category promises
          * @type {external:Promise}
          * @resolved when frames are not blocked.
          * @rejected when frames are blocked
          * */
-        weavy.whenBlockChecked = new Promise(function (resolve, reject) {
-            weavy.on("frame-check", function (e, framecheck) {
-                framecheck.blocked ? reject() : resolve();
-            });
-        });
+        weavy.whenReady = new WeavyPromise();
 
-        var loadPromise = function () {
-            return new Promise(function (resolve) {
-                weavy.on("processed:load", function () {
-                    resolve();
-                });
-            })
-        };
+        weavy.on("frame-check", function (e, framecheck) {
+            framecheck.blocked ? weavy.whenReady.reject() : weavy.whenReady.resolve();
+        });
 
         /**
          * Promise that weavy has recieved the after:load event
          *
          * @example
-         * weavy.whenLoaded.then(function() { ... })
+         * weavy.whenLoaded().then(function() { ... })
          *
          * @category promises
          * @type {external:Promise}
          * @resolved when init is called, the websocket has connected, data is received from the server and weavy is built and the load event has finished.
          */
-        weavy.whenLoaded = loadPromise();
+        weavy.whenLoaded = new WeavyPromise();
+
+        weavy.on("processed:load", function () {
+            weavy.whenLoaded.resolve();
+        });
 
         /**
          * Initializes weavy. This is done automatically unless you specify `init: false` in {@link Weavy#options}.
+         * @param {Weavy#options} [options] Any new or additional options.
          * @emits Weavy#init
          */
-        weavy.init = function () {
+        weavy.init = function (options) {
+
+            weavy.options = weavy.extendDefaults(weavy.options, options);
+
             /**
              * Event that is triggered when the weavy instance is initiated. This is done automatically unless you specify `init: false` in {@link Weavy#options}.
              * You may use the `before:init` event together with `event.stopPropagation()` if you want to intercept the initialization.
@@ -480,38 +463,38 @@
             return weavy.connection.disconnect(async, notify);
         }
 
-        function connectAndLoad(fullReload, notify) {
-            if (weavy.isLoaded) {
-                weavy.whenLoaded = loadPromise();
-            }
-            if (fullReload === true) {
-                weavy.isLoaded = false;
-            }
-
+        function loadClientData() {
             if (!weavy.isLoading) {
-                weavy.isLoading = true;
-                weavy.connection.init(true, weavy.authentication).then(function () {
-                    weavy.options.href = window.location.href;
-                    if (notify !== false) {
+                if (weavy.isLoaded) {
+                    weavy.whenLoaded.reset();
+                }
 
-                        weavy.authentication.whenAuthenticated().then(function () {
-                            weavy.connection.invoke("client", "init", weavy.options).then(function (clientData) {
-                                weavy.triggerEvent("clientdata", clientData);
-                            }).catch(function (error) {
-                                weavy.error("Weavy connectAndLoad client init", error.message, error);
-                            });
-                        })
-                    }
+                weavy.isLoaded = false;
+                weavy.isLoading = true;
+ 
+                weavy.options.href = window.location.href;
+
+                var authUrl = weavy.httpsUrl("/client/init", weavy.options.url);
+
+                var initData = {
+                    spaces: weavy.options.spaces,
+                    plugins: weavy.options.plugins,
+                    version: weavy.options.version
+                }
+
+                weavy.ajax(authUrl, initData, "POST", null, true).then(function (clientData) {
+                    weavy.triggerEvent("clientdata", clientData);
                 });
             }
-
-            return weavy.whenLoaded;
+            return weavy.whenLoaded();
         }
 
 
         var _roots = new Map();
 
         weavy.createRoot = function (parentSelector, id) {
+            var supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
+
             var rootId = weavy.getId(id);
 
             if (!parentSelector) {
@@ -535,7 +518,7 @@
             rootDom.setAttribute("data-version", weavy.options.version);
 
             var rootContainer = document.createElement("weavy-container");
-            rootContainer.className = "weavy-container " + weavy.options.className;
+            rootContainer.className = "weavy-container";
             rootContainer.id = weavy.getId("weavy-container-" + weavy.removeId(rootId));     
 
             var root = { parent: parentElement, section: rootSection, root: rootDom, container: rootContainer, id: rootId };
@@ -545,7 +528,7 @@
             parentElement.appendChild(rootSection);
             rootSection.appendChild(rootDom);
 
-            if (weavy.supportsShadowDOM) {
+            if (supportsShadowDOM) {
                 root.root = rootDom = rootDom.attachShadow({ mode: "closed" });
             }
             rootDom.appendChild(rootContainer);
@@ -577,35 +560,37 @@
         }
 
         function frameStatusCheck() {
+            var statusUrl = "/client/ping";
+
             if (!weavy.nodes.statusFrame) {
                 // frame status checking
                 weavy.nodes.statusFrame = document.createElement("iframe");
-                weavy.nodes.statusFrame.className = "weavy-status-check weavy-hidden-frame";
+                weavy.nodes.statusFrame.className = "weavy-status-check weavy-hidden";
                 weavy.nodes.statusFrame.style.display = "none";
                 weavy.nodes.statusFrame.id = weavy.getId("weavy-status-check");
                 weavy.nodes.statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
 
                 weavy.one(wvy.postal, "ready", weavy.getId("weavy-status-check"), function () {
-                    weavy.log("Status check", "√")
+                    weavy.log("Frame status check", "√")
                     weavy.isBlocked = false;
                     weavy.triggerEvent("frame-check", { blocked: false });
                 });
 
                 weavy.nodes.container.appendChild(weavy.nodes.statusFrame);
                 weavy.timeout(1).then(function () {
-                    weavy.nodes.statusFrame.src = weavy.data.statusUrl;
+                    weavy.nodes.statusFrame.src = weavy.httpsUrl(statusUrl, weavy.options.url);
                     weavy.isBlocked = true;
+
                     try {
                         wvy.postal.registerContentWindow(weavy.nodes.statusFrame.contentWindow, weavy.getId("weavy-status-check"), weavy.getId("weavy-status-check"));
                     } catch (e) {
                         weavy.warn("Frame postMessage is blocked", e);
                         weavy.triggerEvent("frame-check", { blocked: true });
                     }
-
                 });
             }
 
-            return weavy.whenBlockChecked;
+            return weavy.whenReady();
         }
 
         function initRoot() {
@@ -647,167 +632,6 @@
 
 
         /**
-         * Sends the id of a frame to the frame content scripts, so that the frame gets aware of which id it has.
-         * The frame needs to have a unique name attribute.
-         * 
-         * @category panels
-         * @param {Window} contentWindow - The frame window to send the data to.
-         * @param {string} windowName - The frame name attribute.
-         * @param {string} [panelId] - If the frame is a panel, the panelId may also be provided.
-         */
-        weavy.registerWindowId = function (contentWindow, windowName) {
-            try {
-                wvy.postal.registerContentWindow(contentWindow, windowName, weavy.getId());
-            } catch (e) {
-                weavy.error("Could not send window id", windowName, e);
-            }
-        };
-
-        /**
-         * Maximizes or restores the size of current panel.
-         * 
-         * @category panels
-         * @emits Weavy#resize
-         */
-        weavy.resize = function () {
-            //$(weavy.nodes.container).toggleClass("weavy-wide");
-
-            /**
-             * Triggered when the panel is resized due to a state change.
-             * 
-             * @category events
-             * @event Weavy#resize
-             */
-            weavy.triggerEvent("resize", null);
-        }
-
-        /**
-         * Maximize the size of current panel. 
-         * 
-         * @category panels
-         * @emits Weavy#maximize
-         */
-        weavy.maximize = function () {
-            //$(weavy.nodes.container).addClass("weavy-wide");
-
-            /**
-             * Triggered when the panel is maximized to full broser window size
-             * 
-             * @category events
-             * @event Weavy#maximize
-             */
-            weavy.triggerEvent("maximize", null);
-        }
-
-        /**
-         * Reload weavy data.
-         * 
-         * @category options
-         * @param {Weavy#options} [options] Any new or additional options.
-         * @emits Weavy#reload
-         * @returns {external:Promise} {@link Weavy#whenLoaded}
-         */
-        weavy.reload = function (options) {
-            weavy.log("weavy.reload()")
-            weavy.options = weavy.extendDefaults(weavy.options, options);
-
-            connectAndLoad(true);
-
-            /**
-             * Triggered when weavy is reloaded with any new data. Current options are provided as event data.
-             * 
-             * @category events
-             * @event Weavy#reload
-             * @returns {Weavy#options}
-             */
-            weavy.triggerEvent("reload", weavy.options);
-            return weavy.whenLoaded;
-        }
-
-
-
-        /**
-         * Loads an url in a frame or sends data into a specific frame. Will replace anything in the frame.
-         * 
-         * @ignore
-         * @category panels
-         * @param {HTMLIFrameElement} frame - The frame element
-         * @param {any} url - URL to load.
-         * @param {any} [data] - URL/form encoded data.
-         * @param {any} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
-         * @returns {external:Promise}
-         */
-        weavy.sendToFrame = function (frame, url, data, method) {
-            // Todo: return complete promise instead
-            return weavy.whenBlockChecked.then(function () {
-                method = String(method || "get").toLowerCase();
-
-                // Ensure target exists
-                //var frame = $("iframe[name='" + frameName + "']", weavy.nodes.container).get(0);
-
-                weavy.log("sendToFrame", frame, url);
-                if (frame) {
-                    var frameUrl = url;
-                    if (method === "get") {
-                        if (data) {
-                            // Append data to URL
-                            if (frameUrl.indexOf('?') === -1) {
-                                frameUrl = frameUrl + "?" + data;
-                            } else {
-                                frameUrl = frameUrl + "&" + data;
-                            }
-                        }
-                    }
-
-
-                    if (frame.src !== frameUrl) {
-                        // If no url is set yet, set an url
-                        frame.src = frameUrl;
-                        if (method === "get") {
-                            weavy.info("sendToFrame using src");
-                            // No need to send a form since data is appended to the url
-                            return;
-                        }
-                    } else if (frame.src && method === "get") {
-                        weavy.info("sendToFrame using window.open");
-                        window.open(frameUrl, frame.name);
-                        return;
-                    }
-
-                    weavy.info("sendToFrame using form");
-
-                    // Create a form to send to the frame
-                    var $form = $("<form>", {
-                        action: url,
-                        method: method,
-                        target: frame.name
-                    });
-
-                    if (data) {
-                        data = data.replace(/\+/g, '%20');
-                    }
-                    var dataArray = data && data.split("&") || [];
-
-                    // Add all data as hidden fields
-                    $form.append(dataArray.map(function (pair) {
-                        var nameValue = pair.split("=");
-                        var name = decodeURIComponent(nameValue[0]);
-                        var value = decodeURIComponent(nameValue[1]);
-                        // Find one or more fields
-                        return $('<input>', {
-                            type: 'hidden',
-                            name: name,
-                            value: value
-                        });
-                    }));
-
-                    // Send the form and forget it
-                    $form.appendTo(weavy.nodes.container).submit().remove();
-                }
-            });
-        }
-
-        /**
          * Method for calling JSON API endpoints on the server. You may send data along with the request or retrieve data from the server.
          * 
          * jQuery ajax is used internally and you may override or extend any settings in the {@link external:jqXHR} by providing custom [jQuery Ajax settings]{@link external:jqAjaxSettings}.
@@ -832,7 +656,7 @@
          *   console.log("Found " + result.count + " results");
          * });
          */
-        weavy.ajax = function (url, data, method, settings, skipAuthenticationCheck) {
+        weavy.ajax = function (url, data, method, settings, allowAnonymous) {
             url = weavy.httpsUrl(url, weavy.options.url);
             method = method || "GET";
             data = data && typeof data === "string" && data || method !== "GET" && data && JSON.stringify(data) || data;
@@ -844,25 +668,44 @@
                 contentType: "application/json",
                 crossDomain: true,
                 dataType: "json",
+                dataFilter: function (data, dataType) {
+                    return dataType === "json" ? JSON.stringify(utils.keysToCamel(JSON.parse(data))) : data;
+                },
                 xhrFields: {
                     withCredentials: true
+                },
+                headers: {
+                    // https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             }, settings, true);
 
-            if (!skipAuthenticationCheck) {
-                // Wait for load to get auth state
-                return weavy.whenLoaded.then(function () {
-                    return weavy.authentication.whenAuthorized().then(function () {
-                        // When signed-in, do ajax
+            var whenAuthenticated = allowAnonymous ? weavy.authentication.whenAuthenticated : weavy.authentication.whenAuthorized;
+
+            return whenAuthenticated().then(function () {
+                return weavy.authentication.getJwt().then(function (token) {
+                    if (typeof token === "string") {
+                        // JWT configured, use bearer token
+                        settings.headers.Authorization = "Bearer " + token;
+
+                        return $.ajax(settings).catch(function (xhr, status, error) {
+                            if (xhr.status === 401) {
+                                weavy.warn("weavy.ajax: JWT failed, trying again");
+                                return weavy.authentication.getJwt(true).then(function (token) {
+                                    // new bearer token
+                                    settings.headers.Authorization = "Bearer " + token;
+                                    return $.ajax(settings);
+                                })
+                            } else {
+                                weavy.error("weavy.ajax: authenticate with JWT token failed", status, xhr.responseJSON && xhr.responseJSON.message ? "\n" + xhr.responseJSON.message : error);
+                            }
+                        });
+                    } else {
+                        // JWT not configured, try without bearer token
                         return $.ajax(settings);
-                    }).catch(function () {
-                        return Promise.reject();
-                    });                        // Give up if not signed in and authentication plugin disabled (no sign-in panel)
+                    }
                 });
-            } else {
-                // Skip the auth check and try ajax anyway
-                return $.ajax(settings);
-            }
+            });
         }
 
         /**
@@ -907,10 +750,8 @@
 
         // Register init before any plugins do
         weavy.on("init", function () {
-            if (weavy.options.space) {
-                weavy.options.spaces = weavy.options.space;
-                weavy.warn("Using new Weavy({ space: ... }) is deprecated. Use new Weavy({ spaces: [...]}) instead.");
-            }
+
+            // Prepopulate spaces
             if (weavy.options.spaces) {
                 var spaces = utils.asArray(weavy.options.spaces);
 
@@ -920,7 +761,12 @@
                     }
                 });
             }
-            return connectAndLoad(true);
+
+            return loadClientData().then(function () {
+                var wFrameStatusCheck = frameStatusCheck.call(weavy);
+                var wConnectionInit = weavy.connection.init(true, weavy.authentication);
+                return $.when(wFrameStatusCheck, wConnectionInit);
+            });
         });
 
 
@@ -946,46 +792,6 @@
             weavy.triggerEvent("message", message.data, message);
         });
 
-        weavy.on(wvy.postal, "reload", weavy.getId(), function (message) {
-            // reload and re-init all weavy instances
-            weavy.log("reload recieved from postal, reconnecting and loading");
-            //connectAndLoad(true);
-        });
-
-        weavy.on(wvy.postal, "reset", weavy.getId(), function (message) {
-            var active = $(".weavy-panel.weavy-open", weavy.nodes.container); // TODO: use weavy.panelId?
-            if (active.length) {
-                weavy.reset(active.attr("data-id"));
-            }
-        });
-
-        weavy.on(wvy.postal, "close", weavy.getId(), function (message) {
-            weavy.close();
-        });
-
-        weavy.on(wvy.postal, "maximize", weavy.getId(), function (message) {
-            weavy.maximize();
-        });
-
-        weavy.on(wvy.postal, "send", weavy.getId(), function (message) {
-            weavy.load(message.data.panelId, message.data.url, message.data.data, message.data.method, true);
-            weavy.open(message.data.panelId);
-        });
-
-        weavy.on(wvy.postal, "request:open", weavy.getId(), function (message) {
-            if (message.data.panelId) {
-                if (message.data.destination) {
-                    weavy.load(message.data.panelId, message.data.destination, null, null, true);
-                }
-                weavy.open(message.data.panelId);
-            }
-        });
-
-        weavy.on(wvy.postal, "request:close", weavy.getId(), function (message) {
-            if (message.data.panelId) {
-                weavy.close(message.data.panelId);
-            }
-        });
 
         // REALTIME EVENTS
 
@@ -1011,8 +817,8 @@
             weavy.triggerEvent("badge", data);
         });
 
-        weavy.on("signing-out signed-out", function () {
-            weavy.triggerEvent("badge", { conversations: 0, notifications: 0, total: 0});
+        weavy.on("clear-user signed-out", function () {
+            weavy.triggerEvent("badge", { conversations: 0, notifications: 0, total: 0 });
         })
 
         weavy.on("clientdata", function (e, clientData) {
@@ -1025,7 +831,7 @@
                 var spaces = utils.asArray(clientData.spaces);
 
                 spaces.forEach(function (spaceData) {
-                     var foundSpace = weavy.spaces.filter(function (ctx) { return ctx.match(spaceData) }).pop();
+                    var foundSpace = weavy.spaces.filter(function (space) { return space.match(spaceData) }).pop();
                     if (foundSpace) {
                         weavy.debug("Populating space data", spaceData.id);
                         foundSpace.data = spaceData;
@@ -1039,72 +845,67 @@
                 weavy.error("Weavy client/server version mismatch! \nclient: " + Weavy.version + " \nserver: " + weavy.data.version);
             }
 
-            initRoot.call(weavy);
+            if (weavy.isLoaded === false) {
+                initRoot.call(weavy);
 
-            frameStatusCheck.call(weavy);
+                /**
+                    * Event triggered when weavy is building up the DOM elements.
+                    * 
+                    * Use this event to build all your elements and attach them to weavy.
+                    * At this point you may safely assume that weavy.nodes.container is built.
+                    * 
+                    * Good practice is to build all elements in the build event and store them as properties on weavy.
+                    * Then you can attach them to other Elements in the after:build event.
+                    * This ensures that all Elements are built before they are attached to each other.
+                    *
+                    * If you have dependencies to Elements built by plugins you should also check that they actually exist before attaching to them.
+                    *
+                    * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
+                    *
+                    * @example
+                    * weavy.on("build", function(e, root) {
+                    *     if (weavy.authentication.isAuthorized()) {
+                    *         weavy.nodes.myElement = document.createElement("DIV");
+                    *     }
+                    * });
+                    * 
+                    * weavy.on("after:build", function(e, root) {
+                    *     if (weavy.authentication.isAuthorized()) {
+                    *         if (weavy.nodes.dock) {
+                    *             weavy.nodes.dock.appendChild(weavy.nodes.myElement);
+                    *         }
+                    *     }
+                    * })
+                    *
+                    * @category events
+                    * @event Weavy#build
+                    */
 
-            weavy.whenBlockChecked.then(function () {
-                if (weavy.isLoaded === false) {
-
-                    /**
-                        * Event triggered when weavy is building up the DOM elements.
-                        * 
-                        * Use this event to build all your elements and attach them to weavy.
-                        * At this point you may safely assume that weavy.nodes.container is built.
-                        * 
-                        * Good practice is to build all elements in the build event and store them as properties on weavy.
-                        * Then you can attach them to other Elements in the after:build event.
-                        * This ensures that all Elements are built before they are attached to each other.
-                        *
-                        * If you have dependencies to Elements built by plugins you should also check that they actually exist before attaching to them.
-                        *
-                        * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
-                        *
-                        * @example
-                        * weavy.on("build", function(e, root) {
-                        *     if (weavy.authentication.isAuthorized()) {
-                        *         weavy.nodes.myElement = document.createElement("DIV");
-                        *     }
-                        * });
-                        * 
-                        * weavy.on("after:build", function(e, root) {
-                        *     if (weavy.authentication.isAuthorized()) {
-                        *         if (weavy.nodes.dock) {
-                        *             weavy.nodes.dock.appendChild(weavy.nodes.myElement);
-                        *         }
-                        *     }
-                        * })
-                        *
-                        * @category events
-                        * @event Weavy#build
-                        */
-
-                    weavy.isLoaded = true;
-                    weavy.triggerEvent("build", { container: weavy.nodes.container, overlay: weavy.nodes.overlay });
+                weavy.isLoaded = true;
+                weavy.triggerEvent("build", { container: weavy.nodes.container, overlay: weavy.nodes.overlay });
 
 
-                    /**
-                        * Event triggered when weavy has initialized, connected to the server and recieved and processed options, and built all components.
-                        * Use this event to do stuff when everything is loaded.
-                        * 
-                        * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
-                        * 
-                        * @example
-                        * weavy.on("load", function() {
-                        *     if (weavy.authentication.isAuthorized()) {
-                        *         weavy.alert("Widget successfully loaded");
-                        *     }
-                        * });
-                        * 
-                        * @category events
-                        * @event Weavy#load
-                        */
-                    weavy.triggerEvent("load");
-                }
+                /**
+                    * Event triggered when weavy has initialized, connected to the server and recieved and processed options, and built all components.
+                    * Use this event to do stuff when everything is loaded.
+                    * 
+                    * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
+                    * 
+                    * @example
+                    * weavy.on("load", function() {
+                    *     if (weavy.authentication.isAuthorized()) {
+                    *         weavy.alert("Widget successfully loaded");
+                    *     }
+                    * });
+                    * 
+                    * @category events
+                    * @event Weavy#load
+                    */
+                weavy.triggerEvent("load");
+            }
 
-                weavy.isLoading = false;
-                weavy.triggerEvent("processed:load");
-            });
+            weavy.isLoading = false;
+            weavy.triggerEvent("processed:load");
 
 
         });
@@ -1217,15 +1018,13 @@
      * The presets may be merged with custom options when you create a new Weavy, since the contructor accepts multiple option sets. 
      * 
      * @example
-     * // Load the minimal weavy core without any panels.
+     * // Load the minimal weavy core without any additional plugins.
      * var weavy = new Weavy(Weavy.presets.core, { url: "https://myweavysite.com" });
      * 
      * @category options
      * @type {Object}
      * @property {Weavy#options} Weavy.presets.noplugins - Disable all plugins.
      * @property {Weavy#options} Weavy.presets.core - Enable all core plugins only.
-     * @property {Weavy#options} Weavy.presets.extended - Enable all core plugins and all extended plugins.
-     * @property {Weavy#options} Weavy.presets.panel - Minimal plugin set to only have one or more panels.
      */
     Weavy.presets = {
         noplugins: {
@@ -1235,18 +1034,6 @@
             includePlugins: false,
             plugins: {
                 alert: true,
-                filebrowser: true,
-                preview: true,
-                theme: true
-            }
-        },
-        extended: {
-            includePlugins: true
-        },
-        panel: {
-            includePlugins: false,
-            className: "weavy-frame",
-            plugins: {
                 filebrowser: true,
                 preview: true,
                 theme: true
@@ -1282,23 +1069,22 @@
      * @property {boolean} [init=true] - Should weavy initialize automatically.
      * @property {boolean} [isMobile] - Indicates if the browser is mobile. Defaults to the RegExp expression <code>/iPhone&#124;iPad&#124;iPod&#124;Android/i.test(navigator.userAgent)</code>
      * @property {boolean} [includePlugins=true] - Whether all registered plugins should be enabled by default. If false, then each plugin needs to be enabled in plugin-options.
-     * @property {Element} [overlay] - Element to use for overlay purposes. May for instance use the overlay of another Weavy instance.
+     * @property {boolean} [preload] - Start automatic preloading after load
      * @property {string} url - The URL to the Weavy-installation to connect to.
      */
     Weavy.defaults = {
         container: null,
-        className: "weavy-frame",
         https: "adaptive", // force, adaptive or default 
         init: true,
         isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent), // Review?
         includePlugins: true,
-        overlay: null,
+        preload: true,
         url: "/"
     };
 
 
     /**
-     * Placeholder for registering plugins. Plugins must be registered and available here to be accessible and initialized in the Widget. Register any plugins after you have loaded weavy.js and before you create a new Weavy instance.
+     * Placeholder for registering plugins. Plugins must be registered and available here to be accessible and initialized in the Weavy instance. Register any plugins after you have loaded weavy.js and before you create a new Weavy instance.
      * @type {Object.<string, plugin>}
      */
     Weavy.plugins = {};
@@ -1309,7 +1095,7 @@
      * @type {string[]}
      */
     Object.defineProperty(Weavy, 'instances', {
-        get: function() { return _weavyIds.slice(); },
+        get: function () { return _weavyIds.slice(); },
         configurable: false
     });
 
@@ -1380,7 +1166,7 @@
                 }
                 url = baseUrl + url;
             }
-            
+
             // Check protocol
             if (https === "enforce") {
                 url = url.replace(/^http:/, "https:");

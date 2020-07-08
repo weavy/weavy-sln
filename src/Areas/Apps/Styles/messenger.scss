@@ -28,7 +28,7 @@
 //@import "../../../styles/vendor/bootstrap/pagination";
 @import "../../../styles/vendor/bootstrap/badge";
 //@import "../../../styles/vendor/bootstrap/jumbotron";
-//@import "../../../styles/vendor/bootstrap/alert";
+@import "../../../styles/vendor/bootstrap/alert";
 @import "../../../styles/vendor/bootstrap/progress";
 @import "../../../styles/vendor/bootstrap/media";
 @import "../../../styles/vendor/bootstrap/list-group";
@@ -66,7 +66,7 @@
 
 
 .turbolinks-progress-bar {
-    display:none;
+    display: none;
 }
 
 body {
@@ -140,6 +140,18 @@ body {
         @include scrollbar;
         @include scroll-y;
     }
+}
+
+.alerts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1rem;
+    width: 100%;
+    position: fixed;
+    top: 1.5rem;
+    z-index: 1051;
+    pointer-events: none;
 }
 
 // pane with conversation list
@@ -378,6 +390,37 @@ body {
 
         .media-title {
             margin-bottom: 0;
+        }
+
+        .list-group-item {
+            padding: .5rem;
+        }
+
+        .list-group-item-action {
+            &:hover, &:focus {
+                background: $list-group-bg;
+            }
+        }
+    }
+
+    .card-meetings {
+
+        .i {
+            margin-right: .5rem;
+            align-self: flex-start;
+        }
+
+        .media-body {
+            margin-right: .25rem;
+
+            button {
+                margin-top: 0.5rem;
+            }
+        }
+
+        .media-title {
+            margin-bottom: 0;
+            white-space: unset;
         }
 
         .list-group-item {
@@ -918,6 +961,18 @@ body.dual {
         }
     }
 }
+
+.table-meetings {
+    // close icon
+    td.table-icon:nth-child(3) {
+        padding: .25rem;
+    }
+
+    tr:last-child td {
+        border-bottom: $border-width solid rgba(0, 0, 0, .08);
+    }
+}
+
 // attached files in new message
 .table-uploads {
 
@@ -1008,7 +1063,7 @@ body.dual {
     bottom: 0;
     z-index: $zindex-sticky;
     background: $white;
-    border-top: 1px solid $border-color;
+    @extend .border-top;
 
     .form-container {
         // relative so that we can position the file upload progress bar and emoji picker
@@ -1027,6 +1082,19 @@ body.dual {
     .form-group {
         margin: 0;
         position: relative;
+        display: flex;
+        flex-direction: row;
+
+        .emojionearea {
+            z-index: 10;
+        }
+
+        .emojionearea-editor {
+            padding: .5rem 2rem .5rem .5rem;
+            background-color: $gray-100;
+            margin: 0.25rem 0.25rem 0.25rem 0.5rem;
+            word-break: break-word;
+        }
     }
 
     .form-control {
@@ -1039,35 +1107,51 @@ body.dual {
             background-color: $input-bg;
         }
     }
-    // file upload button
-    .btn-file {
-        position: absolute;
-        bottom: .5rem;
-        left: .5rem;
-        overflow: hidden;
-        display: inline-flex;
+
+    .dropup {
+        display: flex;
+        align-items: center;
+        margin: 0 0 0.25rem 0.25rem;
+        align-self: flex-end;
+    }
+    
+    .btn-tool {
+        align-self: flex-end;
+        margin: 0 0 0.5rem 0.25rem;
+        cursor: pointer;
 
         &:hover {
             opacity: 1;
         }
-
-        > input {
-            position: absolute;
-            top: 0;
-            right: 0;
-            margin: 0;
-            opacity: 0;
-            -ms-filter: 'alpha(opacity=0)';
-            font-size: 8.125rem; // 130px;
-            direction: ltr;
-            cursor: pointer;
-        }
     }
+
+    // file upload button
+    .btn-file > input {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        opacity: 0;
+        -ms-filter: 'alpha(opacity=0)';
+        font-size: 8.125rem; // 130px;
+        direction: ltr;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
     // submit button
     .btn-primary {
-        position: absolute;
-        bottom: .5rem;
-        right: .5rem;
+        align-self: flex-end;
+        margin: 0 0.25rem 0.5rem 0;
+    }
+}
+
+body:not(.embedded) {
+    @include media-breakpoint-down(xs) {
+        .emojionearea-editor {
+            padding: .5rem !important;
+        }
     }
 }
 
@@ -1193,22 +1277,8 @@ body.dual {
 // images
 .image-grid {
     background-color: inherit;
-
-    .image {
-
-        .img-play {
-            display: none;
-            animation-play-state: paused;
-        }
-
-        &:hover, &:focus {
-            .img-play {
-                display: block;
-                animation-play-state: running;
-            }
-        }
-    }
 }
+
 // preview navbar (instead of including _navbar.scss to avoid lots of unused rules)
 .navbar-preview {
     .navbar-icons {
@@ -1244,7 +1314,7 @@ body.dual {
 }
 // emoji and mentions autocomplete
 .textcomplete-dropdown {
-    max-width: 16rem;
+    max-width: 20rem;
 
     @include media-breakpoint-down(xs) {
         left: 1rem !important;
@@ -1264,7 +1334,7 @@ body.dual {
             margin-right: .325rem;
         }
 
-        span {
+        > span {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

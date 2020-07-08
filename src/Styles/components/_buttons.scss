@@ -152,3 +152,29 @@
         z-index: 1;
     }
 }
+
+.btn-checkbox {
+
+    .i-checkbox-blank-outline {
+        display: inline-flex;
+    }
+
+    .i-checkbox-marked-outline {
+        display: none;
+    }
+
+    [type=checkbox] {
+        visibility: hidden;
+        position: absolute;
+
+        &:checked {
+            ~ .i-checkbox-blank-outline {
+                display: none;
+            }
+
+            ~ .i-checkbox-marked-outline {
+                display: inline-flex;
+            }
+        }
+    }
+}

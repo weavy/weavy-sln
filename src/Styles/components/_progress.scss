@@ -1,5 +1,18 @@
 ﻿/// <reference path="../_core.scss" />
 
+.fileupload-progress-bar,
+.turbolinks-progress-bar {
+    position: fixed;
+    display: block;
+    top: 0;
+    left: 0;
+    background-color: $primary; // a color that is visible on our navbar and on the defult body color
+    transition: width 300ms ease-out, opacity 150ms 150ms ease-in;
+    transform: translate3d(0, 0, 0);
+    height: .25rem;
+    z-index: 9999;
+}
+
 .progress {
     &.progress-fixed {
         position: fixed;

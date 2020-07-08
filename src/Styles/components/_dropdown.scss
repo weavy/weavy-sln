@@ -75,7 +75,7 @@ $md-menu-fade-duration: 0.2s;
         margin-right: .5rem;
     }
 
-    span {
+    > span {
         @include text-truncate();
         flex: 1 1 0%;
         line-height: $line-height-base;
@@ -100,7 +100,7 @@ $md-menu-fade-duration: 0.2s;
 
 .dropdown-menu.textcomplete-dropdown {
     opacity: 1;
-    max-width: 16rem;
+    max-width: 20rem;
     z-index: $zindex-modal !important;
 
     .textcomplete-item {
@@ -116,7 +116,7 @@ $md-menu-fade-duration: 0.2s;
                 margin-right: .5rem;
             }
 
-            span {
+            > span {
                 @include text-truncate();
                 flex: 1 1 0%;
             }

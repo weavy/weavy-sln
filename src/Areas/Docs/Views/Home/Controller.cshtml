@@ -1,0 +1,12 @@
+@model ControllerDoc
+@{
+    Title = Model.Name;
+    Back = Url.Action(nameof(HomeController.Index));
+}
+
+<h1 class="display-1">@Title</h1>
+@if (Model.Description != null) {
+    <p>@Model.Description @if (Model.Remarks != null) {<em>@Model.Remarks</em>}</p>
+}
+
+@{ Html.RenderPartial("_Actions"); }

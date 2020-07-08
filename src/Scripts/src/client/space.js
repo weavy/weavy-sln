@@ -9,7 +9,8 @@
         define([
             'jquery',
             './app',
-            './utils'
+            './utils',
+            './promise'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -18,17 +19,19 @@
         module.exports = factory(
             require('jquery'),
             require('./app'),
-            require('./utils')
+            require('./utils'),
+            require('./promise')
         );
     } else {
         // Browser globals (root is window)
         root.WeavySpace = factory(
             jQuery,
             root.WeavyApp,
-            root.WeavyUtils
+            root.WeavyUtils,
+            root.WeavyPromise
         );
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyApp, utils) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyApp, utils, WeavyPromise) {
     console.debug("space.js");
 
     var WeavySpace = function (weavy, options, data) {
@@ -54,7 +57,6 @@
         this.options = options;
         this.data = data;
 
-
         this.apps = new Array();
 
         // Event handlers
@@ -67,27 +69,8 @@
         this.isLoaded = false;
         this.isBuilt = false;
 
-        var _whenLoaded = $.Deferred();
-        // app.whenLoaded().then(...)
-        Object.defineProperty(this, "whenLoaded", {
-            get: function () {
-                return _whenLoaded.promise;
-            }
-        });
-
-        var _whenBuilt = $.Deferred();
-        // app.whenBuilt().then(...)
-        Object.defineProperty(this, "whenBuilt", {
-            get: function () {
-                return _whenBuilt.promise;
-            }
-        });
-
-        // DEPRECATED
-        if (options.toggled !== undefined) {
-            weavy.warn("space: { toggled: " + options.toggled + " } option is deprecated, use { tabbed: " + options.toggled + " } instead")
-            options.tabbed = options.toggled;
-        }
+        this.whenLoaded = new WeavyPromise();
+        this.whenBuilt = new WeavyPromise();
 
         // Use tabbed option otherwise false.
         this.tabbed = options.tabbed !== undefined ? options.tabbed : false;
@@ -145,16 +128,15 @@
                     space.apps.forEach(function (app) {
                         var foundAppData = dataApps.filter(function (appData) { return app.match(appData) }).pop();
                         if (foundAppData) {
-                            weavy.debug("Populating app data", foundAppData.id);
+                            weavy.debug("Populating app data", { id: foundAppData.id, key: foundAppData.key || app.key, type: foundAppData.type || app.type });
                             app.data = foundAppData;
                             app.configure();
                         }
                     })
                 }
 
-
                 space.isLoaded = true;
-                _whenLoaded.resolve(space.data);
+                space.whenLoaded.resolve(space.data);
 
                 if (space.weavy.isLoaded) {
                     space.build();
@@ -169,18 +151,18 @@
             }
 
             if (space.options && typeof space.options === "object") {
-                space.weavy.connection.invoke("client", "initSpace", space.options).then(function (data) {
-                    space.data = data;
+                var initSpaceUrl = weavy.httpsUrl("/client/space", weavy.options.url);
 
+                weavy.ajax(initSpaceUrl, space.options, "POST").then(function (data) {
+                    space.data = data;
                     space.configure.call(space);
-                }).catch(function (error) {
-                    space.weavy.error("WeavySpace.fetchOrCreate()", error.message, error);
-                    _whenLoaded.reject(error);
+                }).catch(function (xhr, status, error) {
+                    space.weavy.error("WeavySpace.fetchOrCreate()", xhr.responseJSON && xhr.responseJSON.message || xhr);
+                    space.whenLoaded.reject(xhr.responseJSON && xhr.responseJSON.message || xhr);
                 });
             } else {
-                _whenLoaded.reject(new Error("WeavySpace.fetchOrCreate() requires options"));
+                space.whenLoaded.reject(new Error("WeavySpace.fetchOrCreate() requires options"));
             }
-
             return space.whenLoaded();
         }
 
@@ -195,7 +177,7 @@
                     space.root = weavy.createRoot(space.container, "space-" + space.id);
                     space.root.container.panels = weavy.panels.createContainer();
                     space.root.container.appendChild(space.root.container.panels);
-                    _whenBuilt.resolve();
+                    space.whenBuilt.resolve();
                 }
             }
         }
@@ -210,7 +192,16 @@
         var isId = Number.isInteger(appOptions);
         var isKey = typeof appOptions === "string";
         var isConfig = $.isPlainObject(appOptions);
+
         var selector = isConfig && appOptions || isId && { id: appOptions } || isKey && { key: appOptions };
+
+        if (!selector) {
+            if ('id' in appOptions) {
+                selector = { id: appOptions.id };
+            } else if ('key' in appOptions) {
+                selector = { key: appOptions.key };
+            }
+        }
 
         return { isId: isId, isKey: isKey, isConfig: isConfig, selector: selector };
     }
@@ -231,7 +222,7 @@
                 if (appSelector.isConfig) {
                     app = new WeavyApp(weavy, space, appOptions);
                     space.apps.push(app);
-                    $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded).then(function () {
+                    $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded(), space.whenLoaded()).then(function () {
                         app.fetchOrCreate();
                     });
                 } else {
@@ -241,30 +232,6 @@
         }
 
         return app;
-    }
-
-    WeavySpace.prototype.open = function (appOptions, destination) {
-        return this.app(appOptions).open(destination);
-    }
-
-    WeavySpace.prototype.toggle = function (appOptions, destination) {
-        return this.app(appOptions).toggle();    
-    }
-
-    WeavySpace.prototype.close = function (appOptions) {
-        return this.app(appOptions).close();
-    }
-
-    WeavySpace.prototype.clear = function () {
-        var clearPromises = [];
-
-        this.apps.forEach(function (app) {
-            clearPromises.push(app.clear());
-        });
-
-        this.apps = new Array();
-
-        return Promise.all(clearPromises);
     }
 
     WeavySpace.prototype.remove = function () {

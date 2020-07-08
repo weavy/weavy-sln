@@ -1,0 +1,25 @@
+﻿@model  Meeting
+
+<div class="list-group-item list-group-item-action" data-type="meeting">
+    <div class="media">
+        @Svg.Icon("zoom", color: "native", size: 48)
+        <div class="media-body">
+            <h6 class="media-title">Zoom Meeting</h6>
+            @if (Model.EndedAt != null) {
+                <small class="text-muted">Meeting ended: @Html.Time(Model.EndedAt, "t")</small>
+            } else {
+                <small class="text-muted">Meeting ID: @(System.Text.RegularExpressions.Regex.Replace(Model.MeetingId, @"(\d{3})(\d{3})(\d{4})", "$1-$2-$3"))</small>
+            }
+
+            @if (Model.EndedAt != null) {
+                if (Model.RecordingUrl != null) {
+                    <p class="mb-1"><a href="@Model.RecordingUrl" target="_blank" class="btn btn-sm btn-primary mt-2">@Svg.Icon("play") Play recording</a></p>
+                }
+            } else if (Model.CreatedById == WeavyContext.User.Id) {
+                <p class="mb-1"><a href="@Model.JoinUrl" target="_blank" class="btn btn-sm btn-primary mt-2">Start meeting</a></p>
+            } else {
+                <p class="mb-1"><a href="@Model.JoinUrl" target="_blank" class="btn btn-sm btn-primary mt-2">Join meeting</a></p>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+// Custom variables and colors
+@import '../../../Styles/variables';
+
+// Bootstrap
+@import "../../../Styles/vendor/bootstrap/functions";
+@import "../../../Styles/functions"; // override some of the default bootstrap functions
+@import "../../../Styles/vendor/bootstrap/variables";
+@import "../../../Styles/vendor/bootstrap/mixins";
+@import "../../../Styles/vendor/bootstrap/root";
+@import "../../../Styles/vendor/bootstrap/reboot";
+@import "../../../Styles/vendor/bootstrap/type";
+@import "../../../Styles/vendor/bootstrap/images";
+@import "../../../Styles/vendor/bootstrap/code";
+@import "../../../Styles/vendor/bootstrap/grid";
+@import "../../../Styles/vendor/bootstrap/tables";
+@import "../../../Styles/vendor/bootstrap/buttons";
+@import "../../../Styles/vendor/bootstrap/transitions";
+@import "../../../Styles/vendor/bootstrap/nav";
+@import "../../../Styles/vendor/bootstrap/navbar";
+@import "../../../Styles/vendor/bootstrap/alert";
+@import "../../../Styles/vendor/bootstrap/progress";
+@import "../../../Styles/vendor/bootstrap/list-group";
+@import "../../../Styles/vendor/bootstrap/utilities";
+@import "../../../Styles/vendor/bootstrap/print";
+@import '../../../Styles/utilities/fonts';
+@import '../../../Styles/utilities/scroll';
+@import '../../../Styles/utilities/text';
+
+// Bootstrap overrides and custom components
+@import "../../../Styles/components/layout";
+@import "../../../Styles/components/buttons";
+@import "../../../Styles/components/icons";
+@import "../../../Styles/components/images";
+@import "../../../Styles/components/nav";
+@import "../../../Styles/components/navbar";
+@import "../../../Styles/components/progress";
+@import "../../../Styles/components/tables";
+
+// syntax highlighting
+@import "prism";
+
+// table with verb + path + description
+.api-methods {
+    @extend .table-fixed;
+    
+    // verb
+    td:nth-child(1), th:nth-child(1) {
+        width: 5rem;
+        @include text-truncate;
+    }
+
+    // path
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    
+    // description
+    td:nth-child(3), th:nth-child(3) {
+        display: none;
+    }
+
+    @include media-breakpoint-up(md) {
+        td:nth-child(2), th:nth-child(2) {
+            width: 15rem;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            width: 100%;
+            display: table-cell;
+            @include text-truncate;
+        }
+    }
+}
+
+.method-params {
+    @extend .list-unstyled;
+
+    li > code {
+        color: $body-color;
+        font-size: $font-size-base;
+    }
+
+    span {
+        color: $text-muted;
+        font-size: $font-size-sm;
+    }
+
+    p {
+        color: $text-muted;
+        margin-bottom:.375rem;
+    }
+}
+
+

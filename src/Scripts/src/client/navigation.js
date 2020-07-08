@@ -6,17 +6,23 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
+        define([
+            'jquery',
+            './promise'
+        ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('jquery'));
+        module.exports = factory(
+            require('jquery'),
+            require('./promise')
+        );
     } else {
         // Browser globals (root is window)
-        root.WeavyNavigation = factory(jQuery);
+        root.WeavyNavigation = factory(jQuery, root.WeavyPromise);
     }
-}(typeof self !== 'undefined' ? self : this, function ($) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyPromise) {
     console.debug("navigation.js");
 
     /**
@@ -32,7 +38,7 @@
         this.options = options = weavy.extendDefaults(WeavyNavigation.defaults, options);
 
         function openRequest(request) {
-            var whenOpened = $.Deferred();
+            var whenOpened = new WeavyPromise();
 
             if (request.space && request.app && (request.space.id || request.space.key) && (request.app.id || request.app.key)) {
 
@@ -75,7 +81,7 @@
                 whenOpened.reject();
             }
 
-            return whenOpened.promise();
+            return whenOpened();
         }
         /**
          * Try to open an url in the app where it belongs. Automaticalyy finds out where to open the url unless routing data is provided in a {NavigationRequest} object.

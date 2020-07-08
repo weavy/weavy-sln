@@ -1,0 +1,27 @@
+﻿@model DirectoryModel
+@{
+    Title = Model.Directory?.Name ?? ConfigurationService.ApplicationName + " (Default)";
+    Back = Url.Action<DirectoriesController>(c => c.Index(null));
+}
+<div class="container-fluid my-3">
+    <table class="table @(Model.Members.HasItems() ? "table-hover" : "") table-name-desc">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th><a href="@Url.OrderBy("name")">Name</a></th>
+                <th><a href="@Url.OrderBy("email")">Email</a></th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody id="infinite-scroll-target">
+            @if (Model.Members.HasItems()) {
+                Html.RenderPartial("_UserTable", Model.Members);
+            } else {
+                <tr>
+                    <td class="text-muted text-center empty" colspan="4">There are no people in this directory.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.ScrollMore(Model.Members)
+</div>

@@ -21,7 +21,7 @@ wvy.stars = (function ($) {
     }
 
     function removeUnstarredInTab() {
-        $('[data-toggle="star"]:not(.on)', "#tab-stars .table-stars").closest("tr").remove();
+        $('[data-toggle="star"]:not(.on)', "#tab-stars .table").closest("tr").remove();
     }
 
     // attach click event handler to [data-toggle=star]
@@ -44,28 +44,31 @@ wvy.stars = (function ($) {
     if (wvy.connection) {
         // respond to realtime star event
         wvy.connection.default.on("star.weavy", function (e, data) {
-            
+
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").addClass("on").removeClass("d-none").attr("title", "Unstar");
 
             // Add to stars tab
             if (!$('#tab-stars tr[data-href="' + data.url + '"]').length) {
 
-                var $starItem = $('<tr data-href="' + data.url + '"></tr>');
+                var $starRow = $('<tr data-href="' + data.url + '"></tr>');
 
                 if (data.type === "space" || data.type === "user") {
-                    $starItem.append('<td class="table-icon"><img alt="" class="img-32 avatar" src="' + data.thumbUrl.replace(/{options}/, "64x64") + '"></td>');
+                    $starRow.append('<td class="table-icon"><img alt="" class="img-32 avatar" src="' + data.thumbUrl.replace(/{options}/, "64") + '"></td>');
                 } else {
-                    $starItem.append('<td class="table-icon"><svg class="i' + (data.icon.color ? " text-" + data.icon.color : "") + '"><use xlink: href="#' + data.icon.name + '"></use></svg></td>')
+                    // TODO: inject actual icon here, but since json only returs name of icon instead of actual svg it's hard... we should maybe change the json response to include the actual icon?
+                    $starRow.append('<td class="table-icon"></td>')
                 }
-                $starItem.append('<td><a href="' + data.url + '">' + (data.name || data.text && data.text.trunc(32) || "") + '</a></td>');
-                $starItem.append('<td class="table-icon"><button type="button" class="btn btn-icon on" data-entity="' + data.type.toString().toLowerCase() + '" data-id="' + data.id + '" data-toggle="star"><svg class="text-yellow i d-block"><use xlink: href="#star-outline"></use></svg><svg class="text-yellow i d-none"><use xlink: href="#star"></use></svg></button></td>');
+                $starRow.append('<td><a href="' + data.url + '">' + (data.name || data.text && data.text.trunc(32) || "") + '</a></td>');
+                $starRow.append('<td class="table-icon"><button type="button" class="btn btn-icon on" data-entity="' + data.type.toString().toLowerCase() + '" data-id="' + data.id + '" data-toggle="star">' +
+                    '<svg height="24" viewBox="0 0 24 24" width="24" class="d-none i i-star text-yellow"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"></path></svg>'
+                    + '</button></td>');
 
-                $starItem.prependTo("#tab-stars .table-stars > tbody");
+                $starRow.prependTo("#tab-stars .table > tbody");
             }
         });
 
         // respond to realtime unstar event
-        wvy.connection.default.on("unstar.weavy", function (e, data) {            
+        wvy.connection.default.on("unstar.weavy", function (e, data) {
             $("[data-toggle=star][data-entity=" + data.type + "][data-id=" + data.id + "]").removeClass("on").attr("title", "Star");
         });
     }

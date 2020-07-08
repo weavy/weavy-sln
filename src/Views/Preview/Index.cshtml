@@ -1,0 +1,35 @@
+﻿@{
+    Title = "Photo Preview";
+    Back = null;
+    Layout = "_Layout.cshtml";
+}
+
+@section scripts {
+    <script async>
+        // Photoswipe
+        wvy.postal.on("photoswipe-options", function (e) {
+            wvy.whenLoaded.then(function () {
+                console.log("opening photoswipe from parent", e.data.options);
+                wvy.photoswipe.open(e.data.options, true);
+            });
+        });
+        wvy.postal.postToParent({ name: "request:photoswipe-options" });
+
+        // Preview
+        wvy.postal.on("preview-options", function (e) {
+            wvy.whenLoaded.then(function () {
+                console.log("opening preview from parent", e.data.options);
+                wvy.preview.open(e.data.options);
+            });
+        });
+
+        // Close on hide
+        wvy.postal.on("hide", function () {
+            wvy.preview.close()
+            wvy.photoswipe.close();
+        })
+    </script>    
+}
+
+
+

@@ -3,16 +3,7 @@
 .table {
 
     th, td {
-        padding-left: .25rem;
-        padding-right: .25rem;
-
-        &:first-child {
-            padding-left: .5rem;
-        }
-
-        &:last-child {
-            padding-right: .5rem;
-        }
+        padding: $table-cell-padding $table-cell-padding-sm;
 
         &.table-icon {
             // cell with .img-32 or .btn-icon
@@ -21,72 +12,61 @@
             text-align: center;
             vertical-align: middle;
             position: relative;
-            width: 2.5rem;
+            padding: 0 $table-cell-padding-sm;
+            width: 2rem + $table-cell-padding-sm * 2;
 
             > :only-child {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                margin: auto;
             }
 
-            &:first-child {
-                padding: .25rem 0 .25rem .5rem;
-
-                > :only-child {
-                    margin: auto;
-                    justify-content: flex-start;
-                }
-            }
-
-            &:last-child {
-                padding: .25rem .5rem .25rem 0;
-
-                > :only-child {
-                    margin-left: auto;
-                    justify-content: flex-end;
-                }
+            &:last-child > :only-child {
+                margin-left: auto;
+                margin-right: 0;
+                justify-content: flex-end;
             }
         }
 
-        .btn-icon {
-            margin-top: -.25rem;
-            margin-bottom: -.25rem;
+        > .btn-icon, > svg.i {
+            margin-top: -$table-cell-padding;
+            margin-bottom: -($table-cell-padding - $table-cell-padding-sm);
         }
     }
 
-    &:not(.table-bordered) {
-        thead th {
+    thead {
+        th, td {
+            font-size: $font-size-xs;
+            text-transform: uppercase;
             border-top-color: transparent;
-            border-bottom-width: $table-border-width;
-            border-bottom-color: $table-border-color;
+            border-bottom: $table-border-width solid $table-border-color;
         }
-    }
-
-    thead th {
-        font-size: $font-size-xs;
-        text-transform: uppercase;
     }
 }
 
-@include media-breakpoint-down(xs) {
-    html:not(.framed) {
-        .table {
-            th, td {
-                &:first-child {
-                    padding-left: #{.5rem + $edge-margin};
+.table-bordered {
+    th,
+    td {
+        padding: $table-cell-padding;
+    }
 
-                    &.table-icon {
-                        width: #{2.5rem + $edge-margin}
-                    }
-                }
+    thead th {
+        border-top-color: $table-border-color;
+    }
+}
 
-                &:last-child {
-                    padding-right: #{.5rem + $edge-margin};
+.table-sm {
+    th, td {
+        padding: $table-cell-padding-sm * 2 $table-cell-padding-sm;
 
-                    &.table-icon {
-                        width: #{2.5rem + $edge-margin}
-                    }
-                }
+        &.table-icon {
+            padding: 0;
+            width: 2rem;
+
+            .img-32 {
+                width: 1.5rem;
+                height: 1.5rem;
             }
         }
     }
@@ -94,6 +74,18 @@
 
 .table-fixed {
     table-layout: fixed;
+
+    tr:first-child td {
+        border-top-color: transparent;
+    }
+
+    thead {
+        display: none;
+
+        @include media-breakpoint-up(sm) {
+            display: table-header-group;
+        }
+    }
 }
 
 .table-muted {
@@ -106,8 +98,7 @@
             }
         }
 
-
-        &.table-icon:first-child {
+        &.table-icon:first-child, .badge {
             opacity: $opacity-muted;
         }
     }
@@ -121,7 +112,7 @@
     }
 }
 
-tr[data-href] {
+tr[data-href], tr.table-checkbox {
     cursor: pointer;
 }
 
@@ -131,23 +122,96 @@ tr.dragging-over {
 }
 
 .table-hover tbody tr:hover {
-    transition: background-color linear 400ms;
+    transition: background-color linear 100ms;
+
+    th, td {
+        border-color: lighten($table-border-color, 50);
+        transition: border-color linear 100ms;
+    }
 }
 
-// table with content in folder
-.table-content {
+// table with icon + name (+ icon)
+.table-name {
     @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
     // name
     td:nth-child(2), th:nth-child(2) {
         width: 100%;
+        @include text-truncate;
+    }
+}
+
+// table with icon + name + description (+ icon), e.g. manage plugins etc.
+.table-name-desc {
+    @extend .table-fixed;
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // description
+    td:nth-child(3), th:nth-child(3) {
+        display: none;
+    }
+
+    @include media-breakpoint-up(md) {
+        td:nth-child(2), th:nth-child(2) {
+            width: 20rem;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            width: 100%;
+            display: table-cell;
+            @include text-truncate;
+        }
+    }
+}
+
+// table with icon + name + description + count (+ icon), e.g. space listing etc.
+.table-name-desc-count {
+    @extend .table-fixed;
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
+    }
+    // description
+    td:nth-child(3), th:nth-child(3) {
+        width: 100%;
+        @include text-truncate;
+        display: none;
+    }
+    // count
+    td:nth-child(4), th:nth-child(4) {
+        display: none;
+        width: 5.5rem; // 85px;
+        @include text-truncate;
+        text-align: right;
+    }
+
+    @include media-breakpoint-up(sm) {
+        td:nth-child(4), th:nth-child(4) {
+            display: table-cell;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        td:nth-child(2), th:nth-child(2) {
+            width: 20rem;
+        }
+
+        td:nth-child(3), th:nth-child(3) {
+            display: table-cell;
+        }
+    }
+}
+
+// table for files app
+.table-files {
+    @extend .table-fixed;
+    // name
+    td:nth-child(2), th:nth-child(2) {
+        width: 100%;
+        @include text-truncate;
     }
     // modified
     td:nth-child(3), th:nth-child(3) {
@@ -167,9 +231,6 @@ tr.dragging-over {
     }
     // show columns on larger devices
     @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
 
         td:nth-child(3), th:nth-child(3) {
             display: table-cell;
@@ -189,246 +250,9 @@ tr.dragging-over {
     }
 }
 
-.table-attachments {
-    @extend .table-fixed;
-
-    tr td {
-        border-top-color: transparent;
-    }
-
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-}
-
-.table-people, .table-members {
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        max-width: 1px; // needed for text-truncate
-        @include text-truncate;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-    }
-}
-
-
-.table-roles {
-    @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%; // 160px
-        @include text-truncate;
-    }
-    // description
-    td:nth-child(3), th:nth-child(3) {
-        width: 10rem;
-        @include text-truncate;
-        display: none;
-    }
-    // members
-    td:nth-child(4), th:nth-child(4) {
-        width: 5.5rem; // 85px;
-        @include text-truncate;
-        display: none;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
-        td:nth-child(4), th:nth-child(4) {
-            display: table-cell;
-        }
-    }
-
-    @include media-breakpoint-up(md) {
-        td:nth-child(2), th:nth-child(2) {
-            width: 10rem; // 160px
-        }
-
-        td:nth-child(3), th:nth-child(3) {
-            display: table-cell;
-            width: 100%;
-        }
-    }
-}
-
-.table-spaces {
-    @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    .table-muted .badge-info {
-        color: $white;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-    // description
-    td:nth-child(3), th:nth-child(3) {
-        width: 100%;
-        @include text-truncate;
-        display: none;
-    }
-    // members
-    td:nth-child(4), th:nth-child(4) {
-        width: 5.5rem; // 85px;
-        @include text-truncate;
-        display: none;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
-        td:nth-child(4), th:nth-child(4) {
-            display: table-cell;
-        }
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(lg) {
-        td:nth-child(2), th:nth-child(2) {
-            width: 20rem;
-        }
-
-        td:nth-child(3), th:nth-child(3) {
-            display: table-cell;
-        }
-    }
-}
-
-// table with url + icon
-.table-urls {
-    // url
-    td:nth-child(1), th:nth-child(1) {
-        width: 100%;
-        white-space: nowrap;
-        @include text-truncate;
-    }
-
-    td:nth-child(2), th:nth-child(2) {
-        width: 3rem;
-    }
-}
-
-
-// tables with icon + name + description
-.table-manage {
-    @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-    // description
-    td:nth-child(3), th:nth-child(3) {
-        display: none;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
-        td:nth-child(2), th:nth-child(2) {
-            width: 10rem; // 200px;
-        }
-
-        td:nth-child(3), th:nth-child(3) {
-            width: 100%;
-            display: table-cell;
-            @include text-truncate;
-        }
-    }
-}
-
-// tables with icon + name + description + icon
-.table-extensions {
-    @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-    // description
-    td:nth-child(3), th:nth-child(3) {
-        display: none;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(md) {
-        thead {
-            display: table-header-group;
-        }
-
-        td:nth-child(2), th:nth-child(2) {
-            width: 12.5rem; // 200px;
-        }
-
-        td:nth-child(3), th:nth-child(3) {
-            width: 100%;
-            display: table-cell;
-            @include text-truncate;
-        }
-    }
-}
-
+// table for manage daemons page
 .table-daemons {
     @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
     // name
     td:nth-child(2), th:nth-child(2) {
         width: 100%;
@@ -451,10 +275,6 @@ tr.dragging-over {
     }
     // show columns on larger devices
     @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
         td:nth-child(5), th:nth-child(5) {
             display: table-cell;
         }
@@ -471,17 +291,9 @@ tr.dragging-over {
     }
 }
 
-
+// table for log files
 .table-logs {
     @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
     // name
     td:nth-child(2), th:nth-child(2) {
         width: 100%;
@@ -500,10 +312,6 @@ tr.dragging-over {
     }
     // show columns on larger devices
     @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
         td:nth-child(3), th:nth-child(3) {
             display: table-cell;
         }
@@ -516,105 +324,9 @@ tr.dragging-over {
     }
 }
 
-
-.table-signups {
-    @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-    // type
-    td:nth-child(3), th:nth-child(3) {
-        width: 6rem;
-        display: none;
-    }
-    // status
-    td:nth-child(4), th:nth-child(4) {
-        width: 6rem;
-        display: none;
-    }
-    // icons
-    td:nth-child(5), th:nth-child(5) {
-        width: 4.5rem;
-        text-align: right;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
-        td:nth-child(4), th:nth-child(4) {
-            display: table-cell;
-        }
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(md) {
-
-        td:nth-child(3), th:nth-child(3) {
-            display: table-cell;
-        }
-    }
-}
-
-// tables with icon + name + icon
-.table-stars, .table-drafts, .table-trash, .table-users {
-    @extend .table-fixed;
-
-    td {
-        height: 3rem;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-}
-
-// table with people that liked, voted or subscribed to something
-.table-users {
-    margin-bottom: 0;
-
-    tr td {
-        border: none;
-    }
-
-    td:nth-child(1), th:nth-child(1) {
-        padding-left: 0;
-        width: 2.5rem;
-        text-align: left;
-
-        > * {
-            right: auto;
-            justify-content: flex-start;
-            margin-left: 0;
-        }
-    }
-}
-
+// table for recycle bin
 .table-recycle-bin {
     @extend .table-fixed;
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child td {
-        border-top-color: transparent;
-    }
     // name
     td:nth-child(2), th:nth-child(2) {
         width: 100%;
@@ -639,10 +351,6 @@ tr.dragging-over {
     }
     // show columns on larger devices
     @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
         td:nth-child(5), th:nth-child(5) {
             display: table-cell;
         }
@@ -661,57 +369,28 @@ tr.dragging-over {
     }
 }
 
+@include media-breakpoint-down(xs) {
+    html:not(.framed) {
+        /* rules below seems to mainly target the files app, we should find a better generic way to get consistent table styling on embedded, framed, mobile and desktop */
+        /* was ".table", but changed to "main .table" because it broke the layout in many places*/
+        main .table {
+            th, td {
+                &:first-child {
+                    padding-left: #{.5rem + $edge-margin};
 
-// table on test page
-.table-test {
-    @extend .table-fixed;
+                    &.table-icon {
+                        width: #{2.5rem + $edge-margin}
+                    }
+                }
 
-    thead {
-        display: none;
-    }
+                &:last-child {
+                    padding-right: #{.5rem + $edge-margin};
 
-    tr:first-child td {
-        border-top-color: transparent;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-    // description
-    td:nth-child(3), th:nth-child(3) {
-        width: 100%;
-        @include text-truncate;
-        display: none;
-    }
-    // type
-    td:nth-child(4), th:nth-child(4) {
-        width: 6rem;
-        @include text-truncate;
-        display: none;
-    }
-    // icons
-    td:nth-child(5), th:nth-child(5) {
-        width: 4.5rem;
-    }
-    // show columns on larger devices
-    @include media-breakpoint-up(sm) {
-        thead {
-            display: table-header-group;
-        }
-
-        td:nth-child(4), th:nth-child(4) {
-            display: table-cell;
-        }
-    }
-
-    @include media-breakpoint-up(lg) {
-        td:nth-child(2), th:nth-child(2) {
-            width: 20rem;
-        }
-
-        td:nth-child(3), th:nth-child(3) {
-            display: table-cell;
+                    &.table-icon {
+                        width: #{2.5rem + $edge-margin}
+                    }
+                }
+            }
         }
     }
 }

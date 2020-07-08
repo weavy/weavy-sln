@@ -16,7 +16,7 @@
         </div>
     }
 
-    <table class="table table-hover table-manage">
+    <table class="table table-hover table-name-desc">
         <thead>
             <tr>
                 <th class="table-icon"></th>
@@ -30,13 +30,33 @@
                 <td><a href="@(Url.Action<ManageController>(x => x.About()))">About</a></td>
                 <td>About @ConfigurationService.ApplicationName v@(Bootstrapper.SemVer).</td>
             </tr>
+            <tr data-href="@(Url.Action<ClientController>(x => x.Index(null, null)))">
+                <td class="table-icon">@Svg.Icon("access-point", "primary")</td>
+                <td><a href="@(Url.Action<ClientController>(x => x.Index(null, null)))">Clients</a></td>
+                <td>Manage API clients.</td>
+            </tr>
+            <tr data-href="@(Url.Action<DaemonsController>(x => x.Index()))">
+                <td class="table-icon">@Svg.Icon("clock")</td>
+                <td><a href="@(Url.Action<DaemonsController>(x => x.Index()))">Daemons</a></td>
+                <td>Schedule and run background jobs.</td>
+            </tr>
+            <tr data-href="@(Url.Action<DirectoriesController>(x => x.Index(null)))">
+                <td class="table-icon">@Svg.Icon("account-box-multiple", "primary")</td>
+                <td><a href="@(Url.Action<DirectoriesController>(x => x.Index(null)))">Directories</a></td>
+                <td>Manage user directories.</td>
+            </tr>
+            <tr data-href="@(Url.Action<HooksController>(x => x.Index()))">
+                <td class="table-icon">@Svg.Icon("webhook")</td>
+                <td><a href="@(Url.Action<HooksController>(x => x.Index()))">Hooks</a></td>
+                <td>Manage hooks.</td>
+            </tr>
             <tr data-href="@(Url.Action<ManageController>(x => x.License()))">
                 <td class="table-icon">@Svg.Icon("certificate", "amber")</td>
                 <td><a href="@(Url.Action<ManageController>(x => x.License()))">License</a></td>
                 <td>Manage your license.</td>
             </tr>
             <tr data-href="@(Url.Action<LogsController>(x => x.Index()))">
-                <td class="table-icon">@Svg.Icon("file-document")</td>
+                <td class="table-icon">@Svg.Icon("file-document", "primary")</td>
                 <td><a href="@(Url.Action<LogsController>(x => x.Index()))">Log files</a></td>
                 <td>View and download log files.</td>
             </tr>
@@ -44,6 +64,11 @@
                 <td class="table-icon">@Svg.Icon("account-multiple", "primary")</td>
                 <td><a href="@(Url.Action<RolesController>(x => x.Index(null)))">Roles</a></td>
                 <td>Manage security roles for authorization.</td>
+            </tr>
+            <tr data-href="@(Url.Action<ToolsController>(x => x.Index()))">
+                <td class="table-icon">@Svg.Icon("wrench")</td>
+                <td><a href="@(Url.Action<ToolsController>(x => x.Index()))">Tools</a></td>
+                <td>Various tools and utilities.</td>
             </tr>
             <tr data-href="@(Url.Action<ManageController>(x => x.Statistics()))">
                 <td class="table-icon">@Svg.Icon("chart-line", "green")</td>

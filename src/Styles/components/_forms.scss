@@ -27,3 +27,78 @@
         margin-right: .5rem;
     }
 }
+
+legend {
+    font-size: 1.25rem;
+}
+
+// form for live search (used in add space members etc.)
+.search-form {
+
+    .form-group {
+        //margin: .5rem;
+        position: relative;
+    }
+
+    .form-control {
+        padding-right: 2rem;
+        box-shadow: none;
+        border-color: $border-color;
+
+        &::-ms-clear {
+            display: none;
+        }
+    }
+
+    .btn-icon {
+        color: $text-muted;
+        position: absolute;
+        top: .25rem;
+        right: .25rem;
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    .btn-reset {
+        display: none;
+    }
+
+    &.searching {
+        .btn-search {
+            display: none;
+        }
+
+        .btn-reset {
+            display: inline-flex;
+
+            .spinner {
+                display: inline-flex;
+                margin:0;
+            }
+
+            .i-close {
+                display: none;
+            }
+        }
+    }
+
+    &.reset {
+        .btn-search {
+            display: none;
+        }
+
+        .btn-reset {
+            display: inline-flex;
+
+            .spinner {
+                display: none;
+            }
+
+            .i-close {
+                display: inline-flex;
+            }
+        }
+    }
+}

@@ -116,7 +116,14 @@
                     if (auth.state !== "updated") {
                         disconnectAndConnect();
                     }
-                })
+                });
+
+                on("reconnected.connection.weavy", function (e) {
+                    if (authentication.isAuthenticated()) {
+                        // Check if user state is still valid
+                        authentication.updateUserState("wvy.connection:reconnected");
+                    }
+                });
 
                 wvy.postal.on("distribute", onParentMessageReceived);
                 wvy.postal.on("message", onChildMessageReceived);
@@ -374,9 +381,9 @@
 
             _reconnectTimeout = setTimeout(function () {
                 if (wvy.alert) {
-                    wvy.alert.alert("warning", "Reconnecting...", null, "connection-state");
+                    wvy.alert.alert("primary", "Reconnecting...", null, "connection-state");
                 } else {
-                    triggerToChildren("alert", "show", { type: "warning", title: "Reconnecting...", id: "connection-state" });
+                    triggerToChildren("alert", "show", { type: "primary", title: "Reconnecting...", id: "connection-state" });
                 }
             }, 2000);
         });

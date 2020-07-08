@@ -1,11 +1,32 @@
-﻿(function ($) {
-    var PLUGIN_NAME = "theme";
+﻿/* eslint-env commonjs, amd */
 
-    console.debug("Registering Weavy plugin:", PLUGIN_NAME);
+// UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// TODO: move to ES6 and transpiler
 
-    if (typeof Weavy === 'undefined' || !Weavy.plugins) {
-        throw new Error("Weavy must be loaded before registering plugin: " + PLUGIN_NAME);
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([
+            'jquery',
+            'weavy'
+        ], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(
+            require('jquery'),
+            require('weavy')
+        );
+    } else {
+        // Browser globals (root is window)
+        if (typeof Weavy === 'undefined' || !Weavy.plugins) {
+            throw new Error("Weavy must be loaded before registering plugin");
+        }
+
+        factory(jQuery, Weavy);
     }
+}(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
 
     /**
      * Inject additional styles into the sealed weavy shadow dom. You may define styles by either setting weavy plugin options or by injecting them via {@link theme#addStyles}
@@ -17,47 +38,36 @@
      *     ...
      * </style>
      * <script>
-     *     var weavy = new Weavy({
-     *         plugins: {
-     *             theme: {
-     *                 styles: ".weavy-dock{ background: red; }"
-     *             }
-     *         }
-     *     });
+     *     weavy.plugins.theme.createStyleSheet(weavy.nodes.container, ".weavy-panel{ background: red; }");
      *
-     *     weavy.addStyles(".weavy-wide { background: none !important; }");
-     *     weavy.addStyles(document.getElementById("weavyStyleOverrides").textContent);
+     *     weavy.plugins.theme.addCss(weavy.nodes.container, document.getElementById("weavyStyleOverrides").textContent);
      * </script>
      * ```
      * 
-     * @mixin theme
+     * @mixin ThemePlugin
      * @returns {Weavy.plugins.theme}
-     * @property {function} .createStyleSheet() - {@link theme#createStyleSheet}
-     * @property {function} .addStyles() - {@link theme#addStyles}
-     * @property {string} styles - The current styles.
+     * @property {function} .createStyleSheet() - {@link ThemePlugin#createStyleSheet}
+     * @property {function} .addCss() - {@link ThemePlugin#addCss}
      * @typicalname weavy
      */
-    Weavy.plugins[PLUGIN_NAME] = function (options) {
+    var ThemePlugin = function (options) {
          /** 
          *  Reference to this instance
-         *  @lends theme#
+         *  @lends ThemePlugin#
          */
         var weavy = this;
 
+        var supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
+
         /**
          * Creates a style sheet for weavy and adds any styles
-         * together with styles provided in options or by using {@link theme#addStyles}.
+         * together with styles provided in options or by using {@link ThemePlugin#addCss}.
          * This function is automatically called on [before:build]{@link Weavy#event:build}
          * 
-         * @param {string} [css] - Optional additional css that will be appended to the previously provided styles.
+         * @param {HTMLElement} root - The dom node where the stylesheet should be attached.
+         * @param {string} css - CSS for the stylesheet.
          */
-        weavy.createStyleSheet = function (css, root) {
-            var options = weavy.options.plugins[PLUGIN_NAME];
-            var data = weavy.data.plugins[PLUGIN_NAME];
-
-            // clientCss is set on the server
-            //css = css + options.styles;
-
+        function createStyleSheet(root, css) {
             if (root.weavyStyles) {
                 if (root.weavyStyles.styleSheet) {
                     root.weavyStyles.styleSheet.cssText = css;
@@ -70,7 +80,7 @@
                 root.weavyStyles.type = "text/css";
                 root.weavyStyles.styleSheet ? root.weavyStyles.styleSheet.cssText = css : root.weavyStyles.appendChild(document.createTextNode(css));
 
-                if (weavy.supportsShadowDOM) {
+                if (supportsShadowDOM) {
                     root.appendChild(root.weavyStyles);
                 } else {
                     var styleId = weavy.getId("weavy-styles");
@@ -84,13 +94,12 @@
         }
 
         /**
-         * Add styles to the weavy stylesheet.
+         * Add styles to an existing weavy stylesheet.
          * 
+         * @param {HTMLElement} root - The root containing the stylesheet
          * @param {string} css - The styles to apply. Full css including selectors etc may be used.
          */
-        weavy.addStyles = function (css, root) {
-            var data = weavy.data.plugins[PLUGIN_NAME];
-
+        function addCss (root, css) {
             css += "\n";
 
             if (root.weavyStyles) {
@@ -100,17 +109,14 @@
                     root.weavyStyles.appendChild(document.createTextNode(css));
                 }
             }
-
-            data.styles += css;
-        };
-
+        }
 
         weavy.on("create-root", function (e, createRoot) {
-            if (weavy.data && weavy.data.plugins[PLUGIN_NAME]) {
-                var data = weavy.data.plugins[PLUGIN_NAME];
+            if (weavy.data && weavy.data.plugins.theme) {
+                var data = weavy.data.plugins.theme;
 
                 // add styles
-                weavy.createStyleSheet(data.clientCss, createRoot.root);
+                createStyleSheet(createRoot.root, data.clientCss);
             }
         });
 
@@ -120,9 +126,8 @@
 
         // Exports
         return {
-            addStyles: weavy.addStyles,
-            createStyleSheet: weavy.createStyleSheet,
-            styles: weavy.styles
+            addCss: addCss,
+            createStyleSheet: createStyleSheet
         };
     };
 
@@ -131,15 +136,14 @@
      * 
      * @example
      * Weavy.plugins.theme.defaults = {
-     *     styles: ""
      * };
      * @name defaults
-     * @memberof theme
+     * @memberof ThemePlugin
      * @type {Object}
-     * @property {string} styles - Styles applied when weavy is created
      */
-    Weavy.plugins[PLUGIN_NAME].defaults = {
-        styles: ""
+    ThemePlugin.defaults = {
     };
 
-})(jQuery);
+    console.debug("Registering Weavy plugin: theme");
+    return Weavy.plugins.theme = ThemePlugin;
+}));

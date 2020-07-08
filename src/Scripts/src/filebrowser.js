@@ -77,7 +77,7 @@ wvy.filebrowser = (function ($) {
                     redirect();
                 });
 
-                $("button.insert-content-keep").on("click", function (e) {
+                $("button.insert-content-keep").on("click", function (e) {                    
                     replaceOrKeep(url, response.skipped, 'keep');
                 });
 
@@ -86,11 +86,12 @@ wvy.filebrowser = (function ($) {
                 });
 
             } else {
-                var url = response.inserted[0].url;
+                
+                var fileUrl = response.inserted[0].url;
                 if (wvy.context.embedded) {
-                    url = "/e" + url;
+                    fileUrl = "/e" + fileUrl;
                 }
-                redirect(open ? url : undefined);
+                redirect(open ? fileUrl : undefined);
             }
         }).fail(function (xhr, status, error) {
             setTimeout(function () {
@@ -104,14 +105,13 @@ wvy.filebrowser = (function ($) {
         });
     }
 
-    var replaceOrKeep = function (url, items, action) {
+    var replaceOrKeep = function (url, items, action) {        
         $.ajax({
             url: url,
             method: "PUT",
             contentType: "application/json",
             data: JSON.stringify({
                 action: action, items: items.map(function (i) {
-                    i.guid = i.content_type;
                     i.url = i.link_url;
                     delete i["created_by"];
                     delete i["icon"];
@@ -224,7 +224,7 @@ wvy.filebrowser = (function ($) {
 
     wvy.postal.on("origin", wvy.postal.parentWeavyId, function (e) {
         // set correct origin to filebrowser.weavycloud.com. Required by Google Drive picker!
-        $("#filebrowser").attr("src", "https://filebrowser.weavycloud.com?origin=" + e.data.url);
+        $("#filebrowser").attr("src", fileBrowserUrl + "?origin=" + e.data.url);
     });
 
     // listen to messages from filebrowser.weavycloud.com and weavy client

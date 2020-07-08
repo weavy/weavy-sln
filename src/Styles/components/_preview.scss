@@ -3,6 +3,7 @@
 // adapted to scss from https://github.com/mozilla/pdfjs-dist/blob/master/web/pdf_viewer.css
 // and https://github.com/mozilla/pdf.js/blob/master/web/viewer.css
 
+
 // backdrop for file previews
 .preview-container {
     position: fixed;
@@ -11,7 +12,7 @@
     right: 0;
     height: 100vh;
     z-index: $zindex-tooltip+1;
-    background-color: $black;
+    background-color: rgba(mix($black, #000), $opacity-panel);
     display: none;
     padding: $navbar-height 0 $navbar-height 0;
     @include overscroll-behavior-contain;
@@ -19,10 +20,6 @@
 
 // custom navbar for photoswipe and file preview
 .navbar-preview {
-
-
-    
-
     color: color-yiq($black);
     background-color: rgba($black, $opacity-backdrop);
     flex-wrap: nowrap;
@@ -52,6 +49,10 @@
         padding-left: .5rem;
         flex-direction: row;
     }
+}
+
+.pswp__bg {
+    background: rgba(mix($black, #000), $opacity-panel);
 }
 
 // hide default photoswipe header
@@ -97,6 +98,10 @@
     .btn {
         pointer-events: auto;
         background-color: $white !important;
+
+        &.btn-icon {
+            color: color-yiq($white);
+        }
     }
 }
 
@@ -338,5 +343,30 @@
         .fileAttachmentAnnotation {
             cursor: pointer;
         }
+    }
+}
+
+.pswp-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1000;
+    opacity: 0;
+    display: none
+}
+
+.controller-preview.embedded {
+    background: transparent !important;
+
+    .preview-container {
+        background: none;
+    }
+    .pswp__bg {
+        display: none;
+    }
+
+    .pswp .navbar-preview .btn-close {
+        visibility: hidden;
+        pointer-events: none;
     }
 }

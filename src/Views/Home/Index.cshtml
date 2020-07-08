@@ -1,7 +1,7 @@
 ﻿@model HomeModel
 
 @{
-    Title = "Start";  
+    Title = "Start";
 }
 
 @section navbar_left {
@@ -28,78 +28,16 @@
     </div>
 </div>
 
-@if (WeavyContext.HQ != null || PermissionService.HasSystemPermission(Permission.ManageSystem)) {
-    <div class="container d-flex flex-column my-4">
-        @if (WeavyContext.HQ != null) {
-            <h5 class="d-flex">
-                <a href="@WeavyContext.HQ.Url()" class="text-hyphens">@WeavyContext.HQ.Name</a>
-                @if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
-                    <div class="dropdown ml-auto">
-                        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                            @Svg.Icon("dots-vertical")
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            @if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
-                                <span class="dropdown-item" data-toggle="modal" data-target="#hq-modal" data-keyboard="true">@Svg.Icon("heart-box-outline") Select main space</span>
-                                <form action="@(Url.Action<HomeController>(c => c.SetHQ(null)))" method="post" data-turboform>
-                                    @Html.HttpMethodOverride(HttpVerbs.Put)
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("minus-box-outline") Unset main space</button>
-                                </form>
-                            }
-                        </div>
-                    </div>
-                }
-            </h5>
-            <a class="card card-action" href="@WeavyContext.HQ.Url()">
-                <div class="card-cover">
-                    @Html.StarToggle(WeavyContext.HQ, htmlAttributes: new { @class = "top-right" })
-                    <div class="facepile">
-                        @foreach (var member in SpaceService.GetMembers(WeavyContext.HQ.Id, new MemberQuery { Top = 8, OrderBy = "Random" })) {
-                            @member.AvatarImg(24)
-                        }
-                    </div>
-                    @WeavyContext.HQ.AvatarImg(64)
-                </div>
-                <div class="card-body text-hyphens">
-                    @(WeavyContext.HQ.Description ?? WeavyContext.HQ.Name)
-                </div>
-            </a>
-        } else if (PermissionService.HasSystemPermission(Permission.ManageSystem)) {
-            <h5 class="d-flex">
-                Set up your main space!
-                @if (Model.HQSpaces.Any()) {
-                    <a href="#hq-modal" data-toggle="modal" data-target="#hq-modal" data-keyboard="true" class="btn btn-icon ml-auto" title="Set main space">@Svg.Icon("plus-box-outline")</a>
-                } else {
-                    <a href="@(Url.Action<HomeController>(c => c.HQ()))" class="btn btn-icon ml-auto" title="Set main space">@Svg.Icon("plus-box-outline")</a>
-                }
-            </h5>
-            <div class="alert alert-primary d-flex flex-column align-items-center flex-md-row align-items-md-start">
-                <div class="d-flex">
-                    @Svg.Icon("information", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-md-block" })
-                    <span class="mr-auto">The main space is the communications hub for your organization. It's a great place to put announcements, notes and stuff everyone needs to know.</span>
-                </div>
-                @if (Model.HQSpaces.Any()) {
-                    <button class="btn btn-primary mt-3 mt-md-1" href="#hq-modal" data-toggle="modal" data-target="#hq-modal" data-keyboard="true">Set main space</button>
-                } else {
-                    <a href="@(Url.Action<HomeController>(c => c.HQ()))" class="btn btn-primary mt-3 mt-md-1">Set main space</a>
-                }
-            </div>
-        }
-    </div>
-}
-
 <div class="container d-flex flex-column my-4">
 
     <h5 class="d-flex">
         <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))" class="text-hyphens">Spaces</a>
-        @if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
-            <a href="@(Url.Action<SpaceController>(c => c.New()))" class="btn btn-icon ml-auto" title="Add space">@Svg.Icon("plus-box-outline")</a>
-        }
+        <a href="@(Url.Action<SpaceController>(c => c.New()))" class="btn btn-icon ml-auto" title="Add space">@Svg.Icon("plus-box-outline")</a>
     </h5>
 
-    @if (Model.Spaces.Any(x => x.Id != WeavyContext.HQ?.Id)) {
+    @if (Model.Spaces.Any()) {
         <div class="cards">
-            @foreach (var space in Model.Spaces.Where(x => x.Id != WeavyContext.HQ?.Id)) {
+            @foreach (var space in Model.Spaces) {
                 <a class="card card-action" href="@space.Url()">
                     <div class="card-cover">
                         @Html.StarToggle(space, htmlAttributes: new { @class = "top-right" })
@@ -110,7 +48,6 @@
                     </div>
                     <div class="card-body d-flex">
                         <div class="card-title text-truncate w-100 mb-0">@space.Name</div>
-                        <div>@Html.Badge(space.Privacy)</div>
                     </div>
                 </a>
             }
@@ -118,12 +55,7 @@
     } else {
         <p class="text-muted">
             All your active spaces will show up right here.
-            @if (PermissionService.HasSystemPermission(Permission.CreateSpace)) {
-                <text>For now, you can <a href="@(Url.Action<SpaceController>(c => c.New()).ToLower())">add a new space</a> or <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">find an existing space</a> to join.</text>
-            } else {
-                <text>Check out the <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">spaces page</a> to see if there are any interesting teams or projects to join.</text>
-            }
-
+            We suggest <a href="@(Url.Action<SpaceController>(c => c.New()).ToLower())">creating your first space</a> to get started.
         </p>
     }
 </div>
@@ -132,22 +64,8 @@
 
     <h5 class="d-flex">
         <a href="@(Url.Action<PeopleController>(c => c.Index(null, null)))" class="text-hyphens">People</a>
-        @if (PermissionService.HasSystemPermission(Permission.ManageUsers)) {
-            if (PermissionService.HasSystemPermission(Permission.Invite)) {
-                <span class="dropdown ml-auto">
-                    <button class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#" title="Add or invite user">@Svg.Icon("account-plus")</button>
-                    <span class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.New()))">@Svg.Icon("account-plus") Add user</a>
-                        @if (PermissionService.HasSystemPermission(Permission.Invite)) {
-                            <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Invite()))">@Svg.Icon("email") Invite people</a>
-                        }
-                    </span>
-                </span>
-            } else {
-                <a class="btn btn-icon ml-auto" href="@(Url.Action<PeopleController>(c => c.New()))" title="Add user">@Svg.Icon("account-plus")</a>
-            }
-        } else if (PermissionService.HasSystemPermission(Permission.Invite)) {
-            <a class="btn btn-icon ml-auto" href="@(Url.Action<PeopleController>(c => c.Invite()))" title="Invite people">@Svg.Icon("account-plus")</a>
+        @if (PermissionService.HasPermission(Permission.Manage)) {
+            <a class="btn btn-icon ml-auto" href="@(Url.Action<PeopleController>(c => c.New()))" title="Add user">@Svg.Icon("account-plus")</a>
         }
     </h5>
 
@@ -158,34 +76,3 @@
         }
     </div>
 </div>
-
-
-@if (PermissionService.HasSystemPermission(Permission.ManageSystem) && Model.HQSpaces.Any()) {
-    @section footer {
-        <div class="modal fade" id="hq-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    @using (Html.BeginForm(nameof(HomeController.HQ), null, FormMethod.Post, new { autocomplete = "off", data_turboform = "" })) {
-                        @Html.HttpMethodOverride(HttpVerbs.Put)
-                        <div class="modal-header">
-                            <h5 class="modal-title">Set up your main space</h5>
-                            <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="Close">@Svg.Icon("close")</button>
-                        </div>
-                        <div class="modal-body pb-0">
-                            <div class="form-group">
-                                <label>Select an existing space or <a href="@(Url.Action<HomeController>(c => c.HQ()))" class="text-nowrap">create a new space</a> to use as your main space.</label>
-                                <select class="form-control custom-select space-picker" name="id" id="id">
-                                    <option></option>
-                                    @Html.SelectOptions(Model.HQSpaces, WeavyContext.HQ?.Id)
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer pt-0">
-                            <button type="submit" class="btn btn-primary btn-load">Set main space</button>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    }
-}

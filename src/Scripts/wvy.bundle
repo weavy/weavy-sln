@@ -32,24 +32,19 @@
 ~/scripts/src/editor.js
 ~/scripts/src/comments.js
 ~/scripts/src/attachment.js
-~/scripts/src/pincode.js
 ~/scripts/src/posts.js
-~/scripts/src/discuss.js
 ~/scripts/src/alert.js
 ~/scripts/src/audio.js
 ~/scripts/src/navigation.js
-~/scripts/src/connect.js
 ~/scripts/src/dropdown.js
 ~/scripts/src/modal.js
 ~/scripts/src/infinitescroll.js
 ~/scripts/src/blocklink.js
-#~/scripts/src/postal.js
 ~/scripts/src/sortable.js
 ~/scripts/src/tagsinput.js
 ~/scripts/src/notifications.js
 ~/scripts/src/badges.js
 ~/scripts/src/desktop-notifications.js
-~/scripts/src/weavy-personal.js
 ~/scripts/src/drawer.js
 ~/scripts/src/tab.js
 ~/scripts/src/fab.js
@@ -68,3 +63,5 @@
 # include apps bundle
 ~/areas/apps/scripts/apps.bundle
 
+# resolve load promise
+~/scripts/src/when-loaded-resolve.js

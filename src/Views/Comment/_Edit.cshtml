@@ -1,29 +1,25 @@
 ﻿@model CommentUpdateModel
 <form class="modal-content" action="@(Url.Action<CommentController>(x => x.Update(Model.Id, null)))" method="post">
-    @Html.HttpMethodOverride(HttpVerbs.Put)    
-    
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+
 
     <div class="modal-header border-0 pb-0">
         <h5 class="modal-title">Edit comment</h5>
         <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
     </div>
-    <div class="modal-body">        
-        @if (ConfigurationService.HtmlComments)
-        {
-            <textarea id="html_comment_@Model.Id" class="form-control" name="html" data-editor-location="comment-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))">@Model.Html</textarea>
+    <div class="modal-body">
+        @if (ConfigurationService.HtmlComments) {
+            <textarea id="html_comment_@Model.Id" class="form-control" name="html" data-editor="comment" data-editor-embed-ids="@(String.Join(",", Model.Embeds))">@Model.Html</textarea>
             <input type="hidden" name="text" value="@Model.Text" />
-        }
-        else
-        {
-            <textarea id="text" class="form-control" name="text" data-editor-location="comment-edit" data-editor-embed-ids="@(String.Join(",", Model.Embeds))">@Model.Text</textarea>
+        } else {
+            <textarea id="text" class="form-control" name="text" data-editor="comment" data-editor-embed-ids="@(String.Join(",", Model.Embeds))">@Model.Text</textarea>
             <input type="hidden" name="html" value="@Model.Html" />
         }
 
 
         <div class="attachments">
-            <table class="table table-attachments">
-                @foreach (var file in Model.Files)
-                {
+            <table class="table table-name table-attachments">
+                @foreach (var file in Model.Files) {
                     <tr>
                         <td class="table-icon">@Svg.Icon(file)</td>
                         <td>@file.GetTitle()</td>
@@ -34,7 +30,7 @@
             <div id="removedAttachments"></div>
         </div>
     </div>
-    <div class="modal-footer border-0">        
+    <div class="modal-footer border-0">
         <button type="submit" class="btn btn-primary">Save</button>
     </div>
 </form>

@@ -1,0 +1,14 @@
+﻿~/scripts/src/browser.js
+~/scripts/src/scrollbar.js
+~/scripts/vendor/jquery/jquery.min.js
+~/scripts/vendor/turbolinks/turbolinks.js
+~/scripts/vendor/prismjs/prism-core.min.js
+~/scripts/vendor/prismjs/prism-clike.min.js
+~/scripts/vendor/prismjs/prism-csharp.min.js
+~/scripts/vendor/prismjs/prism-http.min.js
+~/scripts/vendor/prismjs/prism-json.min.js
+
+# component
+~/scripts/src/codesample.js
+
+

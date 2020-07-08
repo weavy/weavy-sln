@@ -35,7 +35,14 @@
             @(Html.ActionLink<HomeController>(c => c.Search("files", null), qs: qs, text: "Files", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
             @(Html.ActionLink<HomeController>(c => c.Search("comments", null), qs: qs, text: "Comments", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
         </nav>
+
+        if (Request.IsLocal && User.IsAdmin) {
+            <div class="alert alert-info">
+                @Model.Query.ToString()
+            </div>
+        }
     }
+
 
     @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
         <p>Your search - <strong>@Model.Query.WrappedQuery.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab).</p>
@@ -47,6 +54,9 @@
             <li>Try fewer keywords.</li>
         </ul>
     }
+
+
+
 
     @{ Html.RenderPartial("_SearchResult"); }
 </div>

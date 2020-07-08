@@ -19,7 +19,7 @@
         <tbody>
             @foreach (var item in Model.AsSmartEnumerable()) {
                 <tr data-href="@(Url.Action<LogsController>(c => c.Get(item.Value.Name.ToLower(), null)))">
-                    <td class="table-icon"><a class="btn btn-icon" href="@Url.Action(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() })" target="_blank">@Svg.Icon("file-document")</a></td>
+                    <td class="table-icon"><a class="btn btn-icon" href="@Url.Action(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() })" target="_blank">@Svg.Icon("file-document", "primary")</a></td>
                     <td>@Html.ActionLink(item.Value.Name, "Get", new { name = item.Value.Name.ToLower() }, new { target = "_blank" })</td>
                     <td>@Html.Time(item.Value.LastWriteTimeUtc, format: "g")</td>
                     <td>@FileUtils.FileSizeAsString(item.Value.Length)</td>

@@ -1,7 +1,7 @@
 ﻿// preview files in fullscreen overlay
 var wvy = wvy || {};
 
-wvy.preview = (function ($) {
+wvy.preview = (function ($)  {
 
     // default options
     var options = {
@@ -18,8 +18,7 @@ wvy.preview = (function ($) {
     $(document).on("click", "[data-preview]", function (e) {
         e.preventDefault();
 
-        // open with options from data attributes
-        open({
+        var previewOptions = {
             preview: $(this).data("preview"), // url to pdf 
             name: $(this).data("name"), // name to display in header
             icon: $(this).data("icon"), // icon of item (used for open in office)
@@ -29,7 +28,16 @@ wvy.preview = (function ($) {
             comments: $(this).data("comments"), // number of comments (if commentable)
             type: $(this).data("type"), // the entity type (attachment or content)
             id: $(this).data("id") // the entity id
-        });
+        };
+
+        wvy.postal.whenLeader.then(function () {
+            // open with options from data attributes
+            open(previewOptions);
+        }).catch(function () {
+            openInParent(previewOptions);
+        })
+
+        console.log("PREVIEW CLICK", e);
     });
 
     // close pdf viewer when clicking the close button
@@ -74,14 +82,13 @@ wvy.preview = (function ($) {
         // add navbar
         var $container = $(".preview-container");
         $container.find(".navbar-preview").remove();
-        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-weavy-event data-weavy-name="close-preview"><svg class="i i-arrow-left" height="24" viewBox="0 0 24 24" width="24"><path d="m20 11v2h-12l5.5 5.5-1.42 1.42-7.92-7.92 7.92-7.92 1.42 1.42-5.5 5.5z"/></svg></button></div></nav>');
+        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-weavy-event data-weavy-name="close-preview"><svg class="i i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path></svg></button></div></nav>');
         var $middle = $('<div class="navbar-middle" />');
         $middle.append('<span class="navbar-text">' + opts.name + '</span>');
         $navbar.append($middle);
 
         // add star?
         if (opts.starred !== undefined) {
-            // get id from url
             var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-entity="' + opts.type + '" data-id="' + opts.id + '"><svg class="i i-star-outline d-block" height="24" viewBox="0 0 24 24" width="24"><path d="m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37 1.71-4.04 1.71 4.04 4.38.37-3.32 2.88.99 4.28m6.24-8.42-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.45 4.73-1.63 7.03 6.18-3.73 6.18 3.73-1.64-7.03z"/></svg><svg class="i i-star d-none" height="24" viewBox="0 0 24 24" width="24"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"/></svg></button>');
             if (opts.starred) {
                 $star.addClass("on");
@@ -103,11 +110,10 @@ wvy.preview = (function ($) {
 
         // show preview container
         $container.show();
+    }
 
-        if (wvy.browser.framed) {
-            // maximize weavy client window
-            wvy.postal.postToParent({ name: "preview-open" });
-        }
+    function openInParent(opts) {
+        wvy.postal.postToParent({ name: "preview-open", options: opts });
     }
 
     // close file preview

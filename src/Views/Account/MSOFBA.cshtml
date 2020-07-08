@@ -18,14 +18,14 @@
 </head>
 <body class="@BodyClasses("body-dark")">
     @if (Model != null) {
-        if (Model.Token != null) {
+        if (Model.HMAC != null) {
             <table class="h-100 w-100">
                 <tbody>
                     <tr>
                         <td class="align-middle text-center">
                             @Html.IconImg(96)
-                            @using (Html.BeginForm(nameof(AccountController.SignInToken), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post, new { novalidate = "", id = "sign-in-form" })) {
-                                @Html.HiddenFor(x => x.Token)
+                            @using (Html.BeginForm(nameof(AccountController.SignInHMAC), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post, new { novalidate = "", id = "sign-in-form" })) {
+                                @Html.HiddenFor(x => x.HMAC)
                             }
                         </td>
                     </tr>
@@ -68,7 +68,7 @@
                 </div>
             </main>
         }
-        if (Model.Token != null) {
+        if (Model.HMAC != null) {
             <script>
                 // autopost
                 $("#sign-in-form").submit();

@@ -2,97 +2,49 @@
 @model MembersModel
 
 @{
-    Title = "Members";
     Back = WeavyContext.Space.Url();
-    var u = new User();
-    string tab = ViewContext.RouteData.Values["tab"] as string;
+    Title = "Members";
+}
+
+@section navbar_middle {
+    @{ Html.RenderPartial("_NavbarMenu"); }
 }
 
 @section navbar_secondary {
     <nav class="nav nav-tabs">
-        @if (tab == null) {
-            @(Html.ActionLink<SpaceController>(c => c.Members(WeavyContext.Space.Id, "all", null), text: "All", htmlAttributes: new { @class = "nav-link active" }))
-        } else {
-            @(Html.ActionLink<SpaceController>(c => c.Members(WeavyContext.Space.Id, "all", null), text: "All", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-        }
-        @(Html.ActionLink<SpaceController>(c => c.Members(WeavyContext.Space.Id, "internal", null), text: "Internal", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-        @(Html.ActionLink<SpaceController>(c => c.Members(WeavyContext.Space.Id, "external", null), text: "External", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        <a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, null)))" class="nav-link active">@Title</a>
     </nav>
-    @if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
-        <div class="fab">
-            <button type="button" class="btn btn-round btn-primary" data-toggle="modal" data-target="#add-dialog" data-keyboard="true" title="Add/invite members">@Svg.Icon("plus")</button>
-        </div>
-    }
 }
 
 <div class="container-fluid mt-3">
 
-    @if (Model.IsPending) {
-        <div class="alert alert-warning text-center">
-            Your membership request is pending approval.
-            <form class="d-inline" method="post" action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" data-turboform>
-                @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <button type="submit" class="btn btn-link alert-link">Undo.</button>
-            </form>
-        </div>
-    }
-
-    @if (Model.Members.HasItems() || Model.Invites.HasItems()) {
-        <table class="table table-hover table-members">
+    @if (Model.Members.HasItems()) {
+        <table class="table table-hover table-name-desc">
             <thead>
                 <tr>
                     <th class="table-icon"></th>
                     <th>Name</th>
+                    <th>Email</th>
                     <th class="table-icon"></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var invite in Model.Invites) {
-                    <tr class="table-warning">
-                        <td class="table-icon">@u.AvatarImg(32)</td>
-                        <td class="text-truncate">@invite.Email @Html.Badge(invite)</td>
-                        <td class="table-icon">
-                            @if (WeavyContext.Space.IsMember && WeavyContext.Space.HasPermission(Permission.Admin)) {
-                                <div class="dropdown d-inline-block d-flex justify-content-end">
-                                    <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                        @Svg.Icon("dots-vertical")
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <form method="post" action="@(Url.Action<SpaceController>(c => c.RemoveInvite(WeavyContext.Space.Id, invite.Id)))" data-turboform>
-                                            @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                            <button type="submit" class="dropdown-item">@Svg.Icon("close") Remove invite</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            }
-                        </td>
-                    </tr>
-                }
-
                 @foreach (var member in Model.Members) {
-                    <tr class="@(member.IsPending ? "table-warning" : "") @(member.IsSuspended ? "table-muted": "")">
+                    <tr data-href="@member.Url()" class="@(member.IsSuspended ? "table-muted": "")" data-modal>
                         <td class="table-icon">@(member.AvatarImg(32, presence: true))</td>
-                        <td class="text-truncate">
+                        <td>
                             @if (member.Username == member.GetTitle()) {
-                                <a href="@(Url.Action<PeopleController>(c => c.Get(member.Id)))"><small>@@@member.Username</small></a>
+                                <a href="@member.Url()"><small>@@@member.Username</small></a>
                             } else {
-                                <a href="@(Url.Action<PeopleController>(c => c.Get(member.Id)))">@member.GetTitle()</a> <small>@@@member.Username</small>
+                                <a href="@member.Url()">@member.GetTitle()</a> <small>@@@member.Username</small>
                             }
                             @Html.Badge(member)
+                            @Html.Shield(member)
                         </td>
+                        <td>@member.Email</td>
                         <td class="table-icon">
                             <div class="d-flex justify-content-end">
-                                @if (member.IsPending && WeavyContext.Space.HasPermission(Permission.ApproveMembers)) {
-                                    using (Html.BeginForm(nameof(SpaceController.ApproveMember), null, new { id = WeavyContext.Space.Id, userid = member.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                                        <button type="submit" class="btn btn-icon" title="Approve">@Svg.Icon("check")</button>
-                                    }
-                                    using (Html.BeginForm(nameof(SpaceController.DenyMember), null, new { id = WeavyContext.Space.Id, userid = member.Id }, FormMethod.Post, new { data_turboform = "" })) {
-                                        @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                        <button type="submit" class="btn btn-icon" title="Deny">@Svg.Icon("close")</button>
-                                    }
-                                }
-
-                                @{ Html.RenderPartial("_MemberMenu", member, new ViewDataDictionary { { nameof(Model.HasAdmin), Model.HasAdmin } });}
+                                @{ Html.RenderPartial("_MemberMenu", member);}
                             </div>
                         </td>
                     </tr>
@@ -101,25 +53,13 @@
         </table>
     }
 
-    @if (!(tab?.Equals("external", StringComparison.OrdinalIgnoreCase) ?? false)) {
-        if (Model.Members.IsNullOrEmpty()) {
-            <form class="text-center text-muted" action="@(Url.Action<SpaceController>(c => c.Join(WeavyContext.Space.Id)))" method="post" data-turboform>
-                <p>
-                    @WeavyContext.Space.Name does not have any members.
-                    @if (WeavyContext.Space.HasPermission(Permission.Join)) {
-                        <text>You can <button type="submit" class="btn btn-link btn-text">join</button> and be the first one here.</text>
-                    }
-                </p>
-            </form>
-        }
 
-        if (WeavyContext.Space.IsMember && Model.Members.Count == 1) {
-            <p class="text-center text-muted">
-                @WeavyContext.Space.Name does not have any other members.
-                @if (WeavyContext.Space.HasPermission(Permission.AddMembers)) {
-                    <text><a href="javascript:;" data-toggle="modal" data-target="#add-dialog">Add some people</a> to start collaborating.</text>
-                }
-            </p>
-        }
-    }
 </div>
+
+@if (WeavyContext.Space.HasPermission(Permission.Members)) {
+    @section fab {
+        <div class="fab">
+            <button type="button" class="btn btn-round btn-primary" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="Add members">@Svg.Icon("plus")</button>
+        </div>
+    }
+}

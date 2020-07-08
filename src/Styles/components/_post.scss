@@ -61,7 +61,16 @@ body.controller-post.action-get {
         padding-bottom: 0;
 
         table {
-            @extend .table, .table-bordered, .table-sm;
+            width: 100%;
+            margin-bottom: $spacer;
+            border: $table-border-width solid $table-border-color;
+
+            th,
+            td {
+                border: $table-border-width solid $table-border-color;
+                padding: $table-cell-padding-sm $table-cell-padding-sm * 2;
+                vertical-align: top;
+            }
         }
     }
 

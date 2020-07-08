@@ -2,21 +2,52 @@
 
 wvy.posts = (function ($) {
 
-    // init edit post editor
+    // init editors on load
     document.addEventListener("turbolinks:load", function () {
-        var $editor = $("[data-editor-location='post-edit']").weavyEditor({
-            mode: 'fixed',
-            onSubmit: function (e, d) {
-                e.preventDefault();
-                $(this).closest("form").submit();
+        // initializing editor is very slow so we wrap the call in setTimeout to prevent blocking rendering
+        setTimeout(function () {
+            // create post editor
+            var $postEditor = $("[data-editor='post']");
+            if ($postEditor.length) {
+
+                $postEditor.siblings(".weavy-editor-placeholder").hide();
+                $postEditor.weavyEditor({
+                    minimized: true,
+                    onSubmit: function (e, data) {
+                        var $editor = $(this);
+                        var $form = $editor.closest("form");
+
+                        // simple check to see that post contains any data
+                        var json = $form.serializeObject(false);
+                        if (json.text || json.html || json.blobs || json.embeds) {
+
+                            // remove .is-invalid
+                            $form.removeClass("is-invalid");
+
+                            // display "fake" post
+                            $form.addClass("sending");
+
+                            // disable submit button
+                            $form.find("button[type=submit]").prop("disabled", true);
+
+                            // submit form
+                            $form.submit();
+
+                            // reset editor
+                            $editor.weavyEditor("reset");
+                        } else {
+                            $form.addClass("is-invalid");
+                            $form.find("button[type=submit]").prop("disabled", false);
+                        }
+                    }
+                });
             }
-        });
-        $editor.weavyEditor("focus");
+        }, 1);
     });
 
-    // destroy edit post editor
+    // destroy editors
     document.addEventListener("turbolinks:before-cache", function () {
-        $("[data-editor-location='post-edit']").weavyEditor("destroy");
+        $("[data-editor='post']").weavyEditor("destroy");
     });
 
     // populate feedback modal with fresh data
@@ -63,6 +94,26 @@ wvy.posts = (function ($) {
         var attachmentId = $(this).data("remove-attachment");
         $("#removedAttachments").append("<input type='hidden' name='removedAttachments' value='" + attachmentId + "'/>");
         $(this).parent().parent().remove();
+    });
+
+    // toogle visibility of post comments
+    $(document).on("click", "[data-toggle=comments]", function (e) {
+        e.preventDefault();
+
+        var $post = $(this).closest(".post");
+        var $comments = $post.find(".post-comments");
+        var id = $post.data("post-id");
+
+        if ($comments.find(".comment").length) {
+            // show/hide existing comments
+            $comments.toggleClass("d-none");
+        } else {
+            if ($comments.hasClass("d-none")) {
+                wvy.comments.getComments(id, "post", true);
+            } else {
+                $comments.addClass("d-none");
+            }
+        }
     });
 
     // like post
@@ -211,11 +262,7 @@ wvy.posts = (function ($) {
         });
     });
 
-    $(document).on("hide.bs.modal", "#edit-post-modal", function (e) {
-        $("[data-editor-location='post-edit']").weavyEditor("destroy");
-    })
-
-    // load edit form
+    // load edit post modal
     $(document).on("show.bs.modal", "#edit-post-modal", function (e) {
 
         var target = $(e.relatedTarget);
@@ -237,7 +284,7 @@ wvy.posts = (function ($) {
         }).then(function (html) {
             $form.replaceWith(html);
 
-            $("[data-editor-location='post-edit']").weavyEditor({
+            $("[data-editor=post]").weavyEditor({
                 collapsed: true,
                 pickerCss: 'collapsed-static',
                 submitButton: $form.find("button[type=submit]"),
@@ -249,8 +296,12 @@ wvy.posts = (function ($) {
             $div.addClass("d-none");
         }).always(function () {
             // stop spinner
-            $spinner.removeClass("spin");            
+            $spinner.removeClass("spin");
         });
+    });
+
+    $(document).on("hide.bs.modal", "#edit-post-modal", function (e) {
+        $("[data-editor=post]").weavyEditor("destroy");
     });
 
     // update post
@@ -278,18 +329,18 @@ wvy.posts = (function ($) {
             });
             delete data["options.Index"];
         }
-                
+
         // fetch modal content from server
         $.ajax({
             contentType: "application/json; charset=utf-8",
             url: $form.attr("action"),
             type: "PUT",
             data: JSON.stringify(data)
-        }).then(function (html) {            
+        }).then(function (html) {
             if (typeof (html) === "string") {
                 $form.replaceWith(html);
 
-                $("[data-editor-location='post-edit']").weavyEditor({
+                $("[data-editor='post']").weavyEditor({
                     collapsed: true,
                     pickerCss: 'collapsed-static',
                     submitButton: $form.find("button[type=submit]"),

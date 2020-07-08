@@ -1,0 +1,46 @@
+// include basic styles for test
+@import '../../Styles/bootstrap';
+@import '../../Styles/components/buttons';
+@import '../../Styles/components/icons';
+@import '../../Styles/components/images';
+@import '../../Styles/components/nav';
+@import '../../Styles/components/navbar';
+
+html {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: none;
+    @include scrollbar;
+}
+
+body {
+    // make place for navbar
+    padding-top: $navbar-height;
+}
+
+
+// move scrollbar to body/main (under the navbar)
+html.scroll {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+
+    body {
+        height: 100%; 
+        width: 100%;
+
+        // make place for navbar
+        padding-top: 0;
+        max-height: calc(100vh - #{$navbar-height});
+        margin-top: $navbar-height;
+    }
+
+    main {
+        height: 100%;
+        width: 100%;
+        @include scrollbar;
+        @include scroll-y;
+        scroll-behavior: smooth;
+        overscroll-behavior-x: none;
+    }
+}

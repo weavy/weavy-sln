@@ -50,14 +50,8 @@
     }
 
     td.facepile {
-        padding: 0 0 0 .25rem;
         display: none;
-        white-space: nowrap;
-
-        &:empty {
-            display: none !important;
-        }
-
+        padding: 0 0 0 .25rem;
         @include media-breakpoint-up(sm) {
             display: flex;
             flex-wrap: nowrap;
@@ -70,15 +64,18 @@
     }
 
     td.votes {
-        white-space: nowrap;
         padding: 0 0 0 .5rem;
-
-        &:empty {
-            display: none !important;
-        }
 
         @include media-breakpoint-up(sm) {
             display: none;
+        }
+    }
+
+    td.votes, td.facepile {
+        white-space: nowrap;
+
+        &:empty {
+            display: none !important;
         }
 
         .more {
@@ -98,8 +95,12 @@
                 left: 0;
                 bottom: 0;
                 right: 0;
-                line-height:2rem;
-                text-align:center;
+                line-height: 2rem;
+                text-align: center;
+                font-size: $font-size-sm;
+                font-weight: $badge-font-weight;
+                text-overflow: ellipsis;
+                overflow:hidden;
             }
         }
     }

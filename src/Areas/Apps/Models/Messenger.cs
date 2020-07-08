@@ -79,6 +79,16 @@ namespace Weavy.Areas.Apps.Models {
         /// Gets or sets a value indicating of we should render full messenger or not.
         /// </summary>
         public bool IsMessenger { get; set; }
+        
+        /// <summary>
+        /// If Zoom meetings are enabled in app settings
+        /// </summary>
+        public bool ZoomEnabled { get; internal set; }
+
+        /// <summary>
+        /// If Microsoft Teams meetings are enabled in app settings
+        /// </summary>
+        public bool TeamsEnabled { get; internal set; }
 
         /// <summary>
         /// Helper for displaying seen by indicator.
@@ -157,5 +167,27 @@ namespace Weavy.Areas.Apps.Models {
         [UIHint("TimeZone")]
         public string Timezone { get; set; }
 
+    }
+
+    /// <summary>
+    /// View model for displaying meeting partials as "attachments" to new message
+    /// </summary>
+    public class PartialMeetingModel {
+
+        /// <summary>
+        /// Gets or sets the topic of the meeting.
+        /// </summary>
+        public string Topic { get; internal set; }
+        
+        
+        /// <summary>
+        /// Gets or sets the conversation id.
+        /// </summary>
+        public int ConversationId { get; internal set; }
+        
+        /// <summary>
+        /// The meeting
+        /// </summary>
+        public Meeting Meeting { get; internal set; }
     }
 }

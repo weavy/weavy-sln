@@ -71,7 +71,7 @@ wvy.autosave = (function ($) {
     // triggered from tiny when all editors are loaded
     function registerEditor() {
         for (var ed in tinyMCE.editors) {
-            tinyMCE.editors[ed].on("keydown", function (e) {
+            tinyMCE.editors[ed].on("keydown", function (e) {                
                 change();
             });
         }
@@ -100,7 +100,7 @@ wvy.autosave = (function ($) {
         clearTimeout(_timer);
 
         // make sure tiny sets content before serializing
-        if (window.tinyMCE !== undefined) {
+        if (window.tinyMCE !== undefined) {            
             tinyMCE.triggerSave();
         }
 
@@ -115,7 +115,7 @@ wvy.autosave = (function ($) {
         // remove unwanted properties
         delete properties.x_http_method_override;
 
-        var url = "/a/content/" + _id + "/draft?force=" + _force;
+        var url = "/a/content/" + _id + "/draft?force=" + _force;        
 
         if (!_cancel) {
             $.ajax({

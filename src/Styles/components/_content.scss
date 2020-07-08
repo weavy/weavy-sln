@@ -56,8 +56,16 @@
             }
 
             table {
-                @extend .table;
-                @extend .table-bordered;
+                width: 100%;
+                margin-bottom: $spacer;
+                border: $table-border-width solid $table-border-color;
+
+                th,
+                td {
+                    border: $table-border-width solid $table-border-color;
+                    padding: $table-cell-padding;
+                    vertical-align: top;
+                }
             }
         }
     }

@@ -6,7 +6,7 @@
     var edit = Model.Content.HasPermission(Permission.Edit);
 }
 
-<table class="table table-hover table-content">
+<table class="table table-hover table-files">
     <thead>
         <tr>
             <th class="table-icon"></th>
@@ -26,7 +26,7 @@
 
             <tr data-href="@href">
                 <td class="table-icon">@Svg.Icon(item)</td>
-                <td class="d-flex"><a href="@href" class="text-truncate">@num. @item.GetTitle()</a> @if (item.IsCurrent()) {<span class="badge badge-primary align-self-center ml-1">current</span>}</td>
+                <td><a href="@href">@num. @item.GetTitle()</a> @if (item.IsCurrent()) {<span class="badge badge-primary">current</span>}</td>
                 <td>@Html.Time(item.ModifiedAt, format: "g")</td>
                 <td>@item.GetKind()</td>
                 <td>--</td>

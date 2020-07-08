@@ -1,0 +1,67 @@
+﻿@model UserSearchResult
+@{
+    var selected = ViewBag.Selected as IEnumerable<User>;
+}
+
+<table class="table table-name table-borderless">
+
+    @foreach (var user in selected) {
+        <tr class="table-checkbox">
+            <td class="table-icon">@user.AvatarImg(32, presence: true)</td>
+            <td>
+                @if (user.Username != user.GetTitle()) {
+                    @user.GetTitle()
+                }
+                <small class="text-muted">@@@user.Username</small>
+
+            </td>
+            <td class="table-icon">
+                <div class="btn btn-icon btn-checkbox">
+                    <input type="checkbox" name="users" value="@user.Id" checked />
+                    @Svg.Icon("checkbox-blank-outline")
+                    @Svg.Icon("checkbox-marked-outline")
+                </div>
+            </td>
+        </tr>
+    }
+
+    @foreach (var user in Model) {
+        if (selected.Any(x => x.Id == user.Id)) {
+            continue;
+        }
+        <tr class="table-checkbox">
+            <td class="table-icon">@user.AvatarImg(32, presence: true)</td>
+            <td>
+                @if (user.Username != user.GetTitle()) {
+                    @user.GetTitle()
+                }
+                <small class="text-muted">@@@user.Username</small>
+                @Html.Badge(user)
+            </td>
+            <td class="table-icon">
+                <div class="btn btn-icon btn-checkbox">
+                    <input type="checkbox" name="users" value="@user.Id" />
+                    @Svg.Icon("checkbox-blank-outline")
+                    @Svg.Icon("checkbox-marked-outline")
+                </div>
+            </td>
+        </tr>
+    }
+
+    @if (Model.IsNullOrEmpty()) {
+        if (Model.Query.Text.IsNullOrEmpty()) {
+            <tr><td colspan="3" class="text-center text-muted"><small>It's empty here :-(</small></td></tr>
+        } else {
+            <tr><td colspan="3" class="text-center text-muted"><small>Your search did not match any people.</small></td></tr>
+        }
+    } else if (Model.HasNextPage && !Model.Query.Text.IsNullOrEmpty()) {
+        <tr><td colspan="3" class="text-center text-muted"><small>Displaying best matches. Refine your search to find more people.</small></td></tr>
+    }
+
+
+</table>
+
+
+
+
+

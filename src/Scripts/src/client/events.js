@@ -154,7 +154,7 @@
          * weavy.on(document, ".modal", "show hide", function() { ... }, ".bs.modal")
          * 
          * @category eventhandling
-         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and wvy.postal may also be used as contexts.
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Weavy instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
          * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
          * @param {function} handler - The listener. The first argument is always the event, followed by any data arguments provided by the trigger.
@@ -205,7 +205,7 @@
          * Similar to {@link Weavy#on}.
          * 
          * @category eventhandling
-         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and wvy.postal may also be used as contexts.
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Weavy instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
          * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
          * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
@@ -218,7 +218,7 @@
          * Unregisters event listneres. The arguments must match the arguments provided on registration using .on() or .one().
          *
          * @category eventhandling
-         * @param {Element} [context] - Context Element. If omitted it defaults to the Widget instance. weavy.connection and wvy.postal may also be used as contexts.
+         * @param {Element} [context] - Context Element. If omitted it defaults to the Weavy instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
          * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
          * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.

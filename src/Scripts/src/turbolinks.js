@@ -122,7 +122,7 @@ wvy.turbolinks = (function ($) {
             sendData($link.attr('href'), null, "get", this.dataset.targetPanel);
         });
 
-        wvy.postal.on("send", function (e) {
+        wvy.postal.on("turbolinks-visit", function (e) {
             sendData(e.data.url, e.data.data, e.data.method);
         })
 
@@ -137,7 +137,6 @@ wvy.turbolinks = (function ($) {
     function submitFormWithData($form, data, $submit) {
         var url = $submit && $submit.attr("formaction") || $form.attr("action");
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
-        var panelId = $submit && $submit.attr("data-formtarget-panel") || $form.attr("data-target-panel");
 
         if ($form.hasClass("tab-content")) {
             // add active tab to data (so that we can activate the correct tab when the page reloads)
@@ -145,7 +144,7 @@ wvy.turbolinks = (function ($) {
             data = data + "&tab=" + encodeURIComponent($tab.attr('id'));
         }
 
-        sendData(url, data, method, panelId);
+        sendData(url, data, method);
     }
 
     function absolutePath(href) {
@@ -154,14 +153,7 @@ wvy.turbolinks = (function ($) {
         return link.href;
     }
 
-    function sendData(url, data, method, panelId) {
-
-        if (panelId && wvy.browser.framed) {
-            console.log("turbolinks trying open panel", { name: 'send', url: absolutePath(url), data: data, method: method, panelId: panelId })
-            wvy.postal.postToParent({ name: 'send', url: absolutePath(url), data: data, method: method, panelId: panelId });
-            return;
-        }
-
+    function sendData(url, data, method) {
         if (!method || method === "get") {
             // append data to querystring
             if (data) {
@@ -173,6 +165,9 @@ wvy.turbolinks = (function ($) {
             }
 
             // visit url
+            if (wvy.navigation) {
+                wvy.navigation.bypassUrl(url);
+            }
             Turbolinks.visit(url);
         } else {
 
@@ -186,6 +181,9 @@ wvy.turbolinks = (function ($) {
             });
 
             // visit url, i.e. post data to server
+            if (wvy.navigation) {
+                wvy.navigation.bypassUrl(url);
+            }
             Turbolinks.visit(url);
         }
     }

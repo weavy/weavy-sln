@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 7.1.0 (2020-07-17)
+
+* Notification.ReadAt property is now publicly available. Developers can now modifiy this value in a Hook or similar to manage the status of specific notifications.
+
 ## 7.0.0 (2020-07-07)
 
 * Added user directory feature for separating users from different organizations. Primarily used for multi-tenant scenarios.
@@ -26,6 +30,10 @@ In addition to the [normal upgrade procedure](https://docs.weavy.com/sdk/server/
 * Register a client on /manage/clients with `Client ID` = `iss` in your JWT tokens, and `Client Secret` = the `shared secret` or `public key` Weavy should use when validating incoming JWT tokens.
 * Update code using the server SDK to use `sudo` and `trashed` properties instead of `filter` if applicable.
 * You must provide a JWT token when instantiating `new Weavy({ jwt: "{token}" })`.
+
+## 6.5.1 (2020-07-08)
+
+* Fixed invisible progressbar.
 
 ## 6.5.0 (2020-06-25)
 

@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 7.1.1 (2020-08-12)
+
+* Fixed an issue with editing posts.
+
 ## 7.1.0 (2020-07-17)
 
 * Notification.ReadAt property is now publicly available. Developers can now modifiy this value in a Hook or similar to manage the status of specific notifications.

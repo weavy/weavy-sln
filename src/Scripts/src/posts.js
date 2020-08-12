@@ -284,7 +284,7 @@ wvy.posts = (function ($) {
         }).then(function (html) {
             $form.replaceWith(html);
 
-            $("[data-editor=post]").weavyEditor({
+            $("#edit-post-modal [data-editor=post]").weavyEditor({
                 collapsed: true,
                 pickerCss: 'collapsed-static',
                 submitButton: $form.find("button[type=submit]"),
@@ -301,7 +301,7 @@ wvy.posts = (function ($) {
     });
 
     $(document).on("hide.bs.modal", "#edit-post-modal", function (e) {
-        $("[data-editor=post]").weavyEditor("destroy");
+        $("#edit-post-modal [data-editor=post]").weavyEditor("destroy");
     });
 
     // update post
@@ -340,7 +340,7 @@ wvy.posts = (function ($) {
             if (typeof (html) === "string") {
                 $form.replaceWith(html);
 
-                $("[data-editor='post']").weavyEditor({
+                $("#edit-post-modal [data-editor='post']").weavyEditor({
                     collapsed: true,
                     pickerCss: 'collapsed-static',
                     submitButton: $form.find("button[type=submit]"),

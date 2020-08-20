@@ -4,6 +4,7 @@ wvy.posts = (function ($) {
 
     // init editors on load
     document.addEventListener("turbolinks:load", function () {
+        
         // initializing editor is very slow so we wrap the call in setTimeout to prevent blocking rendering
         setTimeout(function () {
             // create post editor
@@ -12,6 +13,7 @@ wvy.posts = (function ($) {
 
                 $postEditor.siblings(".weavy-editor-placeholder").hide();
                 $postEditor.weavyEditor({
+                    accept: wvy.config.blobWhitelist,
                     minimized: true,
                     onSubmit: function (e, data) {
                         var $editor = $(this);
@@ -285,6 +287,7 @@ wvy.posts = (function ($) {
             $form.replaceWith(html);
 
             $("#edit-post-modal [data-editor=post]").weavyEditor({
+                accept: wvy.config.blobWhitelist,
                 collapsed: true,
                 pickerCss: 'collapsed-static',
                 submitButton: $form.find("button[type=submit]"),
@@ -341,6 +344,7 @@ wvy.posts = (function ($) {
                 $form.replaceWith(html);
 
                 $("#edit-post-modal [data-editor='post']").weavyEditor({
+                    accept: wvy.config.blobWhitelist,
                     collapsed: true,
                     pickerCss: 'collapsed-static',
                     submitButton: $form.find("button[type=submit]"),

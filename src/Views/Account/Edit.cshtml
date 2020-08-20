@@ -50,7 +50,7 @@
             <tbody>
                 @foreach (Login login in User.Logins) {
                     <tr>
-                        <td class="table-icon"></td>
+                        <td class="table-icon">@Svg.Icon("lock")</td>
                         <td>@login.Type</td>
                         <td>@(login.Email ?? login.Sub)</td>
                         <td class="table-icon text-right">

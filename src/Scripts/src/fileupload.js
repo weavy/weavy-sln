@@ -6,7 +6,7 @@ wvy.fileupload = (function ($) {
     // event handler for removing existing file from input field
     $(document).on("click", ".file-upload .clear", function (evt) {
         evt.preventDefault();
-        
+
         var $upload = $(this).closest('.file-upload');
         $upload.find("input[type=hidden]").val("delete");
 
@@ -17,7 +17,7 @@ wvy.fileupload = (function ($) {
         $img.prop("src", $img.data("thumb"));
         $(this).addClass("d-none");
 
-        var $svg = $upload.find("svg");        
+        var $svg = $upload.find("svg");
         $svg.addClass("d-none");
     });
 
@@ -59,55 +59,55 @@ wvy.fileupload = (function ($) {
             dataType: "json",
             pasteZone: null,
             add: function (e, data) {
+                // reset errors
                 $(this).removeClass("is-invalid");
                 var $upload = $(this).closest(".file-upload");
-                var $custom = $upload.find(".custom-file-control").text("");
-                var $text = $upload.find(".form-text").removeClass("d-none");
-                var $feedback = $upload.find(".invalid-feedback").removeClass("d-block");
-                var errors = validate(data.files, $(this).data("max-size"), $(this).attr("accept"));
-                if (errors.length > 0) {
-                    $(this).addClass("is-invalid");
-                    $text.addClass("d-none");
-                    $feedback.addClass("d-block").text(errors.join(" "));
-                } else {
-                    // show progressbar
-                    $custom.text("Uploading...");
-                    $upload.find(".progress").removeClass("invisible");
-                    // upload file
-                    data.submit();
-                }
+                $upload.find(".form-text").removeClass("d-none");
+                $upload.find(".invalid-feedback").removeClass("d-block");
+             
+                // show progress
+                $upload.find(".custom-file-control").text("Uploading...");
+                $upload.find(".progress").removeClass("invisible");
+
+                // upload file
+                data.submit();
+
             },
             progressall: function (e, data) {
                 // update progress bar
                 $(this).closest(".file-upload").find(".progress-bar").css("width", parseInt(data.loaded / data.total * 100, 10) + "%");
             },
             done: function (e, data) {
-                var json = data.result.data[0];
-
                 var $upload = $(this).closest(".file-upload");
-                $upload.find("input[type=hidden]").val(json.id);
-                $upload.find(".clear").removeClass("d-none");
-                $upload.find(".custom-file-control").text(json.name);
-                if (json.thumb_url) {
-                    $upload.find("img").removeClass("d-none").prop("src", json.thumb_url.replace("{options}", "256-crop"));                    
+                if (data.result.data) {
+                    var json = data.result.data[0];
+                    $upload.find("input[type=hidden]").val(json.id);
+                    $upload.find(".clear").removeClass("d-none");
+                    $upload.find(".custom-file-control").text(json.name);
+                    if (json.thumb_url) {
+                        $upload.find("img").removeClass("d-none").prop("src", json.thumb_url.replace("{options}", "256-crop"));
+                    }
+
+                    $(this).focus();
+                } else {
+                    $upload.find(".form-text").addClass("d-none");
+                    $upload.find(".invalid-feedback").text("File was not accepted.").addClass("d-block");
+                    $(this).addClass("is-invalid");
                 }
-                
-                $(this).focus();
             },
             fail: function (e, data) {
                 console.error(data.jqXHR.responseJSON.message);
             },
             always: function () {
-                // reset progress bar
-                var $upload = $(this).closest(".file-upload");
-                $upload.find(".progress").addClass("invisible").find(".progress-bar").css("width", "0%");
+                // reset and hide progress bar
+                $(this).closest(".file-upload").find(".progress").addClass("invisible").find(".progress-bar").css("width", "0%");
             }
         });
-        
+
         $(".fab-upload input[type=file]").fileupload({
             dataType: "json",
             pasteZone: null,
-            add: function (e, data) {                
+            add: function (e, data) {
                 $("head").after("<div class='fileupload-progress-bar'></div>");
 
                 if (e.delegatedEvent.type !== "drop") {
@@ -140,7 +140,7 @@ wvy.fileupload = (function ($) {
                             '</button>');
                     } else {
                         wvy.alert.warning('There are ' + data.result.skipped.length + ' files with the same names.' +
-                            '<form action="' + action +'" class="alert-form upload-replace">' +
+                            '<form action="' + action + '" class="alert-form upload-replace">' +
                             '<input type="hidden" name="blobs" value="' + ids + '" />' +
                             '<button type="submit" class="btn btn-icon">' +
                             '<svg class="i i-check" height="24" viewBox="0 0 24 24" width="24"><path d="m21 7-12 12-5.5-5.5 1.41-1.41 4.09 4.08 10.59-10.58z"/></svg> Replace the files' +
@@ -175,7 +175,6 @@ wvy.fileupload = (function ($) {
                 data.submit();
             },
             progressall: function (e, data) {
-                
                 $("html > .fileupload-progress-bar").css({ "width": parseInt(data.loaded / data.total * 100, 10) + "%", "opacity": 1 });
             },
             done: function (e, data) {
@@ -214,7 +213,7 @@ wvy.fileupload = (function ($) {
             fail: function (e, data) {
                 console.error(data.jqXHR.responseJSON.message);
             },
-            always: function () {                
+            always: function () {
                 $("html > .fileupload-progress-bar").remove();
             }
         });
@@ -244,42 +243,6 @@ wvy.fileupload = (function ($) {
 
     });
 
-    // validate filetype and sizes
-    function validate(files, maxSize, accept) {
-        var errors = [];
 
-        $.each(files, function (index, file) {
-
-            // accepted file types for this field
-            if (errors.length === 0 && accept && accept.length && file["name"].length) {
-                accept = accept.split(", ").join("|");
-                var rx = new RegExp("(" + accept + ")$", "i");
-                //console.debug("Validating " + file["name"] + " against " + rx.source);
-                if (!rx.test(file["name"])) {
-                    errors.push("File type is not allowed.");
-                }
-            }
-
-            // maximum file size for this this field
-            var fs = parseInt(file["size"]);
-            if (errors.length === 0 && maxSize) {
-                if (fs > parseInt(maxSize)) {
-                    errors.push("The file is too big.");
-                }
-            }
-
-            // maximum file size (global)
-            if (errors.length === 0 && wvy.config.maxUploadSize) {
-                if (fs > parseInt(wvy.config.maxUploadSize)) {
-                    errors.push("The file is too big.");
-                }
-            }
-        });
-        return errors;
-    }
-
-    return {
-        validate: validate
-    };
 
 })(jQuery);

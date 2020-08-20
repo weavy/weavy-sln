@@ -9,16 +9,7 @@
             <div class="progress-bar" role="progressbar"></div>
         </div>
         <div class="form-group">
-
-            <button type="button" class="btn btn-file btn-tool  btn-icon" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" multiple /></button>
-            @*<div class="dropup">
-            <button type="button" class="btn btn-sm btn-round btn-outline-info btn-add dropup" data-toggle="dropdown" title="Add">@Svg.Icon("plus")</button>
-
-            <div class="dropdown-menu">
-                <button type="button" class="dropdown-item btn btn-file" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" multiple />Attachment</button>
-            </div>
-        </div>*@
-
+            <button type="button" class="btn btn-file btn-tool  btn-icon" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" accept="@ConfigurationService.BlobWhitelist" multiple /></button>
             @if (Model.TeamsEnabled && Model.ZoomEnabled) {
                 <div class="dropup">
                     <button type="button" class="btn btn-meeting btn-icon dropup mx-0" data-toggle="dropdown" title="Add meeting">@Svg.Icon("video")</button>

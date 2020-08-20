@@ -93,18 +93,18 @@
 
 
         <nav class="nav nav-tabs" role="tablist">
-            <a class="nav-item nav-link @(propsActive ? "active" : "")" href="@(Request.Path + Request.QueryString.Rebuild("q", null).AsQueryString())#props" id="nav-properties-tab" aria-controls="nav-properties" aria-selected="false">Properties</a>
-            <a class="nav-item nav-link" id="nav-attachments-tab" data-toggle="tab" href="#nav-attachments" aria-controls="nav-attachments" aria-selected="true">Attachments (@attachments.Count)</a>
+            <a class="nav-item nav-link @(propsActive ? "active" : "")" href="@(Request.Path + Request.QueryString.Rebuild("q", null).AsQueryString())#props">Properties</a>
+            <a class="nav-item nav-link" href="#nav-attachments" data-toggle="tab">Attachments (@attachments.Count)</a>
 
 
-            <a class="nav-item nav-link @(searchActive ? "active" : "")" href="#nav-search" data-toggle="tab" aria-controls="nav-search" aria-selected="false">Search</a>
+            <a class="nav-item nav-link @(searchActive ? "active" : "")" href="#nav-search" data-toggle="tab">Search</a>
 
         </nav>
 
     </header>
 
     <div class="tab-content mt-3">
-        <div class="tab-pane @(propsActive ? "active" : "")" id="nav-properties" role="tabpanel" aria-labelledby="nav-properties-tab">
+        <div class="tab-pane @(propsActive ? "active" : "")" id="nav-properties" role="tabpanel">
             <form method="get" class="properties">
                 <div class="form-group">
                     <label class="control-label" for="url">Url</label>
@@ -117,7 +117,7 @@
             </form>
 
         </div>
-        <div class="tab-pane" id="nav-attachments" role="tabpanel" aria-labelledby="nav-attachments-tab">
+        <div class="tab-pane" id="nav-attachments" role="tabpanel">
             <div class="row p-3">
                 @foreach (var file in attachments)
                 {

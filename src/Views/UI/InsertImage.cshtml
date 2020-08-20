@@ -18,7 +18,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 var props = getFileProperties();
-                
+
                 if (props.url.length > 0) {
                     window.parent.postMessage({
                         mceAction: 'insertImage',
@@ -26,21 +26,21 @@
                     }, '*');
                 }
 
-                var attachmentsRoot = $("#blobs", window.parent.document).empty();                
+                var attachmentsRoot = $("#blobs", window.parent.document).empty();
                 $(".result").find("input[type='hidden']").each(function (i, item) {
                     attachmentsRoot.append($("<input type='hidden' name='blobs' value='" + $(item).val() + "' />"));
-                });            
+                });
 
             }
         });
 
         $(".ui-insertimage #size button").click(function (e) {
             var sizer = $("#size button").removeClass("active");
-            var props = getFileProperties();            
+            var props = getFileProperties();
 
             if (/\.(png|jpg|jpeg|gif)$/i.test(props.name)) {
-                var size = $(this).attr("id");                
-                var url = props.file_url;                
+                var size = $(this).attr("id");
+                var url = props.file_url;
                 switch (size) {
                     case "small":
                         url = props.thumb_url.replace("{options}", "240x0")
@@ -56,7 +56,7 @@
                         url = props.file_url;
                         break;
                 }
-                
+
                 $("input[name=url]").val(convertToRelativeUrl(url));
             }
         });
@@ -88,7 +88,7 @@
                 group.find(".help-block").text("");
                 group.removeClass("has-error");
 
-                // basic check for duplicate filenames               
+                // basic check for duplicate filenames
                 var names = $.map($(".result [data-name]"), function (val, i) { return $(val).data("name"); });
                 data.files.forEach(function (file) {
                     if (names.indexOf(file.name) !== -1) {
@@ -146,21 +146,21 @@
         });
 
         if ($("#size").length > 0) {
-            
+
             var url = $("input[name=url]").val()
             var width = $("input[name=width]").val()
             var height = $("input[name=height]").val()
             var sizer = $("#size button");
             sizer.removeClass("active");
-            
+
             if (url.indexOf("1024x0") !== -1) {
-                sizer.eq(2).addClass("active");                
+                sizer.eq(2).addClass("active");
             } else if (url.indexOf("640x0") !== -1) {
-                sizer.eq(1).addClass("active");                
+                sizer.eq(1).addClass("active");
             } else if (url.indexOf("240x0") !== -1) {
-                sizer.eq(0).addClass("active");                
+                sizer.eq(0).addClass("active");
             } else if (url.indexOf("" + width + "x" + height) !== -1) {
-                sizer.eq(3).addClass("active");                
+                sizer.eq(3).addClass("active");
             }
         }
 
@@ -174,7 +174,7 @@
         }
 
         function setFileProperties(file) {
-            
+
             var url = file.url || file.file_url;
             $("input[name=name]").val(file.name);
             $("input[name=url]").val(convertToRelativeUrl(url));
@@ -211,14 +211,13 @@
 <div class="container-fluid insert-image">
 
     <header class="page-header">
-        @if (Model.Markdown)
-        {
+        @if (Model.Markdown) {
             <button type="button" class="btn btn-transparent pull-right" data-close title="Close">@Svg.Icon("close")</button>
             <div class="page-title">Insert image</div>
         }
         <nav class="nav nav-tabs" role="tablist">
-            <a class="nav-item nav-link active" href="#nav-properties" id="nav-properties-tab" aria-controls="nav-properties" aria-selected="false">Properties</a>
-            <a class="nav-item nav-link" id="nav-attachments-tab" data-toggle="tab" href="#nav-attachments" aria-controls="nav-attachments" aria-selected="true">Attachments  (<span id="filecount">@(Model.Image ? blobs.Count(x => FileUtils.IsWebImage(x.Name)) : blobs.Count())</span>)</a>
+            <a class="nav-item nav-link active" href="#nav-properties" data-toggle="tab">Properties</a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#nav-attachments">Attachments  (<span id="filecount">@(Model.Image ? blobs.Count(x => FileUtils.IsWebImage(x.Name)) : blobs.Count())</span>)</a>
             <a class="nav-item nav-link" href="#nav-upload" data-toggle="tab">Upload</a>
         </nav>
 
@@ -233,8 +232,7 @@
                     @Html.TextBox("url", Request.QueryString["src"] ?? Request.QueryString["href"], new { @class = "form-control", placeholder = Model.Image ? "Paste or type a link to an image..." : "Paste or type a link to a file..." })
                 </div>
 
-                @if (Model.Image)
-                {
+                @if (Model.Image) {
                     <div class="form-group">
                         <label class="control-label" for="alt">Description</label>
                         @Html.TextBox("alt", "", new { @class = "form-control" })
@@ -251,32 +249,25 @@
                     </div>
                 }
 
-                @if (Model.SelectedAttachment != null)
-                {
+                @if (Model.SelectedAttachment != null) {
                     <input type="hidden" name="name" value="@Model.SelectedAttachment.Blob.Name" />
                     <input type="hidden" name="file_url" value="@Model.SelectedAttachment.ContentUrl()" />
                     <input type="hidden" name="thumb_url" value="@Model.SelectedAttachment.ThumbPlaceholderUrl().LeftBefore("?")" />
                     <input type="hidden" name="width" value="@(Model.SelectedAttachment.Blob.Width ?? 0)" />
                     <input type="hidden" name="height" value="@(Model.SelectedAttachment.Blob.Height ?? 0)" />
-                }
-                else if (Model.SelectedBlob != null)
-                {
+                } else if (Model.SelectedBlob != null) {
                     <input type="hidden" name="name" value="@Model.SelectedBlob.Name" />
                     <input type="hidden" name="file_url" value="@Model.SelectedBlob.ContentUrl()" />
                     <input type="hidden" name="thumb_url" value="@Model.SelectedBlob.ThumbPlaceholderUrl().LeftBefore("?")" />
                     <input type="hidden" name="width" value="@(Model.SelectedBlob.Width ?? 0)" />
                     <input type="hidden" name="height" value="@(Model.SelectedBlob.Height ?? 0)" />
-                }
-                else if (Model.SelectedFile != null)
-                {
+                } else if (Model.SelectedFile != null) {
                     <input type="hidden" name="name" value="@Model.SelectedFile.Name" />
                     <input type="hidden" name="content_url" value="@Model.SelectedFile.ContentUrl()" />
                     <input type="hidden" name="thumb_url" value="@Model.SelectedFile.ThumbPlaceholderUrl().LeftBefore("?")" />
                     <input type="hidden" name="width" value="@(Model.SelectedFile.Blob.Width ?? 0)" />
                     <input type="hidden" name="height" value="@(Model.SelectedFile.Blob.Height ?? 0)" />
-                }
-                else
-                {
+                } else {
                     <input type="hidden" name="name" />
                     <input type="hidden" name="file_url" />
                     <input type="hidden" name="thumb_url" />
@@ -293,10 +284,8 @@
 
         <div class="tab-pane" id="nav-attachments">
             <div class="result row p-3">
-                @foreach (var file in Model.Attachments)
-                {
-                    if (!Model.Image || (Model.Image && FileUtils.IsWebImage(file.Blob.Name)))
-                    {
+                @foreach (var file in Model.Attachments) {
+                    if (!Model.Image || (Model.Image && FileUtils.IsWebImage(file.Blob.Name))) {
                         <div class="card mr-1" style="width: 96px;">
                             <a href="javascript:;" data-name="@file.Blob.Name" data-file-url="@file.ContentUrl()" data-thumb-url="@file.ThumbPlaceholderUrl().LeftBefore("?")" data-width="@file.Blob.Width" data-height="@file.Blob.Height" title="@file.Blob.Name">
                                 <img alt="" src="@file.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" />
@@ -308,10 +297,8 @@
                         </div>
                     }
                 }
-                @foreach (var blob in Model.Blobs)
-                {
-                    if (!Model.Image || (Model.Image && FileUtils.IsWebImage(blob.Name)))
-                    {
+                @foreach (var blob in Model.Blobs) {
+                    if (!Model.Image || (Model.Image && FileUtils.IsWebImage(blob.Name))) {
                         <div class="card mr-1" style="width: 96px;">
                             <a href="javascript:;" data-name="@blob.Name" data-file-url="@blob.ContentUrl()" data-thumb-url="@blob.ThumbPlaceholderUrl().LeftBefore("?")" data-width="@blob.Width" data-height="@blob.Height" title="@blob.Name">
                                 <img alt="" src="@blob.ThumbUrl(48, 48, fit: FitMode.Crop, scale: ScaleMode.Both)" />
@@ -329,7 +316,7 @@
 
         <div class="tab-pane" id="nav-upload">
             <div class="form-group">
-                <input type="file" name="files" data-url="@Url.Content("~/a/blobs")" data-single-file-uploads="true" />
+                <input type="file" accept="@ConfigurationService.BlobWhitelist" name="files" data-url="@Url.Content("~/a/blobs")" data-single-file-uploads="true" />
                 <div class="help-block"></div>
             </div>
         </div>

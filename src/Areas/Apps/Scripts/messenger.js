@@ -326,22 +326,26 @@ wvy.messenger = (function ($) {
                         $(".message-form .progress-bar").css("width", percentage + "%");
                     },
                     done: function (e, data) {
-                        // animate progress bar to indicate that we are doing some kind of processing
-                        $(".message-form .progress-bar").addClass("progress-bar-striped progress-bar-animated");
+                        if (data.result.data) {
+                            // animate progress bar to indicate that we are doing some kind of processing
+                            $(".message-form .progress-bar").addClass("progress-bar-striped progress-bar-animated");
 
-                        // call server to get partial html for uploaded files
-                        var qs = "?" + data.result.data.map(x => "ids=" + x.id).join("&");
-                        $.get(wvy.url.resolve(_prefix + "/blobs" + qs), function (html) {
-                            $(".table-uploads").append(html);
+                            // call server to get partial html for uploaded files
+                            var qs = "?" + data.result.data.map(x => "ids=" + x.id).join("&");
+                            $.get(wvy.url.resolve(_prefix + "/blobs" + qs), function (html) {
+                                $(".table-uploads").append(html);
 
+                                // hide and reset progress bar
+                                $(".message-form .progress").addClass("d-none");
+                                $(".message-form .progress-bar").removeClass("progress-bar-striped progress-bar-animated").css("width", "0%");
+
+                                saveMessageForm(false);
+                            });
+                        } else {
                             // hide and reset progress bar
                             $(".message-form .progress").addClass("d-none");
                             $(".message-form .progress-bar").removeClass("progress-bar-striped progress-bar-animated").css("width", "0%");
-
-                            saveMessageForm(false);
-                        });
-
-
+                        }
                     },
                     fail: function (e, data) {
                         console.error(e);

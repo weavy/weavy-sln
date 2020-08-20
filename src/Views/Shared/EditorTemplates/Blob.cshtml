@@ -23,8 +23,10 @@
         attrs.Append("class", "is-invalid");
     }
 
-    if (prop.Extensions() != null) {
-        attrs["accept"] = string.Join(", ", prop.Extensions().Split('|').Select(x => "." + x));
+    if (prop.Accept() != null) {
+        attrs["accept"] = prop.Accept();
+    } else if (ConfigurationService.BlobWhitelist != null) {
+        attrs["accept"] = ConfigurationService.BlobWhitelist;
     }
 
     attrs["data-drop-zone"] = "#dz-" + id;

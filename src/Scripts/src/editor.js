@@ -29,7 +29,7 @@ wvy.editor = (function ($) {
             $wrapper = $("<div class='weavy-editor'/>");
             $wrapper.insertAfter($el);
             var $editor = null;
-            
+
             var handleEmbeds = function () {
                 if (!embedAdded) {
 
@@ -89,7 +89,7 @@ wvy.editor = (function ($) {
                 }
             }
 
-            var handlePaste = function (e) {                
+            var handlePaste = function (e) {
                 var imageDataOnly = true;
                 var dataTransfer = e.clipboardData || e.dataTransfer;
 
@@ -118,14 +118,14 @@ wvy.editor = (function ($) {
                             var fileOfBlob = new File([file], "image-" + wvy.guid.get() + type, { type: item.type });
                             $wrapper.fileupload('add', { files: fileOfBlob });
                         }
-                    } 
-                } 
+                    }
+                }
             }
-            
+
             tinymce.init({
                 target: $el[0],
-                min_height: 20,      
-                max_height: 350,      
+                min_height: 20,
+                max_height: 350,
                 autoresize_bottom_margin: 0,
                 skin_url: window.tinymceSkinURL,
                 content_css: window.tinymceContentURL,
@@ -135,7 +135,7 @@ wvy.editor = (function ($) {
                 placeholder: options.placeholder,
                 paste_data_images: false,
                 upload_paste_data_images: false,
-                entity_encoding: "raw",                            
+                entity_encoding: "raw",
                 plugins: 'paste autoresize codesample table link media weavy_autocomplete lists',
                 menubar: false,
                 extended_valid_elements: 'em,i[class|title]',
@@ -147,7 +147,7 @@ wvy.editor = (function ($) {
                     try {
                         isTable = $(args.content).is("table");
                     } catch (err) { }
-                    
+
                     if (isTable) {
                         args.content += '<br/>';
                     }
@@ -170,8 +170,8 @@ wvy.editor = (function ($) {
                         handleEmbeds();
                     });
 
-                    editor.on('paste', function (e) {                        
-                        handlePaste(e);                        
+                    editor.on('paste', function (e) {
+                        handlePaste(e);
                     });
 
                     editor.on('drop', function (e) {
@@ -180,7 +180,7 @@ wvy.editor = (function ($) {
                     });
 
                 }
-            }).then(function (editors) {                
+            }).then(function (editors) {
                 $editor = editors[0];
                 $editor.show();
             });
@@ -288,33 +288,7 @@ wvy.editor = (function ($) {
                         paramName: "blobs",
                         singleFileUploads: false,
                         add: function (e, data) {
-                            // check if we allow the added file(s) to be uploaded
-                            var errors = [];
-                            $.each(data.files, function (index, file) {
-                                // accepted file types for this field
-
-                                if (errors.length === 0 && options.accept && options.accept.length && file["name"].length) {
-                                    var pattern = options.accept.split(",").join("|");
-                                    var rx = new RegExp("(" + pattern + ")$", "i");
-                                    if (!rx.test(file["name"])) {
-                                        errors.push("File type is not allowed.");
-                                    }
-                                }
-
-                                // maximum file size (global)
-                                if (errors.length === 0 && wvy.config.maxUploadSize) {
-                                    var fs = parseInt(file["size"]);
-                                    if (fs > parseInt(wvy.config.maxUploadSize)) {
-                                        errors.push("The file is too big.");
-                                    }
-                                }
-                            });
-
-                            if (errors.length > 0) {
-                                console.error(errors.join("\n"));
-                            } else {
-                                data.submit();
-                            }
+                            data.submit();
                         },
                         start: function (e) {
                             // disable submit button while upload in progress
@@ -357,7 +331,7 @@ wvy.editor = (function ($) {
                         $(this).closest("tr").remove();
                     });
 
-                   
+
 
                 }
 
@@ -410,7 +384,7 @@ wvy.editor = (function ($) {
 
             $submit.on("click", function (e) {
                 e.preventDefault();
-                e.stopPropagation();                                
+                e.stopPropagation();
                 hook("onSubmit", e, { html: tinymce.get($editor.id).getContent(), wrapper: $wrapper, editor: _emojiarea });
             });
         }
@@ -697,33 +671,7 @@ wvy.editor = (function ($) {
                             paramName: "blobs",
                             singleFileUploads: false,
                             add: function (e, data) {
-                                // check if we allow the added file(s) to be uploaded
-                                var errors = [];
-                                $.each(data.files, function (index, file) {
-                                    // accepted file types for this field
-
-                                    if (errors.length === 0 && options.accept && options.accept.length && file["name"].length) {
-                                        var pattern = options.accept.split(",").join("|");
-                                        var rx = new RegExp("(" + pattern + ")$", "i");
-                                        if (!rx.test(file["name"])) {
-                                            errors.push("File type is not allowed.");
-                                        }
-                                    }
-
-                                    // maximum file size (global)
-                                    if (errors.length === 0 && wvy.config.maxUploadSize) {
-                                        var fs = parseInt(file["size"]);
-                                        if (fs > parseInt(wvy.config.maxUploadSize)) {
-                                            errors.push("The file is too big.");
-                                        }
-                                    }
-                                });
-
-                                if (errors.length > 0) {
-                                    console.error(errors.join("\n"));
-                                } else {
-                                    data.submit();
-                                }
+                                data.submit();
                             },
                             start: function (e) {
                                 // disable submit button while upload in progress
@@ -946,8 +894,8 @@ wvy.editor = (function ($) {
                 _emojiarea.setText("");
             }
 
-            if (tinymce && tinymce.editors[$el.attr("id")]) {                
-                tinymce.editors[$el.attr("id")].resetContent();                                    
+            if (tinymce && tinymce.editors[$el.attr("id")]) {
+                tinymce.editors[$el.attr("id")].resetContent();
             }
         }
 
@@ -972,7 +920,7 @@ wvy.editor = (function ($) {
             // Iterate over each matching element.            
             $el.each(function () {
                 var $el = $(this);
-                if (tinymce) {                    
+                if (tinymce) {
                     tinymce.remove("#" + $el.attr("id"));
                 }
                 // Code to restore the element to its original state...                
@@ -1016,10 +964,10 @@ wvy.editor = (function ($) {
                 $wrapper.removeClass("minimized");
             }
         }
-        
+
         // Initialize the plugin instance.
-        var location = $el.data("editor");        
-        if ((location === "post" && wvy.config.htmlPosts) || (location === "comment"  && wvy.config.htmlComments)) {
+        var location = $el.data("editor");
+        if ((location === "post" && wvy.config.htmlPosts) || (location === "comment" && wvy.config.htmlComments)) {
             initHtmlEditor();
         } else {
             init();

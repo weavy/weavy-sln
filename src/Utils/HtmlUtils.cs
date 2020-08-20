@@ -129,7 +129,7 @@ namespace Weavy.Utils {
                         if (c.Url.StartsWith("#")) {
                             menu.InnerHtml += $@"<a class=""dropdown-item"" href=""#"" data-toggle=""modal"" data-target=""{c.Url}"" data-param=""{c.Param}"" data-type=""{c.Name}"">{Weavy.Web.Utils.Svg.Icon(c.Icon, c.Color)} {c.Name}</a>";
                         } else if (c.Url == "upload") {
-                            menu.InnerHtml += $@"<div class=""dropdown-item fab-upload"">{Weavy.Web.Utils.Svg.Icon(c.Icon, c.Color)} {c.Name}<input type=""file"" data-single-file-uploads=""false"" data-url=""{uploadUrl}"" multiple /></div>";
+                            menu.InnerHtml += $@"<div class=""dropdown-item fab-upload"">{Weavy.Web.Utils.Svg.Icon(c.Icon, c.Color)} {c.Name}<input type=""file"" data-single-file-uploads=""false"" data-url=""{uploadUrl}"" accept=""{ConfigurationService.BlobWhitelist}"" multiple /></div>";
                         } else {
                             menu.InnerHtml += $@"<a class=""dropdown-item"" href=""{c.Url}"">{Weavy.Web.Utils.Svg.Icon(c.Icon, c.Color)} {c.Name}</a>";
                         }

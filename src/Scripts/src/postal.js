@@ -156,14 +156,14 @@
                                         var frameWeavyId = frameElement.dataset.weavyId;
                                         registerContentWindow(frameWindow, frameName, frameWeavyId);
                                     } else {
-                                        var errorMsg = "wvy.postal: could not register frame"
+                                        var msg = "wvy.postal: did not register frame"
                                         if (!frameName) {
-                                            errorMsg += "; name attribute is missing";
+                                            msg += "; name attribute is missing";
                                         }
                                         if (!frameElement) {
-                                            errorMsg += "; frame not accessible";
+                                            msg += "; frame not accessible";
                                         }
-                                        console.error(errorMsg);
+                                        console.warn(msg);
                                     }
                                 }
                             }

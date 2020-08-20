@@ -28,6 +28,7 @@ wvy.comments = (function ($) {
         if ($el.length === 0) return;
         
         $el.weavyEditor({
+            accept: wvy.config.blobWhitelist,
             collapsed: true,
             embeds: false,
             polls: false,
@@ -295,6 +296,7 @@ wvy.comments = (function ($) {
             $form.replaceWith(html);
 
             $("[data-editor=comment]").weavyEditor({
+                accept: wvy.config.blobWhitelist,
                 collapsed: true,
                 embeds: false,
                 polls: false,

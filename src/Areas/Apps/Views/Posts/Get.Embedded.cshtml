@@ -19,12 +19,12 @@
                 </div>
                 <div class="poll-options"></div>
                 <div class="emojionearea-button-container">
-                    <div class="btn-file btn btn-icon" title="Add files"><svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"></path></svg><input type="file" name="files" accept="" multiple=""></div>
-                    <button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"></path></svg></button>
+                    <div class="btn-file btn btn-icon" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" accept="@ConfigurationService.BlobWhitelist" multiple=""></div>
+                    <button type="button" class="btn btn-icon btn-poll" title="Add poll">@Svg.Icon("poll-box")</button>
                     @if (!ConfigurationService.HtmlPosts) {
                         <div class="emojionearea-button" title="Insert emoji"><div class="emojionearea-button-open"></div><div class="emojionearea-button-close"></div></div>
                     }
-                    <button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"></path></svg></button>
+                    <button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit">@Svg.Icon("send")</button>
                 </div>
             </div>
 

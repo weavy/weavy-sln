@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 7.2.0 (2020-08-20)
+
+* Added setting weavy.blob-whitelist for controlling the type of files that can be uploaded.
+* Fixed toggling of properties tab in tiny mce image picker
+
 ## 7.1.1 (2020-08-12)
 
 * Fixed an issue with editing posts.

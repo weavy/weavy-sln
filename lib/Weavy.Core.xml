@@ -4377,7 +4377,7 @@
         </member>
         <member name="T:Weavy.Core.Models.FileAttribute">
             <summary>
-            Specifies the file size, height, width and allowed filetypes of uploaded images.
+            Specifies the file size, height, width and allowed file types of uploaded images.
             </summary>
         </member>
         <member name="M:Weavy.Core.Models.FileAttribute.#ctor">
@@ -4385,9 +4385,9 @@
             Initializes a new instance of the FileAttribute class.
             </summary>
         </member>
-        <member name="P:Weavy.Core.Models.FileAttribute.Extensions">
+        <member name="P:Weavy.Core.Models.FileAttribute.Accept">
             <summary>
-            Gets or sets the allowed file extensions.
+            Gets or sets the file type specifiers that the file input should accept, e.g. ".gif, .png".
             </summary>
         </member>
         <member name="P:Weavy.Core.Models.FileAttribute.MinWidth">
@@ -4407,7 +4407,7 @@
         </member>
         <member name="P:Weavy.Core.Models.FileAttribute.PlaceholderImage">
             <summary>
-            Gets or sets the name of the placeholder image.
+            Gets or sets the virtual path to a placeholder image, e.g. ~/img/pixel.png.
             </summary>
         </member>
         <member name="M:Weavy.Core.Models.FileAttribute.IsValid(System.Object)">
@@ -15686,14 +15686,19 @@
             Used for links in outgoing emails etc. (<code>weavy.application-url</code>).
             </summary>
         </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.BlobCache">
+            <summary>
+            Gets a value indicating if we should cache blobs on local disk or serve them directly from the blob provider (<code>weavy.blob-cache</code>).
+            </summary>
+        </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobProvider">
             <summary>
             Gets the configured blob provider (<code>weavy.blob-provider</code>).
             </summary>
         </member>
-        <member name="P:Weavy.Core.Services.ConfigurationService.BlobThumbnails">
+        <member name="P:Weavy.Core.Services.ConfigurationService.BlobSize">
             <summary>
-            Gets a value indicating if we should create thumbnail images for uploaded blobs (<code>weavy.blob-thumbnails</code>).
+            Gets the maximum accepted size of uploaded files (in bytes).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobText">
@@ -15701,9 +15706,15 @@
             Gets a value indicating if we should extract text for fulltext indexing from uploaded blobs (<code>weavy.blob-text</code>).
             </summary>
         </member>
-        <member name="P:Weavy.Core.Services.ConfigurationService.CacheBlobs">
+        <member name="P:Weavy.Core.Services.ConfigurationService.BlobThumbnails">
             <summary>
-            Gets a value indicating if we should cache blobs on local disk or serve them directly from the blob provider (<code>weavy.cache-blobs</code>).
+            Gets a value indicating if we should create thumbnail images for uploaded blobs (<code>weavy.blob-thumbnails</code>).
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.BlobWhitelist">
+            <summary>
+            A comma-separated list of unique file type specifiers that can be uploaded to blob storage (<code>weavy.blob-whitelist</code>).
+            If not specified all file types are accepted.
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.CorsOrigins">
@@ -15767,11 +15778,6 @@
         <member name="P:Weavy.Core.Services.ConfigurationService.LogLevel">
             <summary>
             Gets the configured logging level.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Services.ConfigurationService.MaxUploadSize">
-            <summary>
-            Gets the maximum allowed size of uploaded files (in bytes).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.NotificationProvider">
@@ -20075,6 +20081,12 @@
             If path is null, GetExtension returns null. If path does not have extension information, GetExtension returns String.Empty.
             </remarks>
         </member>
+        <member name="M:Weavy.Core.Utils.FileUtils.GetMediaType(System.String)">
+            <summary>
+            Gets the MIME type for the specified file.
+            </summary>
+            <param name="path">The path string from which to get the MIME type.</param>
+        </member>
         <member name="M:Weavy.Core.Utils.FileUtils.GetFileNameWithoutExtension(System.String)">
             <summary>
             Returns the file name of the specified path string without the extension.
@@ -20239,13 +20251,6 @@
             </summary>
             <param name="path">The path string to check.</param>
             <returns>Returns true if the file is a text file.</returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.FileUtils.IsFileToLarge(System.Int64)">
-            <summary>
-            Returns a value indicating if the file is larger than MaxUploadSize.
-            </summary>
-            <param name="size">The size of the file (in bytes) to check.</param>
-            <returns><c>true</c> if the file is to large, otherwise <c>false</c>.</returns>
         </member>
         <member name="M:Weavy.Core.Utils.FileUtils.GetDirectoryPartition(System.String)">
             <summary>
@@ -21100,9 +21105,9 @@
             Gets the name of the property when serialized to Json.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Utils.ReflectionUtils.Extensions(System.Reflection.PropertyInfo)">
+        <member name="M:Weavy.Core.Utils.ReflectionUtils.Accept(System.Reflection.PropertyInfo)">
             <summary>
-            Gets the allowed file extensions.
+            Gets the unique file type specifiers that the file input should accept.
             </summary>
         </member>
         <member name="M:Weavy.Core.Utils.ReflectionUtils.GetEmbeddedFile(System.String,System.Reflection.Assembly)">
@@ -22458,6 +22463,21 @@
             </summary>
             <param name="c"></param>
             <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.ValidationUtils.IsFileSizeAllowed(System.Int64)">
+            <summary>
+            Returns a value indicating if the file size is less than orr equal to <see cref="P:Weavy.Core.Services.ConfigurationService.BlobSize"/>.
+            </summary>
+            <param name="size">The size of the file (in bytes) to check.</param>
+            <returns><c>true</c> if the file is to large, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.ValidationUtils.IsFileTypeAccepted(System.String,System.String)">
+            <summary>
+            Returns a value indicating if the file type is accepted.
+            </summary>
+            <param name="name">The name of the file to check, e.g. "report.pdf"</param>
+            <param name="accept">A comma-separated list of unique file type specifiers to validate against.</param>
+            <returns><c>true</c> if the file is accepted, otherwise <c>false</c>.</returns>
         </member>
         <member name="T:Weavy.Core.Utils.ZoomApiUtils">
             <summary>

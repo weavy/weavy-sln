@@ -15,7 +15,7 @@
             <p class="content-upload text-center my-3">
                 <span class="text-muted">Drag and drop files here or</span>
                 <button type="button" class="btn btn-link btn-text">click to upload</button>.
-                <input type="file" data-single-file-uploads="false" data-url="/a/content/@Model.Id/attachments" multiple="">
+                <input type="file" accept="@ConfigurationService.BlobWhitelist" data-single-file-uploads="false" data-url="/a/content/@Model.Id/attachments" multiple="">
             </p>
         }
 

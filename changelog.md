@@ -1,16 +1,21 @@
 # Changelog for Weavy
 
+## 7.3.1 (2020-08-25)
+
+* Fixed incorrect setting for CustomErrors in web.config.
+* Increased column size for Tokens.AccessToken and Tokens.RefreshToken.
+
 ## 7.3.0 (2020-08-25)
 
 * Added support for validating JWT tokens using JWK and JWKS.
 * Added support for Open ID providers with multiple and rotating JWT signing keys.
-* Fixed ajax catch promise handling in client
-* Fixed https setting in client for authentication and connection
+* Fixed ajax catch promise handling in client.
+* Fixed https setting in client for authentication and connection.
 
 ## 7.2.0 (2020-08-20)
 
 * Added setting weavy.blob-whitelist for controlling the type of files that can be uploaded.
-* Fixed toggling of properties tab in tiny mce image picker
+* Fixed toggling of properties tab in tiny mce image picker.
 
 ## 7.1.1 (2020-08-12)
 

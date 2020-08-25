@@ -256,7 +256,7 @@
 
 
         // AUTHENTICATION & JWT
-        weavy.authentication = wvy.authentication.get(weavy.options.url);
+        weavy.authentication = wvy.authentication.get(weavy.httpsUrl(weavy.options.url));
 
         if (weavy.options.jwt === undefined) {
             weavy.error("specify a jwt string or a provider function")
@@ -296,7 +296,7 @@
         });
 
         // WEAVY REALTIME CONNECTION
-        weavy.connection = wvy.connection.get(weavy.options.url);
+        weavy.connection = wvy.connection.get(weavy.httpsUrl(weavy.options.url));
 
 
         // PANELS
@@ -684,26 +684,50 @@
 
             return whenAuthenticated().then(function () {
                 return weavy.authentication.getJwt().then(function (token) {
+                    var whenAjax = new WeavyPromise();
+
                     if (typeof token === "string") {
                         // JWT configured, use bearer token
                         settings.headers.Authorization = "Bearer " + token;
-
-                        return $.ajax(settings).catch(function (xhr, status, error) {
-                            if (xhr.status === 401) {
-                                weavy.warn("weavy.ajax: JWT failed, trying again");
-                                return weavy.authentication.getJwt(true).then(function (token) {
-                                    // new bearer token
-                                    settings.headers.Authorization = "Bearer " + token;
-                                    return $.ajax(settings);
-                                })
-                            } else {
-                                weavy.error("weavy.ajax: authenticate with JWT token failed", status, xhr.responseJSON && xhr.responseJSON.message ? "\n" + xhr.responseJSON.message : error);
+  
+                        $.ajax(settings).then(
+                            function (data, textStatus, jqXHR) {
+                                whenAjax.resolve(data, textStatus, jqXHR);
+                            },
+                            function (jqXHR, textStatus, errorThrown) {
+                                if (jqXHR.status === 401) {
+                                    weavy.warn("weavy.ajax: JWT failed, trying again");
+                                    return weavy.authentication.getJwt(true).then(function (token) {
+                                        // new bearer token
+                                        settings.headers.Authorization = "Bearer " + token;
+                                        $.ajax(settings).then(
+                                            function (data, textStatus, jqXHR) {
+                                                whenAjax.resolve(data, textStatus, jqXHR);
+                                            },
+                                            function (jqXHR, textStatus, errorThrown) {
+                                                whenAjax.reject(jqXHR, textStatus, errorThrown);
+                                            }
+                                        );
+                                    })
+                                } else {
+                                    weavy.error("weavy.ajax: authenticate with JWT token failed", textStatus, jqXHR.responseJSON && jqXHR.responseJSON.message ? "\n" + jqXHR.responseJSON.message : errorThrown);
+                                    whenAjax.reject(jqXHR, textStatus, errorThrown);
+                                }
                             }
-                        });
+                        );
                     } else {
                         // JWT not configured, try without bearer token
-                        return $.ajax(settings);
+                        $.ajax(settings).then(
+                            function (data, textStatus, jqXHR) {
+                                whenAjax.resolve(data, textStatus, jqXHR);
+                            },
+                            function (jqXHR, textStatus, errorThrown) {
+                                whenAjax.reject(jqXHR, textStatus, errorThrown);
+                            }
+                        );
                     }
+
+                    return whenAjax();
                 });
             });
         }

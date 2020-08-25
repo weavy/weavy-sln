@@ -4896,14 +4896,14 @@
         </member>
         <member name="M:Weavy.Web.Controllers.PeopleController.Trash(System.Int32)">
             <summary>
-            Trashes the user e.i. sets the IsTrashed flag.
+            Trashes the user i.e. sets the IsTrashed flag.
             </summary>
             <param name="id"></param>
             <returns></returns>        
         </member>
         <member name="M:Weavy.Web.Controllers.PeopleController.Restore(System.Int32)">
             <summary>
-            Restores the user e.i. clears the IsTrashed flag.
+            Restores the user i.e. clears the IsTrashed flag.
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -5129,14 +5129,14 @@
         </member>
         <member name="M:Weavy.Web.Controllers.RolesController.Trash(System.Int32)">
             <summary>
-            Trashes the role e.i. sets the IsTrashed flag.
+            Trashes the role i.e. sets the IsTrashed flag.
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.RolesController.Restore(System.Int32)">
             <summary>
-            Restores the role e.i. clears the IsTrashed flag.
+            Restores the role i.e. clears the IsTrashed flag.
             </summary>
             <param name="id"></param>
             <returns></returns>

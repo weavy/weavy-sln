@@ -190,7 +190,7 @@
                         return resolvedProvider.then(function (token) {
                             _jwt = token;
                             resolve(_jwt);
-                        }).catch(function () {
+                        }, function () {
                             reject("failed to get token from the jwt provider promise");
                         });
                     } else if (typeof resolvedProvider === "string") {
@@ -352,7 +352,7 @@
                 xhrFields: {
                     withCredentials: true
                 }
-            }).catch(function () {
+            }).fail(function () {
                 console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " signOut request fail");
             }).always(function () {
                 console.debug("wvy.authentication: signout ajax -> processing user");
@@ -455,7 +455,7 @@
                             authSettings.data = JSON.stringify({ jwt: token });
                         }
 
-                        $.ajax(authSettings).catch(function (xhr, status, error) {
+                        $.ajax(authSettings).then(null, function (xhr, status, error) {
                             if (token !== undefined && xhr.status === 401) {
                                 console.warn("wvy.authentication: JWT failed, trying again");
                                 return getJwt(true).then(function (token) {
@@ -466,9 +466,9 @@
                         }).then(function (actualUser) {
                             console.debug("wvy.authentication: updateUserState ajax -> processing user")
                             processUser(actualUser, "updateUserState," + originSource);
-                        }).catch(function () {
+                        }, function () {
                             console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " updateUserState request fail");
-                            console.debug("wvy.authentication: updateUserState ajax.catch() -> processing user");
+                            console.debug("wvy.authentication: updateUserState ajax xhr fail -> processing user");
                             processUser({ id: null }, "updateUserState," + originSource);
                         });
                     });
@@ -506,7 +506,7 @@
                 }).then(function (ssoUser) {
                     processUser(ssoUser);
                     return whenSSO.resolve(ssoUser);
-                }).catch(function (xhr, status, error) {
+                }, function (xhr, status, error) {
 
                     if (xhr.status === 401 && !refresh) {
                         console.warn("wvy.authentication: JWT failed, trying again");

@@ -35,9 +35,7 @@ wvy.preview = (function ($)  {
             open(previewOptions);
         }).catch(function () {
             openInParent(previewOptions);
-        })
-
-        console.log("PREVIEW CLICK", e);
+        });
     });
 
     // close pdf viewer when clicking the close button

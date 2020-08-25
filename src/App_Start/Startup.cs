@@ -9,7 +9,7 @@ namespace Weavy {
     /// OWIN Startup class that configures our application on application start.
     /// </summary>
     public partial class Startup {
-                
+
         /// <summary>
         /// Configures the application.
         /// </summary>

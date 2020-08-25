@@ -8579,7 +8579,8 @@
         <member name="P:Weavy.Core.Models.UserQuery.BuiltIn">
             <summary>
             Gets or sets a value indicating whether the result should return built-in users;
-            <c>true</c> returns only built-in users, <c>false</c> returns only users that are not built-in, and <c>null</c> returns all users. Default is <c>false</c>.
+            <c>true</c> returns only built-in users, <c>false</c> returns only users that are not built-in, and <c>null</c> returns all users. 
+            Default is <c>false</c>.
             </summary>
         </member>
         <member name="P:Weavy.Core.Models.UserQuery.DirectoryId">
@@ -8594,7 +8595,8 @@
         </member>
         <member name="P:Weavy.Core.Models.UserQuery.Clients">
             <summary>
-            Gets or sets a value indicating whether to find users that are clients (e.i. has values for ClientId and ClientSecret) or not, <c>null</c> returns all users.
+            Gets or sets a value indicating whether to find users that are clients (i.e. has values for ClientId and ClientSecret) or not, <c>null</c> returns all users. 
+            Default is <c>false</c>
             </summary>
         </member>
         <member name="T:Weavy.Core.Models.UserSettings">
@@ -10648,6 +10650,19 @@
             
             </summary>
             <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.ClientSecretDaemon">
+            <summary>
+            Periodically update client secrets to support multiple and rotating JWT signing keys.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ClientSecretDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Check open id provider for updated JWKS.
+            </summary>
+            <param name="token"></param>
+            <param name="args"></param>
             <returns></returns>
         </member>
         <member name="T:Weavy.Core.Plugins.UploadHook">
@@ -15662,38 +15677,38 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryDomain">
             <summary>
-            Gets the name of the Active Directory domain or server to authenticate against (<code>weavy.active-directory-domain</code>).
+            Gets the name of the Active Directory domain or server to authenticate against (<c>weavy.active-directory-domain</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryUsername">
             <summary>
-            Gets the username to use when authenticating users against the active directory (<code>weavy.active-directory-username</code>).
+            Gets the username to use when authenticating users against the active directory (<c>weavy.active-directory-username</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ActiveDirectoryPassword">
             <summary>
-            Gets the password to use when authenticating users against the active directory (<code>weavy.active-directory-password</code>).
+            Gets the password to use when authenticating users against the active directory (<c>weavy.active-directory-password</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ApplicationName">
             <summary>
-            Gets the name of the application, e.g. Weavy (<code>weavy.application-name</code>).
+            Gets the name of the application, e.g. Weavy (<c>weavy.application-name</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ApplicationUrl">
             <summary>
             Gets the absolute url to the installation, e.g. http://intranet.weavy.com or https://www.weavy.com/intranet. 
-            Used for links in outgoing emails etc. (<code>weavy.application-url</code>).
+            Used for links in outgoing emails etc. (<c>weavy.application-url</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobCache">
             <summary>
-            Gets a value indicating if we should cache blobs on local disk or serve them directly from the blob provider (<code>weavy.blob-cache</code>).
+            Gets a value indicating if we should cache blobs on local disk or serve them directly from the blob provider (<c>weavy.blob-cache</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobProvider">
             <summary>
-            Gets the configured blob provider (<code>weavy.blob-provider</code>).
+            Gets the configured blob provider (<c>weavy.blob-provider</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobSize">
@@ -15703,23 +15718,23 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobText">
             <summary>
-            Gets a value indicating if we should extract text for fulltext indexing from uploaded blobs (<code>weavy.blob-text</code>).
+            Gets a value indicating if we should extract text for fulltext indexing from uploaded blobs (<c>weavy.blob-text</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobThumbnails">
             <summary>
-            Gets a value indicating if we should create thumbnail images for uploaded blobs (<code>weavy.blob-thumbnails</code>).
+            Gets a value indicating if we should create thumbnail images for uploaded blobs (<c>weavy.blob-thumbnails</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.BlobWhitelist">
             <summary>
-            A comma-separated list of unique file type specifiers that can be uploaded to blob storage (<code>weavy.blob-whitelist</code>).
+            A comma-separated list of unique file type specifiers that can be uploaded to blob storage (<c>weavy.blob-whitelist</c>).
             If not specified all file types are accepted.
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.CorsOrigins">
             <summary>
-            Gets the configured cors origins (<code>weavy.cors-origins</code>).
+            Gets the configured cors origins (<c>weavy.cors-origins</c>).
             </summary>
             <remarks>
               Separate multiple entries with comma, e.g. https://www.example.com, https://www.example.org
@@ -15727,17 +15742,17 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.CacheProvider">
             <summary>
-            Gets the configured cache provider (<code>weavy.cache-provider</code>).
+            Gets the configured cache provider (<c>weavy.cache-provider</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.AuthenticationEndpoint">
             <summary>
-            Gets the full url to an external authentication endpoint. Must start with https:// (<code>weavy.authentication-endpoint</code>).
+            Gets the full url to an external authentication endpoint. Must start with https:// (<c>weavy.authentication-endpoint</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Daemons">
             <summary>
-            Gets a value indicating if daemons are enabled <code>weavy.daemons</code>.
+            Gets a value indicating if daemons are enabled <c>weavy.daemons</c>.
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.FormsAuthentication">
@@ -15757,12 +15772,12 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Https">
             <summary>
-            Gets a value indicating if HTTPS is required (<code>weavy.https</code>).
+            Gets a value indicating if HTTPS is required (<c>weavy.https</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Hsts">
             <summary>
-            Gets a value indicating whether HTTP Strict Transport Security (HSTS) is enabled (<code>weavy.hsts</code>).
+            Gets a value indicating whether HTTP Strict Transport Security (HSTS) is enabled (<c>weavy.hsts</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.LicenseUrl">
@@ -15772,7 +15787,7 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.LicensePublicKey">
             <summary>
-            Gets the (base64 encoded) public key used to verify that the license signature is valid (<code>weavy.license-public-key</code>).
+            Gets the (base64 encoded) public key used to verify that the license signature is valid (<c>weavy.license-public-key</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.LogLevel">
@@ -15782,83 +15797,83 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.NotificationProvider">
             <summary>
-            Gets the configured notification provider (<code>weavy.notification-provider</code>).
+            Gets the configured notification provider (<c>weavy.notification-provider</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordLength">
             <summary>
-            Gets the minimum required password length (<code>weavy.password-length</code>).
+            Gets the minimum required password length (<c>weavy.password-length</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresDigit">
             <summary>
-            Gets a value indicating whether passwords must contain at least one digit (0-9) (<code>weavy.password-requires-digit</code>).
+            Gets a value indicating whether passwords must contain at least one digit (0-9) (<c>weavy.password-requires-digit</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresLower">
             <summary>
-            Gets a value indicating whether passwords must contain at least one lower case letter (a-z) (<code>weavy.password-requires-lower</code>).
+            Gets a value indicating whether passwords must contain at least one lower case letter (a-z) (<c>weavy.password-requires-lower</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresUpper">
             <summary>
-            Gets a value indicating whether passwords must contain at least one upper case letter (A-Z) (<code>weavy.password-requires-upper</code>).
+            Gets a value indicating whether passwords must contain at least one upper case letter (A-Z) (<c>weavy.password-requires-upper</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PasswordRequiresSpecial">
             <summary>
-            Gets a value indicating whether passwords must at least one special character (non letter or digit) (<code>weavy.password-requires-special</code>).
+            Gets a value indicating whether passwords must at least one special character (non letter or digit) (<c>weavy.password-requires-special</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.PluginAssemblies">
             <summary>
-            Gets names of plugin assemblies (<code>weavy.plugin-assemblies</code>).
+            Gets names of plugin assemblies (<c>weavy.plugin-assemblies</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ProfileProvider">
             <summary>
-            Gets the configured profile provider (<code>weavy.profile-provider</code>).
+            Gets the configured profile provider (<c>weavy.profile-provider</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpFrom">
             <summary>
-            Gets the email address from which outgoing emails should be sent (<code>weavy.smtp-from</code>).
+            Gets the email address from which outgoing emails should be sent (<c>weavy.smtp-from</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpPassword">
             <summary>
-            Gets the password to use for authentication against the SMTP server (<code>weavy.smtp-password</code>).
+            Gets the password to use for authentication against the SMTP server (<c>weavy.smtp-password</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpPort">
             <summary>
-             Gets the port used for SMTP transactions, default value is 25 (<code>weavy.smtp-port</code>).
+             Gets the port used for SMTP transactions, default value is 25 (<c>weavy.smtp-port</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpServer">
             <summary>
-            Gets the name or IP address of the host used for SMTP transactions (<code>weavy.smtp-server</code>).
+            Gets the name or IP address of the host used for SMTP transactions (<c>weavy.smtp-server</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpUsername">
             <summary>
-            Gets the username to use for authentication against the SMTP server (<code>weavy.smtp-username</code>).
+            Gets the username to use for authentication against the SMTP server (<c>weavy.smtp-username</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpDefaultCredentials">
             <summary>
             Gets a value indicating whether default user credentials should be used to access the SMTP server.
-            When this property is set, username and password will be ignored (<code>weavy.smtp-default-credentials</code>).
+            When this property is set, username and password will be ignored (<c>weavy.smtp-default-credentials</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpSsl">
             <summary>
-            Gets a value indicating whether to use Secure Sockets Layer (SSL) to encrypt the connection with the SMTP server (<code>weavy.smtp-ssl</code>).
+            Gets a value indicating whether to use Secure Sockets Layer (SSL) to encrypt the connection with the SMTP server (<c>weavy.smtp-ssl</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Source">
             <summary>
-            Gets the source of the deployment package (<code>weavy.source</code>).
+            Gets the source of the deployment package (<c>weavy.source</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.WindowsAuthentication">
@@ -18436,7 +18451,7 @@
         </member>
         <member name="M:Weavy.Core.Services.UserService.GetClients(Weavy.Core.Models.UserQuery)">
             <summary>
-            Gets all clients (e.i. users with ClientId and ClientSecret properties).
+            Gets all clients (i.e. users with ClientId and ClientSecret properties).
             </summary>
             <param name="query">The query that compliments the search.</param>
             <returns></returns>
@@ -18879,13 +18894,6 @@
             <param name="identity">A claims-based identity.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetAuthenticationTypeForLogin(System.Security.Claims.ClaimsIdentity)">
-            <summary>
-            Get the authentication type for logins.
-            </summary>
-            <param name="identity">A claims-based identity.</param>
-            <returns></returns>
-        </member>
         <member name="M:Weavy.Core.Utils.ClaimsUtils.Get(System.Security.Claims.ClaimsIdentity,System.String[])">
             <summary>
             Get the first claim with any of the specified type(s), otherwise <c>null</c>.
@@ -18951,13 +18959,14 @@
             Provides helper methods for working with JWT tokens. See https://tools.ietf.org/html/rfc7519 and https://www.iana.org/assignments/jwt/jwt.xhtml.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Utils.JwtUtils.Encode(System.Collections.Generic.IDictionary{System.String,System.Object},Jose.JwsAlgorithm,System.String)">
+        <member name="M:Weavy.Core.Utils.JwtUtils.Encode(System.Collections.Generic.IDictionary{System.String,System.Object},System.String,Jose.JwsAlgorithm,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Encode a JSON web token with the specified shared secret.
             </summary>
             <param name="payload">The claims to add to the token</param>
+            <param name="secret">Private key or shared secret (depending on algorithm). Private keys should be encoded in PEM format.</param>
             <param name="alg">The algorithm to use.</param>
-            <param name="secret">Shared secret or private key (depending on algoritm).</param>
+            <param name="headers">Extra headers in addition to <c>alg</c> and <c>typ</c> which are automatically encoded in the token.</param>
             <returns>The encoded JWT token string.</returns>
         </member>
         <member name="M:Weavy.Core.Utils.JwtUtils.Decode(System.String,System.String,System.Boolean)">
@@ -18965,25 +18974,9 @@
             Decodes a JSON web token.
             </summary>
             <param name="token">The JSON web token to decode.</param>
-            <param name="secret">Shared secret or public key for validating signature.</param>
+            <param name="secret">Public key, JWK, JWKS or shared secret for validating signature.</param>
             <param name="validate"><c>true</c> to validate exp, nbf etc.</param>
             <returns>A dictionary with claims from the token.</returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.JwtUtils.GetRSACryptoServiceProvider(System.String,System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="key"></param>
-            <param name="isPrivate"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.JwtUtils.GetRsaParams(System.String,System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="key"></param>
-            <param name="isPrivate"></param>
-            <returns></returns>
         </member>
         <member name="M:Weavy.Core.Utils.JwtUtils.ValidateExp(System.Collections.Generic.IReadOnlyDictionary{System.String,System.Object})">
             <summary>
@@ -18998,14 +18991,6 @@
             </summary>
             <remarks>See https://tools.ietf.org/html/rfc7515#section-4.1.4</remarks>        
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
-        </member>
-        <member name="M:Weavy.Core.Utils.JwtUtils.GetPayloadProperty(System.String,System.String)">
-            <summary>
-            Gets a single property from the payload of the jwt token.
-            </summary>
-            <param name="token">The jwt token.</param>
-            <param name="name">The name of the property to return value for.</param>
-            <returns></returns>
         </member>
         <member name="T:Weavy.Core.Utils.CryptoUtils">
             <summary>
@@ -19992,7 +19977,7 @@
         </member>
         <member name="M:Weavy.Core.Utils.OfficeUtils.GetProductName(System.String)">
             <summary>
-            Gets the name of the Office product that can open the filetype specified by path (e.i. Word, Excel, PowerPoint).
+            Gets the name of the Office product that can open the filetype specified by path (i.e. Word, Excel, PowerPoint).
             </summary>
             <param name="path">The path of the file.</param>
             <returns>The Office product name or null if no product was found.</returns>

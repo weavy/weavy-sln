@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 7.3.0 (2020-08-25)
+
+* Added support for validating JWT tokens using JWK and JWKS.
+* Added support for Open ID providers with multiple and rotating JWT signing keys.
+* Fixed ajax catch promise handling in client
+* Fixed https setting in client for authentication and connection
+
 ## 7.2.0 (2020-08-20)
 
 * Added setting weavy.blob-whitelist for controlling the type of files that can be uploaded.

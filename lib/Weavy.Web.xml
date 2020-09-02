@@ -3407,7 +3407,7 @@
         </member>
         <member name="T:Weavy.Web.Attributes.AuthorizeClientAttribute">
             <summary>
-            Only users that are configrued as a client are allowed access to controllers/actions with this attribute.
+            Only users that are configured as a client are allowed access to controllers/actions with this attribute.
             </summary>
         </member>
         <member name="M:Weavy.Web.Attributes.AuthorizeClientAttribute.IsAuthorized(System.Web.Http.Controllers.HttpActionContext)">

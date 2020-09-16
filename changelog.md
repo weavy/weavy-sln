@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 7.4.1 (2020-09-16)
+
+* Fixed issue with new users not being created correctly when using a jwt token.
+
 ## 7.4.0 (2020-09-16)
 
 * Added support for updating user avatar and name from jwt token.

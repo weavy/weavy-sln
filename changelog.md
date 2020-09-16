@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 7.4.0 (2020-09-16)
+
+* Added support for updating user avatar and name from jwt token.
+
 ## 7.3.2 (2020-09-02)
 
 * Fixed issue with email notifications not being sent.

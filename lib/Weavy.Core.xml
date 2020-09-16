@@ -18811,117 +18811,142 @@
         </member>
         <member name="F:Weavy.Core.Utils.ClaimsUtils.AUTHENTICATION_TYPE">
             <summary>
-            Name of the claim that tells us which authentication type was used to sign in
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Utils.ClaimsUtils.LOGIN_ID">
-            <summary>
-            Name of the login id claim that holds a ref to the login used when authenticating.
+            Name of the "authentication_type" claim type that tells us which authentication type was used to sign in
             </summary>
         </member>
         <member name="F:Weavy.Core.Utils.ClaimsUtils.CLIENT_ID">
             <summary>
-            Name of the client id claim that holds a ref to the client used to authenticate with.
+            Name of the "client_id" claim type that holds a reference to the client used to authenticate with.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetIdClaim(System.Security.Claims.ClaimsIdentity)">
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.DIR">
             <summary>
-            Get the user id claim if it exists, otherwise <c>null</c>.
+            Name of the "dir" claim type that holds a reference to user directory.
             </summary>
-            <param name="identity">A claims-based identity.</param>
-            <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetId(System.Security.Claims.ClaimsIdentity)">
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.EMAIL">
             <summary>
-            Get the value of the user id claim if it exists, otherwise <c>null</c>.
+            Name of the "email" claim type.
             </summary>
-            <param name="identity">A claims-based identity.</param>
-            <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetUsername(System.Security.Claims.ClaimsIdentity)">
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.EXP">
             <summary>
-            Get the username if it exists, otherwise <c>null</c>.
+            Name of the "exp" claim type.
             </summary>
-            <param name="identity">A claims-based identity.</param>
-            <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetClientId(System.Security.Principal.IIdentity)">
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.FAMILY_NAME">
             <summary>
-            Gets the value of the client id claim.
+            Name of the "family_name" claim type.
             </summary>
-            <param name="identity"></param>
-            <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetLoginId(System.Security.Principal.IIdentity)">
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.GIVEN_NAME">
             <summary>
-            Gets the value of the login id claim.
+            Name of the "given_name" claim type.
             </summary>
-            <param name="identity"></param>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.ID">
+            <summary>
+            Name of the "id" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.ISS">
+            <summary>
+            Name of the "iss" claim.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.LOGIN_ID">
+            <summary>
+            Name of the "login_id" claim type that holds a reference to the login used when authenticating.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.NAME">
+            <summary>
+            Name of the "name" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.NBF">
+            <summary>
+            Name of the "nbf" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.NICKNAME">
+            <summary>
+            The "nickname" claim.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.PICTURE">
+            <summary>
+            Name of the "picture" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.PREFERRED_USERNAME">
+            <summary>
+            Name of the "preferred_username" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.ROLE">
+            <summary>
+            Name of the "role" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.SUB">
+            <summary>
+            Name of the "sub" claim type.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Utils.ClaimsUtils.USERNAME">
+            <summary>
+            Name of the "username" claim type.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.FindFirst(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String[])">
+            <summary>
+            Retrieves the first claim with any of the specified claim types, otherwise <c>null</c>.
+            </summary>
+            <param name="claims">A list of claims to check.</param>
+            <param name="claimTypes">A list of claim types to check, e.g. ["sub", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"].</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Core.Utils.ClaimsUtils.GetClient(System.Security.Principal.IIdentity)">
             <summary>
-            Gets the actual client from the claims on the identity.
+            Gets a client from the "client_id" claim on the identity.
             </summary>
             <param name="identity"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetPicture(System.Security.Claims.ClaimsIdentity)">
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetDirectory(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
             <summary>
-            Get the value of the picture claim if it exists, otherwise <c>null</c>.
+            Get the value of the "dir" claim as a <see cref="T:Weavy.Core.Models.Directory"/>. 
+            </summary>
+            <param name="claims">A claims collection.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetId(System.Security.Claims.ClaimsIdentity)">
+            <summary>
+            Get the value of a claim identifying the user ("sid", "sub" or "nameidentifier") if it exists, otherwise <c>null</c>.
             </summary>
             <param name="identity">A claims-based identity.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetDir(System.Security.Claims.ClaimsIdentity)">
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetIdClaim(System.Security.Claims.ClaimsIdentity)">
             <summary>
-            Get the value of the user directory claim if it exists, otherwise <c>null</c>.
+            Get a claim identifying the user ("sid", "sub" or "nameidentifier") if it exists, otherwise <c>null</c>.
             </summary>
             <param name="identity">A claims-based identity.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetEmail(System.Security.Claims.ClaimsIdentity)">
-            <summary>
-            Get the value of the email claim if it exists, otherwise <c>null</c>.
-            </summary>
-            <param name="identity">A claims-based identity.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetName(System.Security.Claims.ClaimsIdentity)">
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetName(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
             <summary>
             Get the value of the name claim if it exists, otherwise <c>null</c>.
             </summary>
-            <param name="identity">A claims-based identity.</param>
+            <param name="claims">A claims collection.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.Get(System.Security.Claims.ClaimsIdentity,System.String[])">
-            <summary>
-            Get the first claim with any of the specified type(s), otherwise <c>null</c>.
-            </summary>
-            <param name="identity">A claims-based identity.</param>
-            <param name="claimTypes">A list of claim types to check, e.g. ["sub", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"].</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.Subset(System.Security.Claims.ClaimsIdentity,System.String[])">
-            <summary>
-            Get the claims that match the supplied type(s), otherwise <c>null</c>.
-            </summary>
-            <param name="identity">A claims-based identity.</param>
-            <param name="claimTypes">The claim types to return.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetAvatar(System.Security.Claims.ClaimsIdentity)">
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetPicture(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
             <summary>
             Get the value of the picture claim as a <see cref="T:Weavy.Core.Models.Blob"/>, the claim can be either a blob id, a base64 encoded data URI or an url to a picture. 
             </summary>
-            <param name="identity">A claims-based identity.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetDirectory(System.Security.Claims.ClaimsIdentity)">
-            <summary>
-            Get the value of the dir claim as a <see cref="T:Weavy.Core.Models.Directory"/>. 
-            </summary>
-            <param name="identity">A claims-based identity.</param>
+            <param name="claims">A claims collection.</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Core.Utils.ClaimsUtils.GetPrincipalFromCookie(System.String)">
@@ -18930,6 +18955,29 @@
             </summary>
             <param name="cookieData">The protected cookie data.</param>
             <returns>The principal from the cookie if it exists and can be unprotected.</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetUsername(System.Security.Claims.ClaimsIdentity)">
+            <summary>
+            Get the username if it exists, otherwise <c>null</c>.
+            </summary>
+            <param name="identity">A claims-based identity.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.GetValue(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String[])">
+            <summary>
+            Retrieves the value of the first claim with any of the specified claim types, otherwise <c>null</c>.
+            </summary>
+            <param name="claims">A list of claims to check.</param>
+            <param name="claimTypes">A list of claim types to check, e.g. ["sub", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"].</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.ClaimsUtils.Subset(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String[])">
+            <summary>
+            Get the claims that match the supplied type(s), otherwise <c>null</c>.
+            </summary>
+            <param name="claims">A claims collection.</param>
+            <param name="claimTypes">The claim types to return.</param>
+            <returns></returns>
         </member>
         <member name="T:Weavy.Core.Utils.StreamUtils">
             <summary>

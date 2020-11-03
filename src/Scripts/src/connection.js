@@ -125,8 +125,8 @@
                     }
                 });
 
-                wvy.postal.on("distribute", onParentMessageReceived);
-                wvy.postal.on("message", onChildMessageReceived);
+                wvy.postal.on("distribute", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, onParentMessageReceived);
+                wvy.postal.on("message", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, onChildMessageReceived);
             }
 
             if (connectAfterInit) {
@@ -142,7 +142,7 @@
                 if (leader) {
                     connectionStart();
                 } else {
-                    wvy.postal.postToParent({ name: "request:connection-start" });
+                    wvy.postal.postToParent({ name: "request:connection-start", weavyId: "wvy.connection", connectionUrl: connectionUrl });
                 }
                 return whenConnected.promise();
             });
@@ -257,7 +257,7 @@
         // trigger a message distribute
         function triggerToChildren(name, eventName, data) {
             try {
-                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data });
+                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data, weavyId: "wvy.connection", connectionUrl: connectionUrl });
             } catch (e) {
                 console.error("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " could not distribute relay realtime message", { name: name, eventName: eventName }, e);
             }
@@ -314,13 +314,13 @@
                                     }
                                     resolve(invokeResult);
                                 }
-                                wvy.postal.off("invokeResult", invokeResult);
+                                wvy.postal.off("invokeResult", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, invokeResult);
                             }
                         };
 
-                        wvy.postal.on("invokeResult", invokeResult);
+                        wvy.postal.on("invokeResult", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, invokeResult);
 
-                        wvy.postal.postToParent({ name: "invoke", hub: hub, args: args, invokeId: invokeId });
+                        wvy.postal.postToParent({ name: "invoke", hub: hub, args: args, invokeId: invokeId, weavyId: "wvy.connection", connectionUrl: connectionUrl });
                     }
                 });
             });
@@ -443,7 +443,9 @@
                                             hub: msg.hub,
                                             args: args,
                                             result: invokeResult,
-                                            invokeId: msg.invokeId
+                                            invokeId: msg.invokeId,
+                                            weavyId: "wvy.connection",
+                                            connectionUrl: connectionUrl
                                         });
                                     })
                                     .catch(function (error) {
@@ -453,7 +455,9 @@
                                             hub: msg.hub,
                                             args: args,
                                             error: error,
-                                            invokeId: msg.invokeId
+                                            invokeId: msg.invokeId,
+                                            weavyId: "wvy.connection",
+                                            connectionUrl: connectionUrl
                                         });
                                     });
                             });
@@ -466,7 +470,7 @@
                         if (leader) {
                             console.debug("wvy.connection: processing connect request");
                             connect().then(function () {
-                                wvy.postal.postToChildren({ name: "connection-started" });
+                                wvy.postal.postToChildren({ name: "connection-started", weavyId: "wvy.connection", connectionUrl: connectionUrl });
                             });
                         }
                     });
@@ -533,8 +537,8 @@
             window.clearTimeout(_connectionTimeout);
 
             try {
-                wvy.postal.off("distribute", onParentMessageReceived);
-                wvy.postal.off("message", onChildMessageReceived);
+                wvy.postal.off("distribute", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, onParentMessageReceived);
+                wvy.postal.off("message", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, onChildMessageReceived);
             } catch (e) { /* Ignore catch */ }
 
             try {

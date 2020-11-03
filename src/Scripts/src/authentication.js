@@ -69,6 +69,8 @@
          */
         var weavyAuthentication = this;
 
+        var initialized = false;
+
         baseUrl = baseUrl || "";
 
         if (baseUrl) {
@@ -225,16 +227,17 @@
                 }
             }
 
-            // Listen on messages from parent?
-            wvy.postal.on("message", onChildMessageReceived);
-            wvy.postal.on("distribute", onParentMessageReceived);
+            if (!initialized) {
+                initialized = true;
 
-            console.log("wvy.authentication: init", baseUrl || window.name || "self");
+                // Listen on messages from parent?
+                wvy.postal.on("message", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onChildMessageReceived);
+                wvy.postal.on("distribute", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onParentMessageReceived);
 
-            wvy.connection.get(baseUrl).on("authenticate.weavy.rtmweavy", function () {
-                console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " authenticate.weavy -> updateUserState");
-                updateUserState("authenticate.weavy.rtmweavy");
-            });
+                console.log("wvy.authentication: init", baseUrl || window.name || "self");
+
+                wvy.connection.get(baseUrl).on("authenticate.weavy.rtmweavy", onConnectionAuthenticate);
+            }
 
             return _whenAuthenticated.promise();
         }
@@ -326,7 +329,7 @@
         // trigger a message distribute
         function triggerToChildren(name, eventName, data) {
             try {
-                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data }, null);
+                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data, weavyId: "wvy.authentication", baseUrl: baseUrl }, null);
             } catch (e) {
                 console.error("wvy.authentication:" + (window.name ? " " + window.name : "") + " could not distribute authentication message to children", { name: name, eventName: eventName }, e);
             }
@@ -473,7 +476,7 @@
                         });
                     });
                 }).catch(function () {
-                    wvy.postal.postToParent({ name: "request:user" });
+                    wvy.postal.postToParent({ name: "request:user", weavyId: "wvy.authentication", baseUrl: baseUrl });
                 });
             }
 
@@ -528,7 +531,7 @@
             switch (msg.name) {
                 case "request:user":
                     _whenAuthenticated.then(function () {
-                        wvy.postal.postToSource(e, { name: "user", user: _user });
+                        wvy.postal.postToSource(e, { name: "user", user: _user, weavyId: "wvy.authentication", baseUrl: baseUrl });
                     })
                     break;
                 default:
@@ -569,34 +572,46 @@
 
         };
 
+        var onConnectionAuthenticate = function (e) {
+            console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " authenticate.weavy -> updateUserState");
+            updateUserState("authenticate.weavy.rtmweavy");
+        };
+
 
         function destroy() {
             _isAuthenticated = null;
             _user = null;
+
+            wvy.postal.off("message", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onChildMessageReceived);
+            wvy.postal.off("distribute", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onParentMessageReceived);
+
+            wvy.connection.get(baseUrl).off("authenticate.weavy.rtmweavy", onConnectionAuthenticate);
 
             _events.forEach(function (eventHandler) {
                 var name = eventHandler[0], handler = eventHandler[1];
                 $(weavyAuthentication).off(name, null, handler);
             });
             _events = [];
+
+            initialized = false;
         }
 
-        return {
-            init: init,
-            isAuthorized: isAuthorized,
-            isAuthenticated: function () { return _isAuthenticated === true; },
-            whenAuthenticated: function () { return _whenAuthenticated.promise(); },
-            whenAuthorized: function () { return _whenAuthorized.promise(); },
-            on: on,
-            off: off,
-            signIn: signIn,
-            signOut: signOut,
-            setJwt: setJwt,
-            getJwt: getJwt,
-            updateUserState: updateUserState,
-            user: function () { return _user },
-            destroy: destroy
-        };
+        // Exports 
+        this.init = init;
+        this.isAuthorized = isAuthorized;
+        this.isAuthenticated = function () { return _isAuthenticated === true; };
+        this.whenAuthenticated = function () { return _whenAuthenticated.promise(); };
+        this.whenAuthorized = function () { return _whenAuthorized.promise(); };
+        this.on = on;
+        this.off = off;
+        this.signIn = signIn;
+        this.signOut = signOut;
+        this.setJwt = setJwt;
+        this.getJwt = getJwt;
+        this.updateUserState = updateUserState;
+        this.user = function () { return _user };
+        this.destroy = destroy;
+
     };
 
     WeavyAuthentication.defaults = {
@@ -633,7 +648,7 @@
         }
     };
 
-    // expose wvy.connection.default. self initiatied upon access and no other connections are active 
+    // expose wvy.authentication.default. self initiatied upon access and no other authentication is active 
     Object.defineProperty(authentications, "default", {
         get: function () {
             if (_authentications.has("")) {

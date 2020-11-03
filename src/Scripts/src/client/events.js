@@ -80,7 +80,7 @@
                 var attachedHandler = eventHandler[4];
 
                 if (context && typeof context.off === "function") {
-                    if (typeof selector === "string") {
+                    if (typeof selector === "string" || $.isPlainObject(selector)) {
                         context.off(events, selector, attachedHandler || handler);
                     } else {
                         context.off(events, attachedHandler || handler);
@@ -232,7 +232,7 @@
 
             if (offHandler) {
                 if (args.context && typeof args.context.off === "function") {
-                    if (typeof args.selector === "string") {
+                    if (typeof args.selector === "string" || $.isPlainObject(args.selector)) {
                         args.context.off(args.events, args.selector, offHandler);
                     } else {
                         args.context.off(args.events, offHandler);

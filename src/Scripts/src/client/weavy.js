@@ -157,6 +157,28 @@
         this.error = this.console.error;
         this.info = this.console.info;
 
+        // ID functions
+
+        /**
+         * Appends the weavy-id to an id. This makes the id unique per weavy instance. You may define a specific weavy-id for the instance in the {@link Weavy#options}. If no id is provided it only returns the weavy id. The weavy id will not be appended more than once.
+         * 
+         * @param {string} [id] - Any id that should be completed with the weavy id.
+         * @returns {string} Id completed with weavy-id. If no id was provided it returns the weavy-id only.
+         */
+        weavy.getId = function (id) {
+            return id ? weavy.removeId(id) + "-" + weavy.options.id : weavy.options.id;
+        }
+
+        /**
+         * Removes the weavy id from an id created with {@link Weavy#getId}
+         * 
+         * @param {string} id - The id from which the weavy id will be removed.
+         * @returns {string} Id without weavy id.
+         */
+        weavy.removeId = function (id) {
+            return id ? String(id).replace(new RegExp("-" + weavy.getId() + "$"), '') : id;
+        };
+
         /**
          * The hardcoded semver version of the weavy-script.
          * @member {string} Weavy.version 
@@ -570,7 +592,7 @@
                 weavy.nodes.statusFrame.id = weavy.getId("weavy-status-check");
                 weavy.nodes.statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
 
-                weavy.one(wvy.postal, "ready", weavy.getId("weavy-status-check"), function () {
+                weavy.one(wvy.postal, "ready", { weavyId: weavy.getId(), windowName: weavy.getId("weavy-status-check") }, function () {
                     weavy.log("Frame status check", "√")
                     weavy.isBlocked = false;
                     weavy.triggerEvent("frame-check", { blocked: false });
@@ -582,7 +604,7 @@
                     weavy.isBlocked = true;
 
                     try {
-                        wvy.postal.registerContentWindow(weavy.nodes.statusFrame.contentWindow, weavy.getId("weavy-status-check"), weavy.getId("weavy-status-check"));
+                        wvy.postal.registerContentWindow(weavy.nodes.statusFrame.contentWindow, weavy.getId("weavy-status-check"), weavy.getId());
                     } catch (e) {
                         weavy.warn("Frame postMessage is blocked", e);
                         weavy.triggerEvent("frame-check", { blocked: true });
@@ -609,26 +631,6 @@
 
 
         // PUBLIC METHODS
-
-        /**
-         * Appends the weavy-id to an id. This makes the id unique per weavy instance. You may define a specific weavy-id for the instance in the {@link Weavy#options}. If no id is provided it only returns the weavy id. The weavy id will not be appended more than once.
-         * 
-         * @param {string} [id] - Any id that should be completed with the weavy id.
-         * @returns {string} Id completed with weavy-id. If no id was provided it returns the weavy-id only.
-         */
-        weavy.getId = function (id) {
-            return id ? weavy.removeId(id) + "-" + weavy.options.id : weavy.options.id;
-        }
-
-        /**
-         * Removes the weavy id from an id created with {@link Weavy#getId}
-         * 
-         * @param {string} id - The id from which the weavy id will be removed.
-         * @returns {string} Id without weavy id.
-         */
-        weavy.removeId = function (id) {
-            return id ? String(id).replace(new RegExp("-" + weavy.getId() + "$"), '') : id;
-        };
 
 
         /**
@@ -762,6 +764,14 @@
                 root.remove();
             });
 
+
+            // Unregister all content windows
+            try {
+                wvy.postal.unregisterAll(weavy.getId());
+            } catch (e) {
+                weavy.warn("weavy.destroy: could not unregister postal content windows")
+            }
+
             // Delete everything in the instance
             for (var prop in weavy) {
                 if (Object.prototype.hasOwnProperty.call(weavy, prop)) {
@@ -795,11 +805,10 @@
 
 
         // MESSAGE EVENTS
-
         // listen for dispatched messages from weavy (close/resize etc.)
-        weavy.on(wvy.postal, "message", function (message) {
+        weavy.on(wvy.postal, "message", weavy.getId(), function (message) {
             /**
-                * THIS IS DEPRECATED. Use the weavy.on(wvy.postal, "message-name", function(e) { ... }); instead
+                * THIS IS DEPRECATED. Use the weavy.on(wvy.postal, "message-name", weavy.getId(), function(e) { ... }); instead
                 * 
                 * Event for window messages directed to the current weavy instance, such as messages sent from panels belonging to the weavy instance.
                 * The original message event is attached as event.originalEvent.
@@ -814,6 +823,7 @@
                 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
             */
             weavy.triggerEvent("message", message.data, message);
+
         });
 
 

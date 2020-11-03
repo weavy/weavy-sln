@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 7.4.2 (2020-11-03)
+
+* Fixed issues with destroy and event handling.
+
 ## 7.4.1 (2020-09-16)
 
 * Fixed issue with new users not being created correctly when using a jwt token.

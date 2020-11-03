@@ -271,7 +271,12 @@
                 selector = null;
             }
             messageListeners = messageListeners.filter(function (listener) {
-                return !(name === listener.name && handler === listener.handler && (typeof selector === "string" && selector === listener.selector || $.isPlainObject(selector) && eqObjects(selector, listener.selector)));
+                var nameMatch = name === listener.name;
+                var handlerMatch = handler === listener.handler;
+                var stringSelectorMatch = typeof selector === "string" && selector === listener.selector;
+                var plainObjectMatch = $.isPlainObject(selector) && eqObjects(selector, listener.selector);
+                var offMatch = nameMatch && handlerMatch && (stringSelectorMatch || plainObjectMatch);
+                return !(offMatch);
             });
         }
 

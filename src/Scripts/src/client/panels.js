@@ -880,19 +880,18 @@
         });
 
         // Exports
-        return {
-            clearPanels: clearPanels,
-            closePanels: closePanels,
-            createContainer: createPanelsContainer,
-            getContainer: function (containerId) {
-                return _panelsContainers.get(containerId || "global");
-            },
-            getPanel: function (panelId) {
-                return _panels.get(panelId);
-            },
-            preload: preloadPanels,
-            resetPanels: resetPanels
-        }
+        this.clearPanels = clearPanels;
+        this.closePanels = closePanels;
+        this.createContainer = createPanelsContainer;
+        this.getContainer = function (containerId) {
+            return _panelsContainers.get(containerId || "global");
+        };
+        this.getPanel = function (panelId) {
+            return _panels.get(panelId);
+        };
+        this.preload = preloadPanels;
+        this.resetPanels = resetPanels;
+        
     };
 
     /**

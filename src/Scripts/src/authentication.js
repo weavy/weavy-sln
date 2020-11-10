@@ -71,7 +71,7 @@
 
         var initialized = false;
 
-        baseUrl = baseUrl || "";
+        baseUrl = baseUrl || window.location.origin + (wvy.config && wvy.config.applicationPath || "/");
 
         if (baseUrl) {
             // Remove trailing slash

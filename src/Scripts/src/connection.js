@@ -48,12 +48,13 @@
 
         var connectionUrl = "/signalr";
 
-        if (url) {
-            // Remove trailing slash
-            url = /\/$/.test(url) ? url.slice(0,-1) : url;
+        // Set explicit self url
+        url = url || window.location.origin + (wvy.config && wvy.config.applicationPath || "/");
 
-            connectionUrl = url + connectionUrl;
-        }
+        // Remove trailing slash
+        url = /\/$/.test(url) ? url.slice(0, -1) : url;
+
+        connectionUrl = url + connectionUrl;
 
         // create a new hub connection
         var connection = $.hubConnection(connectionUrl, { useDefaultPath: false });
@@ -95,7 +96,7 @@
         function init(connectAfterInit, authentication) {
             if (!initialized) {
                 initialized = true;
-                console.debug("wvy.connection: init", url || window.name || "self", connectAfterInit ? "and connect" : "");
+                console.debug("wvy.connection: init", window.name || "self", "to " + url, connectAfterInit ? "and connect" : "");
 
                 wvy.postal.whenLeader.then(function () {
                     console.log("wvy.connection: is leader, let's go");

@@ -1,0 +1,50 @@
+﻿@model TaskItem
+@{ 
+    var hideTask = ViewData["hidecompleted"] != null && (bool)ViewData["hidecompleted"];
+}
+<div class="list-group-item task-item @(Model.Completed ? "list-group-item-success": "") @(hideTask && Model.Completed ? "hidden": "" )" data-type="content" data-id="@Model.Id">
+    <div class="card">
+        <div class="card-header media task" data-toggle="modal" data-target="#task-details-modal" data-path="@(Url.Action<TasksController>(c => c.EditModal(Model.Id)))">
+            <div class="btn btn-icon btn-checkbox">
+                <input type="checkbox" id="checkbox-@Model.Id" data-task-id="@Model.Id" @(Model.Completed ? "checked" : "") />
+                @Svg.Icon("checkbox-blank-outline")
+                @Svg.Icon("checkbox-marked-outline")
+            </div>
+            <div class="media-body">
+                <h6 class="media-title">@Html.Raw(Emojione.ToImage(Model.Name)) </h6>
+                @if (!Model.Description.IsNullOrEmpty()) {
+                    <small class="text-muted mb-1 d-block">@Model.Description</small>
+                }
+
+                @if (Model.AssignedTo.HasValue) {
+                    <span class="assignee">
+                        @Model.AssignedToUser.AvatarLink(24)
+                    </span>
+                }
+                @if (Model.Attachments().Any()) {
+                    <span class="attachments" title="@T[Model.Attachments().Count(), "{0} attachment"]">
+                        @Svg.Icon("paperclip", size: 18, htmlAttributes: new { @class = "text-icon" })
+                    </span>
+                }
+
+                @if (Model.Comments().Any()) {
+                    <span class="comments" title="@T[Model.Comments().Count(), "{0} comment"]">
+                        @Svg.Icon("comment", size: 18, htmlAttributes: new { @class = "text-icon" })
+                    </span>
+                }
+
+                @if (Model.DueDate.HasValue) {
+                    <small class="due-date @(Model.DueDate.Value < DateTime.Now ? "text-danger" : "text-muted ") @(Model.Completed ? "d-none" : "")" title="@Model.DueDate.ToLocal()">due @Model.DueDate.ToLocal().FromNow()</small>
+                }
+            </div>
+            <div class="media-icons">
+                @Html.StarToggle(Model)
+                @{ Html.RenderPartial("_TaskMenu", Model); }
+            </div>
+            @if (Model.HasPermission(Permission.Attach)) {
+                @Html.Filebrowser(true, ConfigurationService.BlobWhitelist, "attach", cssClass: "d-none", htmlAttributes: new { data_dropzone = ".card", data_attach_url = $"/a/content/{Model.Id}/attachments" });
+            }
+        </div>
+    </div>
+    
+</div>

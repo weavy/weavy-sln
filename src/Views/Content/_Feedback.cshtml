@@ -1,0 +1,36 @@
+﻿@model Content
+@{
+    var commentable = Model as ICommentable;
+    var versionable = Model as IVersionable;
+    var likeable = Model as ILikeable;
+}
+
+@if (versionable?.IsCurrent() ?? true) {
+    if (likeable != null) {
+        if (likeable.IsLiked()) {
+            <a class="ml-2 btn btn-primary btn-icon" href="@Model.Url()/like" title="Unlike" data-post-unlike="@Model.Id">@Svg.Icon("thumb-up", size: 18)</a>
+        } else {
+            <a class="ml-2 btn btn-primary btn-icon" href="@Model.Url()/like" title="Like" data-post-like="@Model.Id">@Svg.Icon("thumb-up-outline", size: 18)</a>
+        }
+    }
+
+    if (commentable != null) {
+        if (commentable.CommentIds.Any()) {
+            <a class="ml-2 btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Svg.Icon("comment", size: 18)</a>
+        } else {
+            <a class="ml-2 btn btn-primary btn-icon mr-auto" href="@Model.Url()/comments" data-toggle="comments" title="Comment">@Svg.Icon("comment-outline", size: 18)</a>
+        }
+    }
+
+    if (likeable != null && likeable.LikedByIds.Any()) {
+        <a class="nav-link likes" href="@Model.Url()/likes" data-toggle="modal" data-target="#feedback-modal" data-path="/content/@Model.Id/likes" data-modal-title="Content liked by" title="Show likes">
+            @likeable.LikedByIds.SingularizeOrPluralize("like", "likes")
+        </a>
+    }
+    if (commentable != null && commentable.CommentIds.Any()) {
+        <a class="nav-link comments" href="@Model.Url()/comments" data-toggle="comments" title="Toggle comments">
+            @commentable.CommentIds.SingularizeOrPluralize("comment", "comments")
+        </a>
+    }
+
+}

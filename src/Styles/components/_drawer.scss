@@ -6,37 +6,15 @@ $zindex-drawer: $zindex-modal-backdrop - 1;
 $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
 
 
-#drawer-user {
-    // hide "Mark all as read" unless the notifications tab is active
-    [data-toggle="tab"][href="#notifications"]:not(.active) ~ [data-read="notifications"] {
-        display: none;
-    }
 
-    .tab-content {
-        position: relative;
-    }
 
-    #tab-messages {
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        position: absolute;
-        overflow: hidden;
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    }
-}
-
+// drawers (initially off screen)
 .drawer {
-    @include overscroll-behavior-contain;
     position: fixed;
     top: 0;
     bottom: 0;
+    width: 80vw;
+    max-width: $drawer-left-width;
     z-index: $zindex-drawer;
     display: flex;
     flex-direction: column;
@@ -44,62 +22,30 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
     overflow: hidden;
     background-color: $body-bg;
     box-shadow: $md-shadow-8dp;
-    // transform offscreen
     transition: transform, opacity;
     will-change: transform, opacity;
     transform-style: preserve-3d;
+    // transform off screen
+    transform: translateX(-($drawer-left-width + $md-shadow-8dp-width));
     @include material-animation-default();
-}
 
-// drawers initially closed (off screen)
-.drawer-left {
-    left: 0;
-    width: $drawer-left-width;
-    max-width: 80%;
-    transform: translateX(-$drawer-left-width - .75rem);
-    // show drawer by moving it on screen
     &.drawer-in {
+        // move drawer on screen
         transform: translateX(0);
     }
 }
 
 .drawer-right {
-    left: 100%; // Instead of right: 0 to be able to ignore scrollbars
-    width: $drawer-right-width;
-    max-width: none; // maybe we should allow this drawer to open full width and have a close button?
-    transform: translateX(.75rem);
-    background-color: transparent;
-    box-shadow: none;
-    align-items: flex-end;
-
-    > .drawer-header, > .drawer-body {
-        width: 100%;
-        max-width: calc(100vw - 4.5rem);
-    }
-
-    &::after {
-        content: "";
-        position: absolute;
-        width: 100%;
-        max-width: calc(100vw - 4.5rem);
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background-color: $body-bg;
-        box-shadow: $md-shadow-8dp;
-        z-index: -1;
-    }
-    // show drawer by moving it on screen
-    &.drawer-in {
-        transform: translateX(-$drawer-right-width);
-    }
+    right: 0;
+    max-width: $drawer-right-width;
+    // transform off screen
+    transform: translateX($drawer-right-width + $md-shadow-8dp-width);
 }
-
 
 
 .drawer-header {
     background-color: rgba($theme-800, .95);
-    padding: .5rem;
+    padding: $navbar-padding-y $navbar-padding-x;
     flex: none;
     display: flex;
     flex-direction: column;
@@ -111,12 +57,12 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
 
     > .dropdown, > .btn-icon {
         position: absolute;
-        top: .5rem;
-        right: .5rem;
+        top: $navbar-padding-y;
+        right: $navbar-padding-x;
 
         .drawer-right & {
             left: auto;
-            right: .5rem;
+            right: $navbar-padding-x;
         }
     }
 
@@ -127,6 +73,7 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
 
 .drawer-body {
     flex: 1 1 auto;
+    position: relative;
 }
 
 .drawer-title {
@@ -143,7 +90,6 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
 
 // backdrop (when drawer is open)
 .drawer-backdrop {
-    @include overscroll-behavior-contain;
     position: fixed;
     top: 0;
     left: 0;
@@ -170,6 +116,45 @@ $zindex-drawer-backdrop: $zindex-modal-backdrop - 2;
         .drawer-open & {
             pointer-events: auto;
             opacity: 1;
+        }
+    }
+}
+
+#drawer-user {
+
+    .drawer-header {
+        padding: 0;
+    }
+
+    // Tabbable tabs
+    //
+    // Hide tabbable panes to start, show them when `.active`
+    .tab-content {
+        > .os-scrollbar-vertical {
+            top: $navbar-height;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+    }
+    // special rules for embedded messenger
+    #tab-messages {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        overflow: hidden;
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
         }
     }
 }

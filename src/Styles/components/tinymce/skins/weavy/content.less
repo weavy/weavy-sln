@@ -1,15 +1,70 @@
+
+
 @import '../../../../../node_modules/@tinymce/oxide/src/less/theme/content-ui';
 
 
 //
 // Place your variables here
 //
+html {
+    will-change: scroll-position;
+    backface-visibility: hidden;
+    // custom scrollbar for webkit browsers
+    &::-webkit-scrollbar {
+        height: .625rem;
+        width: .625rem;
+        background: transparent;
+        z-index: 999;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(#8c8c8c, 0.75);
+        border: .125rem solid transparent;
+        border-radius: .5rem;
+        background-clip: padding-box;
+
+        &:hover {
+            background-color: rgba(#545454, 0.75);
+        }
+
+        &:window-inactive {
+            background-color: rgba(#8c8c8c, 0.5);
+        }
+    }
+    // custom scrollbar for firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba(#8c8c8c, 0.75) transparent;
+}
+
 
 body {
     color: #545454;
     font-size: 1rem;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-    padding:0 0.5rem !important;
+    padding: 1.5rem !important;
+    margin: 0 !important;
+
+    &.weavy_html_editor {
+        padding: 0 .5rem !important;
+        margin: .5rem !important;
+    }
+
+
+    @media (min-width: (768px)) {
+        padding: 1.5rem 3rem !important;
+    }
+
+    @media (min-width: 992px ) {
+        padding: 3rem !important;
+        max-width: calc(960px - 2 * 3rem); // subtract padding due to the box-sizing
+        margin: 1.5rem auto !important;
+        box-shadow: 0px 0.1875rem 0.625rem rgba(23, 23, 23, 0.3);
+        min-height: 79rem; // 960px * 1.4142 - padding
+    }
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -21,18 +76,22 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: inherit;
 }
 
-h1, .h1{
-    font-size:2.5rem;
+h1, .h1 {
+    font-size: 2.5rem;
 }
+
 h2, .h2 {
     font-size: 2rem;
 }
+
 h3, .h3 {
     font-size: 1.75rem;
 }
+
 h4, .h4 {
     font-size: 1.5rem;
 }
+
 h5, .h5 {
     font-size: 1.25rem;
 }
@@ -57,7 +116,7 @@ table {
     vertical-align: baseline;
 }
 
-img{
+img {
     max-width: 100%;
 }
 
@@ -65,8 +124,6 @@ img{
     left: unset;
 }
 
-.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before { 
+.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
     color: #8C8C8C;
 }
-
-

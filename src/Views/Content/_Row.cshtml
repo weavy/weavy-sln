@@ -1,12 +1,20 @@
 ﻿@model Content
 @{
     var meta = Model.MetaData();
+    var attrs = Html.PreviewAttributes(Model.Parent(), Model as IFile);
+    var href = attrs?["data-href"] ?? Model.Url();
+    var target = attrs?["target"] ?? (Model is IFolder ? null : "overlay");
+    var prev = ViewData["prev"] as int?;
+    var next = ViewData["next"] as int?;
 }
-<tr data-id="@Model.Id" data-item-guid="@Model.ContentGuid" data-allowed-children="@meta.AllowedChildren()" data-allowed-parents="@meta.AllowedParents()" data-href="@Model.Url()" @(Model.HasPermission(Permission.Edit) ? "draggable=true" : "")>
+<tr data-id="@Model.Id" @Html.Raw(prev != null ? ("data-prev=" + prev) : null) @Html.Raw(next != null ? ("data-next=" + next) : null) data-href="@href" data-target="@target" data-content-guid="@Model.ContentGuid" data-allowed-children="@meta.AllowedChildren()" data-kind="@Model.Kind()" @(Model.HasPermission(Permission.Edit) ? "draggable=true" : "")>
     <td class="table-icon">@Svg.Icon(Model)</td>
-    <td title="@Model.Name">
-        <a href="@Model.Url()" draggable="false">@Model.Name</a>
-        @Html.ContentBadge(Model)
+    <td>
+        <a href="@href" target="@target" data-kind="@Model.Kind()" title="@Model.Name" draggable="false">
+            @Model.Name
+            @if (Model.Kind() == "image") { Html.RenderPartial("_ContentMicroThumb", Model); }
+        </a>
+        @Html.Badge(Model)
         @if (Model is IStarrable starrable) {
             @Html.StarToggle(starrable)
         }

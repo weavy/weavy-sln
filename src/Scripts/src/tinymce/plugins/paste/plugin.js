@@ -567,10 +567,9 @@ var wvy = wvy || {};
             function pasteImageData(e, rng) {
                 
                 var dataTransfer = e.clipboardData || e.dataTransfer;
-
-
+                
                 // If more than image data in clipboard, do not paste as image
-                if (e.clipboardData.types.length > 1) return;
+                if (dataTransfer.types.length > 1) return;
                 
                 function processItems(items) {
                     var i, item, reader, hadImage = false;
@@ -584,9 +583,7 @@ var wvy = wvy || {};
                             rng = null;
                         }
 
-                        var pswpSize = reader.width && reader.height ? ' data-size="' + reader.width + "x" + reader.height + '"' : '';
-
-                        pasteHtml('<a href="' + reader.result + '" data-photoswipe="document"' + pswpSize + '><img src="' + reader.result + '"></a>');
+                        pasteHtml('<a href="' + reader.result + '" target="overlay"><img src="' + reader.result + '"></a>');
                     }
 
                     if (items) {                        
@@ -638,10 +635,10 @@ var wvy = wvy || {};
                                         success: function (data, textStatus, jqXHR) {
                                             var response = JSON.parse(data).data[0];
                                             
-                                            if (response && response.file_url) {
+                                            if (response && response.download) {
                                                 var attachmentsRoot = $("#blobs", window.document);                                                
                                                 attachmentsRoot.append($("<input type='hidden' name='blobs' value='" + response.id + "' />"));
-                                                pasteImage({ result: response.file_url, width: response.width, height: response.height });
+                                                pasteImage({ result: response.download, width: response.width, height: response.height });
                                             }
                                         },
                                         complete: function () {

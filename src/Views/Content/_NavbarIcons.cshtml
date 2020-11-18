@@ -1,0 +1,22 @@
+﻿@model Content
+@{
+    var lockable = Model as ILockable;
+}
+@Html.Badge(Model)
+@if (Model is IFile file) {
+    if (file.Blob.Link != null) {
+        <a class="btn btn-icon" href="@file.Blob.Link" target="_blank" title="@T["Open in {0}", file.Blob.Provider]">@Svg.Icon(Model)</a>
+    } else if (file.Blob.Link == null && FileUtils.IsOfficeDocument(file.Name)) {
+        <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model)</a>
+    } else {
+        <a class="btn btn-icon" href="@file.DownloadUrl(download: true)" title="@T["Download"]">@Svg.Icon("download")</a>
+    }
+} else if (Model.HasPermission(Permission.Edit)) {
+    if (lockable == null || !lockable.IsLocked() || lockable?.LockedById == User.Id) {
+        <a class="btn btn-icon" href="@Model.Url()/edit" target="overlay" title="@T["Edit"]">@Svg.Icon("pencil", "primary")</a>
+    }
+}
+
+@{Html.RenderPartial("_ContentMenu", Model, new ViewDataDictionary { { "override_menu", true } });}
+
+

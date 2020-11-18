@@ -1,0 +1,19 @@
+﻿@model Content
+@{
+    var lockable = Model as ILockable;
+}
+@if (Model.HasPermission(Permission.Edit) && (!lockable?.IsLocked() ?? true)) {
+    <form id="navbar-rename-form" class="navbar-form hover" action="@(Url.Action<ContentController>(c => c.Rename(Model.Id, null)))" method="put" autocomplete="off" novalidate>
+        <div class="form-group autosize">
+            <input class="form-control hover" type="text" name="@nameof(Model.Name)" value="@Model.Name" placeholder="@T["Untitled"]" required />
+            <span class="form-control">@Model.Name</span>
+        </div>
+        <input type="submit" class="d-none" disabled />
+    </form>
+} else {
+    <span class="navbar-text">@Model.GetTitle()</span>
+}
+
+@if (Model is IStarrable starrable) {
+    @Html.StarToggle(starrable)
+}

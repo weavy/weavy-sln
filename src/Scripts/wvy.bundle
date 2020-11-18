@@ -1,5 +1,5 @@
 ﻿# default bundle included on _Layout.cshtml (asap.bundle should be loaded prior to this)
-~/scripts/vendor/turbolinks/turbolinks.js
+
 ~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/_bootstrap.bundle
 ~/scripts/src/signalr/jquery.signalR.js
@@ -14,11 +14,8 @@
 ~/scripts/vendor/mousetrap/mousetrap-global-bind.min.js
 ~/scripts/vendor/select2/select2.min.js
 ~/scripts/src/_extensions.js
-~/scripts/src/turbolinks.js 
-~/scripts/src/url.js
 ~/scripts/src/emoji.js
 ~/scripts/src/guid.js
-~/scripts/src/scroll.js
 ~/scripts/src/authentication.js
 ~/scripts/src/connection.js
 ~/scripts/src/presence.js
@@ -28,14 +25,13 @@
 ~/scripts/src/content.js
 ~/scripts/src/star.js
 ~/scripts/src/subscribe.js
-~/scripts/src/draggable.js
+~/scripts/src/drag.js
 ~/scripts/src/editor.js
 ~/scripts/src/comments.js
 ~/scripts/src/attachment.js
 ~/scripts/src/posts.js
 ~/scripts/src/alert.js
 ~/scripts/src/audio.js
-~/scripts/src/navigation.js
 ~/scripts/src/dropdown.js
 ~/scripts/src/modal.js
 ~/scripts/src/infinitescroll.js
@@ -51,12 +47,10 @@
 ~/scripts/src/share.js
 ~/scripts/src/userspicker.js
 ~/scripts/src/autosave.js
-~/scripts/src/filebrowser.js
 ~/scripts/src/recycle-bin.js
 ~/scripts/_fileupload.bundle
 ~/scripts/_button.bundle
 ~/scripts/_preview.bundle
-~/scripts/_photoswipe.bundle
 ~/scripts/_tinymce.bundle
 ~/scripts/_codesample.bundle
 

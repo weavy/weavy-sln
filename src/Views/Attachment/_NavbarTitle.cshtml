@@ -1,0 +1,5 @@
+﻿@model Attachment
+<div class="navbar-text">@Model.GetTitle()</div>
+@if (Model is IStarrable starrable) {
+    @Html.StarToggle(starrable)
+}

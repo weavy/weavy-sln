@@ -3,43 +3,54 @@
     Title = Model.Name;
 }
 
+@section navbar_tertiary {
+    <nav class="navbar navbar-light">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active"><a href="@Model.Url()">@Svg.Icon("folder-open", "amber")<span>@Model.Name</span></a></li>
+        </ol>
+        @Html.StarToggle(Model)
+        <div class="navbar-icons">
+            @if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.Card) {
+                <a href="@Url.Rebuild("layout", "table")" class="btn btn-icon" title="@T["Table view"]">@Svg.Icon("view-list-outline")</a>
+            } else {
+                <a href="@Url.Rebuild("layout", "card")" class="btn btn-icon" title="@T["Card view"]">@Svg.Icon("view-module-outline")</a>
+            }
+            @*<button class="btn btn-icon">@Svg.Icon("sort-alphabetical")</button>*@
+            <div class="dropdown">
+                <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">@Svg.Icon("dots-vertical")</button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <button type="button" class="dropdown-item" data-toggle="modal" data-target="#share-modal" data-share-type="@Model.Type" data-share-id="@Model.Id" data-share-title="Share @Model.Kind()">@Svg.Icon("share-variant", "success") @T["Share"]</button>
+                    @Html.StarToggle(Model, false, htmlAttributes: new { @class = "dropdown-item toggle-dropdown" })
+                    @Html.SubscribeToggle(Model, htmlAttributes: new { @class = "dropdown-item toggle-dropdown" })
+                </div>
+            </div>
+        </div>
+    </nav>
+}
+<div class="progress progress-files d-none">
+    <div class="progress-bar" role="progressbar"></div>
+</div>
+
+@if (Model.Items.IsNullOrEmpty()) {
+    <p class="empty text-center text-muted py-4 px-1">
+        @T["Nothing in this folder yet."]
+        @if (Model.HasPermission(Permission.Content)) {
+            <text>@T["Go ahead and add some files!"]</text>
+        }
+    </p>
+} 
 @if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.Card) {
-    <div class="cards" id="infinite-scroll-target">
-        @{ Html.RenderPartial(Model.Items); }
-    </div>
-} else if (Model.Items.Query.Layout == Weavy.Core.Models.Layout.List) {
-    <div class="list-group" id="infinite-scroll-target">
+    <div class="content-cards draggable" id="infinite-scroll-target">
         @{ Html.RenderPartial(Model.Items); }
     </div>
 } else {
     <table class="table table-hover table-files draggable">
-        <thead>
-            <tr>
-                <th class="table-icon"></th>
-                <th>Name</th>
-                <th>Modified</th>
-                <th>Type</th>
-                <th>Size</th>
-                <th class="table-icon"></th>
-            </tr>
-        </thead>
-        @if (Model.Items.IsNullOrEmpty()) {
-            <tfoot>
-                <tr>
-                    <td class="empty text-center text-muted py-4" colspan="6">
-                        Nothing in this folder yet.
-                        @if (Model.HasPermission(Permission.Content)) {
-                            <text>Go ahead and add some files!</text>
-                        }
-                    </td>
-                </tr>
-            </tfoot>
-        }
         <tbody id="infinite-scroll-target">
             @{ Html.RenderPartial(Model.Items); }
         </tbody>
     </table>
 }
+
 @Html.ScrollMore(Model.Items)
 
 @section fab {
@@ -48,10 +59,6 @@
 
 @section footer {
     @{
-        Html.RenderPartial("_AttachModal");
-        Html.RenderPartial("_ContentModal");
-        Html.RenderPartial("_MoveModal");
-        Html.RenderPartial("_OfficeModal");
-        Html.RenderPartial("_ShareModal");
+        Html.RenderPartial("_FilesModals");
     }
 }

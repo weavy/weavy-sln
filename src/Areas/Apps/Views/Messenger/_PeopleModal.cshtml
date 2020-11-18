@@ -6,13 +6,13 @@
             <div class="modal-content">
                 <div class="modal-header pane-header">
                     <button type="button" class="btn btn-icon btn-primary" data-dismiss="modal">@Svg.Icon("arrow-left")</button>
-                    <div class="pane-title text-truncate">Add people to @Model.Conversation.GetTitle()</div>
-                    <button type="button" class="btn btn-icon" data-action="submit" data-form="#add-people-form" title="Add selected people" disabled>@Svg.Icon("check")</button>
+                    <div class="pane-title text-truncate">@T["Add people to {0}", Model.Conversation.GetTitle()]</div>
+                    <button type="button" class="btn btn-icon" data-action="submit" data-form="#add-people-form" title="@T["Add selected people"]" disabled>@Svg.Icon("check")</button>
                 </div>
                 <div class="modal-body">
                     <form class="search-form" action="@(Url.Action<MessengerController>(c => c.PartialPeople(null, null)))" method="get" role="search" data-target="#add-people-form">
                         <div class="form-group">
-                            <input type="text" name="q" value="" class="form-control form-control-sm" placeholder="Search or select from recent contacts..." autocomplete="off" />
+                            <input type="text" name="q" value="" class="form-control form-control-sm" placeholder="@T["Search or select from recent contacts..."]" autocomplete="off" />
                             <button type="submit" class="btn btn-icon btn-search">@Svg.Icon("magnify")</button>
                             <button type="button" class="btn btn-icon btn-reset">@Svg.Spinner(size: 18, spin: true)@Svg.Icon("close")</button>
                         </div>

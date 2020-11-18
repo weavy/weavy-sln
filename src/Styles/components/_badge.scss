@@ -30,4 +30,8 @@
             display: none;
         }
     }
+
+    &.badge-large {
+        font-size: $font-size-base;
+    }
 }

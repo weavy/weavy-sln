@@ -1,6 +1,4 @@
 /// <reference path="../_core.scss" />
-$card-size: 10rem;
-
 .card {
     border: none;
 
@@ -14,35 +12,22 @@ $card-size: 10rem;
         border: $card-border-width solid $card-border-color;
         border-radius: $card-border-radius;
         pointer-events: none;
-        //mix-blend-mode: darken;
     }
 
     .table {
         margin: 0;
     }
-}
 
-.cards {
-    display: flex;
-    margin: -.5rem;
-    flex-wrap: wrap;
-
-    .card {
-        flex: 1 1 $card-size;
-        margin: .5rem;
-
-        @include media-breakpoint-up(md) {
-            max-width: (2 * $card-size + 1rem);
-        }
+    > [data-toggle=star] {
+        position: absolute;
+        top: 0;
+        right: 0;
     }
 }
 
-.card-action {
-    position: relative;
-
+a.card {
     &:hover::after {
-        border-color: $link-color;
-        //mix-blend-mode: normal;
+        border-color: rgba($link-color, .5);
     }
 }
 
@@ -55,35 +40,28 @@ $card-size: 10rem;
     align-items: center;
     justify-content: space-around;
     flex-direction: column;
-    padding: $card-spacer-x;
-    padding-bottom: $card-spacer-x;
+    padding: 1rem $card-spacer-x 1.5rem $card-spacer-x;
     position: relative;
     @include border-top-radius($card-border-radius);
 
-    .top-right {
-        position: absolute;
-        top: .25rem;
-        right: .25rem;
-    }
-
-    .top-left {
-        position: absolute;
-        top: .25rem;
-        left: .25rem;
-    }
-
     .facepile {
-        width: 100%;
-        bottom: -.9375rem;
-        left: 0;
-        justify-content: center;
         position: absolute;
+        bottom: -.75rem;
+        justify-content: center;
+        flex-wrap: nowrap;
 
-        ~ .avatar {
-            position: relative;
-            top: -.375rem;
+        .avatar {
+            margin-bottom: 0;
+
+            &:last-child {
+                margin-right: 0;
+            }
         }
     }
+}
+
+.card-title {
+    margin: 0;
 }
 
 .card-images {
@@ -92,8 +70,8 @@ $card-size: 10rem;
     .image-grid {
         border-radius: 0;
         background-color: $card-bg;
-        
-        &:not([data-image-count="1"]):not([data-image-count="2"])  {
+
+        &:not([data-image-count="1"]):not([data-image-count="2"]) {
             margin-right: -1px;
         }
 
@@ -104,12 +82,99 @@ $card-size: 10rem;
     }
 }
 
-.card-footer.bg-transparent {
-    background-color: transparent;
-    border-top: none;
+// grid layout for space listing on start page
+.space-cards {
+    display: grid;
+    grid-auto-flow: dense;
+    grid-auto-rows: 10rem;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    grid-gap: $grid-gutter-width/2;
 }
 
-// heading above card (e.g. on manage page)
-.card-heading {
-    padding-left: $card-border-width;
+// grid layout for files app
+.content-cards {
+    display: grid;
+    grid-auto-flow: dense;
+    grid-auto-rows: 13rem;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    grid-gap: $grid-gutter-width/2;
+    padding: $grid-gutter-width/2;
+
+
+    .card {
+        &:hover {
+            &::after {
+                border-color: rgba($link-color, .5);
+            }
+        }
+
+        a {
+            position: relative;
+            overflow: hidden;
+            // transform badge into ribbon
+            > .badge {
+                position: absolute;
+                top: 1.5rem;
+                left: -3rem;
+                width: 10rem;
+                transform: rotate(-45deg);
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+        // highlight drop target
+        &.drop-target {
+
+            .card-icon, .card-image, .card-footer {
+                background-color: color("amber", 100);
+            }
+
+            &::after {
+                border: $card-border-width*2 dashed $amber;
+            }
+        }
+
+        > .dropdown {
+            position: absolute;
+            bottom: .5rem;
+            right: 0;
+        }
+    }
+
+    .card-icon, .card-image {
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 10rem;
+    }
+
+    .card-image {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+
+        &.hz {
+            background-size: contain;
+        }
+
+        &.vt {
+            background-position: top;
+        }
+
+        &.sm {
+            background-position: center !important;
+            background-size: auto !important;
+        }
+    }
+
+    .card-footer {
+        height: 3rem;
+        padding: 0 2rem 0 .5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
 }

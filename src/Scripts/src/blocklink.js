@@ -1,5 +1,6 @@
 ﻿/*global Turbolinks */
 // makes en entire block/row clickable like <a href=""></a>
+// TODO: Integrate this into the wvy.turbolinks click listener
 var wvy = wvy || {};
 
 (function ($) {
@@ -32,7 +33,7 @@ var wvy = wvy || {};
 
         $(document).on("click", clickSelector, function (evt) {
             var $target = $(evt.target);
-            if ($target.is(clickElementExceptions) || $target.parents(clickElementExceptions).length) {
+            if (evt.isPropagationStopped() || evt.isDefaultPrevented() || $target.is(clickElementExceptions) || $target.parents(clickElementExceptions).length) {
                 return;
             }
 
@@ -42,8 +43,8 @@ var wvy = wvy || {};
             var target = $(this).attr(linkTarget);
 
             if (href.length > 0) {
-                if (target && target === "_blank") {
-                    window.open(href);
+                if (target) {
+                    window.open(href, target);
                 } else {
                     Turbolinks.visit(href);
                 }

@@ -1,0 +1,15 @@
+﻿@model Attachment
+@{
+    var lockable = Model as ILockable;
+}
+
+@if (Model.HasPermission(Permission.Delete)) {
+    <div class="dropdown d-inline-block">
+        <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+            @Svg.Icon("dots-vertical")
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <button type="button" data-trash="attachment" data-id="@Model.Id" class="dropdown-item">@Svg.Icon("delete", "danger") @T["Trash"]</button>
+        </div>
+    </div>
+}

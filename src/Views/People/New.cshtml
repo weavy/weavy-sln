@@ -1,6 +1,6 @@
 ﻿@model CreateUserModel
 @{
-    Title = "People";
+    Title = T["People"].ToString();
     Back = Url.Action<PeopleController>(c => c.Index(null, null));
 }
 
@@ -12,20 +12,20 @@
 
 <div class="container mt-3">
     @using (Html.BeginForm(nameof(PeopleController.Insert), typeof(PeopleController).ControllerName(), FormMethod.Post, new { autocomplete = "off", data_turboform = "", novalidate = "" })) {
-    
+
         <div class="text-center">
             @Html.EditorFor(x => Model.Avatar)
         </div>
 
-        @Html.EditorsForModel(exclude: new string[] { nameof(Model.IsAdmin), nameof(Model.IsSuspended) })
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.Avatar), nameof(Model.IsAdmin), nameof(Model.IsSuspended) })
 
         <div class="form-group">
-            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })
-            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { __html = false })
+            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { __html = false })
         </div>
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary">@T["Cancel"]</a>
         </div>
     }
 </div>

@@ -1,6 +1,6 @@
 ﻿@model User
 @{
-    Title = "People";
+    Title = T["People"].ToString();
     Back = Url.Action<PeopleController>(c => c.Index(null, null));
     var profiledata = Html.DisplayGroups(Model.Profile, exclude: new[] { "Avatar", "Name" })?.ToHtmlString();
 }
@@ -35,7 +35,7 @@
         @Html.Raw(profiledata)
         @if (Model.Email != null) {
             <div class="display-group" data-type="string">
-                <label class="font-weight-bold">Email</label>
+                <label class="font-weight-bold">@T["Email"]</label>
                 <div>@Html.DisplayFor(x => Model.Email)</div>
             </div>
         }

@@ -5,6 +5,7 @@
     var colors = new string[] { "theme", "light-blue", "blue", "indigo", "deep-purple", "purple", "pink", "red", "deep-orange", "orange", "amber", "lime", "yellow", "light-green", "green", "teal", "cyan", "gray" };
     var shades = new int[] { 50, 100, 200, 300, 400, 500, 600, 700, 800, 900 };
     var theme = new Dictionary<string, string> { { "theme-500", "primary" }, { "teal-500", "success" }, { "light-blue-500", "info" }, { "amber-500", "warning" }, { "red-500", "danger" }, { "gray-400", "secondary" } };
+    var now = DateTime.UtcNow;
 }
 
 @section styles {
@@ -20,81 +21,86 @@
 }
 
 @section navbar_secondary {
-    <nav class="nav nav-tabs">
-        <a class="nav-link active" href="@(Url.Action<TestController>(c => c.Get("LoremIpsum")))">Lorem ipsum</a>
-        <div class="dropdown align-self-center ml--1">
-            <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Svg.Icon("menu-down")</button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.GetRedirect(null)))">Redirect via GET</a>
-                <form action="@(Url.Action<TestController>(c => c.PostRedirect()))" method="post" data-turboform>
-                    <button class="dropdown-item" type="submit">Redirect via POST</button>
-                </form>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.GetRedirect("comments")))">Redirect to #comments</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.GetRedirect(null)))#comments" data-turbolinks="false">Redirect to #comments (no turbolinks)</a>
+    <nav class="navbar navbar-theme">
+        <div class="nav nav-tabs">
+            <a class="nav-link active pr-4" href="@(Url.Action<TestController>(c => c.Get("LoremIpsum")))">Lorem ipsum</a>
+            <div class="dropdown align-self-center ml--4">
+                <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Svg.Icon("menu-down")</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.GetRedirect(null)))">Redirect via GET</a>
+                    <form action="@(Url.Action<TestController>(c => c.PostRedirect()))" method="post" data-turboform>
+                        <button class="dropdown-item" type="submit">Redirect via POST</button>
+                    </form>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.GetRedirect("comments")))">Redirect to #comments</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.GetRedirect(null)))#comments" data-turbolinks="false">Redirect to #comments (no turbolinks)</a>
+                </div>
             </div>
+
+            <a class="nav-link pr-4" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">Email</a>
+            <div class="dropdown align-self-center ml--4">
+                <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Svg.Icon("menu-down")</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">@Svg.Icon("email") Email Template</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.ConversationEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Conversation</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.DailyDigestEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Daily digest</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.NotificationEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Notification</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.PasswordResetEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Password reset</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.TestEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Test</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.WelcomeEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Welcome</a>
+                </div>
+            </div>
+            <button type="button" class="nav-link nav-icon" title="Nav link with icon and badge">@Svg.Icon("bell") <span class="badge badge-danger">4</span></button>
         </div>
 
-        <a class="nav-link" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">Email</a>
-        <div class="dropdown align-self-center ml--1">
-            <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Svg.Icon("menu-down")</button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">@Svg.Icon("email") Email Template</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.ConversationEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Conversation</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.DailyDigestEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Daily digest</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.NotificationEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Notification</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.PasswordResetEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Password reset</a>
-                <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.WelcomeEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Welcome</a>
-
+        <div class="navbar-icons">
+            <div class="dropdown">
+                <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    @Svg.Icon("dots-vertical")
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="javascript:;">@Svg.Icon("textbox") Rename tab</a>
+                    <a class="dropdown-item" href="javascript:;">@Svg.Icon("delete") Remove tab</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="javascript:;">@Svg.Icon("plus") Add tab</a>
+                </div>
             </div>
         </div>
-
-        <button type="button" class="nav-link nav-icon" title="Nav link with icon and badge">@Svg.Icon("bell") <span class="badge badge-danger">4</span></button>
-
     </nav>
-    <div class="navbar-icons">
-        <div class="dropdown">
-            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                @Svg.Icon("dots-vertical")
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="javascript:;">@Svg.Icon("textbox") Rename tab</a>
-                <a class="dropdown-item" href="javascript:;">@Svg.Icon("delete") Remove tab</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="javascript:;">@Svg.Icon("plus") Add tab</a>
-            </div>
-        </div>
-    </div>
 }
 
-<nav class="navbar navbar-content sticky-top">
+@section navbar_tertiary {
+    <nav class="navbar navbar-light">
 
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item" title="Files"><a href="#">@Svg.Icon("folder", "amber")<span>Files</span></a>@Svg.Icon("chevron-right")</li>
-        <li class="breadcrumb-item" title="Long Folder Name That Should Get Truncated"><a href="#">@Svg.Icon("folder", "amber")<span>Long Folder Name That Should Get Truncated</span></a>@Svg.Icon("chevron-right")</li>
-        <li class="breadcrumb-item active" title="@Title">@Title</li>
-    </ol>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" title="Files"><a href="#">@Svg.Icon("folder", "amber")<span>Files</span></a>@Svg.Icon("chevron-right")</li>
+            <li class="breadcrumb-item" title="Long Folder Name That Should Get Truncated"><a href="#">@Svg.Icon("folder", "amber")<span>Long Folder Name That Should Get Truncated</span></a>@Svg.Icon("chevron-right")</li>
+            <li class="breadcrumb-item active" title="@Title">@Title</li>
+        </ol>
 
-    <div class="navbar-icons ml-auto">
-        <button class="btn btn-icon d-dark" data-body-bg="light">@Svg.Icon("lightbulb-outline")</button>
-        <button class="btn btn-icon d-light" data-body-bg="dark">@Svg.Icon("lightbulb")</button>
-        <div class="dropdown">
-            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                @Svg.Icon("dots-vertical")
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="#icons">Icons</a>
-                <a class="dropdown-item" href="#colors">Colors</a>
-                <a class="dropdown-item" href="#forms">Forms</a>
-                <a class="dropdown-item" href="#tables">Tables</a>
-                <a class="dropdown-item" href="#text">Text</a>
-                <a class="dropdown-item" href="#alerts">Alerts</a>
-                <a class="dropdown-item" href="#buttons">Buttons</a>
-                <a class="dropdown-item" href="#spinners">Spinners</a>
-                <a class="dropdown-item" href="#pagination">Pagination</a>
+        <div class="navbar-icons ml-auto">
+            <button class="btn btn-icon d-dark" data-body-bg="light">@Svg.Icon("lightbulb-outline")</button>
+            <button class="btn btn-icon d-light" data-body-bg="dark">@Svg.Icon("lightbulb")</button>
+            <div class="dropdown">
+                <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    @Svg.Icon("dots-vertical")
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="#icons">Icons</a>
+                    <a class="dropdown-item" href="#colors">Colors</a>
+                    <a class="dropdown-item" href="#forms">Forms</a>
+                    <a class="dropdown-item" href="#tables">Tables</a>
+                    <a class="dropdown-item" href="#text">Text</a>
+                    <a class="dropdown-item" href="#formatting">Formatting</a>
+                    <a class="dropdown-item" href="#alerts">Alerts</a>
+                    <a class="dropdown-item" href="#buttons">Buttons</a>
+                    <a class="dropdown-item" href="#spinners">Spinners</a>
+                    <a class="dropdown-item" href="#pagination">Pagination</a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
+}
+
 
 <div class="container">
 
@@ -123,6 +129,29 @@
     <section id="emoji">
         <h1 class="display-3 mt-4">Emoji</h1>
         <p>@Html.Raw(Emojione.ToImage("Testing some &lt;img&gt; emoji :smiley:😍")) and some &lt;svg&gt; emoji @Svg.Emoji(":poop:")@Svg.Emoji(";)").</p>
+    </section>
+
+    <section id="formatting">
+        <h1 class="display-3 mt-4">Localization</h1>
+        <div class="row">
+            <div class="col">
+                @T["Language"]: @CultureInfo.CurrentUICulture<br />
+                @T["Format"]: @CultureInfo.CurrentCulture<br />
+                @T["First day of week"]: @CultureInfo.CurrentCulture.DateTimeFormat.DayNames[(int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek]<br />
+                @T["Decimal symbol"]: @CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator<br />
+                @T["Time zone"]: @WeavyContext.Current.TimeZone.DisplayName<br />
+                @T["Date"]: @now.ToString("s")<br />
+                @T["Short date"]: @now.ToLocal().ToShortDateString()<br />
+                @T["Long date"]: @now.ToLocal().ToLongDateString()<br />
+                @T["Short time"]: @now.ToLocal().ToShortTimeString()<br />
+                @T["Long time"]: @now.ToLocal().ToLongTimeString()<br />
+            </div>
+            <div class="col">
+                @T["Lorem ipsum."]<br />
+                <br/>
+                @{ Html.RenderPartial("_Localization"); }
+            </div>
+        </div>
     </section>
 
     <section id="colors">
@@ -156,7 +185,7 @@
             </div>
             <div class="row">
                 <div class="col">
-                    @Html.EditorFor(x => Model.Username, additionalViewData: new { FormGroup = false })
+                    @Html.EditorFor(x => Model.Username)
                 </div>
                 <div class="col">
                     @Html.EditorFor(x => Model.Password)
@@ -192,26 +221,20 @@
             </div>
             <div class="row">
                 <div class="col-sm-3">
-                    @Html.EditorFor(x => Model.CheckStatus)
+                    <label class="text-muted">Custom label</label>
+                    @Html.EditorFor(x => Model.AlertStatus, additionalViewData: new { __label = false })
                 </div>
                 <div class="col-sm-3">
-
+                    @Html.EditorFor(x => Model.ContentType)
                 </div>
                 <div class="col">
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-3">
                     <div class="form-group">
-                        @Html.EditorFor(x => Model.Bool, additionalViewData: new { FormGroup = false })
-                        @Html.EditorFor(x => Model.RequiredBool, additionalViewData: new { FormGroup = false })
+                        @Html.EditorFor(x => Model.Bool, additionalViewData: new { __html = false })
+                        @Html.EditorFor(x => Model.RequiredBool, additionalViewData: new { __html = false })
                     </div>
                 </div>
-                <div class="col">
-                    @Html.EditorFor(x => Model.Status, additionalViewData: new { FormLabel = false })
-                </div>
             </div>
+
             @Html.EditorFor(x => Model.Text)
             @Html.EditorFor(x => Model.Webpage)
             @Html.EditorFor(x => Model.Tags)
@@ -226,6 +249,19 @@
                     @Html.EditorFor(x => Model.File)
                 </div>
             </div>
+            
+            <div class="row">
+                <div class="col">
+                    @Html.EditorFor(x => Model.Select)
+                </div>
+                <div class="col">
+                    @Html.EditorFor(x => Model.RadioTest)
+                </div>
+                <div class="col">
+                    @Html.EditorFor(x => Model.SelectMany)
+                </div>
+            </div>
+
             <div class="form-buttons">
                 @Html.EditorFor(x => Model.Hidden)
                 <button class="btn btn-primary btn-load" type="submit">Submit</button>
@@ -345,7 +381,7 @@
                     <td>Info description</td>
                     <td class="table-icon"><button type="button" class="btn btn-icon">@Svg.Icon("information", "info")</button></td>
                 </tr>
-                
+
                 <tr class="table-trashed" data-href="javascript:;">
                     <td class="table-icon">@Svg.Icon("file")</td>
                     <td><a href="javascript:;">Trashed</a></td>
@@ -487,7 +523,7 @@
             This is a dismissible info alert.
         </div>
         <a class="alert alert-info fade show d-flex" role="alert" href="#">
-            @Svg.Icon("information-outline", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mt-1 mr-2 d-none d-sm-block" })
+            @Svg.Icon("information-outline", size: 36, htmlAttributes: new { @class = "align-self-start flex-noscale mr-2 d-none d-sm-block" })
             <span>Alls of this alert is <span class="alert-link">a link</span>.</span>
             <span class="btn btn-outline-info ml-auto d-none d-sm-inline-flex">Button</span>
         </a>
@@ -539,6 +575,29 @@
             <a href="javascript:;" class="btn btn-outline-dark" data-body-bg="dark">Dark</a>
         </div>
         <div class="form-group">
+            <button type="button" class="btn btn-sm btn-primary btn-load">Load button</button>
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-sm btn-primary">Split button</button>
+                <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    @Svg.Icon("menu-down")
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <form>
+                        <button type="submit" class="dropdown-item">Form action</button>
+                    </form>
+                    <a class="dropdown-item" href="#">Link action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Separated link</a>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-success">@Svg.Icon("message-plus") Icon button</button>
+            <button type="button" class="btn btn-sm btn-success">@Svg.Icon("azure") <span>Span button</span></button>
+            <button type="button" class="btn btn-sm btn-info">@Svg.Emoji(":smiley:") Emoji button</button>
+            <button type="button" class="btn btn-sm btn-success btn-square">@Svg.Icon("content-copy")</button>
+            <button type="button" class="btn btn-sm btn-info btn-square">@Svg.Emoji(":thumbsup:")</button>
+        </div>
+        <div class="form-group">
             <button type="button" class="btn btn-primary btn-load">Load button</button>
             <div class="btn-group dropdown">
                 <button type="button" class="btn btn-primary">Split button</button>
@@ -560,7 +619,29 @@
             <button type="button" class="btn btn-info">@Svg.Emoji(":smiley:") Emoji button</button>
             <button type="button" class="btn btn-success btn-square">@Svg.Icon("content-copy")</button>
             <button type="button" class="btn btn-info btn-square">@Svg.Emoji(":thumbsup:")</button>
-
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-lg btn-primary btn-load">Load button</button>
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-lg btn-primary">Split button</button>
+                <button type="button" class="btn btn-lg btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    @Svg.Icon("menu-down")
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <form>
+                        <button type="submit" class="dropdown-item">Form action</button>
+                    </form>
+                    <a class="dropdown-item" href="#">Link action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Separated link</a>
+                </div>
+            </div>
+            <button type="button" class="btn btn-lg btn-success">@Svg.Icon("message-plus") Icon button</button>
+            <button type="button" class="btn btn-lg btn-success">@Svg.Icon("azure") <span>Span button</span></button>
+            <button type="button" class="btn btn-lg btn-info">@Svg.Emoji(":smiley:") Emoji button</button>
+            <button type="button" class="btn btn-lg btn-success btn-square">@Svg.Icon("content-copy")</button>
+            <button type="button" class="btn btn-lg btn-info btn-square">@Svg.Emoji(":thumbsup:")</button>
         </div>
 
         <div class="form-group">

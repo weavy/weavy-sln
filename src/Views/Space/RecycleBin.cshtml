@@ -1,6 +1,6 @@
 ﻿@model TrashSearchResult
 @{
-    Title = "Recycle bin";
+    Title = T["Recycle bin"].ToString();
     Back = WeavyContext.Space.Url();
 }
 
@@ -9,8 +9,10 @@
 }
 
 @section navbar_secondary {
-    <nav class="nav nav-tabs">
-        <a href="@(Url.Action<SpaceController>(c => c.RecycleBin(WeavyContext.Space.Id, null)))" class="nav-link active">@Title</a>
+    <nav class="navbar navbar-theme">
+        <nav class="nav nav-tabs">
+            <a href="@(Url.Action<SpaceController>(c => c.RecycleBin(WeavyContext.Space.Id, null)))" class="nav-link active">@Title</a>
+        </nav>
     </nav>
 }
 
@@ -21,10 +23,10 @@
             <thead>
                 <tr>
                     <th class="table-icon"></th>
-                    <th>Name</th>
-                    <th>Kind</th>
-                    <th>Trashed by</th>
-                    <th>Trashed at</th>
+                    <th>@T["Name"]</th>
+                    <th>@T["Kind"]</th>
+                    <th>@T["Trashed by"]</th>
+                    <th>@T["Trashed at"]</th>
                     <th class="table-icon"></th>
                 </tr>
             </thead>
@@ -38,18 +40,18 @@
                         <td>@Html.Time(item.TrashedAt, format: "g")</td>
                         <td class="table-icon text-right">
                             <div class="dropdown">
-                                <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                                <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
                                     @Svg.Icon("dots-vertical")
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <button type="button" class="dropdown-item" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore", "success") Restore</button>
-                                    <button type="button" class="dropdown-item" data-delete="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("delete", "danger") Delete</button>
+                                    <button type="button" class="dropdown-item" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore", "success") @T["Restore"]</button>
+                                    <button type="button" class="dropdown-item" data-delete="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("delete", "danger") @T["Delete"]</button>
                                     @*<form method="post" action="@(Url.Action<SpaceController>(c => c.DeleteFromRecycleBin(WeavyContext.Space.Id, item)))" data-turboform>
-                                        @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                        <input type="hidden" name="@nameof(item.Id)" value="@item.Id" />
-                                        <input type="hidden" name="@nameof(item.Type)" value="@item.Type" />
-                                        <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Delete</button>
-                                    </form>*@
+                                            @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                            <input type="hidden" name="@nameof(item.Id)" value="@item.Id" />
+                                            <input type="hidden" name="@nameof(item.Type)" value="@item.Type" />
+                                            <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") Delete</button>
+                                        </form>*@
                                 </div>
                             </div>
                         </td>
@@ -58,6 +60,6 @@
             </tbody>
         </table>
     } else {
-        <p class="text-muted text-center">The recycle bin is empty (trashed items are automatically deleted after 30 days).</p>
+        <p class="text-muted text-center">@T["The recycle bin is empty (trashed items are automatically deleted after 30 days)."]</p>
     }
 </div>

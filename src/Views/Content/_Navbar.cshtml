@@ -3,21 +3,26 @@
     var versionable = Model as IVersionable;
 }
 
-<nav class="navbar navbar-content sticky-top">
+<nav class="navbar @(WeavyContext.Current.IsEmbedded ? "navbar-dark" : "navbar-light")">
+    <div class="btn btn-icon d-framed"></div>
     @Html.Breadcrumbs(Model)
     @if (Model is IStarrable starrable) {
         @Html.StarToggle(starrable)
     }
     <div class="navbar-icons">
         @if (versionable == null || versionable.IsCurrent()) {
-            if (Model is IFile file && FileUtils.IsOfficeDocument(file.Name)) {
-                <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_blank" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model, "icon")</a>
+            if (Model is IFile file) {
+                if (file.Blob.Link != null) {
+                    <a class="btn btn-icon" href="@file.Blob.Link" target="_blank" title="Open in @file.Blob.Provider">@Svg.Icon(file.Blob.Provider.ToKebabCase(), "native")</a>
+                } else if (FileUtils.IsOfficeDocument(file.Name)) {
+                    <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="@T["Open in {0}", OfficeUtils.GetProductName(file.Name)]">@Svg.Icon(Model, "native")</a>
+                }
             }
             Html.RenderPartial("_ContentMenu", Model);
         } else if (Model.HasPermission(Permission.Edit)) {
             <form action="@(Url.Action<ContentController>(c => c.Revert(versionable.Id, versionable.Version)))" method="post">
                 @Html.HttpMethodOverride(HttpVerbs.Put)
-                <button type="submit" class="btn btn-icon" title="Revert">@Svg.Icon("undo", "icon")</button>
+                <button type="submit" class="btn btn-icon" title="@T["Revert"]">@Svg.Icon("undo", "icon")</button>
             </form>
         }
     </div>

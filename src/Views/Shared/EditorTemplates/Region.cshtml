@@ -1,0 +1,43 @@
+﻿@using System.Globalization
+@model string
+@{ 
+    var attrs = new Dictionary<string, object>();
+    attrs["id"] = ViewData.TemplateInfo.GetFullHtmlFieldId("");
+    attrs["name"] = ViewData.TemplateInfo.GetFullHtmlFieldName("");
+    attrs["class"] = "form-control";
+
+    var meta = ViewData.ModelMetadata;
+    if (meta.IsRequired) {
+        attrs["required"] = null;
+    }
+
+    var error = ViewData.ErrorMessage();
+    if (error != null) {
+        attrs.Append("class", "is-invalid");
+    }
+}
+
+@if (ViewData.RenderSurroundingHtml()) {
+    WriteLiteral(@"<div class=""form-group"">");
+}
+
+@if (ViewData.RenderLabel()) {
+    @Html.LabelFor(m => m)
+}
+
+<select @Html.Attributes(attrs)>
+    <option value=""></option>
+    @foreach (var region in CultureUtils.Regions.OrderBy(x => x.DisplayName)) {
+    <option value="@region.Name" @(Model == region.Name ? @"selected=""selected""" : "")>@region.DisplayName</option>
+    }
+</select>
+
+@if (error != null) {
+<div class="invalid-feedback">@error</div>
+} else if (ViewData.RenderDescription()) {
+<div class="form-text">@meta.Description</div>
+}
+
+@if (ViewData.RenderSurroundingHtml()) {
+    WriteLiteral(@"</div>");
+}

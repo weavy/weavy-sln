@@ -24,6 +24,7 @@ wvy.tiny = (function ($) {
                     entity_encoding: "raw",
                     paste_data_images: true,
                     upload_paste_data_images: true,
+                    placeholder: "",
                     plugins: 'weavy_paste weavy_link weavy_sourcecode codesample table link media weavy_autocomplete weavy_image lists weavy_shortcuts',  
                     paste_retain_style_properties: "color font-size background background-color",
                     resize: true,

@@ -15,12 +15,10 @@ wvy.tab = (function ($) {
             var iframe = $iframe[0];
             iframe.onload = function () {
                 $loading.addClass("d-none").find(".spinner").removeClass("spin");
-                $iframe.removeClass("d-none")
             }
 
             // set src on first load or if location has changes
             if (!iframe.src || iframe.contentWindow.location.href !== iframe.src) {
-                $iframe.addClass("d-none");
                 $loading.removeClass("d-none").find(".spinner").addClass("spin");
                 iframe.src = iframe.dataset.src;
                 return;
@@ -70,6 +68,14 @@ wvy.tab = (function ($) {
             setTimeout(wvy.stars.prune, 200);
         });
     }
+
+    function scrollActiveTabsIntoView() {
+        $(".nav-tabs.scroll-x .nav-link.active").each(function () {
+            this.scrollIntoView();
+        });
+    }
+
+    $(document).on("DOMContentLoaded turbolinks:render", scrollActiveTabsIntoView);
 
     return {
         load: load,

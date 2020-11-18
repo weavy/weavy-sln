@@ -18,7 +18,7 @@
                                 @Svg.Icon("pencil")
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control" id="conversation-name" name="@nameof(Model.Name)" value="@Model.Name" placeholder="Enter a name for this conversation...">
+                                <input type="text" class="form-control" id="conversation-name" name="@nameof(Model.Name)" value="@Model.Name" placeholder="@T["Enter a name for this conversation..."]">
                             </div>
                         </form>
                     } else {
@@ -53,9 +53,9 @@
                                 </td>
                                 <td class="table-icon">
                                     @if (member.Id == User.Id) {
-                                        <button type="button" class="btn btn-icon" data-action="leave" data-id="@Model.Id" title="Leave conversation">@Svg.Icon("account-minus")</button>
+                                        <button type="button" class="btn btn-icon" data-action="leave" data-id="@Model.Id" title="@T["Leave conversation"]">@Svg.Icon("account-minus")</button>
                                     } else if (Model.HasPermission(Permission.Edit)) {
-                                        <button type="button" class="btn btn-icon" data-action="remove-member" data-id="@member.Id" title="Remove from conversation">@Svg.Icon("account-minus")</button>
+                                        <button type="button" class="btn btn-icon" data-action="remove-member" data-id="@member.Id" title="@T["Remove from conversation"]">@Svg.Icon("account-minus")</button>
                                     }
                                 </td>
                             </tr>

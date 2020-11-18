@@ -1,15 +1,36 @@
 ﻿@model Weavy.Core.Models.File
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Title = "Edit " + Model.MetaData().Name;
+    Layout = "~/Views/Content/_Layout.Embedded.cshtml";
+    Title = @T["Edit {0}", Model.MetaData().Name].ToString();
     Back = Url.Back(Model.Url());
     ViewData["turboform"] = true;
 }
 
-@section navbar_middle {
-    <div class="navbar-middle"><span class="navbar-text">@Title</span></div>
+@section navbar_left {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarClose")
+    </div>
 }
+
+@section navbar_middle {
+    <div class="navbar-middle">
+        <div class="navbar-form">
+            <div class="form-group autosize">
+                @Html.EditorFor(x => Model.Name, new { __html = false, __label = false, _desc = false, __form = "#content-form" })
+                <span class="form-control">@Model.Name</span>
+            </div>
+        </div>
+    </div>
+}
+
+@section navbar_right {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarIcons")
+    </div>
+}
+
+@{ Html.RenderPartial("_Edit", Model); }
 
 @if (Html.HasHtmlEditor()) {
     @section scripts{
@@ -17,15 +38,4 @@
     }
 }
 
-    <div class="container mt-3">
-        <form action="@(Url.Action<ContentController>(x => x.Update(Model.Id, null, null)))" autocomplete="off" data-turboform="" novalidate="" method="post">
-            @Html.HttpMethodOverride(HttpVerbs.Put)
-            @Html.EditorsForModel()
-            @Html.EditorFor(x => Model.Blob, additionalViewData: new { DisplayName = "Replace file", DisplayDescription = "Select new file, or leave as is to keep existing.", Required = false, Remove = false })
-            <div class="form-buttons">
-                <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
-                <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel">Cancel</button>
-            </div>
-            
-        </form>
-    </div>
+

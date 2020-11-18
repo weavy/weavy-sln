@@ -1,0 +1,19 @@
+﻿@model TaskItem
+@{
+    bool details = ViewData["details"] as bool? ?? false;
+}
+<div class="dropdown">
+    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
+        @Svg.Icon("dots-vertical")    
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="#">@Svg.Icon("information", "info") @T["Details"]</a>
+        <div class="dropdown-divider"></div>
+        
+        @Html.StarToggle(Model, compact: false, htmlAttributes: new { @class = "dropdown-item toggle-dropdown" })
+        
+        @if (Model.HasPermission(Permission.Delete)) {
+            <button type="button" class="dropdown-item" data-trash="task" data-id="@Model.Id">@Svg.Icon("delete", "danger") @T["Trash"]</button>
+        }
+    </div>
+</div>

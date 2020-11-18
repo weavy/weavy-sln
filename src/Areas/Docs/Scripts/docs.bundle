@@ -1,6 +1,7 @@
 ﻿~/scripts/src/browser.js
-~/scripts/src/scrollbar.js
 ~/scripts/vendor/jquery/jquery.min.js
+~/scripts/vendor/overlayscrollbars/jquery.overlayScrollbars.min.js
+~/scripts/src/scrollbar.js
 ~/scripts/vendor/turbolinks/turbolinks.js
 ~/scripts/vendor/prismjs/prism-core.min.js
 ~/scripts/vendor/prismjs/prism-clike.min.js

@@ -8,16 +8,16 @@ wvy.subscribe = (function ($) {
         e.stopPropagation();
 
         if ($(this).hasClass("on")) {
-            unsubscribe(this.dataset.entity, this.dataset.id);
+            unsubscribe(this.dataset.type, this.dataset.id);
         } else {
-            subscribe(this.dataset.entity, this.dataset.id);
+            subscribe(this.dataset.type, this.dataset.id);
         }
     });
 
     // subscribe to specified entity
     function subscribe(entity, id) {
         // find all subscription togglers for the entity and add the .on class
-        $("[data-toggle=subscribe][data-entity=" + entity + "][data-id=" + id + "]").addClass("on");
+        $("[data-toggle=subscribe][data-type=" + entity + "][data-id=" + id + "]").addClass("on");
 
         // call api to subscribe (follow) to entity
         wvy.api.follow(entity, id).then(function () {
@@ -28,7 +28,7 @@ wvy.subscribe = (function ($) {
     // unsubscribe specified entity
     function unsubscribe(entity, id) {
         // find all subscription togglers for the entity and remove the .on class
-        $("[data-toggle=subscribe][data-entity=" + entity + "][data-id=" + id + "]").removeClass("on");
+        $("[data-toggle=subscribe][data-type=" + entity + "][data-id=" + id + "]").removeClass("on");
 
         // call api to unsubscribe (unfollow) to entity
         wvy.api.unfollow(entity, id).then(function () {

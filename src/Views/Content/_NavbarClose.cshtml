@@ -1,0 +1,20 @@
+﻿@model Content
+@{
+    var versionable = Model as IVersionable;
+    var current = versionable != null ? versionable.IsCurrent() : true;
+}
+
+@if (!current) {
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Back = Url.Action<ContentController>(c => c.Get(Model.Id, null));
+} else {
+    // back to folder
+    if (Model.ParentId != null) {
+        Back = Model.Parent().Url();
+    } else {
+        Back = Model.App().Url();
+    }
+
+}
+
+<a class="btn btn-icon d-standalone" href="@Back" data-link>@Svg.Icon("close")</a>

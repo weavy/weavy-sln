@@ -6,7 +6,7 @@
         padding: $table-cell-padding $table-cell-padding-sm;
 
         &.table-icon {
-            // cell with .img-32 or .btn-icon
+            // cell with icon or avatar
             line-height: 0;
             color: $icon-color;
             text-align: center;
@@ -26,6 +26,22 @@
                 margin-left: auto;
                 margin-right: 0;
                 justify-content: flex-end;
+            }
+        }
+
+        &:first-child {
+            padding-left: $navbar-padding-x;
+
+            &.table-icon {
+                width: $navbar-padding-x + 2rem + $table-cell-padding-sm;
+            }
+        }
+
+        &:last-child {
+            padding-right: $navbar-padding-x;
+
+            &.table-icon {
+                width: $table-cell-padding-sm + 2rem + $navbar-padding-x;
             }
         }
 
@@ -116,18 +132,30 @@ tr[data-href], tr.table-checkbox {
     cursor: pointer;
 }
 
-// drag & drop
-tr.dragging-over {
-    background-color: $table-hover-bg;
+// highlight drop target
+tr.drop-target {
+    background-color: color("amber", 100);
+
+    td {
+        position: relative;
+        border-color: transparent;
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            border: $card-border-width*2 dashed $amber;
+            border-left: 0;
+            border-right: 0;
+        }
+    }
 }
 
 .table-hover tbody tr:hover {
-    transition: background-color linear 100ms;
-
-    th, td {
-        border-color: lighten($table-border-color, 50);
-        transition: border-color linear 100ms;
-    }
+    transition: background-color $md-animation-duration-fast $md-animation-curve-fast-out-slow-in;
 }
 
 // table with icon + name (+ icon)
@@ -211,7 +239,16 @@ tr.dragging-over {
     // name
     td:nth-child(2), th:nth-child(2) {
         width: 100%;
-        @include text-truncate;
+        display: flex;
+
+        a {
+            @include text-truncate;
+        }
+
+        span.badge {
+            align-self: center;
+            margin-left:.5rem;
+        }
     }
     // modified
     td:nth-child(3), th:nth-child(3) {
@@ -247,6 +284,29 @@ tr.dragging-over {
         td:nth-child(4), th:nth-child(4) {
             display: table-cell;
         }
+    }
+}
+
+// table for displaying versions
+.table-versions {
+    td {
+        padding: $table-cell-padding;
+        vertical-align: top;
+
+        &.table-icon {
+            padding: 0;
+            padding-top:.9rem;
+            vertical-align: top;
+        }
+    }
+    // desc
+    td:nth-child(2) {
+        padding-left: 0;
+    }
+
+    td:nth-child(3) {
+        padding-right: $table-cell-padding-sm;
+        padding-top: .4rem;
     }
 }
 
@@ -290,7 +350,6 @@ tr.dragging-over {
         }
     }
 }
-
 // table for log files
 .table-logs {
     @extend .table-fixed;
@@ -323,7 +382,6 @@ tr.dragging-over {
         }
     }
 }
-
 // table for recycle bin
 .table-recycle-bin {
     @extend .table-fixed;
@@ -365,32 +423,6 @@ tr.dragging-over {
     @include media-breakpoint-up(lg) {
         td:nth-child(3), th:nth-child(3) {
             display: table-cell;
-        }
-    }
-}
-
-@include media-breakpoint-down(xs) {
-    html:not(.framed) {
-        /* rules below seems to mainly target the files app, we should find a better generic way to get consistent table styling on embedded, framed, mobile and desktop */
-        /* was ".table", but changed to "main .table" because it broke the layout in many places*/
-        main .table {
-            th, td {
-                &:first-child {
-                    padding-left: #{.5rem + $edge-margin};
-
-                    &.table-icon {
-                        width: #{2.5rem + $edge-margin}
-                    }
-                }
-
-                &:last-child {
-                    padding-right: #{.5rem + $edge-margin};
-
-                    &.table-icon {
-                        width: #{2.5rem + $edge-margin}
-                    }
-                }
-            }
         }
     }
 }

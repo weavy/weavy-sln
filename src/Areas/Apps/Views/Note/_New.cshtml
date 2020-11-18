@@ -1,0 +1,48 @@
+﻿@model Note
+@{
+    var draftable = Model as IDraftable;
+
+    var htmlAttributes = new Dictionary<string, object>(){
+        { "class", draftable != null ? "autosave" : "" },
+        { "autocomplete", "off" },
+        { "novalidate", "" },
+        { "data-is-draft", draftable?.IsDraft.ToString().ToLower() },
+        { "data-status", "#autosave-status" }
+    };
+
+    var blobIds = ViewBag.BlobIds as IEnumerable<int>;
+
+    if (ViewData["turboform"] != null) {
+        htmlAttributes.Add("data-turboform", "");
+    }
+
+    var formAction = (WeavyContext.Content?.Url() ?? WeavyContext.App?.Url()) + "/content";
+}
+
+<form id="content-form" action="@formAction" method="post" @Html.Attributes(htmlAttributes)>
+
+    @Html.Hidden(nameof(Guid), Model.ContentGuid)
+    @Html.Hidden(nameof(Model.Name), Model.Name)
+
+    <article class="content-area px-0" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+        <section class="content-editor">
+            @Html.EditorFor(x => Model.Body, additionalViewData: new { __label = false, __html = false })
+        </section>
+
+        @* hidden, triggered from navbar *@
+        <div class="d-none">
+            <button type="submit" name="operation" value="update">@Model.MetaData().CreateVerb</button>
+            <button type="submit" name="operation" value="draft">@T["Save draft"]</button>
+        </div>
+    </article>
+
+    <div id="blobs">
+        @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
+        @if (blobIds != null && blobIds.Any()) {
+            foreach (var id in blobIds) {
+                <input type="hidden" name="blobs" value="@id" />
+            }
+        }
+    </div>
+</form>
+

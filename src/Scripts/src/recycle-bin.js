@@ -10,7 +10,7 @@ $(document).on("click", ".table-trashed [data-recycle][data-id]", function (e) {
 
     wvy.api.restore(type, id).then(function () {
         $row.addClass("d-none");
-        wvy.alert.alert("success", "The <a href='" + wvy.url.mvc(type) + id + "' class='alert-link'>" + type + "</a> was restored.", 5000, "alert-trash-" + type + "-" + id);
+        wvy.alert.alert("success", "<a href='" + wvy.url.mvc(type) + id + "' class='alert-link'>" + wvy.t("The item was restored.") + "</a>", 5000, "alert-trash-" + type + "-" + id);
     });
 });
 
@@ -24,6 +24,6 @@ $(document).on("click", ".table-trashed [data-delete][data-id]", function (e) {
 
     wvy.api.delete(type, id).then(function () {
         $row.addClass("d-none");
-        wvy.alert.alert("success", "The " + type + " was deleted.", 5000, "alert-trash-" + type + "-" + id);
+        wvy.alert.alert("success", wvy.t("The item was deleted."), 5000, "alert-trash-" + type + "-" + id);
     });
 });

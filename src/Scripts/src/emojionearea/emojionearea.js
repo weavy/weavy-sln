@@ -1323,7 +1323,7 @@ document = window.document || {};
                 if (self.content !== content) {
                     self.content = content;
                     trigger(self, 'change', [self.editor]);
-                    source.trigger("blur").trigger("change");
+                    source.trigger("blur"); //.trigger("change");
                 } else {
                     source.trigger("blur");
                 }

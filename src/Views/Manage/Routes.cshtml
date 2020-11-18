@@ -5,13 +5,15 @@
 }
 
 @section navbar_secondary {
-    <nav class="nav nav-tabs">
-        @if (ViewContext.RouteData.Values["tab"] == null) {
-            @(Html.ActionLink<ManageController>(c => c.Routes("mvc"), text: "MVC", htmlAttributes: new { @class = "nav-link active" }))
-        } else {
-            @(Html.ActionLink<ManageController>(c => c.Routes("mvc"), text: "MVC", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-        }
-        @(Html.ActionLink<ManageController>(c => c.Routes("api"), text: "API", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+    <nav class="navbar navbar-theme">
+        <nav class="nav nav-tabs">
+            @if (ViewContext.RouteData.Values["tab"] == null) {
+                @(Html.ActionLink<ManageController>(c => c.Routes("mvc"), text: "MVC", htmlAttributes: new { @class = "nav-link active" }))
+            } else {
+                @(Html.ActionLink<ManageController>(c => c.Routes("mvc"), text: "MVC", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            }
+            @(Html.ActionLink<ManageController>(c => c.Routes("api"), text: "API", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        </nav>
     </nav>
 }
 

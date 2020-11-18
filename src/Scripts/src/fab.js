@@ -3,35 +3,65 @@
 (function ($) {
     $(function () {
         // create word, excel, powerpoint document
-        $(document).on("show.bs.modal", "#filename-dialog", function (e) {
-
-            $("#o365-modal").modal('toggle')
-
+        $(document).on("show.bs.modal", "#office-modal", function (e) {
+            var docType = $(e.relatedTarget).data("type");
             var ext = $(e.relatedTarget).data("param");
-            var $that = $(this);
-            $(this).find("#filename-dialog-type").text($(e.relatedTarget).data("type"));
-            $(this).find("#name").val("");
-            $(this).find("#ext").val(ext);
-            $(this).find(".input-group-append .btn").text(ext);
 
-            setTimeout(function () { $that.find("#name").focus() }, 1);
+            var $modal = $(this);
+            $modal.find(".file-type").text(docType);
+            $modal.find("input[name=name]").val("");
+            $modal.find("input[name=ext]").val(ext);
+            $modal.find("button[type=submit]").text(ext);
+            setTimeout(function () { $modal.find("input[name=name]").focus() }, 1);
         });
 
         // create google drive document
-        $(document).on("show.bs.modal", "#google-create-modal", function (e) {
-
-            $("#google-modal").modal('hide')
+        $(document).on("show.bs.modal", "#google-drive-modal", function (e) {
 
             var docType = $(e.relatedTarget).data("param");
             var name = $(e.relatedTarget).data("type");
-            var guid = $(e.relatedTarget).data("guid");
 
-            var $that = $(this);
-            $(this).find("button").data("type", docType);
-            $(this).find("button").data("guid", guid);
-            $(this).find("#doctype").text(name);
-            $(this).find(".doctitle").val("");
-            setTimeout(function () { $that.find(".doctitle").focus() }, 1);
+            var $modal = $(this);
+            $modal.find(".file-type").text(name);
+            $modal.find("input[name=name]").val("");
+            $modal.find("button[type=submit]").attr("data-type", docType);
+            setTimeout(function () { $modal.find("input[name=name]").focus() }, 1);
         });
+
+        $(document).on("click", ".fab [data-toggle=menu]", function (e) {
+            e.preventDefault();
+
+            // hide all visible
+            var $menu = $(this).closest(".dropdown-menu");
+            $menu.find(".dropdown-item:visible").addClass("d-none");
+
+            // show current category
+            $menu.find("[data-menu=" + $(this).data("target") + "]").removeClass("d-none");
+
+            // update dropdown position
+            $(this).closest(".fab").find("[data-toggle=dropdown]").dropdown("update");
+
+            return false;
+        });
+
+        $(document).on("click", "[data-menu]:not(.dropdown-item)", function (e) {
+            e.preventDefault();
+
+            // reset
+            var $menu = $(this).closest(".dropdown-menu");
+            $menu.find(".dropdown-item").removeClass("d-none");
+            $menu.find("[data-menu]").addClass("d-none");
+
+            // update dropdown position
+            $menu.closest(".fab").find("[data-toggle=dropdown]").dropdown("update");
+            return false;
+        });
+
+        $(document).on("hidden.bs.dropdown", ".fab", function (e) {
+            // reset
+            $(this).find(".dropdown-item").removeClass("d-none");
+            $(this).find("[data-menu]").addClass("d-none");
+        });
+
     });
 })(jQuery);

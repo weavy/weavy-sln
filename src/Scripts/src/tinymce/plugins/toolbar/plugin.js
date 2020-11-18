@@ -10,8 +10,8 @@
 
     editor.addButton("toggle_toolbar", {
         type: 'menubutton',
-        text: 'More',
-        tooltip: "Toggle toolbar",
+        text: wvy.t('More'),
+        tooltip: wvy.t("Toggle toolbar"),
         onclick: function () {
             this.hideMenu();
             this.active(!this.active());
@@ -27,7 +27,7 @@
 
     editor.addButton("h1", {
         text: "H1",
-        title: "Heading 1",
+        title: wvy.t("Heading 1"),
         stateSelector: "h1",
         onclick: function () {
             editor.execCommand("FormatBlock", false, "h1");
@@ -36,7 +36,7 @@
 
     editor.addButton("h2", {
         text: "H2",
-        title: "Heading 2",
+        title: wvy.t("Heading 2"),
         stateSelector: "h2",
         onclick: function () {
             editor.execCommand("FormatBlock", false, "h2");
@@ -45,7 +45,7 @@
 
     editor.addButton("h3", {
         text: "H3",
-        title: "Heading 3",
+        title: wvy.t("Heading 3"),
         stateSelector: "h3",
         onclick: function () {
             editor.execCommand("FormatBlock", false, "h3");
@@ -54,7 +54,7 @@
 
     editor.addButton("h4", {
         text: "H4",
-        title: "Heading 4",
+        title: wvy.t("Heading 4"),
         stateSelector: "h4",
         onclick: function () {
             editor.execCommand("FormatBlock", false, "h4");
@@ -63,7 +63,7 @@
 
     editor.addButton("normal", {
         text: "P",
-        title: "Normal text",
+        title: wvy.t("Normal text"),
         onclick: function () {
             editor.execCommand("FormatBlock", false, "p");
         }

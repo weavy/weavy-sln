@@ -1,5 +1,14 @@
-﻿<!DOCTYPE html>
-<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+﻿@{ 
+    if (IsSectionDefined("navbar_tertiary")) {
+        BodyAttributes.Add("class", "has-navbar-3");
+    } else if (IsSectionDefined("navbar_secondary")) {
+        BodyAttributes.Add("class", "has-navbar-2");
+    } else {
+        BodyAttributes.Add("class", "has-navbar");
+    }
+}
+<!DOCTYPE html>
+<html @RenderHtmlAttributes()>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
@@ -9,6 +18,7 @@
     @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
     @RenderSection("styles", required: false)
     <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @Bundler.Scripts($"~/scripts/resources/resources.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.js", htmlAttributes: new { data_turbolinks_track = "reload" })
     @Bundler.Scripts("~/scripts/asap.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     @if (WeavyContext.Browser.Browser == "IE") {
         @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
@@ -16,10 +26,10 @@
     @Bundler.Scripts("~/scripts/wvy.bundle", htmlAttributes: new { data_turbolinks_track = "reload", defer = "" })
     @RenderSection("scripts", required: false)
 </head>
-<body class="@BodyClasses("has-navbar" + (IsSectionDefined("navbar_secondary") ? " has-navbar-secondary" : ""))" @BodyAttributes>
+<body @RenderBodyAttributes()>
     <script>@Html.ContextInfo()@Html.UserSettings()</script>
-    <nav class="navbar-theme fixed-top">
-        <div class="navbar navbar-primary">
+    <div class="navbars fixed-top">
+        <nav class="navbar navbar-theme">
             @if (IsSectionDefined("navbar_left")) {
                 @RenderSection("navbar_left", required: false)
             } else {
@@ -30,8 +40,7 @@
                     if (WeavyContext.Space != null) {
                         <button type="button" class="btn btn-icon" data-toggle="drawer" data-target="#drawer-space">@WeavyContext.Space.AvatarImg(24)</button>
                     } else {
-                        <a class="btn btn-icon d-framed" href="@WeavyContext.ApplicationPath">@Svg.Icon("arrow-left")</a>
-                        <a class="btn btn-icon d-standalone" href="@WeavyContext.ApplicationPath">@Html.IconImg(24)</a>
+                        <a class="btn btn-icon" href="@WeavyContext.ApplicationPath">@Html.IconImg(24)</a>
                     }
                 }
             </div>
@@ -47,38 +56,34 @@
                 @RenderSection("navbar_right", required: false)
             } else {
                 <div class="navbar-icons">
-                    <button type="button" class="btn btn-icon d-standalone" data-toggle="drawer" data-target="#drawer-user">@User.AvatarImg(24)
+                    <button type="button" class="btn btn-icon" data-toggle="drawer" data-target="#drawer-user">@User.AvatarImg(24)
                     @if (WeavyContext.Browser.Desktop) {
                         @Html.TotalBadge()
                     } else {
                         @Html.NotificationsBadge()
                     }
                     </button>
-                    <button type="button" class="btn btn-icon d-framed visibility-h">@Svg.Icon("expand-window")</button>
-                    <button type="button" class="btn btn-icon d-framed visibility-h">@Svg.Icon("close")</button>
                 </div>
             }
-        </div>
-        @if (IsSectionDefined("navbar_secondary")) {
-            <div class="navbar navbar-secondary">
-                @RenderSection("navbar_secondary", required: false)
-            </div>
-        }
-    </nav>
+        </nav>
+        @RenderSection("navbar_secondary", required: false)
+        @RenderSection("navbar_tertiary", required: false)
+    </div>
     <div class="alerts">@Html.AlertMessages()</div>
     <main @if (IsSectionDefined("fab")) { <text> class="has-fab" </text> }>
         @RenderBody()
         @RenderSection("fab", required: false)
     </main>
+
     @{
+        Html.RenderPartial("_ScrollbarsInit");
         Html.RenderPartial("_DrawerPersonal");
-        Html.RenderPartial("_PhotoSwipe");
-        Html.RenderPartial("_Preview");
         Html.RenderPartial("_ProfileModal");
         @RenderSection("footer", required: false)
     }
     <div class="drawer-backdrop"></div>
     <audio id="notification-sound" src="~/media/notification.mp3" preload="none"></audio>
+    <iframe id="filebrowser" src="about:blank" style="display:none;width:100%;height:100%;z-index:99999999;position:fixed;top:0;left:0;border:0;"></iframe>
     @Html.Scripts()
 </body>
 </html>

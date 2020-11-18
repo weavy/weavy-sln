@@ -4,16 +4,14 @@
     @Html.HiddenFor(x => x.PollId)
 
     <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title">Edit post</h5>
+        <h5 class="modal-title">@T["Edit post"]</h5>
         <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
     </div>
     <div class="modal-body">
         @if (ConfigurationService.HtmlPosts) {
             <textarea id="html_@Model.Id" class="form-control" name="html" data-editor="post" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Html</textarea>
-            <input type="hidden" name="text" value="@Model.Text" />
         } else {
-            <textarea id="text" class="form-control" name="text" data-editor="post" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Text</textarea>
-            <input type="hidden" name="html" value="@Model.Html" />
+            <textarea id="text" class="form-control" name="text" data-editor="post" data-editor-embed-ids="@(String.Join(",", Model.Embeds))" data-editor-poll-id="@(Model.PollId)">@Model.Text</textarea>            
         }
 
         @Html.ValidationMessageFor(x => x.Text)
@@ -23,14 +21,20 @@
                     <tr>
                         <td class="table-icon">@Svg.Icon(file)</td>
                         <td>@file.GetTitle()</td>
-                        <td class="table-icon"><a class="btn btn-icon remove" data-file="file.title" href="#" data-remove-attachment="@file.Id" title="Remove file">@Svg.Icon("close")</a><input type="hidden" name="attachments" value="@file.Id" /></td>
+                        <td class="table-icon"><a class="btn btn-icon remove" data-file="file.title" href="#" data-remove-attachment="@file.Id" title="@T["Remove file"]">@Svg.Icon("close")</a></td>
                     </tr>
                 }
             </table>
-            <div id="removedAttachments"></div>
+            <div id="removedAttachments">
+                @if (!Model.RemovedAttachments.IsNullOrEmpty()) {
+                    foreach (var rem in Model.RemovedAttachments) {
+                        <input type="hidden" name="removedAttachments" value="@rem" />
+                    }
+                }
+            </div>
         </div>
     </div>
     <div class="modal-footer border-0">
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary">@T["Save"]</button>
     </div>
 </form>

@@ -1,10 +1,4 @@
 /// <reference path="../_core.scss" />
-body.controller-home.action-index,
-body.controller-post.action-index,
-body.controller-post.action-get,
-body.app-5ebfa152-de85-48da-82dd-30a1b560c313 { // posts app
-    background: $gray-100;
-}
 
 body.app-5ebfa152-de85-48da-82dd-30a1b560c313, // posts app
 body.controller-post.action-get {
@@ -39,6 +33,7 @@ body.controller-post.action-get {
 }
 
 .post {
+    background-color: $gray-50;
     margin-bottom: 1rem;
     display: block;
 
@@ -47,11 +42,6 @@ body.controller-post.action-get {
         border: none;
         padding: $card-spacer-x $card-spacer-x 0;
         margin-bottom: $card-spacer-x;
-    }
-
-    .card-title {
-        margin: 0;
-        font-weight: $font-weight-normal;
     }
 
     .card-body {
@@ -82,6 +72,14 @@ body.controller-post.action-get {
         margin-top: $card-spacer-y;
         margin-bottom: $card-spacer-y;
         padding: 0 $card-spacer-x;
+    }
+
+    .card-meetings {
+        padding: 0 $card-spacer-x;
+
+        .list-group-item {
+            background: #fff;
+        }
     }
 
     .card-context {
@@ -117,7 +115,6 @@ body.controller-post.action-get {
     }
 
     .post-comments {
-        background: $card-cap-bg;
         border-top: $card-border-width solid $card-border-color;
         padding: $card-spacer-x;
 
@@ -144,7 +141,6 @@ body.controller-post.action-get {
 .fake-post {
     // initially hidden
     display: none;
-    
     border: $card-border-width solid $card-border-color;
     border-radius: $card-border-radius;
 
@@ -196,8 +192,8 @@ body.controller-post.action-get {
 @include media-breakpoint-down(xs) {
     html:not(.framed) {
         .post, .post-form {
-            margin-left: calc(-#{$grid-gutter-width/2 + $edge-margin});
-            margin-right: calc(-#{$grid-gutter-width/2 + $edge-margin});
+            margin-left: -$grid-gutter-width/2;
+            margin-right: -$grid-gutter-width/2;
 
             &, > *, &::after {
                 border-radius: 0;

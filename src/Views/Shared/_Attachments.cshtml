@@ -1,36 +1,52 @@
 ﻿@model IEnumerable<Attachment>
 @{
     var parent = ViewBag.Parent as IEntity;
+    var blobs = ViewBag.Blobs as IEnumerable<Blob>;
 }
-<div class="list-group">
+<div class="list-group file-list">
+    @if (blobs != null && blobs.Any()) {
+        foreach (var blob in blobs) {
+            Html.RenderPartial("_Blob", blob);
+        }
+    }
+
     @foreach (var attachment in Model) {
         var attrs = Html.PreviewAttributes(parent, attachment);
-
-        <a class="list-group-item list-group-item-action" href="@attachment.ContentUrl()" data-type="attachment" data-id="@attachment.Id" @Html.Raw(attrs.AsHtmlAttributes())>
+        // TODO: open attachment overlay
+        //var href = attachment.DownloadUrl() ?? attachment.Blob.Link;
+        <a class="list-group-item list-group-item-action" href="@(attrs?["data-href"] ?? attachment.Url())" @Html.Raw(attrs.AsHtmlAttributes())>
             <div class="media">
-                @Svg.Icon(attachment, size: 48)
+                @if (attachment.Blob.Link == null && FileUtils.IsWebImage(attachment.Blob.Name)) {
+                    <img class="img-48" src="@attachment.ThumbUrl(48, 48, fit: FitMode.Crop)" />
+                } else {
+                    @Svg.Icon(attachment, size: 48)
+                }
                 <div class="media-body">
-                    <h6 class="media-title">@attachment.Blob.Name</h6>
-                    <small class="text-muted">
-                        @if (parent.Type == EntityType.Content) {
-                            <text>Uploaded @Html.Time(attachment.ModifiedAt) by @attachment.ModifiedBy().GetTitle() –</text>
+                    <h6 class="media-title">
+                        @attachment.Blob.Name
+                        @if (attachment.Blob.Link != null && attachment.Blob.Embed == null) {
+                            @Svg.Icon("open-in-new", "icon", 18)
                         }
-                        @if (FileUtils.IsImage(attachment.Blob.Name)) {
+                    </h6>
+                    <small class="text-muted">
+                        @if (FileUtils.IsImage(attachment.Blob.Name) &&  (attachment.Blob.Width != null && attachment.Blob.Height != null)) {
                             <text>@(attachment.Blob.Width)x@(attachment.Blob.Height) ·</text>
                         }
-                        @FileUtils.FileSizeAsString(attachment.Blob.Size)
+                        @if (attachment.Blob.Size > 0) {
+                            <text>@(FileUtils.FileSizeAsString(attachment.Blob.Size))</text>
+                            if (attachment.Blob.Provider != null) {
+                                <text> -</text>
+                            }
+                        }
+                        @if (attachment.Blob.Provider != null) {
+                            <text>@attachment.Kind() @T["from"] @attachment.Blob.Provider</text>
+                        }
                     </small>
                 </div>
-                @if (parent.Type == EntityType.Content && attachment.HasPermission(Permission.Delete)) {
+
+                @if (parent != null && parent.Type == EntityType.Content) {
                     <div class="media-icons">
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                @Svg.Icon("dots-vertical")
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <button type="button" data-trash="attachment" data-id="@attachment.Id" class="dropdown-item">@Svg.Icon("delete", "danger") Trash</button>
-                            </div>
-                        </div>
+                        @Html.Partial("_AttachmentMenu", attachment)
                     </div>
                 }
             </div>

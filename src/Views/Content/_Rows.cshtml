@@ -4,7 +4,7 @@
     foreach (var content in Model) {
         Html.RenderPartial(content, Weavy.Core.Models.Layout.Table);
     }
-    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+    <tr class="scroll-next" data-next="@Url.ScrollNext(Model)">
         <td colspan="6"></td>
     </tr>
 }

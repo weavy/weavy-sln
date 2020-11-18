@@ -43,13 +43,13 @@ wvy.preview = (function ($)  {
         close();
     });
 
-    // close pdf viewer when clicking the backdrop
+    /*// close pdf viewer when clicking the backdrop
     $(document).on("click", ".preview-container", function (e) {
         var $target = $(e.target);
         if ($target.attr("id") === "pdfViewer" || $target.hasClass("preview-container") || $target.hasClass("preview-document")) {
             close();
         }
-    });
+    });*/
 
     // init/destroy pdf viewer
     if (wvy.turbolinks.enabled) {
@@ -62,7 +62,7 @@ wvy.preview = (function ($)  {
 
     // init pdf viewer
     function init() {
-        if (!document.getElementById('preview')) {
+        if (!document.getElementById('pdfPreview')) {
             // exit if no preview container
             return;
         }
@@ -74,11 +74,14 @@ wvy.preview = (function ($)  {
         // add event handle for closing preview on ESC
         $(document).on("keyup", keyup);
 
+        $('html').addClass("preview-open");
+
         // open up the document with pdf.js
         wvy.pdf.pdfjsWebApp.PDFViewerApplication.open(opts.preview);
 
-        // add navbar
         var $container = $(".preview-container");
+        /*
+        // add navbar
         $container.find(".navbar-preview").remove();
         var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-weavy-event data-weavy-name="close-preview"><svg class="i i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path></svg></button></div></nav>');
         var $middle = $('<div class="navbar-middle" />');
@@ -87,7 +90,7 @@ wvy.preview = (function ($)  {
 
         // add star?
         if (opts.starred !== undefined) {
-            var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-entity="' + opts.type + '" data-id="' + opts.id + '"><svg class="i i-star-outline d-block" height="24" viewBox="0 0 24 24" width="24"><path d="m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37 1.71-4.04 1.71 4.04 4.38.37-3.32 2.88.99 4.28m6.24-8.42-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.45 4.73-1.63 7.03 6.18-3.73 6.18 3.73-1.64-7.03z"/></svg><svg class="i i-star d-none" height="24" viewBox="0 0 24 24" width="24"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"/></svg></button>');
+            var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-type="' + opts.type + '" data-id="' + opts.id + '"><svg class="i i-star-outline d-block" height="24" viewBox="0 0 24 24" width="24"><path d="m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37 1.71-4.04 1.71 4.04 4.38.37-3.32 2.88.99 4.28m6.24-8.42-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.45 4.73-1.63 7.03 6.18-3.73 6.18 3.73-1.64-7.03z"/></svg><svg class="i i-star d-none" height="24" viewBox="0 0 24 24" width="24"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"/></svg></button>');
             if (opts.starred) {
                 $star.addClass("on");
             } else {
@@ -106,6 +109,7 @@ wvy.preview = (function ($)  {
         $navbar.append($icons);
         $container.append($navbar);
 
+        */
         // show preview container
         $container.show();
     }
@@ -116,7 +120,7 @@ wvy.preview = (function ($)  {
 
     // close file preview
     function close() {
-        if (!document.getElementById('preview')) {
+        if (!document.getElementById('pdfPreview')) {
             // exit if no preview container
             return;
         }
@@ -128,6 +132,8 @@ wvy.preview = (function ($)  {
 
         // remove event handler for ESC
         $(document).off("keyup", keyup);
+
+        $('html').removeClass("preview-open");
 
         // hide container
         $(".preview-container").hide();
@@ -146,7 +152,7 @@ wvy.preview = (function ($)  {
     // close preview on ESC
     function keyup(e) {
         if (e.keyCode === 27) {
-            close();
+            //close();
         }
     }
 

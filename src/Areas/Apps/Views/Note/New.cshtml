@@ -1,0 +1,50 @@
+﻿@model Note
+@{
+    Layout = "~/Views/Content/_Layout.Embedded.cshtml";
+    Title = T["New"] + " " + Model.MetaData().Name;
+    Back = Url.Back(WeavyContext.Content.Url() ?? WeavyContext.App.Url());
+    ViewData["turboform"] = true;
+}
+
+@section navbar_left {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarClose")
+    </div>
+}
+
+@section navbar_middle {
+    <div class="navbar-middle">
+        <div class="navbar-form">
+            <div class="form-group autosize">
+                @Html.EditorFor(x => Model.Name, new { __html = false, __label = false, _desc = false, __form = "#content-form" })
+                <span class="form-control">@Model.Name</span>
+            </div>
+        </div>
+    </div>
+}
+
+@section navbar_right {
+    <div class="navbar-icons">
+        <div class="form-buttons" data-trigger>
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-sm btn-primary" id="autosave-status" data-name="operation" data-value="update">@Model.MetaData().ModifyVerb</button>
+                <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    @Svg.Icon("menu-down")
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                     <button type="button" class="dropdown-item" data-name="operation" data-value="draft">@T["Save draft"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Html.HasHtmlEditor()) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
+
+@{ Html.RenderPartial("_New", Model); }
+
+

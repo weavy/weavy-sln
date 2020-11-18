@@ -1,0 +1,54 @@
+﻿@model Note
+@{
+    Layout = "~/Views/Content/_Layout.Embedded.cshtml";
+    Title = T["Edit"] + " " + Model.MetaData().Name;
+    Back = Url.Back(Model.Url());
+    ViewData["turboform"] = true;
+    var draftable = Model as IDraftable;
+}
+
+@section navbar_left {
+    <div class="navbar-icons">
+        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Svg.Icon("close")</a>
+    </div>
+}
+
+@section navbar_middle {
+    <div class="navbar-middle">
+        <div class="navbar-form">
+            <div class="form-group autosize">
+                @Html.EditorFor(x => Model.Name, new { __html = false, __label = false, _desc = false, __form = "#content-form" })
+                <span class="form-control">@Model.Name</span>
+            </div>
+        </div>
+    </div>
+}
+
+@section navbar_right {
+    <div class="navbar-icons">
+        <div class="form-buttons" data-trigger>
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-sm btn-primary" id="autosave-status" data-name="operation" data-value="update">@Model.MetaData().ModifyVerb</button>
+                <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    @Svg.Icon("menu-down")
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <button type="button" class="dropdown-item" data-name="operation" data-value="draft">@T["Save draft"]</button>
+                    @* if transient - make ajax call to discard draft, then handle overlay *@
+                    @* always render discard buttons - could be made visible after autosaving draft *@
+                    <button type="button" class="dropdown-item @(draftable.IsDraft && draftable.IsTransient ? "" : "d-none") draft-transient" data-discard data-href="/a/content/@Model.Id/discard" data-redirect="@(Model.Parent().Url() ?? Model.App().Url())">@T["Discard changes"]</button>
+                    <button type="button" class="dropdown-item @(draftable.IsDraft && !draftable.IsTransient ? "" : "d-none") draft-not-transient" data-name="operation" data-value="discard">@T["Discard changes"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Html.HasHtmlEditor()) {
+    @section scripts{
+        @Html.InitHtmlEditor()
+    }
+}
+
+@{ Html.RenderPartial("_Edit", Model); }
+

@@ -3,7 +3,7 @@
 
 @{
     Back = WeavyContext.Space.Url();
-    Title = "Members";
+    Title = T["Members"].ToString();
 }
 
 @section navbar_middle {
@@ -11,8 +11,10 @@
 }
 
 @section navbar_secondary {
-    <nav class="nav nav-tabs">
-        <a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, null)))" class="nav-link active">@Title</a>
+    <nav class="navbar navbar-theme">
+        <nav class="nav nav-tabs">
+            <a href="@(Url.Action<SpaceController>(c => c.Members(WeavyContext.Space.Id, null)))" class="nav-link active">@Title</a>
+        </nav>
     </nav>
 }
 
@@ -23,8 +25,8 @@
             <thead>
                 <tr>
                     <th class="table-icon"></th>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>@T["Name"]</th>
+                    <th>@T["Email"]</th>
                     <th class="table-icon"></th>
                 </tr>
             </thead>
@@ -59,7 +61,7 @@
 @if (WeavyContext.Space.HasPermission(Permission.Members)) {
     @section fab {
         <div class="fab">
-            <button type="button" class="btn btn-round btn-primary" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="Add members">@Svg.Icon("plus")</button>
+            <button type="button" class="btn btn-round btn-primary" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="@T["Add members"]">@Svg.Icon("plus")</button>
         </div>
     }
 }

@@ -1,6 +1,6 @@
 ﻿@model Role
 @{
-    Title = "Add role";
+    Title = T["Add role"].ToString();
     Back = Url.Action<RolesController>(c => c.Index(null));
 }
 
@@ -9,8 +9,8 @@
 
         @Html.EditorsForModel()
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load" title="Save">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">@T["Cancel"]</a>
         </div>
 
     }

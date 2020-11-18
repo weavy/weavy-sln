@@ -1,0 +1,182 @@
+﻿@model Attachment
+@using System.Collections.Specialized
+
+@{
+    Title = Model.GetTitle();
+    Layout = WeavyContext.Current.IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+
+    /*
+    // May apply to parent instead
+    var commentable = Model as ICommentable;
+    var likeable = Model as ILikeable;
+    */
+
+    var (prev, next) = AttachmentService.GetPreviousAndNextSiblings(Model);
+
+    var fmt = Model.Blob == null ? PreviewFormat.None : (Model.Blob.Link != null ? PreviewFormat.Icon : FileUtils.GetPreviewFormat(Model.Blob.Name));
+
+    NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(WeavyContext.App, Model) : null;
+}
+
+@section navbar_left {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarClose")
+    </div>
+}
+
+@section navbar_middle {
+    <div class="navbar-middle">
+        @Html.Partial("_NavbarTitle")
+    </div>
+}
+
+@section navbar_right {
+    <div class="navbar-icons">
+        @if (Model.Blob?.Link != null) {
+            <a class="btn btn-icon" href="@Model.Blob.Link" target="_blank" title="@T["Open in {0}", Model.Blob.Provider]">@Svg.Icon(Model, "inherit")</a>
+        } else {
+            <a class="btn btn-icon" href="@Model.DownloadUrl(download: true)" title="@T["Download"]">@Svg.Icon("download")</a>
+        }
+        @if (Model is IFile file && ((IFile)Model).Blob.Link == null && FileUtils.IsOfficeDocument(file.Name)) {
+            <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model, "inherit")</a>
+        }
+    </div>
+}
+
+
+<!-- Attachment -->
+<article class="content-area px-0" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+    @if (prev != null) {
+        <nav class="content-nav nav-prev"><a class="btn" href="@prev.Url()">@Svg.Icon("arrow-left")@{Html.RenderPartial("_MicroThumb", prev);}</a></nav>
+    }
+    @if (next != null) {
+        <nav class="content-nav nav-next"><a class="btn" href="@next.Url()">@Svg.Icon("arrow-right")@{Html.RenderPartial("_MicroThumb", next);}</a></nav>
+    }
+
+<section class="content-section content-viewer">
+
+    @if (fmt == PreviewFormat.Text) {
+        var lang = FileUtils.SyntaxHighlight(Model.GetTitle());
+        <div class="content-text scroll-y@(lang != null ? " content-code" : "")">
+            @if (lang != null) {
+                <pre class="language-@lang line-numbers"><code class="language-@lang">@System.IO.File.ReadAllText(BlobService.GetContent(Model.Blob).FullName)</code></pre>
+            } else {
+                <pre class="document">@System.IO.File.ReadAllText(BlobService.GetContent(Model.Blob).FullName)</pre>
+            }
+        </div>
+
+    } else if (fmt == PreviewFormat.Image) {
+
+        if (Model.Blob.Width != null && Model.Blob.Height != null) {
+            <div class="content-image responsive-image" style="--width: @Model.Blob.Width; --height: @Model.Blob.Height">
+                <img class="loading" src="@attrs["data-src"]" width="@Model.Blob.Width" height="@Model.Blob.Height" decoding="async" />
+                @Svg.Spinner(spin: true)
+                @* TODO: microthumb, find a better transfer *@
+                @*<img id="content-thumb" class="loading responsive-image-thumb" src="@attrs["data-microthumb-src"]" width="@Model.Blob.Width" height="@Model.Blob.Height" loading="eager" decoding="sync" />*@
+            </div>
+        } else {
+            <div class="content-image responsive-image intrinsic-image">
+                <img class="loading" src="@attrs["data-src"]" decoding="async" />
+            </div>
+        }
+
+        //Html.RenderPartial("_PhotoSwipe");
+<script type="text/javascript">
+            @*
+            // TODO: microthumb, find a better transfer
+            var thumb = /^#?thumb:(.+)/.exec(document.location.hash);
+            if (thumb && thumb.length) {
+                var thumbUrl = decodeURIComponent(thumb[1]);
+                console.log("inserting content thumb");
+                $('<img class="responsive-image-thumb loading loaded" src="' + thumbUrl + '" loading="eager" decoding="sync" />').insertBefore("#content-thumb");
+            }
+            *@
+            wvy.whenLoaded.checkImageLoad();
+</script>
+
+    } else if (fmt == PreviewFormat.Document) {
+
+        Html.RenderPartial("_Pdf");
+        <script type="text/javascript" async>
+                var previewOptions = {
+                    url: "@Model.Url()",
+                    src: "@attrs["data-src"]",
+                    preview: "@attrs["data-src"]", // url to pdf
+                    //name: "@attrs["data-name"]", // name to display in header
+                    icon: "@attrs["data-icon"]", // icon of item (used for open in office)
+                    download: "@attrs["data-download"]", // url for downloading file
+                    office: "@attrs["data-office"]", // url for opening document in office
+                    //starred: @(attrs["data-starred"] == "true" ? "true" : "false"), // true|false indicating if document is starred (if starrable)
+                    //comments: @(attrs["data-comments"] ?? "null"), // number of comments (if commentable)
+                    type: "@attrs["data-type"]", // the entity type (attachment or content)
+                    id: @attrs["data-id"] // the entity id
+                };
+
+                wvy.whenLoaded.then(function () {
+                    wvy.preview.open(previewOptions);
+                });
+        </script>
+
+
+    } else if (fmt == PreviewFormat.Video) {
+        <video id="content-video" class="content-video loading" controls crossorigin="use-credentials" autoplay>
+            <source src="@Model.DownloadUrl()" type="@Model.Blob.MediaType" />
+            <div class="content-media">
+                <div class="content-icon">
+                    @Svg.Icon(Model.GetIcon())
+                </div>
+                <div class="content-name">
+                    <a href="@Model.DownloadUrl(download: true)">@Model.GetTitle()</a>
+                </div>
+            </div>
+        </video>
+        @Svg.Spinner(size: 48, spin: true);
+    } else if (fmt == PreviewFormat.Audio) {
+
+        <div class="content-media">
+            <div class="content-icon">
+                @Svg.Icon(Model.GetIcon())
+            </div>
+            <div class="content-name">
+                <a href="@Model.DownloadUrl(download: true)">@Model.GetTitle()</a>
+            </div>
+            <audio id="content-audio" class="content-audio loading mt-3" controls crossorigin="use-credentials" autoplay>
+                <source src="@Model.DownloadUrl()" type="@Model.Blob.MediaType" />
+            </audio>
+        </div>
+    } else if (Model.Blob?.Embed != null && WeavyContext.Browser.Platform != "iOS") {
+        @* iframe needs to be object to not render error pages when content is blocked *@
+        <object class="content-iframe loading" data="@Model.Blob.Embed"></object>
+        @Svg.OverlaySpinner(spin: true, id: "content-iframe-spinner")
+        <div class="content-media content-iframe-fallback">
+            <div class="content-icon">
+                @Svg.Icon(Model.GetIcon())
+            </div>
+            <div class="content-name">
+                <a href="@Model.Blob.Link" target="_blank" title="@T["Open in {0}", Model.Blob.Provider]">@Model.GetTitle() @Svg.Icon("open-in-new", null, 18)</a>
+            </div>
+        </div>
+    } else if (Model.Blob?.Link != null) {
+        <div class="content-media">
+            <div class="content-icon">
+                @Svg.Icon(Model.GetIcon())
+            </div>
+            <div class="content-name">
+                <a href="@Model.Blob.Link" target="_blank" title="@T["Open in {0}", Model.Blob.Provider]">@Model.GetTitle() @Svg.Icon("open-in-new", null, size: 18)</a>
+            </div>
+        </div>
+    } else if (fmt != PreviewFormat.None) {
+        <div class="content-media">
+            <div class="content-icon">
+                @Svg.Icon(Model.GetIcon())
+            </div>
+            <div class="content-name">
+                <a href="@Model.DownloadUrl(download: true)">@Model.GetTitle()</a>
+            </div>
+        </div>
+    }
+</section>
+
+</article>
+
+

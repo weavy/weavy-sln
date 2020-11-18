@@ -13,6 +13,20 @@ body.controller-comments.action-get {
     }
 }
 
+.section-comments {
+    .meeting-dropup {
+        .dropdown-menu {
+            right: 0;
+        }
+    }
+
+    .meetings {
+        svg.spinner{
+            margin:0 auto;
+        }
+    }
+}
+
 .comment {
     background-color: inherit;
     border: 0;
@@ -42,6 +56,16 @@ body.controller-comments.action-get {
             font-size: $font-size-sm;
         }
     }
+
+    .card-meetings {
+        padding: 0;
+
+        .list-group-item {
+            background: #fff;
+        }
+    }
+
+    
 }
 
 .comment-feedback {

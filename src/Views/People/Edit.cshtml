@@ -1,7 +1,7 @@
 ﻿@model UserModel
 @{
-    Title = "People";
-    Back = Url.Action<PeopleController>(c => c.Index(null, Model.IsSuspended ? "suspended": null));
+    Title = T["People"].ToString();
+    Back = Url.Action<PeopleController>(c => c.Index(null, Model.IsSuspended ? "suspended" : null));
 }
 
 @section navbar_middle {
@@ -9,10 +9,12 @@
 }
 
 @section navbar_secondary {
-<nav class="nav nav-tabs">
-    @(Html.ActionLink<PeopleController>(c => c.Edit(Model.Id), text: "Details", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
-    @(Html.ActionLink<PeopleController>(c => c.Settings(Model.Id), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-</nav>
+    <nav class="navbar navbar-theme">
+        <nav class="nav nav-tabs">
+            @(Html.ActionLink<PeopleController>(c => c.Edit(Model.Id), text: T["Details"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<PeopleController>(c => c.Settings(Model.Id), text: T["Settings"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        </nav>
+    </nav>
 }
 
 <div class="container my-3">
@@ -29,24 +31,24 @@
             @Html.EditorFor(x => Model.Password)
         }
 
-        @Html.EditorsForModel(Model.Profile, exclude: new string[] { nameof(Model.Profile.Name)}, formText:false)
+        @Html.EditorsForModel(Model.Profile, exclude: new string[] { nameof(Model.Profile.Avatar), nameof(Model.Profile.Name) }, descriptions: false)
 
         @Html.EditorFor(x => Model.Comment)
         @Html.EditorFor(x => Model.DirectoryId)
 
         <div class="form-group">
-            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { FormGroup = false })
-            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { FormGroup = false })
+            @Html.EditorFor(x => Model.IsAdmin, additionalViewData: new { __html = false })
+            @Html.EditorFor(x => Model.IsSuspended, additionalViewData: new { __html = false })
         </div>
 
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load" title="Save">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>@T["Cancel"]</a>
         </div>
     }
 
     @if (Model.Logins.Any()) {
-        <h6>Linked accounts</h6>
+        <h6>@T["Linked accounts"]</h6>
         <ul class="list-unstyled">
             @foreach (Login login in Model.Logins) {
                 <li>@login.Type / @(login.Email ?? login.Sub)</li>

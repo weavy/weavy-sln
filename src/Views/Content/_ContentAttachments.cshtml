@@ -1,24 +1,26 @@
 ﻿@model Content
-@{
-    var versionable = Model as IVersionable;
-}
 
-@if (Model is IHasAttachments attachable && (versionable == null || versionable.IsCurrent())) {
-    <section class="content-section">
-        <h4 class="display-4"><span>Attachments</span></h4>
-
-        @if (attachable.AttachmentIds.Any()) {
-            Html.RenderPartial("~/Views/Shared/_Attachments.cshtml", attachable.Attachments(), viewData: new ViewDataDictionary { { "Parent", attachable} });
-        }
-
+@if (Model is IHasAttachments attachable) {
+    <div class="attachment-drop content-flex offset-navbar">
+        <section class="content-section content-attachments scroll-y padding-navbar">
+            <div id="attachments-list" class="my-2">
+                @if (attachable.AttachmentIds.Any()) {
+                    Html.RenderPartial("~/Views/Shared/_Attachments.cshtml", attachable.Attachments(), viewData: new ViewDataDictionary { { "Parent", attachable } });
+                }
+            </div>
+        </section>
         @if (Model.HasPermission(Permission.Attach)) {
-            <p class="content-upload text-center my-3">
-                <span class="text-muted">Drag and drop files here or</span>
-                <button type="button" class="btn btn-link btn-text">click to upload</button>.
-                <input type="file" accept="@ConfigurationService.BlobWhitelist" data-single-file-uploads="false" data-url="/a/content/@Model.Id/attachments" multiple="">
-            </p>
+            <div class="content-upload text-center p-3 border-top">
+                <div class="progress d-none">
+                    <div class="progress-bar" role="progressbar"></div>
+                </div>
+                <div class="text-muted d-inline">@T["Drag and drop files here or"]</div>
+                <div class="btn btn-link btn-text position-relative d-inline">
+                    @T["click to upload"]
+                    @Weavy.Utils.HtmlUtils.Filebrowser(null, true, ConfigurationService.BlobWhitelist, "attach", htmlAttributes: new { data_dropzone = ".attachment-drop", data_attach_url = $"/a/content/{Model.Id}/attachments", data_refresh_target = "#attachments-list", data_refresh_url = "/content/" + Model.Id + "/attachments" })
+                </div>
+            </div>
         }
-
-    </section>
+    </div>
 }
 

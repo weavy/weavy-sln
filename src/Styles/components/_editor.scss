@@ -23,13 +23,17 @@
         }
 
         .emojionearea-editor {
+            @include scroll-y;
+
+            html.scrollbars & {
+                @include custom-scrollbar;
+            }
+
             max-height: 23em;
             font-size: $font-size-base;
             line-height: $input-btn-line-height;
             border-bottom: $border-width solid $border-color;
             padding: $card-spacer-y ($card-spacer-x - .0625rem);
-            // To enable HW acceleration and not cause repaint on scroll
-            backface-visibility: hidden;
 
             &:empty:before {
                 color: $input-placeholder-color;
@@ -131,29 +135,8 @@
             opacity: 1;
         }
 
-        :last-child {
+        > :last-child {
             margin-left: auto;
-        }
-        // file upload button
-        .btn-file {
-            position: relative;
-            overflow: hidden;
-
-            > .i:nth-child(2) {
-                margin-left: .5rem;
-            }
-            // TODO: add focus state to .btn-file when input is focused...
-            > input {
-                position: absolute;
-                top: 0;
-                right: 0;
-                margin: 0;
-                opacity: 0;
-                -ms-filter: 'alpha(opacity=0)';
-                font-size: 130px;
-                direction: ltr;
-                cursor: pointer;
-            }
         }
 
         &.footer {
@@ -195,9 +178,19 @@
         }
 
         .progress {
-            height: .5rem;
-            background-color: $progress-bar-bg;
+            position: absolute;
+            width: 100%;
+            height: .25rem;
         }
+    }
+
+    .table-meetings {
+
+        tr:first-child td {
+            border-top: $border-width solid $border-color;
+        }
+
+        margin: 0;
     }
 
     .embeds {
@@ -259,7 +252,7 @@
             .emojionearea-editor {
                 min-height: 2em;
                 margin-right: 0;
-                border-bottom: none;                
+                border-bottom: none;
 
                 > div {
                     // Makes the scrollbar appear on the very right side where it should
@@ -406,7 +399,7 @@ textarea[data-editor=share] {
     border: $border-width solid $border-color;
     border-radius: $border-radius;
     box-shadow: none;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 @include media-breakpoint-down(xs) {

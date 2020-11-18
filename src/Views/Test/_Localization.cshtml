@@ -1,0 +1,12 @@
+﻿@model TestViewModel
+@{
+    HtmlAttributes.Add("data-test", "localization-was-here");
+}
+@Model.Text
+<br />
+<br />
+@T["{0} are fewer than {1}", T[2, "{0} ant"], T[3, "{0} elephant"]]
+<br />
+@T["{0} ants are more than {1} elephants", 5, 4]
+<br />
+

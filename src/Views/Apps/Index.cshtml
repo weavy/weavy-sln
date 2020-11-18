@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<IPlugin>
 @{
-    Title = "Apps";
+    Title = T["Apps"].ToString();
     Back = Url.Action<ManageController>(c => c.Index());
 }
 
@@ -11,8 +11,8 @@
         <thead>
             <tr>
                 <th class="table-icon"></th>
-                <th>Name</th>
-                <th>Description</th>
+                <th>@T["Name"]</th>
+                <th>@T["Description"]</th>
                 <th class="table-icon"></th>
             </tr>
         </thead>
@@ -26,17 +26,17 @@
                         @if (!plug.IsLoaded()) {
                             using (Html.BeginForm(nameof(AppsController.Delete), null, new { id = plug.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
                                 @Html.HttpMethodOverride(HttpVerbs.Delete);
-                                <button type="submit" class="btn btn-icon btn-danger" title="Remove">@Svg.Icon("close")</button>
+                                <button type="submit" class="btn btn-icon btn-danger" title="@T["Remove"]">@Svg.Icon("close")</button>
                             }
                         } else if (!plug.IsEnabled) {
                             using (Html.BeginForm(nameof(AppsController.Enable), null, new { id = plug.Id.ToString() }, FormMethod.Post, new { data_turboform = ""})) {
                                 @Html.HttpMethodOverride(HttpVerbs.Put);
-                                <button type="submit" class="btn btn-icon btn-warning" title="Disabled">@Svg.Icon("checkbox-blank-outline")</button>
+                                <button type="submit" class="btn btn-icon btn-warning" title="@T["Disabled"]">@Svg.Icon("checkbox-blank-outline")</button>
                             }
                         } else {
                             using (Html.BeginForm(nameof(AppsController.Disable), null, new { id = plug.Id.ToString() }, FormMethod.Post, new { data_turboform = "" })) {
                                 @Html.HttpMethodOverride(HttpVerbs.Put);
-                                <button type="submit" class="btn btn-icon btn-success" title="Enabled">@Svg.Icon("checkbox-marked-outline")</button>
+                                <button type="submit" class="btn btn-icon btn-success" title="@T["Enabled"]">@Svg.Icon("checkbox-marked-outline")</button>
                             }
                         }
                     </td>

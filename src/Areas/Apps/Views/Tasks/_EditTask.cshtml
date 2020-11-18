@@ -1,0 +1,75 @@
+﻿@model TaskItem
+<div data-type="content" data-id="@Model.Id">
+    <form class="modal-content" action="@(Url.Action<TasksController>(x => x.Update(Model.Id)))" method="post">
+        <div class="modal-body">
+
+            @Html.HttpMethodOverride(HttpVerbs.Put)
+            @Html.HiddenFor(m => m.Id)
+            @Html.HiddenFor(m => m.Completed)
+
+            @Html.EditorFor(m => m.Name)
+            @Html.EditorFor(m => m.Description)
+            <div class="d-none">@Html.EditorFor(m => m.AssignedTo)</div>
+
+            <div class="form-group assigned-group">
+                <label>@T["Assigned to"]</label>
+                <div class="form-control">
+                    <select data-role="user-picker">
+                        @if (Model.AssignedToUser != null) {
+                            <option value="@Model.AssignedToUser.Id">@Model.AssignedToUser.GetTitle()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            @Html.EditorFor(m => m.DueDate)
+
+        </div>
+
+        <div class="modal-footer border-0">
+            <button type="submit" class="btn btn-primary">@T["Update"]</button>
+        </div>
+    </form>
+
+    <div class="modal-body">
+
+        @if (Model is IHasAttachments attachable) {
+            <section class="content-section task-dropzone">
+                <h4 class="display-4"><span>@T["Attachments"]</span></h4>
+
+                <div id="attachments-list">
+                    @if (attachable.AttachmentIds.Any()) {
+                        Html.RenderPartial("~/Views/Shared/_Attachments.cshtml", attachable.Attachments(), viewData: new ViewDataDictionary { { "Parent", attachable } });
+                    }
+                </div>
+                @if (Model.HasPermission(Permission.Attach)) {
+                    <div class="content-upload text-center my-3">
+                        <div class="progress d-none">
+                            <div class="progress-bar" role="progressbar"></div>
+                        </div>
+                        <div class="text-muted d-inline">@T["Drag and drop files here or"]</div>
+                        <div class="btn btn-link btn-text position-relative d-inline">
+                            @T["click to upload"]
+                            @Weavy.Utils.HtmlUtils.Filebrowser(null, true, ConfigurationService.BlobWhitelist, "attach", htmlAttributes: new { data_dropzone = ".task-dropzone", data_attach_url = $"/a/content/{Model.Id}/attachments", data_refresh_target = "#attachments-list", data_refresh_url = "/content/" + Model.Id + "/attachments" })
+                        </div>
+                    </div>
+                }
+            </section>
+        }
+
+        <section class="content-section section-comments content-comments">
+            <h4 class="display-4"><span>@T["Comments"]</span></h4>
+            <div class="list-group comments">
+                @{Html.RenderPartial("_Comments", Model.CommentIds.Any() ? Model.Comments() : new List<Comment>(), new ViewDataDictionary { { "Parent", Model } }); }
+            </div>
+
+            @Html.Partial("_CommentForm", Model, new ViewDataDictionary() { { "container", ".comments" } })
+        </section>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        wvy.drop.initSingle($("#task-details-modal .content-section").find("input[type=file]"));
+    });
+</script>

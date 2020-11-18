@@ -1,42 +1,7 @@
 /// <reference path="../_core.scss" />
 
-// Shorthand
-
-.sticky-top-secondary {
-    @extend .sticky-top;
-
-    @supports (position: sticky) {
-        top: $navbar-height;
-    }
-}
-
-@supports (position: sticky) {
-    html:not(.scrollbar):not(.windows) {
-        > body.has-navbar {
-            .sticky-top {
-                top: $navbar-height;
-            }
-
-            .sticky-top-secondary {
-                top: $navbar-height * 2;
-            }
-        }
-
-        > body.has-navbar-secondary {
-            .sticky-top {
-                top: $navbar-height * 2;
-            }
-
-            .sticky-top-secondary {
-                top: $navbar-height * 3;
-            }
-        }
-    }
-}
-
 // Positions top, right, bottom, left (t, r, b, l)
 // Examples: .t-1 .t-sm--3 t-lg-auto
-
 @each $breakpoint in map-keys($grid-breakpoints) {
     @include media-breakpoint-up($breakpoint) {
         $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
@@ -55,6 +20,14 @@
                 #{$prop}: auto !important;
             }
         }
+    }
+}
+
+@mixin sticky-bottom {
+    @supports (position: sticky) {
+        position: sticky;
+        bottom: 0;
+        z-index: $zindex-sticky;
     }
 }
 
@@ -89,4 +62,8 @@
 
 .z-over {
     z-index: 100;
+}
+
+.sticky-bottom {
+    @include sticky-bottom;
 }

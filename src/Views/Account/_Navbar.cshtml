@@ -1,8 +1,10 @@
 ﻿@model User
-<nav class="nav nav-tabs">
-    @(Html.ActionLink<AccountController>(c => c.Edit(), text: "Profile", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))    
-    @(Html.ActionLink<AccountController>(c => c.Settings(), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-    @if (ConfigurationService.FormsAuthentication && !ConfigurationService.WindowsAuthentication) {
-        @(Html.ActionLink<AccountController>(c => c.Password(), text: "Password", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-    }
+<nav class="navbar navbar-theme">
+    <nav class="nav nav-tabs">        
+        @(Html.ActionLink<AccountController>(c => c.Edit(), text: T["Profile"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @(Html.ActionLink<AccountController>(c => c.Settings(), text: T["Settings"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        @if (ConfigurationService.FormsAuthentication && !ConfigurationService.WindowsAuthentication) {
+            @(Html.ActionLink<AccountController>(c => c.Password(), text: T["Password"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+        }
+    </nav>
 </nav>

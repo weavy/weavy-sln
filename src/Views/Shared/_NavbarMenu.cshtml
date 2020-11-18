@@ -24,38 +24,43 @@
             @Svg.Icon("menu-down")
         </button>
         <div class="dropdown-menu">
-            <div class="dropdown-header">
-                @Html.StarToggle(WeavyContext.Space)
-                <div class="dropdown">
-                    <span class="navbar-text">@navtitle</span>
-                    @Svg.Icon("menu-up")
+            <div class="scroll-y">
+                <div class="dropdown-header">
+                    @Html.StarToggle(WeavyContext.Space)
+                    <div class="dropdown">
+                        <span class="navbar-text">@navtitle</span>
+                        @Svg.Icon("menu-up")
+                    </div>
                 </div>
-            </div>
-            <a class="dropdown-item@(ActionName == nameof(HomeController.Index) && ControllerName == typeof(HomeController).ControllerName() && AreaName.IsNullOrEmpty() ? " active" : "")" href="@(Url.Action<HomeController>(c => c.Index()))">
-                @Html.IconImg(24)<span>Start</span>
-            </a>
-            
-            @if (visited.Any()) {
-            <div class="active-spaces">
-                @foreach (var space in visited) {
-                    <a href="@space.Url()" class="dropdown-item@(space.Id == WeavyContext.Space?.Id ? " active" : "")">
-                        @space.AvatarImg(24)<span>@space.Name @if (space.Teamname != null) {<small class="text-muted">@@@space.Teamname</small>}</span>
+                <a class="dropdown-item@(ActionName == nameof(HomeController.Index) && ControllerName == typeof(HomeController).ControllerName() && AreaName.IsNullOrEmpty() ? " active" : "")" href="@(Url.Action<HomeController>(c => c.Index()))">
+                    @Html.IconImg(24)<span>@T["Start"]</span>
+                </a>
+
+                @if (visited.Any()) {
+                    <div class="dropdown-divider"></div>
+                    foreach (var space in visited) {
+                        <a href="@space.Url()" class="dropdown-item@(space.Id == WeavyContext.Space?.Id ? " active" : "")">
+                            @space.AvatarImg(24)<span>@space.Name @if (space.Teamname != null) {<small class="text-muted">@@@space.Teamname</small>}</span>
+                        </a>
+                    }
+                    <div class="dropdown-divider"></div>
+                }
+                @(Html.ActionLink<SpaceController>(c => c.Index(null, null), icon: "view-grid", color: "primary", text: T["Spaces"].ToString(), htmlAttributes: new { @class = "dropdown-item spaces" }, active: LinkActive.Action))
+                @(Html.ActionLink<PeopleController>(c => c.Index(null, null), icon: "account-multiple", color: "primary", text: T["People"].ToString(), htmlAttributes: new { @class = "dropdown-item" }, active: LinkActive.Controller))
+
+                @if (WeavyContext.Browser.Desktop) {
+                    <a class="dropdown-item" href="@(Url.Action<Weavy.Areas.Apps.Controllers.MessengerController>(c => c.Index(null)))" target="_blank" title="@T["Open Messenger"]">
+                        @Svg.Icon("message-text", color: "primary")
+                        <span>@T["Messenger"]</span>
+                        @Svg.Icon("open-in-new", size: 18, htmlAttributes: new { @class = "mr--1" })
                     </a>
                 }
+
+                @if (PermissionService.HasPermission(Permission.Manage)) {
+                    @(Html.ActionLink<ManageController>(c => c.Index(), icon: "settings", color: "primary", text: T["Manage"].ToString(), htmlAttributes: new { @class = "dropdown-item" }, active: LinkActive.Controller))
+                }
+
             </div>
-            }
-
-            @(Html.ActionLink<SpaceController>(c => c.Index(null, null), icon: "view-grid", color: "primary", text: "Spaces", htmlAttributes: new { @class = "dropdown-item spaces" }, active: LinkActive.Action))
-
-            @(Html.ActionLink<PeopleController>(c => c.Index(null, null), icon: "account-multiple", color: "primary", text: "People", htmlAttributes: new { @class = "dropdown-item" }, active: LinkActive.Controller))
-
-            @if (WeavyContext.Browser.Desktop) {
-            <a class="dropdown-item" href="@(Url.Action<Weavy.Areas.Apps.Controllers.MessengerController>(c => c.Index(null)))" target="_blank" title="Open Messenger">
-                @Svg.Icon("message-text", color: "primary")
-                <span>Messenger</span>
-                @Svg.Icon("open-in-new", size: 18, htmlAttributes: new { @class = "mr--1" })
-            </a>
-            }
 
         </div>
     </div>

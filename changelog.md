@@ -1,5 +1,25 @@
 # Changelog for Weavy
 
+## 8.0.0 (2020-11-18)
+
+* Added Tasks app for to-do lists etc.
+* Added card view to Files app.
+* Added option to create and attach video meetings to posts and comments.
+* Added option to select files from cloud providers in posts, comments, messages etc.
+* Added internationalization support making it possible to translate the UI to any language.
+* Added option to pass in language and timezone when initializing new Weavy() from the client SDK.
+* Added full browser window preview of files.
+* Added preview for browser supported video and audio.
+* Improved Note editor.
+* Improved version browsing.
+* Improved file renaming.
+* Fixed issue with notifications created between 23:45pm and 00:00pm not being sent via email.
+* Fixed issue with user timezone not being applied to outgoing emails.
+* Removed Link content type.
+* Replaced CloudLink content type with File.
+* Replaced ContentService.GetRoots() and ContentService.GetHierarchy() with AppService.GetContent().
+* Replaced IAsyncHook interface with IHook. All event handlers in hooks should new return void instead of Task.
+
 ## 7.4.3 (2020-11-10)
 
 * Fixed issues with connection and authentication not being propagated in the client.

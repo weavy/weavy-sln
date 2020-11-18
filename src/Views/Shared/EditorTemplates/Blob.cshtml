@@ -1,49 +1,44 @@
 ﻿@model Blob
 @{
-    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
     var meta = ViewData.ModelMetadata;
-    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
-    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
-    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
-    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
-    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
-    bool remove = ViewData["Remove"] as bool? ?? true;
-    bool required = ViewData["Required"] as bool? ?? prop.IsRequired();
+    var attrs = new Dictionary<string, object>();
     string id = ViewData.TemplateInfo.GetFullHtmlFieldId("");
     string name = ViewData.TemplateInfo.GetFullHtmlFieldName("");
-    string displayName = ViewData["DisplayName"] as string ?? prop.DisplayName();
-    string description = ViewData["DisplayDescription"] as string ?? meta.Description;
+    bool required = ViewData["Required"] as bool? ?? meta.IsRequired;
+    bool remove = ViewData["Remove"] as bool? ?? true;
+    bool cloudEnabled = ViewData["CloudEnabled"] as bool? ?? true;
     int size = 128;
-
-    var attrs = new Dictionary<string, object>();
     attrs["id"] = id;
     attrs["type"] = "file";
-    attrs["class"] = "custom-file-input";
-    if (feedback != null) {
-        attrs.Append("class", "is-invalid");
-    }
-
-    if (prop.Accept() != null) {
-        attrs["accept"] = prop.Accept();
-    } else if (ConfigurationService.BlobWhitelist != null) {
-        attrs["accept"] = ConfigurationService.BlobWhitelist;
-    }
-
-    attrs["data-drop-zone"] = "#dz-" + id;
-
-    if (prop.MaxSize() != null) {
-        attrs["data-max-size"] = prop.MaxSize();
-    }
-
-    attrs["data-single-file-uploads"] = false;
-    attrs["data-url"] = WeavyContext.ApplicationPath + "a/blobs";
+    attrs["class"] = "file-ctrl";
+    attrs["data-kind"] = "single-file";
+    attrs["data-dropzone"] = ".form-group";
 
     if (required) {
         attrs["required"] = null;
     }
 
-    string placeholder = meta.Watermark ?? "Choose file";
+    var error = ViewData.ErrorMessage();
+    if (error != null) {
+        attrs.Append("class", "is-invalid");
+    }
+
+    var prop = meta.Property();
+
+    var accept = prop.Accept() ?? ConfigurationService.BlobWhitelist;
+    if (accept != null) {
+        attrs["accept"] = accept;
+    }
+
+    if (prop.MaxSize() != null) {
+        attrs["data-max-size"] = prop.MaxSize();
+    }
+
+    string placeholder = meta.Watermark ?? T["Choose file"].ToString();
     string placeholderImage = prop.PlaceholderImage() != null ? Url.Content(prop.PlaceholderImage()) : null;
+    if (placeholderImage != null) {
+        attrs["data-kind"] = "thumb";
+    }
 
     string previewImage = ViewData["PreviewImage"] as string;
     if (previewImage == null && prop.Name == nameof(IHasAvatar.Avatar) && ViewData.ModelMetadata.Container is IHasAvatar parent) {
@@ -51,52 +46,51 @@
         previewImage = parent.AvatarUrl(size);
     }
     previewImage = previewImage ?? Model?.ThumbUrl(size, size, retina: true, fit: FitMode.Crop, scale: ScaleMode.Both) ?? placeholderImage;
-
-    string attributes = "";
-    foreach (var attr in attrs) {
-        attributes += " ";
-        if (attr.Value == null) {
-            attributes += attr.Key;
-        } else {
-            attributes += string.Concat(attr.Key, "=", @"""" + Html.AttributeEncode(attr.Value) + @"""");
-        }
-    }
 }
 
-@if (group) {
+@if (ViewData.RenderSurroundingHtml()) {
     WriteLiteral(@"<div class=""form-group"">");
 }
-@if (label) {
-    @Html.Label(prop.DisplayName(), displayName)
+@if (ViewData.RenderLabel()) {
+    <label>@meta.DisplayName</label>
 }
 
-<div class="file-upload" id="dz-@id">
+<div class="file-upload">
     <input type="hidden" name="@name" value="@(Model != null ? Model.Id.ToString() : "delete")" />
     @if (placeholderImage != null) {
         <label class="custom-file custom-image">
             <img class="img-@size" src="@previewImage" data-thumb="@placeholderImage" alt="" width="@size" height="@size" />
             <span class="custom-file-label">@placeholder</span>
-            <input @Html.Raw(attributes.Trim()) />
-            <span class="progress invisible"><span class="progress-bar" role="progressbar"></span></span>
+            <input @Html.Attributes(attrs) />
+            <span class="progress d-none">
+                <span class="progress-bar" role="progressbar"></span>
+            </span>
         </label>
     } else {
-        <div class="custom-file">
-            <input @Html.Raw(attributes.Trim()) />
-            <label class="custom-file-label custom-file-control" for="@id">@(Model?.Name)</label>
-        </div>
-        <div class="progress invisible">
-            <div class="progress-bar" role="progressbar"></div>
+        <div class="input-group single-blob-upload">
+            <div class="progress d-none">
+                <div class="progress-bar" role="progressbar"></div>
+            </div>
+            @if (cloudEnabled) {
+                @Weavy.Utils.HtmlUtils.Filebrowser(null, false, accept, "single-file", align: "dropdown-menu-right", htmlAttributes: new { data_dropzone = ".form-group" })
+            } else {
+                <input @Html.Attributes(attrs) />
+            }
+            <input type="text" class="form-control" placeholder="@(Model?.Name)" />
+            <div class="input-group-append">
+                <button class="btn input-group-text" type="button">@T["Browse"]</button>
+            </div>
         </div>
     }
-    <div class="invalid-feedback@(feedback != null ? " d-block" : "")">@feedback</div>
-    <div class="form-text@(feedback != null ? " d-none" : "")">
-        @description
-    @if (remove) {
-        <a href="javascript:;" class="clear@(Model == null ? " d-none" : "")">Remove @displayName.ToLower().</a>
-    }
-</div>
+    <div class="invalid-feedback@(error != null ? " d-block" : "")">@error</div>
+    <div class="form-text@(error != null ? " d-none" : "")">
+        @meta.Description
+        @if (remove) {
+            <a href="javascript:;" class="clear@(Model == null ? " d-none" : "")">@T["Remove"] @meta.DisplayName.ToLower().</a>
+        }
+    </div>
 </div>
 
-@if (group) {
+@if (ViewData.RenderSurroundingHtml()) {
     WriteLiteral(@"</div>");
 }

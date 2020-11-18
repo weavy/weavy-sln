@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Weavy.Core;
 using Weavy.Core.Collections;
-using Weavy.Core.Utils;
 using Weavy.Core.Models;
-using Weavy.Web.Models;
+using Weavy.Core.Utils;
 
 namespace Weavy.Areas.Apps.Models {
 
@@ -169,25 +167,5 @@ namespace Weavy.Areas.Apps.Models {
 
     }
 
-    /// <summary>
-    /// View model for displaying meeting partials as "attachments" to new message
-    /// </summary>
-    public class PartialMeetingModel {
-
-        /// <summary>
-        /// Gets or sets the topic of the meeting.
-        /// </summary>
-        public string Topic { get; internal set; }
-        
-        
-        /// <summary>
-        /// Gets or sets the conversation id.
-        /// </summary>
-        public int ConversationId { get; internal set; }
-        
-        /// <summary>
-        /// The meeting
-        /// </summary>
-        public Meeting Meeting { get; internal set; }
-    }
+    
 }

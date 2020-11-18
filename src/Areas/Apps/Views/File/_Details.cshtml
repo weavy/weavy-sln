@@ -1,0 +1,69 @@
+﻿@model Weavy.Core.Models.File
+@using System.Collections.Specialized
+@{
+    var versionable = Model as IVersionable;
+    var creator = Model.CreatedBy();
+    var editor = Model.ModifiedBy();
+
+    var fmt = Model.Blob.Link != null ? PreviewFormat.Icon : FileUtils.GetPreviewFormat(Model.Blob.Name);
+    NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(WeavyContext.App, Model) : null;
+}
+
+<section class="content-section" data-type="content" data-id="@Model.Id">
+    <table class="table table-bordered mx-auto">
+        <tr>
+            <th>@T["Name"]</th>
+            <td>
+                @if (Model.Blob.Link != null) {
+                    <a href="@Model.Blob.Link" target="_blank" title="@T["Open in {0}", Model.Blob.Provider]">@Model.GetTitle() @Svg.Icon("open-in-new", "icon", 18)</a>
+                } else {
+                    <a href="@Model.DownloadUrl()" @(attrs != null ? Html.Raw(attrs.AsHtmlAttributes()) : MvcHtmlString.Empty)>@Model.GetTitle()</a>
+                }
+            </td>
+        </tr>
+
+        @if (Model.GetExcerpt() != null) {
+            <tr>
+                <th>@T["Description"]</th>
+                <td>@Model.GetExcerpt()</td>
+            </tr>
+        }
+
+        @if (Model is ITaggable taggable && taggable.Tags.Any()) {
+            <tr>
+                <th>@T["Tags"]</th>
+                <td>@Html.Raw(taggable.Tags.Join(" ", tag => $@"<span class=""badge badge-primary"">{tag}</span>"))</td>
+            </tr>
+        }
+
+        <tr>
+            <th>@T["Type"]</th>
+            <td>@Model.Blob.MediaType</td>
+        </tr>
+
+        <tr>
+            <th>@T["Kind"]</th>
+            <td>@Model.Kind()</td>
+        </tr>
+
+        <tr>
+            <th>@T["Size"]</th>
+            <td>@FileUtils.FileSizeAsString(Model.Blob.Size)</td>
+        </tr>
+
+        @if (FileUtils.IsImage(Model.Blob.Name) && Model.Blob.Width != null && Model.Blob.Height != null) {
+            <tr>
+                <th>@T["Dimensions"]</th>
+                <td>@(Model.Blob.Width)x@(Model.Blob.Height)</td>
+            </tr>
+        }
+
+        <tr>
+            <th>@T["Modified"]</th>
+            <td>@Html.Time(Model.ModifiedAt, format: "g") @T["by"] @Model.ModifiedBy().Link()</td>
+        </tr>
+
+    </table>
+
+    @Html.Partial("_Subscribers")
+</section>

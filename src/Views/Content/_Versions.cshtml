@@ -1,0 +1,52 @@
+﻿@model Weavy.Web.Models.VersionsModel
+@{
+    var edit = Model.Content.HasPermission(Permission.Edit);
+    var delete = Model.Content.HasPermission(Permission.Delete);
+}
+<section class="content-section scroll-y p-0">
+    <table class="table table-hover table-versions">
+        <tbody>
+            @foreach (var ver in Model.Versions.AsSmartEnumerable()) {
+                var num = Model.Versions.Count() - ver.Index;
+                var item = ver.Value;
+                var href = Url.Action<ContentController>(c => c.GetVersion(item.Id, item.Version));
+                var selected = item.Version == (Model.Content as IVersionable).Version;
+                var isCurrent = item.IsCurrent();
+
+                <tr data-href="@(isCurrent ? Url.Action<ContentController>(c => c.Get(Model.Content.Id, null)) : href)" class="@(selected ? "table-primary" : "")">
+                    @if (item is Weavy.Core.Models.File file && !isCurrent) {
+                        <td class="table-icon">@Svg.Icon(FileUtils.GetIcon(file.Blob.Name))</td>
+                    } else {
+                        <td class="table-icon">@Svg.Icon(item)</td>
+                    }
+                    <td>
+                        @Html.Time(item.ModifiedAt, format: "g") @if (isCurrent) {<span class="badge badge-primary">@T["current"]</span>}
+                        <br />
+                        <span class="text-muted">@T["by"] @item.ModifiedBy().Link()</span>
+                    </td>
+                    <td class="table-icon">
+                        @if (edit && !isCurrent) {
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
+                                    @Svg.Icon("dots-vertical")
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <form action="@(Url.Action<ContentController>(c => c.Revert(item.Id, item.Version)))" method="post">
+                                        @Html.HttpMethodOverride(HttpVerbs.Put)
+                                        <button type="submit" class="dropdown-item">@Svg.Icon("undo") @T["Revert"]</button>
+                                    </form>
+                                    @if (delete) {
+                                        <form action="@(Url.Action<ContentController>(c => c.DeleteVersion(item.Id, item.Version)))" method="post">
+                                            @Html.HttpMethodOverride(HttpVerbs.Delete)
+                                            <button type="submit" class="dropdown-item">@Svg.Icon("close") @T["Remove"]</button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>

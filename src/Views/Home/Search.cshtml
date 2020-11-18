@@ -1,6 +1,6 @@
 ﻿@model IndexSearchResult
 @{
-    Title = "Search";
+    Title = T["Search"].ToString();
     Back = WeavyContext.ApplicationPath;
     string tab = ViewContext.RouteData.Values["tab"] as string;
     string qs = Request.QueryString.Rebuild("top", null, "skip", null).AsQueryString();
@@ -12,7 +12,7 @@
     </div>
     <form action="@Url.Rebuild("q", null)" method="get" data-turboform>
         <div class="form-group" role="search">
-            <input class="form-control" type="search" name="q" value="@Model.Query.WrappedQuery.Text" placeholder="Search @WeavyContext.System.Name" />
+            <input class="form-control" type="search" name="q" value="@Model.Query.WrappedQuery.Text" placeholder="@T["Search"] @WeavyContext.System.Name" />
             @if (Model.Query.WrappedQuery.Text.IsNullOrEmpty()) {
                 <button type="submit" class="btn btn-icon">@Svg.Icon("magnify")</button>
             } else {
@@ -24,16 +24,16 @@
 
 <div class="container my-4">
     @if (!string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
-        <nav class="nav nav-tabs mb-4">
+        <nav class="nav nav-tabs nav-tabs-cluster scroll-x mb-4">
             @if (tab == null) {
-                @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: "Everything", htmlAttributes: new { @class = "nav-link active" }))
+                @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: T["Everything"], htmlAttributes: new { @class = "nav-link active" }))
             } else {
-                @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: "Everything", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+                @(Html.ActionLink<HomeController>(c => c.Search(null, null), qs: qs, text: T["Everything"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
             }
-            @(Html.ActionLink<HomeController>(c => c.Search("spaces", null), qs: qs, text: "Spaces", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-            @(Html.ActionLink<HomeController>(c => c.Search("posts", null), qs: qs, text: "Posts", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-            @(Html.ActionLink<HomeController>(c => c.Search("files", null), qs: qs, text: "Files", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
-            @(Html.ActionLink<HomeController>(c => c.Search("comments", null), qs: qs, text: "Comments", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("spaces", null), qs: qs, text: T["Spaces"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("posts", null), qs: qs, text: T["Posts"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("files", null), qs: qs, text: T["Files"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
+            @(Html.ActionLink<HomeController>(c => c.Search("comments", null), qs: qs, text: T["Comments"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Path))
         </nav>
 
         if (Request.IsLocal && User.IsAdmin) {
@@ -45,13 +45,13 @@
 
 
     @if (Model.TotalCount == 0 && !string.IsNullOrEmpty(Model.Query.WrappedQuery.Text)) {
-        <p>Your search - <strong>@Model.Query.WrappedQuery.Text</strong> - did not match @(tab == null || tab == "everything" ? "anything" : "any " + tab).</p>
-        <p>Suggestions:</p>
+        <p>@T["Your search - <strong>{0}</strong> - did not match {1}.", Model.Query.WrappedQuery.Text, (tab == null || tab == "everything" ? T["anything"].ToString() : $"{T["any"].ToString()} {T[tab.ToSentenceCase()].ToString().ToLower()}")]</p>
+        <p>@T["Suggestions:"]</p>
         <ul>
-            <li>Make sure that all words are spelled correctly.</li>
-            <li>Try different keywords.</li>
-            <li>Try more general keywords.</li>
-            <li>Try fewer keywords.</li>
+            <li>@T["Make sure that all words are spelled correctly."]</li>
+            <li>@T["Try different keywords."]</li>
+            <li>@T["Try more general keywords."]</li>
+            <li>@T["Try fewer keywords."]</li>
         </ul>
     }
 

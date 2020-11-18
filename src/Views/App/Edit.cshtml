@@ -1,6 +1,6 @@
 ﻿@model App
 @{
-    Title = "Edit tab";
+    Title = T["Edit tab"].ToString();
     Back = ViewData.ModelState.IsValid ? Url.Back(Model.Url()) : WeavyContext.Space.Url();
     ViewData["turboform"] = true;
 }
@@ -16,8 +16,10 @@
 }
 
 @section navbar_secondary {
-    <nav class="nav nav-tabs">
-        @(Html.ActionLink<AppController>(c => c.Edit(Model.Id), text: "Settings", htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Action))
+    <nav class="navbar navbar-theme">
+        <nav class="nav nav-tabs">
+            @(Html.ActionLink<AppController>(c => c.Edit(Model.Id), text: T["Settings"], htmlAttributes: new { @class = "nav-link" }, active: LinkActive.Action))
+</nav>
     </nav>
 }
 

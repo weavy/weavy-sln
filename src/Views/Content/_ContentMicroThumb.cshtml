@@ -1,0 +1,34 @@
+﻿@model Content
+@{
+    /*
+    var meta = Model.MetaData();
+
+    // get thumbnail dimensions
+    int width = 1;
+    int height = 1;
+    if (Model is Weavy.Core.Models.File imgfile) {
+        width = imgfile.Blob.Width ?? 1;
+        height = imgfile.Blob.Height ?? 1;
+    } else {
+        //var thumb = ContentService.GetThumb(Model, 160, 160);
+        //var im = FileUtils.GetImageMetadata(thumb);
+        //width = im?.Width ?? 1;
+        //height = im?.Height ?? 1;
+    }
+
+    string thumburl = null;
+
+    if (width > 1 && height > 1) {
+        // looks like we have a thumbnail for this content item
+
+        double aspectRatio = (double)width / (double)height;
+        int microSize = (int)Math.Sqrt(64 / (aspectRatio > 1 ? 1 / aspectRatio : aspectRatio)); // ~64 pixel area (ex: 8x8, 1x64, 32x2)
+
+        thumburl = Model.ThumbUrl(microSize, microSize, retina: false, quality: 40);
+    }
+
+    // TODO: microthumb, find better transfer
+    
+    if (thumburl != null) {<img class="content-thumb-hidden" src="@thumburl" loading="lazy" decoding="async" />}
+    */
+}

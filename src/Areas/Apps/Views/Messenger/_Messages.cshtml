@@ -14,7 +14,7 @@
     <div class="date-separator"><time>@messagesGroupedByDate.Key.ToShortDateString()</time></div>
     foreach (var message in messagesGroupedByDate) {
         if (readAt < message.CreatedAt) {
-            <div class="new-separator">New messages</div>
+            <div class="new-separator">@T["New messages"]</div>
             readAt = null;
         }
         Html.RenderPartial("_Message", message, new ViewDataDictionary(ViewData) { { "Messenger", Model } });
@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div class="status status-sending" title="Sending">@Svg.Icon("circle-outline", size: 18)</div>
+        <div class="status status-sending" title="@T["Sending"]">@Svg.Icon("circle-outline", size: 18)</div>
     </div>
 }
 

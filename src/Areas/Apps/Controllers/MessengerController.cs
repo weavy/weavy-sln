@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -10,7 +9,6 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
-using Newtonsoft.Json;
 using NLog;
 using Weavy.Areas.Apps.Models;
 using Weavy.Core;
@@ -89,7 +87,7 @@ namespace Weavy.Areas.Apps.Controllers {
                 }
             } else {
                 // get most recent conversation
-                model.Conversation = ConversationService.Search(new ConversationQuery { OrderBy = "PinnedAt DESC, Messages.CreatedAt DESC", Top = 1 }).FirstOrDefault();
+                model.Conversation = ConversationService.Search(new ConversationQuery { OrderBy = "PinnedAt DESC, LastMessageAt DESC", Top = 1 }).FirstOrDefault();
             }
 
             if (model.Conversation != null) {
@@ -115,7 +113,7 @@ namespace Weavy.Areas.Apps.Controllers {
             // NOTE: we load conversations last so that selected conversation does not appear unread in the list
             var query = new ConversationQuery(opts);
             query.UserId = User.Id;
-            query.OrderBy = "PinnedAt DESC, Messages.CreatedAt DESC";
+            query.OrderBy = "PinnedAt DESC, LastMessageAt DESC";
             model.Conversations = ConversationService.Search(query);
 
             // make sure selected conversation is visible in conversations list
@@ -174,7 +172,7 @@ namespace Weavy.Areas.Apps.Controllers {
             // mark conversation as read (if needed)
             if (model.Conversation.ReadAt == null) {
                 model.Conversation = ConversationService.SetRead(id, DateTime.UtcNow);
-            } else if (model.Conversation.ReadAt < model.Conversation.LastMessage.CreatedAt) {
+            } else if (model.Conversation.LastMessage != null && model.Conversation.ReadAt < model.Conversation.LastMessage.CreatedAt) {
                 // NOTE: do not assign the read conversation to model.Conversation since that will prevent rendering of the "New messages" separator
                 ConversationService.SetRead(model.Conversation.Id, DateTime.UtcNow);
             }
@@ -200,7 +198,7 @@ namespace Weavy.Areas.Apps.Controllers {
 
             var cq = new ConversationQuery(query);
             cq.UserId = User.Id;
-            cq.OrderBy = "PinnedAt DESC, Messages.CreatedAt DESC";
+            cq.OrderBy = "PinnedAt DESC, LastMessageAt DESC";
 
             var model = new Messenger();
             model.IsMessenger = false;
@@ -334,18 +332,6 @@ namespace Weavy.Areas.Apps.Controllers {
         }
 
         /// <summary>
-        /// Returns partial html for the specified blobs.
-        /// </summary>
-        /// <param name="ids">Ids of blobs.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/blobs")]
-        public PartialViewResult PartialBlobs(IEnumerable<int> ids) {
-            var blobs = BlobService.Get(ids);
-            return PartialView("_Blobs", blobs);
-        }
-
-        /// <summary>
         /// Returns partial html for the specified meeting.
         /// </summary>
         /// <param name="provider">A string defining the video provider.</param>
@@ -358,7 +344,7 @@ namespace Weavy.Areas.Apps.Controllers {
             var model = new PartialMeetingModel {
                 Topic = $"{provider.ToTitleCase()} meeting",
                 Meeting = MeetingService.CreateMeeting(provider),
-                ConversationId = id
+                //ConversationId = id
             };
                         
             return PartialView($"_Meeting{provider}", model);
@@ -553,10 +539,10 @@ namespace Weavy.Areas.Apps.Controllers {
         /// <returns></returns>
         [HttpPost]
         [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/c/{id:int}/typing")]
-        public async Task<HttpStatusCodeResult> Typing(int id) {
+        public HttpStatusCodeResult Typing(int id) {
             var conversation = ConversationService.Get(id);
             // push typing event to other conversation members
-            await PushService.PushToUsers(PushService.EVENT_TYPING, new TypingModel { Conversation = id, User = WeavyContext.Current.User }, conversation.MemberIds.Where(x => x != WeavyContext.Current.User.Id));
+            PushService.PushToUsers(PushService.EVENT_TYPING, new TypingModel { Conversation = id, User = WeavyContext.Current.User }, conversation.MemberIds.Where(x => x != WeavyContext.Current.User.Id));
             return new HttpStatusCodeResult(HttpStatusCode.OK);
         }
 
@@ -578,7 +564,7 @@ namespace Weavy.Areas.Apps.Controllers {
 
             // no search criteria, try to fetch most recently contacted people instead
             if (query.Text.IsNullOrEmpty()) {
-                var conversations = ConversationService.Search(new ConversationQuery { UserId = User.Id, SearchRooms = false, OrderBy = "Messages.CreatedAt DESC", Top = 10 });
+                var conversations = ConversationService.Search(new ConversationQuery { UserId = User.Id, SearchRooms = false, OrderBy = "LastMessageAt DESC", Top = 10 });
                 List<int> ids = new List<int>();
                 foreach (var c in conversations) {
                     ids.Add(c.MemberIds.FirstOrDefault(x => x != User.Id));
@@ -619,7 +605,7 @@ namespace Weavy.Areas.Apps.Controllers {
             // create and insert new message
             try {
                 msg = MessageService.Insert(new Message { Text = message.Text }, conversation, blobs: message.Blobs, embeds: message.Embeds, meetings: message.Meetings);
-            } catch (ValidationException ex) {
+            } catch (Exception ex) {
                 // TODO: handle some way?
                 _log.Warn(ex.Message);
             }

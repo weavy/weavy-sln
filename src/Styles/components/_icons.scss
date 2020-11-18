@@ -5,6 +5,7 @@
     flex: 0 0 auto;
     width: 1.5rem; // 24px
     height: 1.5rem; // 24px
+
     // icon sizes
     &.i-9 {
         width: .5625rem;
@@ -41,6 +42,11 @@
         height: 3rem;
     }
 
+    &.i-72 {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+
     &.i-96 {
         width: 6rem;
         height: 6rem;
@@ -53,7 +59,7 @@
 }
 
 // stacked icons
-&.i-stack {
+.i-stack {
     display: inline-block;
     position: relative;
     line-height: 1;

@@ -1,0 +1,189 @@
+/// <reference path="../_core.scss" />
+
+.controller-tasks {
+    #createTaskForm {
+        position: relative;
+
+        textarea {
+            resize: none;
+            padding: 0.4375rem $input-padding-x .4375rem 2.5rem;
+            height: 2.625rem;
+        }
+
+        .form-group {
+            display: flex;
+
+            button {
+                position: absolute;
+                z-index: 1;
+                top: .3125rem;
+                left: .25rem;
+            }
+
+            .emojionearea {
+                height: auto;
+                border-color: $input-border-color;
+
+                &.focused {
+                    border-color: $input-focus-border-color;
+                    box-shadow: $input-focus-box-shadow;
+                    outline: 0;
+                }
+
+                .emojionearea-button {
+                    display: none;
+                }
+
+                .emojionearea-editor {
+                    padding: 0.4375rem $input-padding-x .4375rem 2.5rem;
+                    font-size: $font-size-base;
+                    line-height: $input-line-height;
+                    color: $input-color;
+                    min-height: 2.5rem;
+
+                    &:empty:before {
+                        content: attr(placeholder);
+                        display: block;
+                        color: $input-placeholder-color;
+                    }
+                }
+            }
+        }
+    }
+
+    .list-group {
+        .list-group-item.task-item {
+            padding: 0.25rem;
+
+            &.hidden {
+                display: none;
+            }
+
+            .card {
+                background: none;
+
+                &:after {
+                    border: 0;
+                }
+
+                .task {
+                    cursor: pointer;
+                    padding: 0;
+                    background: none;
+                    border: 0;
+
+                    .media-body {
+                        margin: 0.25rem 0 0 0.25rem;
+
+                        h6 {
+                            margin: 0 0 0.5rem;
+                        }
+
+                        button {
+                            top: -0.25rem;
+                            align-self: flex-start;
+                        }
+
+                        .assignee, .due-date, .comments, .attachments {
+                            display: inline-block;
+                            margin-bottom: 0.25rem;
+                        }
+                    }
+
+                    .media-icons {
+                        margin: 0 0.25rem 0 0;
+                    }
+
+                    .task-item-upload {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+
+    #task-details-modal {
+
+        .assigned-group {
+            .form-control {
+                padding: 0;
+                margin: 0;
+                border: 0;
+
+                .select2-container {
+                    width: 100% !important;
+
+                    .select2-selection {
+                        height: 2.25rem;
+                        border: 1px solid $theme-300;
+
+                        &:focus {
+                            outline: none;
+                        }
+
+                        .select2-selection__rendered {
+                            line-height: 2.25rem;
+                        }
+
+                        .select2-selection__arrow {
+                            top: 0.25rem;
+                        }
+
+                        .select2-selection__clear {
+                            margin-top: -2px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .emojionearea {
+            border-color: $input-border-color;
+
+            &.emojionearea-inline {
+                height: 2.25rem;
+            }
+
+            &.focused {
+                border-color: $input-focus-border-color;
+                box-shadow: $input-focus-box-shadow;
+                outline: 0;
+            }
+
+            .emojionearea-button {
+                display: none;
+            }
+
+            .emojionearea-editor {
+                //padding: $input-padding-y $input-padding-x;
+                font-size: $font-size-base;
+                line-height: $input-line-height;
+                color: $input-color;
+                min-height: 2.125rem;
+                max-height: 2.125rem;
+                padding-top: .3125rem;
+                padding-bottom: .3125rem;
+
+                &:empty:before {
+                    content: attr(placeholder);
+                    display: block;
+                    color: $input-placeholder-color;
+                }
+            }
+        }
+    }
+
+    .toggle-hide {
+        &.hidden {
+            display: none
+        }
+    }
+
+    .select2-search__field {
+        border: 1px solid #98D4F0;
+
+        &:focus {
+            outline: none !important;
+        }
+    }
+}

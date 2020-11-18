@@ -1,6 +1,6 @@
 ﻿@model IPlugin
 @{
-    Title = "Content types";
+    Title = T["Content types"].ToString();
     Back = Url.Action<AppsController>(c => c.Index());
 }
 
@@ -10,36 +10,36 @@
     @using (Html.BeginForm(nameof(AppsController.Update), null, FormMethod.Post, new { data_turboform = "" })) {
         @Html.HttpMethodOverride(HttpVerbs.Put)
         <div class="form-group">
-            <label class="control-label">Id</label>
+            <label class="control-label">@T["Id"]</label>
             <p class="form-control-static">@Model.Id</p>
         </div>
         <div class="form-group">
-            <label class="control-label">Type</label>
+            <label class="control-label">@T["Type"]</label>
             <p class="form-control-static">@Model.FullName</p>
         </div>
         <div class="form-group">
-            <label class="control-label">Desciption</label>
+            <label class="control-label">@T["Description"]</label>
             <p class="form-control-static">@Model.Description</p>
         </div>
         if (!Model.IsLoaded()) {
             <div class="form-group">
-                <label class="control-label">Status</label>
+                <label class="control-label">@T["Status"]</label>
                 <p class="form-control-static">
-                    <span class="badge badge-danger">missing</span>
+                    <span class="badge badge-danger">@T["missing"]</span>
                 </p>
             </div>
         }
 
         <div class="form-buttons">
-            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">Back</a>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">@T["Back"]</a>
 
             @if (!Model.IsLoaded()) {
-                <button type="submit" name="button" value="@nameof(AppsController.Delete)" class="btn btn-danger btn-load" @if (Model.IsCore()) { <text> disabled</text> }>Delete</button>
+                <button type="submit" name="button" value="@nameof(AppsController.Delete)" class="btn btn-danger btn-load" @if (Model.IsCore()) { <text> disabled</text> }>@T["Delete"]</button>
             } else if (!Model.IsCore()) {
                 if (Model.IsEnabled) {
-                    <button type="submit" name="button" value="@nameof(AppsController.Disable)" class="btn btn-outline-warning btn-load">Disable</button>
+                    <button type="submit" name="button" value="@nameof(AppsController.Disable)" class="btn btn-outline-warning btn-load">@T["Disable"]</button>
                 } else {
-                    <button type="submit" name="button" value="@nameof(AppsController.Enable)" class="btn btn-outline-success btn-load">Enable</button>
+                    <button type="submit" name="button" value="@nameof(AppsController.Enable)" class="btn btn-outline-success btn-load">@T["Enable"]</button>
                 }
             }
 

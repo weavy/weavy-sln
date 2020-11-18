@@ -44,12 +44,12 @@ wvy.notifications = (function ($) {
         if ($notification.hasClass("read")) {
             // first update ui then call api (for better perceived perf.)
             $notification.removeClass("read");
-            $toggler.attr("title", "Mark as read");
+            $toggler.attr("title", wvy.t("Mark as read"));
             unread(id);
         } else {
             // first update ui then call api (for better perceived perf.)
             $notification.addClass("read");
-            $toggler.attr("title", "Mark as unread");
+            $toggler.attr("title", wvy.t("Mark as unread"));
             read(id);
         }
     });
@@ -62,11 +62,11 @@ wvy.notifications = (function ($) {
 
         if (typeof parentEntity !== "undefined" && typeof parentId !== "undefined") {
             // first add .read class then call api (for better perceived perf.)
-            $(".notifications-list[data-parent-entity='" + parentEntity + "'][data-parent-id='" + parentId + "']").find("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
+            $(".notifications-list[data-parent-entity='" + parentEntity + "'][data-parent-id='" + parentId + "']").find("a.notification[data-type='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
             readAllForParent(parentEntity, parentId);
         } else {
             // first add .read class then call api (for better perceived perf.)
-            $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
+            $("a.notification[data-type='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
             readAll();
         }
 
@@ -94,18 +94,18 @@ wvy.notifications = (function ($) {
 
     wvy.connection.default.on("notification-updated.weavy", function (event, data) {
         if (data.isRead) {
-            $("a.notification[data-id='" + data.id + "']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");                       
+            $("a.notification[data-id='" + data.id + "']").addClass("read").find("[data-toggle=notification]").attr("title", wvy.t("Mark as unread"));                       
         } else {
-            $("a.notification[data-id='" + data.id + "']").removeClass("read").find("[data-toggle=notification]").attr("title", "Mark as read");
+            $("a.notification[data-id='" + data.id + "']").removeClass("read").find("[data-toggle=notification]").attr("title", wvy.t("Mark as read"));
         }
     });
 
     wvy.connection.default.on("notifications-read.weavy", function (event, data) {
-        $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
+        $("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", wvy.t("Mark as unread"));
     });
 
     wvy.connection.default.on("notifications-space-read.weavy", function (event, data) {
-        $(".notifications-list[data-spaceid='" + data.spaceId + "']").find("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", "Mark as unread");
+        $(".notifications-list[data-spaceid='" + data.spaceId + "']").find("a.notification[data-entity='notification']").addClass("read").find("[data-toggle=notification]").attr("title", wvy.t("Mark as unread"));
     });
     
     // get html for notification

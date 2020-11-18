@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
-using Weavy.Core.Attributes;
 using Weavy.Core.Models;
 
 namespace Weavy.Areas.Apps.Models {
-    
+
     /// <summary>
     /// App for embedding notifications in a space.
     /// </summary>

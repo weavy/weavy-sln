@@ -3,6 +3,7 @@
 @model Weavy.Web.Models.SignInModel
 @{
     Layout = null;
+    BodyAttributes.Add("class", "body-dark");
 }
 <!DOCTYPE html>
 <html>
@@ -16,7 +17,7 @@
         @Bundler.Scripts("~/scripts/msofba.bundle")
     }
 </head>
-<body class="@BodyClasses("body-dark")">
+<body @RenderBodyAttributes()>
     @if (Model != null) {
         if (Model.HMAC != null) {
             <table class="h-100 w-100">
@@ -48,17 +49,17 @@
                                         @Html.EditorFor(x => x.Password, new { HideSurroundingHtml = true })
                                     </div>
                                     <div class="form-buttons align-items-baseline">
-                                        <button type="submit" class="btn btn-primary ml-auto">Sign in</button>
+                                        <button type="submit" class="btn btn-primary ml-auto">@T["Sign in"]</button>
                                     </div>
                                 }
                             }
 
                             @if (Model.AuthenticationTypes != null && Model.AuthenticationTypes.Any()) {
-                                <p class="text-center mt--3">&ndash; or &ndash;</p>
+                                <p class="text-center mt--3">&ndash; @T["or"] &ndash;</p>
                                 using (Html.BeginForm(nameof(AccountController.SignInExternal), typeof(AccountController).ControllerName(), new { path = Model.Path }, FormMethod.Post)) {
                                     <div class="buttons text-center">
                                         @foreach (AuthenticationDescription ad in Model.AuthenticationTypes) {
-                                            <button type="submit" class="btn btn-primary mb-3" id="@ad.AuthenticationType" name="provider" value="@ad.AuthenticationType">@Svg.Icon(ad.AuthenticationType) Sign in with @ad.Caption</button>
+                                            <button type="submit" class="btn btn-primary mb-3" id="@ad.AuthenticationType" name="provider" value="@ad.AuthenticationType">@Svg.Icon(ad.AuthenticationType) @T["Sign in with {0}", ad.Caption]</button>
                                         }
                                     </div>
                                 }

@@ -1,9 +1,16 @@
 ﻿@model Messenger
 @{
     Layout = null;
+    BodyAttributes.Add("class", "dual");
+    if (Model.ConversationId == null) {
+        BodyAttributes.Add("class", "one");
+    } else {
+        BodyAttributes.Add("class", "two");
+    }
+    
 }
 <!DOCTYPE html>
-<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<html @RenderHtmlAttributes()>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -12,23 +19,27 @@
     @Html.ThemeHead()
     @Html.ThemeStyle("~/areas/apps/styles/messenger.scss")
     <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @Bundler.Scripts($"~/scripts/resources/resources.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.js", htmlAttributes: new { data_turbolinks_track = "reload" })
     @Bundler.Scripts("~/areas/apps/scripts/messenger.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
 </head>
-<body class="@BodyClasses(Model.ConversationId == null ? "dual one" : "dual two")" @BodyAttributes>
+<body @RenderBodyAttributes()>
     <script>@Html.ContextInfo()@Html.UserSettings()</script>
     <div class="pane" id="sidebar">
         <header class="pane-header">
-            <button type="button" class="btn btn-primary btn-icon" data-toggle="modal" data-target="#new-message-modal" title="New message">@Svg.Icon("message-plus")</button>
-            <div class="pane-title text-truncate"><a href="@(Url.Action<MessengerController>(c => c.Index(null)))">@(IsEmbedded ? "Conversations" : "Messenger")</a></div>
+            <button type="button" class="btn btn-primary btn-icon" data-toggle="modal" data-target="#new-message-modal" title="@T["New message"]">@Svg.Icon("message-plus")</button>
+            <div class="pane-title text-truncate"><a href="@(Url.Action<MessengerController>(c => c.Index(null)))">@(IsEmbedded ? T["Conversations"].ToString() : T["Messenger"].ToString())</a></div>
             <button type="button" class="btn btn-icon dropdown-toggle top-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Svg.Icon("dots-vertical")</button>
             <div class="dropdown-menu dropdown-menu-right">
-                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#settings-modal">Settings</button>
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#settings-modal">@T["Settings"]</button>
+                @if (WeavyContext.Browser.Mobile) {
+                    <a class="dropdown-item" href="~/sign-out?path=/@Weavy.Areas.Apps.Controllers.MessengerController.MESSENGER_PREFIX" id="signout">@T["Sign out"]</a>
+                }
             </div>
         </header>
-        <div class="pane-body">
+        <div class="pane-body scroll-y">
             <form class="search-form" action="@(Url.Action<MessengerController>(c => c.Conversations(null)))" method="get" role="search" data-target="#conversations">
                 <div class="form-group">
-                    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." autocomplete="off" />
+                    <input type="text" name="q" class="form-control form-control-sm" placeholder="@T["Search..."]" autocomplete="off" />
                     <button type="button" class="btn btn-icon btn-search">@Svg.Icon("magnify")</button>
                     <button type="button" class="btn btn-icon btn-reset">@Svg.Spinner(size: 18, spin: true)@Svg.Icon("close")</button>
                 </div>
@@ -39,25 +50,22 @@
         </div>
     </div>
     <div class="alerts">@Html.AlertMessages()</div>
-    @if (Model.Conversation == null)
-    {
+    @if (Model.Conversation == null) {
         <main class="pane" id="main">
             <header class="pane-header">
                 <div class="pane-title">&nbsp;</div>
             </header>
             <p class="text-center m-3">
-                Welcome! Go ahead and <a href="#new-message-modal" data-toggle="modal">write your first message</a>.
+                <a href="#new-message-modal" data-toggle="modal">@T["Welcome! Go ahead and write your first message"]</a>.
             </p>
         </main>
-    }
-    else
-    {
-        <main id="main" class="pane conversation@(Model.Conversation.IsRoom ? " room" : "")@(Model.Conversation.IsPinned ? " pinned" : "")@(Model.Conversation.IsStarred() ? " starred" : "")@(Model.Conversation.IsRead ? "" : " unread")" data-id="@Model.Conversation.Id">
+        Html.RenderPartial("_ScrollbarsInit");
+    } else {
+        <main id="main" class="pane conversation @(Model.Conversation.IsRoom ? " room" : "")@(Model.Conversation.IsPinned ? " pinned" : "")@(Model.Conversation.IsStarred() ? " starred" : "")@(Model.Conversation.IsRead ? "" : " unread")" data-id="@Model.Conversation.Id">
             <header class="pane-header">
                 <div class="pane-actions">
                     <a href="@(Url.Action<MessengerController>(c => c.Index(null)))" class="btn btn-primary btn-icon btn-back">@Svg.Icon("arrow-left")</a>
-                    @if (WeavyContext.Browser.Mobile)
-                    {
+                    @if (WeavyContext.Browser.Mobile) {
                         <span class="badge badge-danger text-truncate">@(Model.Unread > 0 ? Model.Unread.ToString() : "")</span>
                     }
                     <a href="@(Url.Action<MessengerController>(c => c.Messenger(Model.Conversation.Id, null)))" class="btn btn-icon btn-avatar">@Model.Conversation.AvatarImg(24)</a>
@@ -67,33 +75,30 @@
                     <span class="typing-show"></span>
                 </div>
                 <div class="pane-actions">
-                    <button type="button" class="btn btn-primary btn-icon" data-toggle="modal" data-target="#info-modal" title="Details">@Svg.Icon("information-outline")</button>
+                    <button type="button" class="btn btn-primary btn-icon" data-toggle="modal" data-target="#info-modal" title="@T["Details"]">@Svg.Icon("information-outline")</button>
                 </div>
             </header>
             <div class="pane-body">
                 <div id="conversation">
-                    <div id="messages">
-                        @Svg.Spinner(spin: true)
-                        @{ Html.RenderPartial("_Messages", Model); }
+                    <div id="messages-scroll" class="scroll-y">
+                        <div id="messages" class="messages-content">
+                            @Svg.Spinner(spin: true)
+                            @{ Html.RenderPartial("_Messages", Model); }
+                        </div>
                     </div>
                     @{ Html.RenderPartial("_MessageForm", Model); }
                 </div>
             </div>
-
-            @{
-                Html.RenderPartial("_InfoModal", Model.Conversation);
-                Html.RenderPartial("_ProfileModal");
-                Html.RenderPartial("_PeopleModal", Model);
-            }
         </main>
+        Html.RenderPartial("_ScrollbarsInit");
+        Html.RenderPartial("_InfoModal", Model.Conversation);
+        Html.RenderPartial("_ProfileModal");
+        Html.RenderPartial("_PeopleModal", Model);
     }
-
     @{
         Html.RenderPartial("_SettingsModal", Model.Settings);
         Html.RenderPartial("_MessageModal", Model);
-        Html.RenderPartial("_PhotoSwipe");
-        Html.RenderPartial("_Preview");
     }
-
+    <iframe id="filebrowser" src="about:blank" style="display:none;width:100%;height:100%;z-index:99999999;position:fixed;top:0;left:0;border:0;"></iframe>
 </body>
 </html>

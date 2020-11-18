@@ -1,7 +1,8 @@
-/*global twttr, _ */
+/*global _ */
 var wvy = wvy || {};
 
 wvy.infinitescroll = (function ($) {
+    // TODO: use IntersectionObserver instead of polling window scroll event
 
     var buffer = window.innerHeight / 2 || 0; // arbitrary value (set to whatever you think is a good distance before triggering automatic click)
     var hasnext = true;
@@ -22,14 +23,14 @@ wvy.infinitescroll = (function ($) {
         loadMore(); 
         // then check again on scroll
         throttle = _.throttle(function (e) { if (!loading) { loadMore(e); } }, 250);
-        $(window).add("main").on("scroll", throttle);
+        $(window).add("body.os-host > .os-padding > .os-viewport").on("scroll", throttle);
     }
 
     function destroy() {
         if (throttle != null) {
             throttle.cancel();
         }
-        $(window).add("main").off("scroll", throttle);
+        $(window).add("body.os-host > .os-padding > .os-viewport").off("scroll", throttle);
     }
 
     // loads data if $more is visible
@@ -86,6 +87,7 @@ wvy.infinitescroll = (function ($) {
 
             // add to target element
             var $target = $($more.attr("data-target"));
+
             if ($more.attr("data-mode") === "prepend") {
                 $target.prepend(data);
             } else {

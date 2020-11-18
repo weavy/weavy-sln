@@ -16,7 +16,7 @@ wvy.user = (function ($) {
 
         wvy.api.trash("user", id).then(function () {
             $("[data-type=user][data-id="+id+"]").addClass("d-none");
-            wvy.alert.alert("success", "User was trashed. <button type='button' class='btn btn-link alert-link' data-restore='user' data-id='" + id + "'>Undo</button>", 5000, "alert-trash-user-" + id);
+            wvy.alert.alert("success", wvy.t("User was trashed.") + " <button type='button' class='btn btn-link alert-link' data-restore='user' data-id='" + id + "'>" + wvy.t("Undo") + "</button>", 5000, "alert-trash-user-" + id);
         });
     });
 
@@ -28,7 +28,7 @@ wvy.user = (function ($) {
 
         wvy.api.restore("user", id).then(function () {
             $("[data-type=user][data-id=" + id + "]").removeClass("d-none");
-            wvy.alert.alert("success", "User was restored.", 5000, "alert-trash-user-" + id);
+            wvy.alert.alert("success", wvy.t("User was restored."), 5000, "alert-trash-user-" + id);
         });
     });
 
@@ -89,7 +89,7 @@ wvy.user = (function ($) {
 
         // finally open modal with profile info
         e.preventDefault();
-        //e.stopPropagation();
+        e.stopPropagation();
         $('#profile-modal').modal();
     });
 
@@ -120,12 +120,12 @@ wvy.user = (function ($) {
     function updateStatus(id, following) {
         if (following) {
             // toggle button class
-            $("button[data-toggle=follow][data-id=" + id + "]").removeClass("btn-outline-success").addClass("btn-success").text("Following");
-            $("a[data-toggle=follow][data-id=" + id + "]").data("following", following).find("div").text("Unfollow");
+            $("button[data-toggle=follow][data-id=" + id + "]").removeClass("btn-outline-success").addClass("btn-success").text(wvy.t("Following"));
+            $("a[data-toggle=follow][data-id=" + id + "]").data("following", following).find("div").text(wvy.t("Unfollow"));
         } else {
             // toggle button class
-            $("button[data-toggle=follow][data-id=" + id + "]").removeClass("btn-success").addClass("btn-outline-success").text("Follow");
-            $("a[data-toggle=follow][data-id=" + id + "]").data("following", following).find("div").text("Follow");
+            $("button[data-toggle=follow][data-id=" + id + "]").removeClass("btn-success").addClass("btn-outline-success").text(wvy.t("Follow"));
+            $("a[data-toggle=follow][data-id=" + id + "]").data("following", following).find("div").text(wvy.t("Follow"));
         }
     }
 

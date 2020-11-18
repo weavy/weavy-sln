@@ -368,7 +368,7 @@
             // Default state when user is unauthenticated or has not changed
             var state = "updated";
 
-            var reloadLink = ' <a href="#" onclick="location.reload(); return false;">Reload</a>';
+            var reloadLink = ' <a href="#" onclick="location.reload(); return false;">' + wvy.t("Reload") + '</a>';
 
             if (user && user.id) {
                 if (_isAuthenticated) {
@@ -376,12 +376,12 @@
                         // When signed in
                         if (user && user.id === -1) {
                             console.log("wvy.authentication: signed-out");
-                            alert("You have been signed out." + reloadLink);
+                            alert(wvy.t("You have been signed out.") + reloadLink);
                             // User signed out
                             state = "signed-out";
                         } else if (user && user.id !== _user.id) {
                             console.log("wvy.authentication: changed-user");
-                            alert("The signed in user has changed." + reloadLink)
+                            alert(wvy.t("The signed in user has changed.") + reloadLink)
                             // User changed
                             state = "changed-user";
                         }
@@ -392,7 +392,7 @@
 
                             // Show a message if the user hasn't loaded a new page
                             if (wvy.context && wvy.context.user && user.id !== wvy.context.user) {
-                                alert("You have signed in." + reloadLink);
+                                alert(wvy.t("You have signed in.") + reloadLink);
                             }
 
                             // User signed in
@@ -413,7 +413,7 @@
                 var eventResult = triggerEvent("user", { state: "user-error", authorized: false, user: user });
                 if (eventResult !== false) {
                     wvy.postal.whenLeader.then(function () {
-                        alert("Authentication error." + reloadLink, "danger");
+                        alert(wvy.t("Authentication error.") + reloadLink, "danger");
                     });
                 }
             }

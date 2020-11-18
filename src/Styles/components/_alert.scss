@@ -55,8 +55,12 @@
     z-index: $zindex-modal + 1;
     pointer-events: none;
 
-    .has-navbar-secondary & {
+    .has-navbar-2 & {
         top: $navbar-height*1.5;
+    }
+
+    .has-navbar-3 & {
+        top: $navbar-height*2.5;
     }
 
     .alert {

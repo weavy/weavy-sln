@@ -25,11 +25,11 @@ wvy.desktopNotifications = (function ($) {
         if (window.Notification && !wvy.browser.framed) {
             console.debug("notification permission is " + Notification.permission + " and context.notify is " + wvy.settings.notify);
             if (Notification.permission === "granted" && wvy.settings.notify) {
-                var n = new Notification("You have a new notification", {
+                var n = new Notification(wvy.t("You have a new notification"), {
                     body: notification.text,
                     tag: notification.url,
                     // get user thumbnail (as .png since svgs are not supported in browser notifications)
-                    icon: notification.thumb_url.replace("{options}", "96").replace(".svg", ".png")
+                    icon: notification.thumb.replace("{options}", "96").replace(".svg", ".png")
                 });
 
                 n.addEventListener("click", function () {
@@ -41,7 +41,7 @@ wvy.desktopNotifications = (function ($) {
                 //setTimeout(n.close.bind(notification), 10000);
             }
         } else {
-            console.debug("Browser does not support notifications");
+            console.debug(wvy.t("Browser does not support notifications"));
         }
     }
 })(jQuery)

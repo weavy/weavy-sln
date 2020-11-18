@@ -1,6 +1,6 @@
 ﻿@model Weavy.Core.Models.Directory
 @{
-    Title = "Edit directory";
+    Title = T["Edit directory"].ToString();
     Back = Url.Action<DirectoriesController>(c => c.Index(null));
 }
 
@@ -10,10 +10,10 @@
         @Html.HttpMethodOverride(HttpVerbs.Put)
         @Html.EditorsForModel()
         <div class="form-buttons">
-            <button type="submit" name="button" value="@nameof(DirectoriesController.Update)" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+            <button type="submit" name="button" value="@nameof(DirectoriesController.Update)" class="btn btn-primary btn-load" title="Save">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">@T["Cancel"]</a>
 
-            <button type="submit" name="button" value="@nameof(DirectoriesController.Delete)" class="btn btn-danger btn-load" title="Delete">Delete</button>
+            <button type="submit" name="button" value="@nameof(DirectoriesController.Delete)" class="btn btn-danger btn-load" title="Delete">@T["Delete"]</button>
         </div>
     }
 </div>

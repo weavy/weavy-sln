@@ -12,8 +12,35 @@
         bottom: 0;
         max-width: none;
 
-        .weavy-panel-frame {
+        .weavy-panel {
             background-color: rgba(mix($black, #000), $opacity-panel);
+
+            &.weavy-open {
+                pointer-events: all;
+                z-index: 5;
+            }
+
+            .weavy-panel-frame {
+                background-color: transparent;
+            }
+
+            &.weavy-panel-light {
+                background-color: rgba(mix($white, #FFF), $opacity-panel);
+
+                .weavy-icon {
+                    color: $icon-color;
+                }
+
+                @include media-breakpoint-up(md) {
+                    left: 1rem;
+                    top: 1rem;
+                    right: 1rem;
+                    bottom: 1rem;
+                    border-radius: .1875rem;
+                    box-shadow: $md-shadow-16dp;
+                    overflow: hidden;
+                }
+            }
         }
     }
 }

@@ -1,89 +1,202 @@
 /// <reference path="../_core.scss" />
-$scrollbar-size: .5rem !default;
 
-@mixin scrollbar {
-    // custom scrollbar for chrome
-    &::-webkit-scrollbar {
-        height: $scrollbar-size;
-        width: $scrollbar-size;
-        background: $gray-100;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: rgba($gray-500, 0.75);
-
-        &:hover {
-            background-color: $gray-500;
-        }
-
-        &:window-inactive {
-            background-color: rgba($gray-500, 0.5);
-        }
-    }
-}
-
-@mixin scroll {
-    // to enable HW acceleration and not cause repaint on scroll
-    will-change: scroll-position;
-    backface-visibility: hidden;
-
-    overflow-x: auto;
+@mixin scroll-y {
     overflow-y: auto;
-
-    @at-root {
-        // Opt-out on windows, opt-in on mac/android
-        html.windows.chrome:not(.overlay-scrollbar) &, html.chrome.scrollbar & {
-            @include scrollbar;
-        }
+    &:not(.scroll-x) {
+        overflow-x: hidden;
+    }
+    // to enable HW acceleration and not cause repaint on scroll
+    // modals sometimes gets blurry text when .fade and backface-visibility is used at the same time
+    &:not(.os-host):not(.modal-dialog) {
+        will-change: scroll-position;
+        backface-visibility: hidden;
     }
 
-    @include overscroll-behavior-contain;
-    // ios momentum scrolling, cannot be used on the <body> element!
-    &:not(body) {
-        -webkit-overflow-scrolling: touch;
-    }
+    max-height: 100%;
 }
 
 @mixin scroll-x {
-    @include scroll;
-    overflow-y: hidden;
-}
-
-@mixin scroll-y {
-    @include scroll;
-    overflow-x: hidden;
-}
-
-@mixin overscroll-behavior-contain {
-    // ms-scroll-chaining only applies to touch and touchpad input
-    -ms-scroll-chaining: none;
-    // overscroll-behavior unfortunately does not support blocking iframe scrollchaning, so we have scroll.js to take care of that
-    overscroll-behavior: contain;
-    // Variable fallback for javascript
-    --overscroll-behavior: contain !important;
-
-    > * {
-        --overscroll-behavior: auto;
+    &:not(.scroll-y) {
+        overflow-y: hidden;
     }
+    overflow-x: auto;
+    // to enable HW acceleration and not cause repaint on scroll
+    // modals sometimes gets blurry text when .fade and backface-visibility is used at the same time
+    &:not(.os-host):not(.modal-dialog) {
+        will-change: scroll-position;
+        backface-visibility: hidden;
+    }
+
+    max-width: 100%;
 }
 
-.scroll {
-    @include scroll;
+
+.scroll-y {
+    @include scroll-y;
 }
 
 .scroll-x {
     @include scroll-x;
 }
 
-.scroll-y {
-    @include scroll-y;
+// custom scrollbar styling
+@mixin custom-scrollbar {
+    // custom scrollbar for webkit browsers
+    &::-webkit-scrollbar {
+        height: .625rem;
+        width: .625rem;
+        background: transparent;
+        z-index: 999;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba($gray-500, 0.75);
+        border: .125rem solid transparent;
+        border-radius: .5rem;
+        background-clip: padding-box;
+
+        &:hover {
+            background-color: rgba($gray-700, 0.75);
+        }
+
+        &:window-inactive {
+            background-color: rgba($gray-500, 0.5);
+        }
+    }
+    // custom scrollbar for firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba($gray-500, 0.75) transparent;
 }
 
-.overscroll-behavior-contain {
-    @include overscroll-behavior-contain;
+// custom scrollbar styling
+@mixin thin-scrollbar {
+    // custom scrollbar for webkit browsers
+    &::-webkit-scrollbar {
+        height: .375rem;
+        width: .375rem;
+        background: transparent;
+        z-index: 999;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba($gray-700, 0.75);
+        border: 0 solid transparent;
+        border-radius: 0;
+        background-clip: padding-box;
+
+        &:hover {
+            background-color: rgba($gray-500, 0.75);
+        }
+
+        &:window-inactive {
+            background-color: rgba($gray-500, 0.5);
+        }
+    }
+    // custom scrollbar for firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba($gray-700, 0.75) transparent;
 }
 
-.scroll-check {
+
+html {
+    overflow-x: hidden;
+
+    &.windows {
+        &.firefox {
+            // Initially hidden scrollbars to avoid relayouting
+            overflow: hidden;
+        }
+    }
+
+    &.scrollbars {
+        // custom scrollbar styling
+        // use overlay scrollbars if supported
+        @supports (overflow-y: overlay) {
+            @include custom-scrollbar;
+            overflow-y: overlay;
+
+            .fixed-top {
+                width: 100vw;
+            }
+        }
+
+        .custom-scrollbar {
+            @include custom-scrollbar;
+        }
+    }
+    // visible scrollbars on html/body (probably windows)
+    &.os-html > .os-host {
+
+        > .os-padding > .os-viewport {
+            will-change: scroll-position;
+            backface-visibility: hidden;
+        }
+
+        &.has-navbar {
+            > .os-scrollbar-vertical {
+                top: $navbar-height;
+            }
+        }
+
+        &.has-navbar-2 {
+            > .os-scrollbar-vertical {
+                top: $navbar-height * 2;
+            }
+        }
+
+        &.has-navbar-3 {
+            > .os-scrollbar-vertical {
+                top: $navbar-height * 3;
+            }
+        }
+
+        > .os-scrollbar {
+            z-index: $zindex-scrollbars;
+        }
+    }
+    // descendant scroll areas (not body/html)
+    // disable for modals
+    .os-host:not(.modal-dialog) > .os-padding > .os-viewport {
+        will-change: scroll-position;
+        backface-visibility: hidden;
+    }
+}
+
+html, html.scrollbars {
+    // prevent scroll when opening modals etc.
+    &.backdrop, &.modal-open, &.drawer-open, &.pswp-open, &.preview-open {
+        overflow: hidden !important;
+    }
+
+    &.block-scroll {
+        &, &.os-html > .os-host > .os-padding > .os-viewport {
+            overflow: hidden !important;
+        }
+    }
+}
+
+// overlayScrollbars styling
+.os-host.os-theme-dark > .os-scrollbar, .os-host.os-theme-light > .os-scrollbar {
+    padding: 3px;
+}
+
+.os-host.os-theme-dark > .os-scrollbar-vertical, .os-host.os-theme-light > .os-scrollbar-vertical {
+    width: 12px;
+}
+
+.os-host.os-theme-dark > .os-scrollbar-horizontal, .os-host.os-theme-light > .os-scrollbar-horizontal {
+    height: 12px;
+}
+// element for detecting scrollbar capabilities (visibility, overlay etc.)
+.scrollbar-detection {
     position: fixed;
     top: 0;
     left: 0;
@@ -93,4 +206,8 @@ $scrollbar-size: .5rem !default;
     z-index: -99999;
     pointer-events: none;
     visibility: hidden;
+}
+// hidden element with next page of data for infinitescroll.js
+.scroll-next {
+    display: none;
 }

@@ -15,24 +15,27 @@ wvy.comments = (function ($) {
 
     function init() {
         // initializing editor is very slow so we wrap the call in setTimeout to prevent blocking rendering
-        setTimeout(function () {
-            console.log("comments.js:init");
+        wvy.whenLoaded.then(function () {
+            setTimeout(function () {
+                console.log("comments.js:init");
 
-            // any visible comment editors
-            initCommentEditor($("body.controller-posts textarea.comments-form:visible, body:not(.controller-posts) textarea.comments-form"));
-        }, 1);
+                // any visible comment editors
+                initCommentEditor($("body.controller-posts textarea.comments-form:visible, body:not(.controller-posts) textarea.comments-form"));
+            }, 1);
+        })
     }
 
     // init comment editor
     function initCommentEditor($el) {
         if ($el.length === 0) return;
-        
+
+        $el.siblings(".weavy-editor-placeholder").hide();
         $el.weavyEditor({
             accept: wvy.config.blobWhitelist,
             collapsed: true,
             embeds: false,
             polls: false,
-            placeholder: 'Your comment...',
+            placeholder: wvy.t('Your comment...'),
             onSubmit: function (e, d) {
                 insertComment(e, d, this);
             }
@@ -53,11 +56,22 @@ wvy.comments = (function ($) {
         var $commentsContainer = $form.parent().find($form.data("comments-container"));
 
         var data = $form.serializeObject(true);        
+
+
+        // check meetings authentication            
+        if (data.meetings) {
+            var auth = $("a[data-meeting-authenticated='0']");
+
+            if (auth.length) {
+                wvy.alert.info(wvy.t("Please sign in to the meeting provider before you submit the comment!"), 3000)
+                return false;
+            }
+        }
+
         if (!wvy.config.htmlComments) {
-            data["text"] = d.text;
+            data["text"] = d.text !== "" ? d.text: null;
             delete data.html;
         }
-        
         
         var method = "POST";
         var url = wvy.url.resolve($form.attr("action"));
@@ -71,6 +85,15 @@ wvy.comments = (function ($) {
                 var id = data.blobs;
                 data.blobs = [];
                 data.blobs[0] = id;
+            }
+        }
+
+        // make sure meetings is an array
+        if (data.meetings) {
+            if (!$.isArray(data.meetings)) {
+                var id = data.meetings;
+                data.meetings = [];
+                data.meetings[0] = id;
             }
         }
 
@@ -139,8 +162,10 @@ wvy.comments = (function ($) {
     function getComments(id, type, expand) {
 
         // check if the entity is present on the page
+        
         var selector = "[data-type=" + type + "][data-id=" + id + "]";
         var $entity = $(selector)
+        
         if ($entity.length === 0) {
             return false;
         }
@@ -226,7 +251,7 @@ wvy.comments = (function ($) {
 
         wvy.api.trash("comment", id).then(function () {
             $comment.slideUp("fast")
-            wvy.alert.alert("success", "Comment was trashed. <a class='alert-link' href='#' data-comment-restore='" + id + "' data-parent-id='" + parentId + "' data-parent-entity='" + parentEntity + "'>Undo</a>", 5000, "alert-comment-trash-" + id);
+            wvy.alert.alert("success", wvy.t("Comment was trashed.") + " <a class='alert-link' href='#' data-comment-restore='" + id + "' data-parent-id='" + parentId + "' data-parent-entity='" + parentEntity + "'>" + wvy.t("Undo") + "</a>", 5000, "alert-comment-trash-" + id);
             triggerEvent("trash", { entityType: parentEntity, entityId: parentId });
 
         });
@@ -243,7 +268,7 @@ wvy.comments = (function ($) {
 
         wvy.api.restore("comment", id).then(function () {
             $comment.slideDown("fast")
-            wvy.alert.alert("success", "Comment was restored.", 5000, "alert-comment-trash-" + id);
+            wvy.alert.alert("success", wvy.t("Comment was restored."), 5000, "alert-comment-trash-" + id);
             triggerEvent("restore", { entityType: parentEntity, entityId: parentId });
 
         });
@@ -291,24 +316,22 @@ wvy.comments = (function ($) {
             url: path,
             type: "GET",
             cache: false
-        }).then(function (html) {
-            
+        }).then(function (html) {            
             $form.replaceWith(html);
 
-            $("[data-editor=comment]").weavyEditor({
+            $("[data-editor=comment]", $modal).weavyEditor({
                 accept: wvy.config.blobWhitelist,
                 collapsed: true,
                 embeds: false,
                 polls: false,
                 pickerCss: 'collapsed-static',
-                placeholder: 'Your comment...',
+                placeholder: wvy.t('Your comment...'),
                 submitButton: $form.find("button[type=submit]"),
                 onSubmit: function (e, d) {
                     e.preventDefault();
                     $(this).closest("form").submit();
                 }
             });
-
             $div.addClass("d-none");
         }).always(function () {
             // stop spinner
@@ -316,8 +339,46 @@ wvy.comments = (function ($) {
         });
     });
 
+    // update post
+    $(document).on("submit", "#edit-comment-modal form.modal-content", function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        var data = $form.serializeObject();
+
+        // fetch modal content from server
+        $.ajax({
+            contentType: "application/json; charset=utf-8",
+            url: $form.attr("action"),
+            type: "PUT",
+            data: JSON.stringify(data)
+        }).then(function (html) {
+            if (typeof (html) === "string") {
+                // must remove editor before binding the new one
+                $("#edit-comment-modal [data-editor=comment]").weavyEditor("destroy");
+                $form.replaceWith(html);
+
+                $("#edit-comment-modal [data-editor=comment]").weavyEditor({
+                    accept: wvy.config.blobWhitelist,
+                    collapsed: true,
+                    embeds: false,
+                    polls: false,
+                    pickerCss: 'collapsed-static',
+                    placeholder: wvy.t('Your comment...'),
+                    submitButton: $form.find("button[type=submit]"),
+                    onSubmit: function (e, d) {
+                        e.preventDefault();
+                        $(this).closest("form").submit();
+                    }
+                });
+            } else {
+                window.location.replace(html.Data.Redirect);
+            }
+        });
+    });
+
     $(document).on("hide.bs.modal", "#edit-comment-modal", function (e) {
-        $("[data-editor=comment]").weavyEditor("destroy");
+        var $modal = $(this);
+        $("[data-editor=comment]", $modal).weavyEditor("destroy");
     });
 
     return {

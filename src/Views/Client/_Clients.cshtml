@@ -18,7 +18,7 @@
                 @if (user.IsTrashed()) {
                     <form action="@(Url.Action<ClientController>(c => c.Restore(user.Id)))" method="post" data-turboform>
                         @Html.HttpMethodOverride(HttpVerbs.Put)
-                        <button type="submit" class="btn btn-icon btn-success" title="Restore">@Svg.Icon("backup-restore")</button>
+                        <button type="submit" class="btn btn-icon btn-success" title="@T["Restore"]">@Svg.Icon("backup-restore")</button>
                     </form>
 
                 } else {
@@ -31,17 +31,17 @@
                             @if (user.IsSuspended) {
                                 <form action="@(Url.Action<ClientController>(c => c.Enable(user.Id)))" method="post" data-turboform>
                                     @Html.HttpMethodOverride(HttpVerbs.Put)
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("checkbox-blank-outline", "success") Enable</button>
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("checkbox-blank-outline", "success") @T["Enable"]</button>
                                 </form>
                             } else {
                                 <form action="@(Url.Action<ClientController>(c => c.Disable(user.Id)))" method="post" data-turboform>
                                     @Html.HttpMethodOverride(HttpVerbs.Put)
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("checkbox-marked-outline", "warning") Disable</button>
+                                    <button type="submit" class="dropdown-item">@Svg.Icon("checkbox-marked-outline", "warning") @T["Disable"]</button>
                                 </form>
                             }
                             <form action="@(Url.Action<ClientController>(c => c.Trash(user.Id)))" method="post" data-turboform>
                                 @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                <button type="submit" class="dropdown-item" >@Svg.Icon("delete", "danger") Trash</button>
+                                <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") @T["Trash"]</button>
                             </form>
 
                         </div>
@@ -50,7 +50,7 @@
             </td>
         </tr>
     }
-    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+    <tr class="scroll-next" data-next="@Url.ScrollNext(Model)">
         <td colspan="4"></td>
     </tr>
 }

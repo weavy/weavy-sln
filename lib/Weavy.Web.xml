@@ -42,6 +42,24 @@
             Api controllers and methods with this attribute can be served without SSL enabled.
             </summary>
         </member>
+        <member name="T:Weavy.Web.Api.Binders.IdentifierBinder">
+            <summary>
+            Binds entity identifiers to its actual IEntity representation (e.g. m3, c253, p42) 
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Api.Binders.IdentifierBinder.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Api.Binders.IdentifierBinder.BindModel(System.Web.Http.Controllers.HttpActionContext,System.Web.Http.ModelBinding.ModelBindingContext)">
+            <summary>
+            Binds the actual type and sets value.
+            </summary>
+            <param name="actionContext"></param>
+            <param name="bindingContext"></param>
+            <returns></returns>
+        </member>
         <member name="T:Weavy.Web.Api.Binders.ContentBinder">
             <summary>
             
@@ -383,7 +401,7 @@
         </member>
         <member name="M:Weavy.Web.Api.Controllers._ClientController.SignIn">
             <summary>
-            Sign in with JSON Web Token. Called from client SDK to get auth cookie.
+            Called from client to get auth cookie. The request should pass a valid JWT in the Authorization header using the Bearer authentication scheme.
             </summary>
             <returns></returns>
         </member>
@@ -399,12 +417,13 @@
             </summary>
             <returns>Returns a <see cref="T:Weavy.Core.Models.User"/> object.</returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._ClientController.Click(System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._ClientController.Click(System.String,System.Boolean)">
             <summary>
-            Called when a link is clicked to check if the target is in another app. 
+            Called when a link is clicked and returns data about the target entity. 
             </summary>
             <param name="url">The url that was clicked.</param>
-            <returns>Returns info about the target.</returns>
+            <param name="embedded"></param>
+            <returns>Returns info about the entity.</returns>
         </member>
         <member name="T:Weavy.Web.Api.Controllers.JwtModel">
             <summary>
@@ -421,6 +440,34 @@
             The Apps API has methods for managing Apps. 
             </summary>
             <remarks>Don't generate documentation for this controller.</remarks>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._AppsController.Follow(System.Int32)">
+            <summary>
+            Follow a content item.
+            </summary>
+            <param name="id">The item id.</param>
+            <returns>The followed item.</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._AppsController.Unfollow(System.Int32)">
+            <summary>
+            Unfollow a content item.
+            </summary>
+            <param name="id">The item id.</param>
+            <returns>The unfollowed item.</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._AppsController.Star(System.Int32)">
+            <summary>
+            Star an item.
+            </summary>
+            <param name="id">The item id.</param>
+            <returns>The starred item.</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._AppsController.Unstar(System.Int32)">
+            <summary>
+            Unstar an item.
+            </summary>
+            <param name="id">The item id.</param>
+            <returns>The unstarred item.</returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers._AppsController.Trash(System.Int32)">
             <summary>
@@ -469,25 +516,21 @@
             </summary>
             <remarks>Don't generate documentation for this controller. Insecure requests are permitted.</remarks>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Get(System.Int32)">
-            <summary>
-            Get the blob with the specified id.
-            </summary>
-            <param name="id">Id of the blob to get.</param>
-            <returns>Returns a blob.</returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Upload">
-            <summary>
-            Uploads new blob(s). We use multipart/form-data for the request format.
-            After upload the blobs can be used for setting avatars or as references when creating attachments and/or files. 
-            </summary>
-            <returns>The uploaded blobs(s).</returns>
-        </member>
         <member name="M:Weavy.Web.Api.Controllers._BlobsController.AppIcon(System.Nullable{System.Int32})">
             <summary>
             Writes the app icon for mobile devices etc to the output.
             </summary>
             <param name="size">Size in pixels (optional).</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Avatar(System.String,System.Int32,System.Nullable{System.Int32},System.String)">
+            <summary>
+            Writes the specified avatar to the output.
+            </summary>
+            <param name="type">Entity type.</param>
+            <param name="id">Entity id.</param>
+            <param name="size">Size in pixels (optional).</param>
+            <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers._BlobsController.Favicon">
@@ -504,113 +547,93 @@
             <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.ConversationAvatar(System.Int32,System.Nullable{System.Int32},System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Attachment(System.Int32,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
-            Writes the avatar for the specified conversation to the output.
-            </summary>
-            <param name="id">Id of conversation.</param>
-            <param name="size">Size in pixels (optional).</param>
-            <param name="ext">File extension of desired output format.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.NotificationAvatar(System.Int32,System.Nullable{System.Int32},System.String)">
-            <summary>
-            Writes the avatar for the specified notification to the output.
-            </summary>
-            <param name="id">Id of notification.</param>
-            <param name="size">Size in pixels (optional).</param>
-            <param name="ext">File extension of desired output format.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.SpaceAvatar(System.Int32,System.Nullable{System.Int32},System.String)">
-            <summary>
-            Writes the avatar for the specified space to the output.
-            </summary>
-            <param name="id">Id of space whose avatar to return.</param>
-            <param name="size">Size in pixels (optional).</param>
-            <param name="ext">File extension of desired output format.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.UserAvatar(System.Int32,System.Nullable{System.Int32},System.String)">
-            <summary>
-            Writes the specified user avatar to the output.
-            </summary>
-            <param name="id">Id of user whose avatar to return.</param>
-            <param name="size">Size in pixels (optional).</param>
-            <param name="ext">File extension of desired output format.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.AttachmenContent(System.Int32,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
-            <summary>
-            Writes the content of the specified attachment to the output.
+            Writes the specified attachment to the output.
             Depending on the input parameters this action can return the original file, a preview or a thumbnail image.
             </summary>
             <param name="id">Id of attachment to return.</param>
-            <param name="name">Filename without extension (optional).</param>
+            <param name="name">Filename.</param>
             <param name="width">Width in pixels (for thumbnail).</param>
             <param name="height">Height in pixels (for thumbnail).</param>
             <param name="options">Additional resize options (for thumbnail).</param>
             <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.BlobContent(System.Int32,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Blob(System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
-            Writes the content of the specified blob to the output.
+            Writes the specified blob to the output.
             Depending on the input parameters this action can return the original file, a preview or a thumbnail image.
             </summary>
             <param name="id">Id of blob to return.</param>
-            <param name="name">Filename without extension.</param>
             <param name="width">Width in pixels (for thumbnail).</param>
             <param name="height">Height in pixels (for thumbnail).</param>
             <param name="options">Additional resize options (for thumbnail).</param>
             <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.ContentThumb(System.Int32,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Content(System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
             Writes a thumbnail image for the specified content item to the output.
             </summary>
             <param name="id">Id of <see cref="T:Weavy.Core.Models.Content"/> item for which to return thumbnail image.</param>
-            <param name="name">Filename without extension.</param>
             <param name="width">Width in pixels.</param>
             <param name="height">Height in pixels.</param>
             <param name="options">Additional resize options.</param>
             <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.EmbedImage(System.Int32,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Embed(System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
             Writes the specified embed image to the output.
             </summary>
             <param name="id">Id of <see cref="T:Weavy.Core.Models.Embed"/> for which to image.</param>
-            <param name="name">Filename without extension.</param>
             <param name="width">Width in pixels.</param>
             <param name="height">Height in pixels.</param>
             <param name="options">Additional resize options.</param>
             <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.FileContent(System.Int32,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.File(System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
-            Writes the content of the specified file to the output.
+            Writes the specified <see cref="T:Weavy.Core.Models.File"/> to the output.
             Depending on the input parameters this action can return the original file, a preview or a thumbnail image.
             </summary>
             <param name="id">Id of the file to return.</param>
-            <param name="name">Filename without extension.</param>
             <param name="width">Width in pixels (for thumbnail).</param>
             <param name="height">Height in pixels (for thumbnail).</param>
             <param name="options">Additional resize options (for thumbnail).</param>
             <param name="ext">File extension of desired output format.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.FileVersion(System.Int32,System.Int64,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Get(System.Int32)">
+            <summary>
+            Get metadata for the specified blob.
+            </summary>
+            <param name="id">Id of the blob.</param>
+            <returns>Returns a blob.</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Insert(System.Collections.Generic.IEnumerable{Weavy.Core.Models.ExternalBlob})">
+            <summary>
+            Insert external blob(s).
+            </summary>
+            <param name="external">The blobs to insert.</param>
+            <returns>The inserted blob(s).</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Upload">
+            <summary>
+            Uploads new blob(s). We use multipart/form-data for the request format.
+            After upload the blobs can be used for setting avatars or as references when creating attachments and/or files. 
+            </summary>
+            <returns>The uploaded blobs(s).</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.Version(System.Int32,System.Int64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
             Writes the content data of the specified file version to the output.
             Depending on the input parameters this action can return the original file, a preview or a thumbnail image.
             </summary>
             <param name="id">Id of the file to return.</param>
             <param name="timestamp">Timestamp of version to return.</param>
-            <param name="name">Filename without extension.</param>
             <param name="width">Width in pixels (for thumbnail).</param>
             <param name="height">Height in pixels (for thumbnail).</param>
             <param name="options">Additional resize options (for thumbnail).</param>
@@ -633,9 +656,9 @@
             <param name="placeholder">Placeholder url to thumbnail image</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._BlobsController.DownloadName(System.String,System.String)">
+        <member name="M:Weavy.Web.Api.Controllers._BlobsController.GetDownloadName(System.String,System.String)">
             <summary>
-            Helper method for getting filename to use in the "Content-Dispostion: attachment;filename=..." header.
+            Helper method for getting filename to use in the "Content-Disposition: attachment;filename=..." header.
             </summary>
             <param name="name">Original filename</param>
             <param name="ext">Requested file extension.</param>
@@ -763,12 +786,14 @@
             <param name="attach"><c>false</c> to upload as child content, <c>true</c> to upload as attachments.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._ContentController.UploadAttachments(System.Int32)">
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.Attach(Weavy.Core.Models.IEntity,System.Collections.Generic.IEnumerable{System.Int32},System.Boolean)">
             <summary>
-            Upload attachments to a content item. The request format must be multipart/form-data.
+            Helper method for attaching external blobs to app or content item.
             </summary>
-            <param name="id">Id of content item where files should be attached.</param>
-            <returns>An instance of the <see cref="T:Weavy.Web.Api.Models.UploadOut"/> object with info about the uploaded file(s).</returns>
+            <param name="parent"><see cref="T:Weavy.Core.Models.App"/> or <see cref="T:Weavy.Core.Models.Content"/> item where files should be uploaded.</param>
+            <param name="blobids">The ids of the Blobs to attach.</param>
+            <param name="attach"><c>false</c> to upload as child content, <c>true</c> to upload as attachments.</param>
+            <returns></returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers._ContentController.Replace(Weavy.Core.Models.IEntity,System.Collections.Generic.IEnumerable{System.Int32})">
             <summary>
@@ -777,14 +802,6 @@
             <param name="parent"><see cref="T:Weavy.Core.Models.App"/> or <see cref="T:Weavy.Core.Models.Content"/> item where files should be uploaded.</param>
             <param name="ids">Id of blobs to to insert while replacing existing files with same names.</param>
             <returns>The files that were updated/replaced.</returns>        
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._ContentController.UploadAndReplaceAttachments(System.Int32,Weavy.Web.Api.Models.UploadIn)">
-            <summary>
-            Replace existing attachments with the specified blobs.
-            </summary>
-            <param name="id">Id of content item where attachments should be uploaded.</param>
-            <param name="model">Model with id of blobs to insert (while replacing existing attachments with same names).</param>
-            <returns>The attachments that were inserted and/or replaced.</returns>        
         </member>
         <member name="M:Weavy.Web.Api.Controllers._ContentController.UploadAndReplaceRoots(System.Int32,Weavy.Web.Api.Models.UploadIn)">
             <summary>
@@ -802,19 +819,32 @@
             <param name="model">Model with id of blobs to insert (while replacing existing files with same names).</param>
             <returns>The files that were inserted and/or replaced.</returns>        
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._ContentController.UploadRoots(System.Int32)">
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.Attach(System.Int32,System.Int32[],System.Boolean)">
             <summary>
-            Upload file(s) to the root of an app. The request format must be multipart/form-data.
+            Attaches the blobs to the specified <see cref="T:Weavy.Core.Models.Content"/> item that must implement the <see cref="T:Weavy.Core.Models.IHasAttachments"/> interface.
             </summary>
-            <param name="id">Id of <see cref="T:Weavy.Core.Models.App"/> where files should be uploaded.</param>
-            <returns>An instance of the <see cref="T:Weavy.Web.Api.Models.UploadOut"/> object with info about the uploaded file(s).</returns>
+            <param name="id">The Id of the <see cref="T:Weavy.Core.Models.App"/> where files should be attached.</param>
+            <param name="ids">The ids of the blobs to attach.</param>
+            <param name="force">True to force the blobs to be attached, possibly replacing existing files with the same name.</param>
+            <returns>An instance of the <see cref="T:Weavy.Web.Api.Models.AttachedOut"/> object with info about the file(s) being attached.</returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._ContentController.UploadChildren(System.Int32)">
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.InsertFiles(System.Int32,System.Int32[],System.Boolean)">
             <summary>
-            Upload file(s) to a folder (or any other content item that allows it). The request format must be multipart/form-data.
+            Creates files from blobs and inserts into the specified app.
             </summary>
-            <param name="id">Id of content item where files should be uploaded.</param>
-            <returns>An instance of the <see cref="T:Weavy.Web.Api.Models.UploadOut"/> object with info about the uploaded file(s).</returns>
+            <param name="id">The Id of the <see cref="T:Weavy.Core.Models.App"/> where files should be attached.</param>
+            <param name="ids">The ids of the blobs to attach.</param>
+            <param name="force">True to force the blobs to be attached, possibly replacing existing files with the same name.</param>
+            <returns>An instance of the <see cref="T:Weavy.Web.Api.Models.AttachedOut"/> object with info about the file(s) being attached.</returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.InsertRootFiles(System.Int32,System.Int32[],System.Boolean)">
+            <summary>
+            Creates files from blobs and inserts into the specified app.
+            </summary>
+            <param name="id">The Id of the <see cref="T:Weavy.Core.Models.App"/> where files should be attached.</param>
+            <param name="ids">The ids of the blobs to attach.</param>
+            <param name="force">True to force the blobs to be attached, possibly replacing existing files with the same name.</param>
+            <returns>An instance of the <see cref="T:Weavy.Web.Api.Models.AttachedOut"/> object with info about the file(s) being attached.</returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers._ContentController.Insert(System.Int32,System.Collections.Generic.IEnumerable{Weavy.Core.Models.Content})">
             <summary>
@@ -950,6 +980,12 @@
             <param name="id">The item id.</param>
             <returns>The starred item.</returns>
         </member>
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.Tags(System.Int32,Weavy.Web.Api.Models.TagsIn)">
+            <summary>
+            Updates tags.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Api.Controllers._ContentController.AttachmentOfficeUrl(System.Int32)">
             <summary>
             Get a url that will open the attachment in an office app and append a JWT token that facilitates SSO with Weavy. 
@@ -1000,27 +1036,10 @@
             <returns>Returns the current user's conversations.</returns>
             <example>GET a/conversations?top=5</example>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._MessagesController.GetRooms(Weavy.Core.Models.QueryOptions)">
-            <summary>
-            Get the current user's chat rooms.
-            </summary>
-            <param name="opts">Query options for paging, sorting etc.</param>
-            <returns>Returns the current user's chat rooms.</returns>
-            <example>GET a/conversations/rooms?top=5</example>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._MessagesController.GetPeople(Weavy.Core.Models.QueryOptions)">
-            <summary>
-            Get the current user's conversations with other people.
-            </summary>
-            <param name="opts">Query options for paging, sorting etc.</param>
-            <returns>Returns the current user's archived conversations.</returns>
-            <example>GET a/conversations/people?top=5</example>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._MessagesController.GetUnread(System.Boolean,Weavy.Core.Models.QueryOptions)">
+        <member name="M:Weavy.Web.Api.Controllers._MessagesController.GetUnread(Weavy.Core.Models.QueryOptions)">
             <summary>
             Get the current user's unread conversations (conversations with unread messages).
             </summary>
-            <param name="followed">When <c>false</c> returns all conversations with unread messages, otherwise returns only followed conversations with unread messages.</param>
             <param name="opts">Query options for paging, sorting etc.</param>
             <returns>Returns the most recent unread conversations for the current user.</returns>
             <example>GET a/conversations/unread?top=5</example>
@@ -1030,13 +1049,6 @@
             Get the conversation with the specified id.
             </summary>
             <param name="id">The conversation id.</param>
-            <returns>Returns a conversation.</returns>
-        </member>
-        <member name="M:Weavy.Web.Api.Controllers._MessagesController.GeConversationWithUser(System.String)">
-            <summary>
-            Get the existing, or create a new, one-on-one conversation between the current- and specified user.
-            </summary>
-            <param name="username">Username of the other participant.</param>
             <returns>Returns a conversation.</returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers._MessagesController.CreateConversation(Weavy.Web.Api.Models.CreateConversationModel)">
@@ -1940,6 +1952,11 @@
             Gets or sets ids of embeds to attach.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Api.Models.CommentIn.Meetings">
+            <summary>
+            Gets or sets ids of meetings to attach.
+            </summary>
+        </member>
         <member name="M:Weavy.Web.Api.Models.CommentIn.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
             Performs custom validation.
@@ -2241,12 +2258,12 @@
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.MentionModel.Url">
+        <member name="P:Weavy.Web.Api.Models.MentionModel.Thumb">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.MentionModel.ThumbUrl">
+        <member name="P:Weavy.Web.Api.Models.MentionModel.Url">
             <summary>
             
             </summary>
@@ -2306,6 +2323,11 @@
             Gets or sets ids of the embeds.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Api.Models.PostIn.Meetings">
+            <summary>
+            Gets or sets ids of the meetings.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Api.Models.PostIn.Options">
             <summary>
             Gets or sets poll options.
@@ -2335,33 +2357,6 @@
             <summary>
             Performs custom validation.
             </summary>
-        </member>
-        <member name="T:Weavy.Web.Api.Models.RegisterIn">
-            <summary>
-            Verify signup model.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Api.Models.RegisterIn.Username">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Api.Models.RegisterIn.Password">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Api.Models.RegisterIn.Token">
-            <summary>
-            Gets or sets the token for the invite.
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Api.Models.RegisterIn.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
-            <summary>
-            Validate model.
-            </summary>
-            <param name="validationContext"></param>
-            <returns></returns>
         </member>
         <member name="T:Weavy.Web.Api.Models.ScrollableList`1">
             <summary>
@@ -2416,14 +2411,14 @@
              The query options for scrolling to the next page.
             </summary>
         </member>
-        <member name="T:Weavy.Web.Api.Models.SignupIn">
+        <member name="T:Weavy.Web.Api.Models.TagsIn">
             <summary>
-            Signup model.
+            Model for tags.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.SignupIn.Email">
+        <member name="P:Weavy.Web.Api.Models.TagsIn.Tags">
             <summary>
-            Gets or sets the email address.
+            The tags to set.
             </summary>
         </member>
         <member name="T:Weavy.Web.Api.Models.ThemeOut">
@@ -2461,29 +2456,34 @@
             Ids of blobs to attach.
             </summary>
         </member>
-        <member name="T:Weavy.Web.Api.Models.UploadOut">
+        <member name="T:Weavy.Web.Api.Models.AttachedOut">
             <summary>
-            File upload output model.
+            File attach/insert output model.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Api.Models.UploadOut.#ctor">
+        <member name="M:Weavy.Web.Api.Models.AttachedOut.#ctor">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.UploadOut.Attached">
+        <member name="P:Weavy.Web.Api.Models.AttachedOut.Attached">
             <summary>
             Gets or sets the attached files.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.UploadOut.Uploaded">
+        <member name="P:Weavy.Web.Api.Models.AttachedOut.Inserted">
             <summary>
-            Gets or sets the uploaded files.
+            Gets or sets the inserted files.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.UploadOut.Skipped">
+        <member name="P:Weavy.Web.Api.Models.AttachedOut.Skipped">
             <summary>
             Gets or sets the skipped blobs.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Api.Models.AttachedOut.ConflictAlert">
+            <summary>
+            Gets or sets the html to display if conflicts occur.
             </summary>
         </member>
         <member name="T:Weavy.Web.Api.Models.UsersGroupsModel">
@@ -2511,12 +2511,12 @@
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.UsersGroupsModel.Url">
+        <member name="P:Weavy.Web.Api.Models.UsersGroupsModel.Thumb">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Weavy.Web.Api.Models.UsersGroupsModel.ThumbUrl">
+        <member name="P:Weavy.Web.Api.Models.UsersGroupsModel.Url">
             <summary>
             
             </summary>
@@ -2529,21 +2529,6 @@
         <member name="P:Weavy.Web.Api.Models.UsersGroupsModel.Email">
             <summary>
             
-            </summary>
-        </member>
-        <member name="T:Weavy.Web.Api.Models.VerifySignupIn">
-            <summary>
-            Verify signup model.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Api.Models.VerifySignupIn.Token">
-            <summary>
-            Gets or sets the token for the invite.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Api.Models.VerifySignupIn.Code">
-            <summary>
-            Gets or set the confirmation code.
             </summary>
         </member>
         <member name="T:Weavy.Web.Api.Routing.IntsConstraint">
@@ -3653,13 +3638,6 @@
             <param name="bindingContext">The binding context.</param>
             <returns>true if model binding is successful; otherwise, false.</returns>
         </member>
-        <member name="M:Weavy.Web.Binders.QueryOptionsBinder.BindModel(System.Web.Mvc.ModelBindingContext)">
-            <summary>
-            Return QueryOptions by parsing the query string.
-            </summary>
-            <param name="bindingContext"></param>
-            <returns></returns>
-        </member>
         <member name="M:Weavy.Web.Binders.QueryOptionsBinder.Get(System.Web.Mvc.ModelBindingContext,System.String[])">
             <summary>
             Gets a string value from the binding context.
@@ -3683,6 +3661,15 @@
             <param name="bindingContext"></param>
             <param name="keys"></param>
             <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Binders.QueryOptionsBinder.GetLayout(System.Web.Mvc.ControllerContext,System.Web.Mvc.ModelBindingContext,System.String[])">
+            <summary>
+            Gets and/or sets the preferred layout.
+            </summary>
+            <param name="controllerContext"></param>
+            <param name="bindingContext"></param>
+            <param name="keys"></param>
+            <returns>The preferred layout for the current url.</returns>
         </member>
         <member name="T:Weavy.Web.Binders.DirectoryQueryBinder">
             <summary>
@@ -3923,6 +3910,22 @@
             </summary>
             <param name="url">The url to redirect to.</param>
             <returns></returns>
+        </member>
+        <member name="T:Weavy.Web.Controllers.AttachmentController">
+            <summary>
+            Controller for attachments.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Controllers.AttachmentController.Empty">
+            <summary>
+            Display an empty attachment page.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Controllers.AttachmentController.Get(System.Int32)">
+            <summary>
+            Display an attachment.
+            </summary>
+            <param name="id">Id of attachment.</param>
         </member>
         <member name="T:Weavy.Web.Controllers.MeetingController">
             <summary>
@@ -4203,40 +4206,29 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="T:Weavy.Web.Controllers.PreviewController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Controllers.PreviewController.Index(System.Nullable{Weavy.Core.Models.Layout})">
-            <summary>
-            Display image preview.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.PreviewController.Attachment(System.Int32,Weavy.Core.Models.Query,System.Nullable{Weavy.Core.Models.Layout})">
-            <summary>
-            Display specified attachment item.
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:Weavy.Web.Controllers.ContentController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Weavy.Web.Controllers.ContentController.Get(System.Int32,Weavy.Core.Models.Query,System.Nullable{Weavy.Core.Models.Layout})">
+        <member name="M:Weavy.Web.Controllers.ContentController.Empty">
             <summary>
-            Display specified content item.
+            Display an empty content page (for preloading content previews).
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.ContentController.GetVersion(System.Int32,System.Int64)">
+        <member name="M:Weavy.Web.Controllers.ContentController.Partial(System.Int32,Weavy.Core.Models.Layout)">
             <summary>
-            Display a specific version of a content item.
+            Return partial html for a content item.
             </summary>
-            <param name="id">The id of the <see cref="T:Weavy.Core.Models.Content"/> item.</param>
-            <param name="version">The version (timestamp) of the version to show.</param>
+            <param name="id"></param>
+            <param name="layout"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ContentController.Get(System.Int32,Weavy.Core.Models.Query)">
+            <summary>
+            Display specified content item.
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.ContentController.New(System.Int32,System.Guid)">
@@ -4277,7 +4269,7 @@
         </member>
         <member name="M:Weavy.Web.Controllers.ContentController.InsertFile(System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.String)">
             <summary>
-            Insert a new file.
+            Insert an empty file with the specified name.
             </summary>
             <param name="appid">Id of the app.</param>
             <param name="parentid">Id of parent content.</param>
@@ -4332,10 +4324,12 @@
             <param name="version">The version (timestamp) to delete.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.ContentController.Versions(System.Int32)">
+        <member name="M:Weavy.Web.Controllers.ContentController.GetVersion(System.Int32,System.Int64)">
             <summary>
-            Display versions for specified content item.
+            Display a specific version of a content item.
             </summary>
+            <param name="id">The id of the <see cref="T:Weavy.Core.Models.Content"/> item.</param>
+            <param name="version">The version (timestamp) of the version to show.</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.ContentController.Revert(System.Int32,System.Int64)">
@@ -4344,6 +4338,20 @@
             </summary>
             <param name="id">Id of the <see cref="T:Weavy.Core.Models.Content"/> to revert.</param>
             <param name="version">Timestamp of the version to revert to.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ContentController.Rename(System.Int32,Weavy.Web.Models.RenameModel)">
+            <summary>
+            Rename specified content item.
+            </summary>
+            <param name="id"></param>
+            <param name="model"></param>
+            <returns>The renamed content item.</returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ContentController.Details(System.Int32)">
+            <summary>
+            Get partial for content details modal.
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.ContentController.Edit(System.Int32,System.Boolean)">
@@ -4375,6 +4383,27 @@
             Get followers for the specified content as a partial view.
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ContentController.Attachments(System.Int32)">
+            <summary>
+            Gets attachments for an IHasAttachment as a partial view.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ContentController.PartialBlobs(System.Collections.Generic.IEnumerable{System.Int32})">
+            <summary>
+            Returns partial html for the specified blobs.
+            </summary>
+            <param name="ids">Ids of blobs.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ContentController.Blob(System.Int32)">
+            <summary>
+            Returns partial html for the specified blob.
+            </summary>
+            <param name="id">Id of the blobs.</param>
             <returns></returns>
         </member>
         <member name="T:Weavy.Web.Controllers.ContentController`1">
@@ -4579,7 +4608,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.ClientController.Insert(Weavy.Core.Models.ClientViewModel)">
+        <member name="M:Weavy.Web.Controllers.ClientController.Insert(Weavy.Web.Models.ClientViewModel)">
             <summary>
             Inserts a new client/user.
             </summary>
@@ -4627,7 +4656,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.ClientController.GetUser(System.Int32)">
+        <member name="M:Weavy.Web.Controllers.ClientController.GetClient(System.Int32)">
             <summary>
             Returns a user or throws response exception if it does not exist.
             </summary>
@@ -4995,6 +5024,14 @@
             <summary>
             Get comments for the specified post as partial view.
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.PostController.PartialMeeting(System.String,System.String)">
+            <summary>
+            Returns partial html for the specified meeting.
+            </summary>
+            <param name="provider">A string defining the video provider.</param>
+            <param name="guid">The unique guid of the meeting.</param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.PostController.Poll(System.Int32,System.Int32)">
@@ -5509,6 +5546,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:Weavy.Web.Controllers.TestController">
+            <summary>
+            Controller for testing various things.
+            </summary>
+        </member>
         <member name="M:Weavy.Web.Controllers.TestController.Index">
             <summary>
             Display test page with ui components.
@@ -5573,6 +5615,50 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Weavy.Web.Controllers.TestController.ConversationEmail(System.Boolean,System.Nullable{System.Int32})">
+            <summary>
+            Display conversation email.
+            </summary>
+            <param name="send"></param>
+            <param name="top"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.TestController.DailyDigestEmail(System.Boolean,System.Nullable{System.Int32})">
+            <summary>
+            Display daily digest email.
+            </summary>
+            <param name="send"></param>
+            <param name="top"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.TestController.NotificationEmail(System.Boolean)">
+            <summary>
+            Display notification email.
+            </summary>
+            <param name="send"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.TestController.PasswordResetEmail(System.Boolean)">
+            <summary>
+            Display password reset email.
+            </summary>
+            <param name="send"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.TestController.WelcomeEmail(System.Boolean)">
+            <summary>
+            Display welcome email.
+            </summary>
+            <param name="send"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.TestController.TestEmail(System.Boolean)">
+            <summary>
+            Display test email.
+            </summary>
+            <param name="send"></param>
+            <returns></returns>
+        </member>
         <member name="T:Weavy.Web.Controllers.ToolsController">
             <summary>
             Controller for managing tools.
@@ -5613,13 +5699,14 @@
             Search with the given query options.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Controllers.UIController.InsertImage(System.Nullable{System.Int32},System.String,System.String,System.Collections.Generic.IEnumerable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.UIController.InsertImage(System.Nullable{System.Int32},System.String,System.String,System.String,System.Collections.Generic.IEnumerable{System.Int32},System.Boolean,System.Boolean)">
             <summary>
             Insert/Edit image dialog for our rich text editor.
             </summary>
             <param name="id"></param>
             <param name="src"></param>
             <param name="href"></param>
+            <param name="alt"></param>
             <param name="blobs"></param>
             <param name="img"></param>
             <param name="md"></param>
@@ -5870,6 +5957,70 @@
             <param name="contentType">Value to set in the Content-Type header. When not set, content type will be inferred from the file name.</param>
             <param name="downloadName">Name to use in Content-Disposition header when downloading the file.</param>
         </member>
+        <member name="T:Weavy.Web.Localization.LocalizedModelMetaDataProvider">
+            <summary>
+            A localization aware model metadata provider for ASP.NET MVC.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Localization.LocalizedModelMetaDataProvider.CreateMetadata(System.Collections.Generic.IEnumerable{System.Attribute},System.Type,System.Func{System.Object},System.Type,System.String)">
+            <summary>
+             Gets the metadata for the specified property.
+            </summary>
+            <param name="attributes"></param>
+            <param name="containerType"></param>
+            <param name="modelAccessor"></param>
+            <param name="modelType"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Web.Models.ClientViewModel">
+            <summary>
+            An model class for editing clients.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.ClientViewModel.#ctor">
+            <summary>
+            Default constructor.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.ClientViewModel.#ctor(Weavy.Core.Models.User)">
+            <summary>
+            Constuctor that populates properties from a <see cref="T:Weavy.Core.Models.User"/> object.
+            </summary>
+            <param name="user"></param>        
+        </member>
+        <member name="M:Weavy.Web.Models.ClientViewModel.#ctor(Weavy.Core.Models.User,System.String)">
+            <summary>
+            Constuctor that populates properties from a <see cref="T:Weavy.Core.Models.User"/> object and a client secret.
+            </summary>
+            <param name="user"></param>
+            <param name="clientSecret"></param>
+        </member>
+        <member name="P:Weavy.Web.Models.ClientViewModel.Id">
+            <summary>
+             Gets the client id.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ClientViewModel.DisplayName">
+            <summary>
+             Gets or sets the main email address.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ClientViewModel.ClientId">
+            <summary>
+            Gets or sets the client id to associate with this user.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ClientViewModel.ClientSecret">
+            <summary>
+            Gets or sets the client secret to associate with this user.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Models.ClientViewModel.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Performs custom validation. 
+            </summary>
+        </member>
         <member name="T:Weavy.Web.Models.MeetingModel">
             <summary>
             Model for creating new meetings 
@@ -5913,6 +6064,26 @@
         <member name="P:Weavy.Web.Models.MeetingAuthModel.Authenticated">
             <summary>
             Authentication state
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.PartialMeetingModel">
+            <summary>
+            View model for displaying meeting partials as "attachments" to new message
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.PartialMeetingModel.Topic">
+            <summary>
+            Gets or sets the topic of the meeting.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.PartialMeetingModel.Meeting">
+            <summary>
+            The meeting
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.PartialMeetingModel.Guid">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Weavy.Web.Models.ZoomEvent">
@@ -6499,6 +6670,21 @@
             
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.AttachmentsModel.Src">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.AttachmentsModel.Href">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.AttachmentsModel.Alt">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Weavy.Web.Models.ClientAppConverter">
             <summary>
             Serializes an App for use in the javacript client.
@@ -6806,33 +6992,6 @@
             Gets the list of people to display on the home page.
             </summary>
         </member>
-        <member name="T:Weavy.Web.Models.InviteUsersModel">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.InviteUsersModel.Email1">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.InviteUsersModel.Email2">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.InviteUsersModel.Email3">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Models.InviteUsersModel.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
-            <summary>
-            Validate.
-            </summary>
-            <param name="validationContext"></param>
-            <returns></returns>
-        </member>
         <member name="T:Weavy.Web.Models.LinkActive">
             <summary>
             Enum used for setting links to .active.
@@ -7021,6 +7180,11 @@
             Gets or sets the embed ids.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.PostInsertModel.Meetings">
+            <summary>
+            Gets or sets the meeting ids.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.PostInsertModel.Html">
             <summary>
             Gets or sets the post html.
@@ -7154,17 +7318,7 @@
         </member>
         <member name="T:Weavy.Web.Models.RenameModel">
             <summary>
-            View model for displaying account/personal information.
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Models.RenameModel.#ctor">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Models.RenameModel.Entity">
-            <summary>
-            Get or sets the entity to rename.
+            View model for renaming an entity.
             </summary>
         </member>
         <member name="P:Weavy.Web.Models.RenameModel.Name">
@@ -7563,9 +7717,19 @@
             Sets plugin options.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.ClientOptions.Language">
+            <summary>
+            Sets language code of preferred language.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ClientOptions.TimeZone">
+            <summary>
+            Sets the client timezone.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.ClientOptions.Version">
             <summary>
-            Sets the client version (used to detect if client needs to be upgraded to match server version).
+            Sets the client version (used to display warning if client and server versions are different).
             </summary>
         </member>
         <member name="T:Weavy.Web.Models.ClientScriptOptions">
@@ -8112,19 +8276,19 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.OwinUtils.IsPrivate(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsManaged(Microsoft.Owin.IOwinRequest)">
             <summary>
-            Checks if the request is for managed code and needs authentication.
+            Checks if the request is for managed code and needs authentication etc.
             </summary>
             <param name="request"></param>
             <returns><c>true</c> for files served by managed code, otherwise <c>true</c></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.OwinUtils.IsPublic(Microsoft.Owin.IOwinRequest)">
+        <member name="M:Weavy.Web.Owin.OwinUtils.IsStatic(Microsoft.Owin.IOwinRequest)">
             <summary>
-            Checks if the request is for a "static" file served by managed code that does not need authentication.
+            Checks if the request is for a "static" file served by managed code that does not need authentication etc.
             </summary>
             <param name="request"></param>
-            <returns><c>true</c> for files served by managed code, otherwise <c>false</c></returns>
+            <returns><c>true</c> for static served by managed code, otherwise <c>false</c></returns>
         </member>
         <member name="M:Weavy.Web.Owin.OwinUtils.IsRegisterWindows(Microsoft.Owin.IOwinRequest)">
             <summary>
@@ -8202,15 +8366,14 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyMiddleware.IsStatic(Microsoft.Owin.IOwinContext)">
+        <member name="M:Weavy.Web.Owin.WeavyMiddleware.SetUri(Microsoft.Owin.IOwinContext)">
             <summary>
-            Checks if the request is for a "static" file served by managed code that does not need authentication.
+            Make sure that WeavyContext.Current.Uri is configured.
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyMiddleware.SetContext(Microsoft.Owin.IOwinContext)">
+        <member name="M:Weavy.Web.Owin.WeavyMiddleware.GetTimeZone(Microsoft.Owin.IOwinContext)">
             <summary>
-            Set context variables for the request.
+            Gets the time zone to use for the current request.
             </summary>
         </member>
         <member name="M:Weavy.Web.Owin.WeavyMiddleware.CheckStatus(Microsoft.Owin.IOwinContext)">
@@ -8218,14 +8381,14 @@
             Check system status.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Owin.WeavyMiddleware.SetUser(Microsoft.Owin.IOwinContext)">
+        <member name="M:Weavy.Web.Owin.WeavyMiddleware.CheckUser(Microsoft.Owin.IOwinContext)">
             <summary>
-            Set the user for the request.
+            Checks authentication status and sets current user for the request.
             </summary>
         </member>
         <member name="M:Weavy.Web.Owin.WeavyMiddleware.CheckLicense(Microsoft.Owin.IOwinContext)">
             <summary>
-            Check that license is allowed and has not expired.
+            Check that license is valid and has not expired.
             </summary>
         </member>
         <member name="T:Weavy.Web.Utils.ControllerUtils">
@@ -8581,18 +8744,18 @@
             <param name="exclude"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.EditorsForModel(System.Web.Mvc.HtmlHelper,System.Object,System.String,System.Boolean,System.Boolean,System.Boolean,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.EditorsForModel(System.Web.Mvc.HtmlHelper,System.Object,System.String,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean,System.Boolean)">
             <summary>
             Returns an HTML input field for each property in the model.
             </summary>
             <param name="html">The HTML helper instance that this method extends.</param>
             <param name="model">The object for which to render input fields, <c>null</c> to render input fields for the current model.</param>
             <param name="group">The name of the group for which to return input fields, <c>null</c> to return input fields for properties without GroupName in the model.</param>
-            <param name="formGroups"><c>true</c> to wrap the label and input field in .form-group, otherwise <c>false</c></param>
-            <param name="formLabels"><c>true</c> to render labels for input fields, otherwise <c>false</c></param>
-            <param name="formText"><c>true</c> to render help text for input fields, otherwise <c>false</c></param>
             <param name="include">Names of properties that should be rendered, <c>null</c> to include all properties.</param>
             <param name="exclude">Names of properties that should not be rendered, <c>null</c> includes all properties.</param>
+            <param name="surroundingHtml"><c>true</c> to wrap the labels and inputs fields in .form-group, otherwise <c>false</c></param>
+            <param name="labels"><c>true</c> to render labels for input fields, otherwise <c>false</c></param>
+            <param name="descriptions"><c>true</c> to render descriptions for input fields, otherwise <c>false</c></param>
             <returns>An HTML input element for each property in the model.</returns>
         </member>
         <member name="M:Weavy.Web.Utils.HtmlUtils.HasEditors(System.Web.Mvc.HtmlHelper,System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
@@ -8607,7 +8770,7 @@
         </member>
         <member name="M:Weavy.Web.Utils.HtmlUtils.HasHtmlEditor(System.Web.Mvc.HtmlHelper,System.Object)">
             <summary>
-            Helper method for checking if the specified model object has a property marked with <see cref="F:System.ComponentModel.DataAnnotations.DataType.Html"/>.
+            Helper method for checking if the specified model object has a property marked with <see cref="F:Weavy.Core.Models.DataType.Html"/>.
             </summary>
             <param name="html">The HTML helper instance that this method extends.</param>
             <param name="model">The object to which for html editor fields, <c>null</c> to check the current model.</param>
@@ -8630,6 +8793,15 @@
             <param name="app"><see cref="T:Weavy.Core.Models.Files"/> for which to list content.</param>
             <param name="source">Content item to move.</param>
             <returns>A list of &lt;option&gt; elements.</returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.ConflictAlert(System.Collections.Generic.List{Weavy.Core.Models.Blob},System.Int32,System.String)">
+            <summary>
+            Returns a html for a form that can be displayed to handle conflicts when uploading files.
+            </summary>
+            <param name="blobs">The conflicting blobs.</param>
+            <param name="uploaded">The number of uploaded files.</param>
+            <param name="url">The url to use to overwrite with the new files.</param>
+            <returns></returns>
         </member>
         <member name="M:Weavy.Web.Utils.HtmlUtils.ContentPickerOptions(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Files)">
             <summary>
@@ -8667,6 +8839,22 @@
             <param name="guid"><see cref="T:System.Guid"/> of content type to insert/attach.</param>
             <param name="depth"></param>
             <returns>A list of &lt;option&gt; elements.</returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.ActionLink``1(System.Web.Mvc.HtmlHelper,System.Linq.Expressions.Expression{System.Action{``0}},System.String,System.String,System.String,System.Web.IHtmlString,System.Nullable{System.Int64},System.Object,Weavy.Web.Models.LinkActive)">
+            <summary>
+            
+            </summary>
+            <typeparam name="TController"></typeparam>
+            <param name="html"></param>
+            <param name="qs">query string</param>
+            <param name="icon">icon name</param>
+            <param name="color">icon color</param>
+            <param name="text"></param>
+            <param name="badge"></param>
+            <param name="expression"></param>
+            <param name="active"></param>
+            <param name="htmlAttributes"></param>
+            <returns></returns>
         </member>
         <member name="M:Weavy.Web.Utils.HtmlUtils.ActionLink``1(System.Web.Mvc.HtmlHelper,System.Linq.Expressions.Expression{System.Action{``0}},System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.Object,Weavy.Web.Models.LinkActive)">
             <summary>
@@ -8751,32 +8939,30 @@
             <param name="format">A standard or custom date and time format string.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.Time(System.Web.Mvc.HtmlHelper,System.DateTime,System.String,System.Boolean)">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.Time(System.Web.Mvc.HtmlHelper,System.DateTime,System.String,System.String)">
             <summary>
             Returns a &lt;time&gt; element with the specified date.
             </summary>
             <param name="helper">The HTML helper instance that this method extends.</param>
             <param name="date">The (UTC) date to return as text.</param>
-            <param name="format">A standard or custom date and time format string.</param>
-            <param name="abbrev"></param>
+            <param name="format">A standard or custom date and time format string.</param>        
+            <param name="text">A text that should be displayed instead of the date.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.TimeWhen(System.Web.Mvc.HtmlHelper,System.Nullable{System.DateTime},System.Boolean)">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.TimeWhen(System.Web.Mvc.HtmlHelper,System.Nullable{System.DateTime})">
             <summary>
             Returns a &lt;time&gt; element when the specified date occured.
             </summary>
             <param name="helper">The HTML helper instance that this method extends.</param>
-            <param name="date">The (UTC) date to return as text.</param>
-            <param name="abbrev"></param>
+            <param name="date">The (UTC) date to return as text.</param>        
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.TimeWhen(System.Web.Mvc.HtmlHelper,System.DateTime,System.Boolean)">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.TimeWhen(System.Web.Mvc.HtmlHelper,System.DateTime)">
             <summary>
             Returns a &lt;time&gt; element when the specified date occured.
             </summary>
             <param name="helper">The HTML helper instance that this method extends.</param>
-            <param name="date">The (UTC) date to return as text.</param>
-            <param name="abbrev"></param>
+            <param name="date">The (UTC) date to return as text.</param>        
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Utils.HtmlUtils.WhatByWhen(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Content)">
@@ -8899,7 +9085,7 @@
             <param name="entity"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.ContentBadge(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Content)">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.Badge(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Content)">
             <summary>
             Returns a badge with content status, i.e. editing, locked etc.
             </summary>
@@ -8914,6 +9100,14 @@
             <param name="html"></param>
             <param name="parent">Parent entity, used to create a unique photoswipe group, e.g. post-37, message-189.</param>
             <param name="attachment"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Blob)">
+            <summary>
+            Gets html attributes needed for triggering image and document preview.
+            </summary>
+            <param name="html"></param>
+            <param name="blob"></param>
             <returns></returns>
         </member>
         <member name="M:Weavy.Web.Utils.HtmlUtils.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.IEntity,Weavy.Core.Models.IFile)">
@@ -8996,6 +9190,46 @@
             <summary>
             Private helper class needed to create a HtmlHelper with a new view context etc.
             </summary>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.Property(System.Web.Mvc.ModelMetadata)">
+            <summary>
+            Gets the underlying property being rendered in an editor template.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.RenderSurroundingHtml(System.Web.Mvc.ViewDataDictionary)">
+            <summary>
+            Gets a value indicating whether an editor template should render the surrounding .form-group element or not.
+            </summary>
+            <param name="viewData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.RenderLabel(System.Web.Mvc.ViewDataDictionary)">
+            <summary>
+            Gets a value indicating whether an editor template should render a &lt;label&gt; for the field/property.
+            </summary>
+            <param name="viewData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.RenderDescription(System.Web.Mvc.ViewDataDictionary)">
+            <summary>
+            Gets a value indicating whether an editor template should render a description for the field/property.
+            </summary>
+            <param name="viewData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.PlaceholderText(System.Web.Mvc.ViewDataDictionary)">
+            <summary>
+            Gets the placeholder text to render in editor templates for the current field/property.
+            </summary>
+            <param name="viewData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Utils.HtmlUtils.ErrorMessage(System.Web.Mvc.ViewDataDictionary)">
+            <summary>
+            Gets the error message to display when a field/property failed validation.
+            </summary>
+            <param name="viewData"></param>
+            <returns></returns>
         </member>
         <member name="T:Weavy.Web.Utils.SerializationUtils">
             <summary>
@@ -9186,133 +9420,161 @@
             Static constructor.
             </summary>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterInsertNotification)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterInsertNotification)">
             <summary>
             Push notification and badge to user.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterUpdateNotification)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUpdateNotification)">
             <summary>
             Push updated notification and badge to user.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterReadAllNotifications)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterReadAllNotifications)">
             <summary>
             Notify user that all notifications were marked as read. Also push updated badge to user.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterInsertSpace)">
-            <summary>
-            Push inserted <see cref="T:Weavy.Core.Models.Space"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Space"/>.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterTrashSpace)">
-            <summary>
-            Push trashed <see cref="T:Weavy.Core.Models.Space"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Space"/>.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterInsertComment)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterInsertComment)">
             <summary>
             Push inserted <see cref="T:Weavy.Core.Models.Comment"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Comment"/>.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterInsertPost)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUpdateComment)">
             <summary>
-            Push inserted <see cref="T:Weavy.Core.Models.Post"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Comment"/>.
+            Push updated <see cref="T:Weavy.Core.Models.Comment"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Comment"/>.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterLikeEntity)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterInsertContent)">
+            <summary>
+            Push inserted <see cref="T:Weavy.Core.Models.Content"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Content"/> item.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUpdateContent)">
+            <summary>
+            Push updated <see cref="T:Weavy.Core.Models.Content"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Content"/> item.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterTrashContent)">
+            <summary>
+            Push trashed <see cref="T:Weavy.Core.Models.Content"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Content"/> item.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterRestoreContent)">
+            <summary>
+            Push restored <see cref="T:Weavy.Core.Models.Content"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Content"/> item.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterInsertPost)">
+            <summary>
+            Push inserted <see cref="T:Weavy.Core.Models.Post"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Post"/>.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUpdatePost)">
+            <summary>
+            Push updated <see cref="T:Weavy.Core.Models.Post"/> to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the <see cref="T:Weavy.Core.Models.Post"/>.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterLikeEntity)">
             <summary>
             Push liked entity to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the entity.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterUnlikeEntity)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUnlikeEntity)">
             <summary>
             Push unliked entity to all users that have <see cref="F:Weavy.Core.Models.Permission.View"/> on the entity.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterInsertMessage)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterInsertMessage)">
             <summary>
             Push message and updated badge to all members in conversation.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterUpdateMessage)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUpdateMessage)">
             <summary>
             Push updated message to all members in conversation.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterDeliverMessage)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterDeliverMessage)">
             <summary>
             Let sender know that their message was delivered.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterDeliverConversation)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterDeliverConversation)">
             <summary>
             Send conversation-delivered event to sender of last message.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterReadConversation)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterReadConversation)">
             <summary>
             Send conversation-read event to all members in the conversation so that they can update their gui.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterPinConversation)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterPinConversation)">
             <summary>
             Push pinned conversation back to user.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterStarEntity)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterStarEntity)">
             <summary>
             Push starred entity back to the user that starred.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterUnstarEntity)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterUnstarEntity)">
             <summary>
             Push unstarred enitity back to the user that unstarred.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterSignIn)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterSignIn)">
             <summary>
             Push authenticate request to all non-signed-in users.
             </summary>
             <param name="e"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Plugins.RealTimeHook.HandleAsync(Weavy.Core.Events.AfterSignOut)">
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterSignOut)">
             <summary>
             Push authenticate request to connections belonging to the signed out user.
             </summary>
@@ -9462,6 +9724,16 @@
             Base class for strongly typed views.
             </summary>
         </member>
+        <member name="M:Weavy.Web.Views.ViewPage`1.InitHelpers">
+            <summary>
+              Initializes the HtmlLocalizer for the view
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Views.ViewPage`1.T">
+            <summary>
+            Gets the localizer for the view.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Views.ViewPage`1.Title">
             <summary>
             Gets or sets the page title.
@@ -9484,26 +9756,8 @@
         </member>
         <member name="P:Weavy.Web.Views.ViewPage`1.Theme">
             <summary>
-              Gets the current theme settings.
+            Gets the current theme settings.
             </summary>
-        </member>
-        <member name="P:Weavy.Web.Views.ViewPage`1.BodyAttributes">
-            <summary>
-            Gets some data-attributes to render in the &lt;body&gt; element. These attributes are used by various javascript functions.
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Views.ViewPage`1.BodyClasses(System.String[])">
-            <summary>
-            
-            </summary>
-            <param name="extra"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Views.ViewPage`1.HtmlClasses">
-            <summary>
-            Gets some css classes to render in the &lt;html&gt; element.
-            </summary>
-            <returns></returns>
         </member>
         <member name="P:Weavy.Web.Views.ViewPage`1.AreaName">
             <summary>
@@ -9523,6 +9777,26 @@
         <member name="P:Weavy.Web.Views.ViewPage`1.IsEmbedded">
             <summary>
              Gets a value indicating whether the request is for an embedded action/view.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Views.ViewPage`1.BodyAttributes">
+            <summary>
+            Attributes to render in the &lt;body&gt; element.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Views.ViewPage`1.HtmlAttributes">
+            <summary>
+            Attributes to render in the &lt;html&gt; element.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Views.ViewPage`1.RenderBodyAttributes">
+            <summary>
+            Render attributes for the &lt;body&gt; element.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Views.ViewPage`1.RenderHtmlAttributes">
+            <summary>
+            Render attributes for the &lt;html&gt; element.
             </summary>
         </member>
         <member name="T:Weavy.Web.WebDAV.DavContext">
@@ -10102,59 +10376,6 @@
             Registers the area.
             </summary>
             <param name="context">Encapsulates the information that is required in order to register the area.</param>
-        </member>
-        <member name="T:Weavy.Core.Models.ClientViewModel">
-            <summary>
-            An model class for editing clients.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Models.ClientViewModel.#ctor">
-            <summary>
-            Default constructor.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Models.ClientViewModel.#ctor(Weavy.Core.Models.User)">
-            <summary>
-            Constuctor that populates properties from a <see cref="P:Weavy.Core.Models.ClientViewModel.User"/> object.
-            </summary>
-            <param name="user"></param>        
-        </member>
-        <member name="M:Weavy.Core.Models.ClientViewModel.#ctor(Weavy.Core.Models.User,System.String)">
-            <summary>
-            Constuctor that populates properties from a <see cref="P:Weavy.Core.Models.ClientViewModel.User"/> object and a client secret.
-            </summary>
-            <param name="user"></param>
-            <param name="clientSecret"></param>
-        </member>
-        <member name="P:Weavy.Core.Models.ClientViewModel.User">
-            <summary>
-            Gets a ref to the actual underlying user.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Models.ClientViewModel.Id">
-            <summary>
-             Gets the client id.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Models.ClientViewModel.DisplayName">
-            <summary>
-             Gets or sets the main email address.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Models.ClientViewModel.ClientId">
-            <summary>
-            Gets or sets the client id to associate with this user.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Models.ClientViewModel.ClientSecret">
-            <summary>
-            Gets or sets the client secret to associate with this user.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Models.ClientViewModel.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
-            <summary>
-            Performs custom validation. 
-            </summary>
         </member>
     </members>
 </doc>

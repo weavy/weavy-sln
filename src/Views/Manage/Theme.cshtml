@@ -1,6 +1,6 @@
 ﻿@model Theme
 @{
-    Title = "Theme settings";
+    Title = T["Theme settings"].ToString();
     Back = ViewBag.Back as string ?? Url.Back(Url.Action<ManageController>(c => c.Index()));
 }
 
@@ -13,8 +13,8 @@
         </div>
         @Html.EditorsForModel()
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary">@T["Cancel"]</a>
         </div>
     </form>
 </div>

@@ -1,0 +1,160 @@
+﻿@* generic modal for editing/creating content in files app, e.g. "New folder" *@
+@if (WeavyContext.App.HasPermission(Permission.Content) || WeavyContext.Content.HasPermission(Permission.Content)) {
+    <div class="modal" id="upsert-content-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog scroll-y" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn btn-icon" data-dismiss="modal">@Svg.Icon("close")</button>
+                </div>
+                @Svg.Spinner()
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+}
+
+@* modal for creating new Microsoft Office files *@
+@if (WeavyContext.App.HasPermission(Permission.Content)) {
+    string action = null;
+    if (WeavyContext.Content != null) {
+        action = Url.Action<ContentController>(c => c.InsertFile(null, WeavyContext.Content.Id, null, null));
+    } else {
+        action = Url.Action<ContentController>(c => c.InsertFile(WeavyContext.App.Id, null, null, null));
+    }
+    <div class="modal" id="office-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog scroll-y" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@T["New"] <span class="file-type"></span> @T["document"]</h5>
+                    <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+                </div>
+                <form action="@action" method="post">
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="@T["Name"]" name="name">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary" title="@T["Add document"]"></button>
+                            </div>
+                        </div>
+                    </div>
+                    @Html.Hidden("ext")
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@* modal for creating new files in Google Drive *@
+<div class="modal" id="google-drive-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog scroll-y" role="document">
+        <form id="google-drive-form" action="#">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">@T["New"] Google <span class="file-type"></span> @T["document"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="@T["Name"]" name="name">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary" title="@T["Add document"]">@T["Save"]</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* modal for moving content from one files app/folder to another *@
+<div class="modal fade" id="move-content-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog scroll-y" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">@T["Move content"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            @Svg.Spinner()
+            <div class="modal-body"></div>
+        </div>
+        <form class="modal-content d-none"></form>
+    </div>
+</div>
+
+@* modal for sharing content with other people *@
+<div id="share-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog scroll-y" role="document">
+        <form id="share-form" class="modal-content" action="@(Url.Action<ShareController>(x => x.Insert(null)))" method="post">
+            <div class="modal-header">
+                <h5 class="modal-title">@T["Share"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" name="Text" data-editor="share" placeholder="@Html.Raw(T["Use @ to mention the people you want to share this with."])"></textarea>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <input type="hidden" name="EntityType" value="" />
+                <input type="hidden" name="EntityId" value="" />
+                <button type="submit" class="btn btn-primary btn-load">@T["Share"]</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* modal for renaming content items *@
+<div id="rename-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@T["Rename"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            <div class="modal-body">
+                <form class="modal-content" action="" method="put" autocomplete="off" novalidate>
+                    <fieldset>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="@T["Name"]" name="@nameof(Content.Name)" required>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary btn-load">@T["Save"]</button>
+                            </div>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* modal for editing tags for content items *@
+<div id="edit-tags-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" method="put" action="">
+            <div class="modal-header">
+                <h5 class="modal-title">@T["Tags"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <select name="Tags" class="form-control" data-role="tagsinput" multiple></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">@T["Save"]</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* modal for viewing tags for content items *@
+<div id="view-tags-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@T["Tags"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>

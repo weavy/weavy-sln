@@ -50,12 +50,12 @@
 
     @if (Model.IsNullOrEmpty()) {
         if (Model.Query.Text.IsNullOrEmpty()) {
-            <tr><td colspan="3" class="text-center text-muted"><small>It's empty here :-(</small></td></tr>
+            <tr><td colspan="3" class="text-center text-muted"><small>@T["It's empty here :-("]</small></td></tr>
         } else {
-            <tr><td colspan="3" class="text-center text-muted"><small>Your search did not match any people.</small></td></tr>
+            <tr><td colspan="3" class="text-center text-muted"><small>@T["Your search did not match any people."]</small></td></tr>
         }
     } else if (Model.HasNextPage && !Model.Query.Text.IsNullOrEmpty()) {
-        <tr><td colspan="3" class="text-center text-muted"><small>Displaying best matches. Refine your search to find more people.</small></td></tr>
+        <tr><td colspan="3" class="text-center text-muted"><small>@T["Displaying best matches. Refine your search to find more people."]</small></td></tr>
     }
 
 

@@ -11,7 +11,7 @@ namespace Weavy.Areas.Apps.Controllers {
     public class FilesController : AppController<Files> {
 
         /// <summary>
-        /// Display root content in specified <see cref="Files"/>.
+        /// Display root content in specified <see cref="Files"/> app.
         /// </summary>
         /// <param name="app">Id of app</param>
         /// <param name="query">An object with query parameters for search, paging etc.</param>

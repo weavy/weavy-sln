@@ -14,10 +14,28 @@
     }
 }
 
-@if (IsSectionDefined("navbar_content")) {
-    @RenderSection("navbar_content")
-} else {
-    Html.RenderPartial("_Navbar", WeavyContext.Content);
+@if (IsSectionDefined("navbar_left")) {
+    @section navbar_left {
+        @RenderSection("navbar_left")
+    }
+}
+
+@if (IsSectionDefined("navbar_middle")) {
+    @section navbar_middle {
+        @RenderSection("navbar_middle")
+    }
+}
+
+@if (IsSectionDefined("navbar_right")) {
+    @section navbar_right {
+        @RenderSection("navbar_right")
+    }
+}
+
+@if (IsSectionDefined("navbar_tertiary")) {
+    @section navbar_tertiary {
+        @RenderSection("navbar_tertiary")
+    }
 }
 
 @RenderBody()
@@ -30,11 +48,8 @@
 
 @section footer {
     @{
-        Html.RenderPartial("_EditCommentModal");
         Html.RenderPartial("_FeedbackModal");
-        Html.RenderPartial("_ContentModal");
-        Html.RenderPartial("_MoveModal");
-        Html.RenderPartial("_ShareModal");
+        Html.RenderPartial("_EditCommentModal");
         @RenderSection("footer", required: false)
     }
 }

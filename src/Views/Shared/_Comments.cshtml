@@ -3,8 +3,9 @@
 @foreach (var comment in Model) {
     var creator = comment.CreatedBy();
     var attachments = comment.AttachmentIds.Any() ? comment.Attachments() : new List<Weavy.Core.Models.Attachment>();
-    var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
-    var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
+    var images = attachments.Where(x => FileUtils.IsImage(x.Blob.Name) && x.ThumbPlaceholderUrl() != null);
+    var files = attachments.Except(images);
+    var meetings = comment.MeetingIds.Any() ? comment.Meetings() : new List<Meeting>();
 
     <div id="comment-@comment.Id" class="list-group-item comment" data-comment-id="@comment.Id" data-parent-id="@comment.Parent.Id" data-parent-entity="@comment.Parent.Type.ToString().ToLower()">
         <div class="media">
@@ -18,6 +19,12 @@
 
                 @if (files.Any()) {
                     Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", comment } });
+                }
+
+                @if (meetings.Any()) {
+                    <div class="card-meetings">
+                        @{ Html.RenderPartial("_Meetings", meetings, new ViewDataDictionary { { "Parent", comment } }); }
+                    </div>
                 }
 
                 <div class="text-muted">

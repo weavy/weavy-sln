@@ -1,0 +1,49 @@
+﻿@model Tasks
+@{
+    var hideCompleted = Model.HideCompleted;
+}
+<div class="container">
+    <form id="createTaskForm">
+        <div class="form-group my-3">
+            <button type="button" class="btn btn-icon">@Svg.Icon("plus")</button>
+            @Html.TextArea("taskname", string.Empty, new { placeholder = T["Add task"], rows = "1", @class = "form-control", @readonly = "readonly" })
+        </div>
+    </form>
+
+    <div class="list-group task-list">
+
+        @if (!Model.Result.Any()) {
+            <p class="text-center text-muted list-empty">@T["Nothing to do here. Add some tasks  :)"]</p>
+        }
+
+        @foreach (var task in Model.Result) {
+            Html.RenderPartial("_Task", task, new ViewDataDictionary() { { "hidecompleted", hideCompleted } });
+        }
+
+        <p class="text-center my-3 toggle-hide @(!Model.Result.Any() ? "hidden": "" )"><a data-hide-completed="@(hideCompleted ? "true": "false")" href="#">@(hideCompleted ? T["Show completed"].ToString() : T["Hide completed"].ToString())</a></p>
+
+
+    </div>
+</div>
+
+
+<div class="modal" id="task-details-modal" role="dialog" aria-labelledby="task-details-modal" aria-hidden="true">
+
+    <div class="modal-dialog scroll-y" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">@T["Task details"]</h5>
+                <button type="button" class="btn btn-icon" data-dismiss="modal" aria-label="@T["Close"]">@Svg.Icon("close")</button>
+            </div>
+            @Svg.Spinner()
+            <div class="modal-body-content"></div>
+
+        </div>
+    </div>
+</div>
+
+@section fab {
+    <div class="fab dropup d-none">
+        <button type="button" class="btn btn-round btn-primary dropdown-toggle" data-toggle="modal" data-target="#task-details-modal" data-path="@(Url.Action<TasksController>(c => c.AddModal(WeavyContext.Current.App.Id)))" title="@T["Create task"]" aria-expanded="false" aria-haspopup="true">@Svg.Icon("plus")</button>
+    </div>
+}

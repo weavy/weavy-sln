@@ -40,51 +40,62 @@
         function openRequest(request) {
             var whenOpened = new WeavyPromise();
 
-            if (request.space && request.app && (request.space.id || request.space.key) && (request.app.id || request.app.key)) {
-
-                var appCount = weavy.spaces.reduce(function (sum, space) {
-                    return sum + space.apps.length;
-                }, 0);
-
-                var rejectCount = 0;
-
-                var reject = function () {
-                    rejectCount++;
-                    if (rejectCount >= appCount) {
-                        weavy.info("navigation: app " + (request.app.key || request.app.id) + " not found");
-                        whenOpened.reject();
-                    }
-                }
-
-                weavy.spaces.forEach(function (space) {
-                    space.whenLoaded().then(function () {
-                        if (request.space.id && space.id === request.space.id || request.space.key && space.key === request.space.key) {
-                            space.apps.forEach(function (app) {
-                                app.whenLoaded().then(function () {
-                                    if (request.app.id && app.id === request.app.id || request.app.key && app.key === request.app.key) {
-                                        weavy.log("navigation: app " + (request.app.key || request.app.id) + " open " + request.url);
-                                        app.open(request.url).then(function (open) {
-                                            whenOpened.resolve(open);
-                                        });
-                                    } else {
-                                        reject(app)
-                                    }
-                                });
-                            });
-                        } else {
-                            space.apps.forEach(reject);
-                        }
-                    });
+            if (request.target === "overlay" && weavy.plugins.preview) {
+                weavy.log("navigation: opening preview " + request.url);
+                weavy.plugins.preview.open(request.url).then(function (open) {
+                    whenOpened.resolve(open);
                 });
             } else {
-                weavy.warn("navigation: url was not resolved to an app");
-                whenOpened.reject();
+                if (weavy.plugins.preview) {
+                    weavy.plugins.preview.closeAll();
+                }
+
+                if (request.space && request.app && (request.space.id || request.space.key) && (request.app.id || request.app.key)) {
+
+                    var appCount = weavy.spaces.reduce(function (sum, space) {
+                        return sum + space.apps.length;
+                    }, 0);
+
+                    var rejectCount = 0;
+
+                    var reject = function () {
+                        rejectCount++;
+                        if (rejectCount >= appCount) {
+                            weavy.info("navigation: app " + (request.app.key || request.app.id) + " not found");
+                            whenOpened.reject();
+                        }
+                    }
+
+                    weavy.spaces.forEach(function (space) {
+                        space.whenLoaded().then(function () {
+                            if (request.space.id && space.id === request.space.id || request.space.key && space.key === request.space.key) {
+                                space.apps.forEach(function (app) {
+                                    app.whenLoaded().then(function () {
+                                        if (request.app.id && app.id === request.app.id || request.app.key && app.key === request.app.key) {
+                                            weavy.log("navigation: app " + (request.app.key || request.app.id) + " open " + request.url);
+                                            app.open(request.url).then(function (open) {
+                                                whenOpened.resolve(open);
+                                            });
+                                        } else {
+                                            reject(app)
+                                        }
+                                    });
+                                });
+                            } else {
+                                space.apps.forEach(reject);
+                            }
+                        });
+                    });
+                } else {
+                    weavy.warn("navigation: url was not resolved to an app");
+                    whenOpened.reject();
+                }
             }
 
             return whenOpened();
         }
         /**
-         * Try to open an url in the app where it belongs. Automaticalyy finds out where to open the url unless routing data is provided in a {NavigationRequest} object.
+         * Try to open an url in the app where it belongs. Automatically finds out where to open the url unless routing data is provided in a {NavigationRequest} object.
          * 
          * @param {string|NavigationRequest} request - String Url or a {NavigationRequest} object with route data.
          */

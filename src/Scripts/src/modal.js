@@ -1,4 +1,6 @@
-﻿var wvy = wvy || {};
+﻿/*global Turbolinks */
+
+wvy = wvy || {};
 
 wvy.modal = (function ($) {
 
@@ -6,6 +8,7 @@ wvy.modal = (function ($) {
         // hide modals
         $(".modal.show").removeClass("show").hide();
         $(".modal-backdrop").remove();
+        $("html").removeClass("modal-open");
     });
 
     // load modal for ajax content
@@ -107,16 +110,21 @@ wvy.modal = (function ($) {
                 return xhr;
             }
         }).done(function (response) {
+            var redirectLocation = !wvy.url.equal(xhr.responseURL, url) && xhr.responseURL;
 
-            var invalid = response.match(/.invalid-feedback/gm);
-
-            if (invalid && invalid.length > 0) {
-                $body.html($(response));
-                focusFirst($body);
-            } else {
-                var redirectLocation = xhr.responseURL !== url && xhr.responseURL || window.location.href;
+            if (redirectLocation) {
                 Turbolinks.visit(redirectLocation);
+            } else {
+                var invalid = response.match(/.invalid-feedback/gm);
+
+                if (invalid && invalid.length > 0) {
+                    $body.html($(response));
+                    focusFirst($body);
+                } else {
+                    Turbolinks.visit(window.location.href, { action: "replace" });
+                }
             }
+
         }).fail(function (jqXhr, status, error) {
             var json = JSON.parse(jqXhr.responseText);
             wvy.alert.danger(json.message);

@@ -1,56 +1,76 @@
 ﻿@model Weavy.Web.Models.VersionsModel
 @{
-    Layout = IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
-    Title = "Versions";
-    Back = Model.Content.Url();
-    var edit = Model.Content.HasPermission(Permission.Edit);
+    //Layout = IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Content/_Layout.Embedded.cshtml";
+    Title = T["Versions"].ToString();
+    var file = Model.Content as Weavy.Core.Models.File;
+    BodyAttributes.Add("class", "has-sidebar");
 }
 
-<table class="table table-hover table-files">
-    <thead>
-        <tr>
-            <th class="table-icon"></th>
-            <th>Versions</th>
-            <th>Modified</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th class="table-icon"></th>
-        </tr>
-    </thead>
-    <tbody>
+@section navbar_left {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarClose", Model.Content)
+    </div>
+}
 
-        @foreach (var ver in Model.Versions.AsSmartEnumerable()) {
-            var num = Model.Versions.Count() - ver.Index;
-            var item = ver.Value;
-            var href = item.IsCurrent() ? item.Url() : Url.Action<ContentController>(c => c.GetVersion(item.Id, item.Version));
+@section navbar_middle {
+    <div class="navbar-middle">
+        <div class="navbar-text">@Model.Content.GetTitle()</div>
+    </div>
+}
 
-            <tr data-href="@href">
-                <td class="table-icon">@Svg.Icon(item)</td>
-                <td><a href="@href">@num. @item.GetTitle()</a> @if (item.IsCurrent()) {<span class="badge badge-primary">current</span>}</td>
-                <td>@Html.Time(item.ModifiedAt, format: "g")</td>
-                <td>@item.GetKind()</td>
-                <td>--</td>
-                <td class="table-icon">
-                    @if (edit && !item.IsCurrent()) {
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
-                                @Svg.Icon("dots-vertical")
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <form action="@(Url.Action<ContentController>(c => c.Revert(item.Id, item.Version)))" method="post">
-                                    @Html.HttpMethodOverride(HttpVerbs.Put)
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("undo") Revert</button>
-                                </form>
-                                <form action="@(Url.Action<ContentController>(c => c.DeleteVersion(item.Id, item.Version)))" method="post">
-                                    @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                    <button type="submit" class="dropdown-item">@Svg.Icon("close") Remove</button>
-                                </form>
-                            </div>
-                        </div>
-                    }
-                </td>
-            </tr>
+@section navbar_right {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarIcons", Model.Content)
+    </div>
+}
+
+<aside class="content-drawer" data-type="content" data-id="@Model.Content.Id" data-content-id="@Model.Content.Id">
+    <header class="content-drawer-header sticky-top t-0">
+        <nav class="nav nav-tabs" role="tablist">
+            @if (Model.Content is ICommentable) {
+                <a class="nav-link" href="#tab-content-comments" data-toggle="tab" role="tab" title="@T["Comments"]">@T["Comments"]</a>
+            }
+            @if (Model.Content is IHasAttachments) {
+                <a class="nav-link" href="#tab-content-attachments" data-toggle="tab" role="tab" title="@T["Attachments"]">@T["Attachments"]</a>
+            }
+            <a class="nav-link active" href="#tab-content-versions" data-toggle="tab" role="tab" title="@T["Versions"]">@T["Versions"]</a>
+            <button class="nav-close btn btn-icon">@Svg.Icon("close", size: 18)</button>
+        </nav>
+    </header>
+    <div class="tab-content">
+        @if (Model.Content is ICommentable) {
+            <div class="tab-pane fade" id="tab-content-comments" role="tabpanel">
+                @Html.Partial("_Comments", Model.Content)
+            </div>
         }
-    </tbody>
-</table>
+        @if (Model.Content is IHasAttachments) {
+            <div class="tab-pane fade" id="tab-content-attachments" role="tabpanel">
+                @Html.Partial("_ContentAttachments", Model.Content)
+            </div>
+        }
+        <div class="tab-pane fade active show" id="tab-content-versions" role="tabpanel">
+            @Html.Partial("_Versions", Model)
+        </div>
+    </div>
+</aside>
 
+<article class="content-area" data-type="content" data-id="@Model.Content.Id" data-content-id="@Model.Content.Id">
+    @Html.Partial("_NavArrows", Model.Content)
+
+    @if (file != null) {
+        Html.RenderPartial("~/Areas/Apps/Views/File/_File.cshtml", file);
+    } else {
+        <div class="content-dropzone scroll-y">
+            <section class="content-section content-generic">
+                @Html.DisplayGroups(Model.Content, exclude: new string[] { nameof(Model.Content.Name), "Tags" })
+            </section>
+        </div>
+    }
+</article>
+
+@section footer {
+    @{
+        Html.RenderPartial("_FilesModals");
+    }
+}

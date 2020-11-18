@@ -1,6 +1,6 @@
 ﻿@model ClientViewModel
 @{
-    Title = "Clients";
+    Title = T["Clients"].ToString();
     Back = Url.Action<ClientController>(c => c.Index(null, null));
 }
 <div class="container my-3">
@@ -8,8 +8,8 @@
         @Html.HttpMethodOverride(HttpVerbs.Put)
         @Html.EditorsForModel()
         <div class="form-buttons">
-            <button type="submit" name="button" value="update" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+            <button type="submit" name="button" value="update" class="btn btn-primary btn-load" title="@T["Save"]">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">@T["Cancel"]</a>
         </div>
     }
 </div>

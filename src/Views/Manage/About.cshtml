@@ -1,25 +1,23 @@
 ﻿@model AboutModel
 @{
-  Title = "About " + ConfigurationService.ApplicationName;
-  Back = Url.Action<ManageController>(c => c.Index());
+    Title = $"{T["About"].ToString()} {ConfigurationService.ApplicationName}";
+    Back = Url.Action<ManageController>(c => c.Index());
 }
-
-
 
 <div class="container-fluid my-3">
 
     <div class="cover py-2">
         <div class="text-center">
             @Html.IconImg(128)
-            <div class="pt-3">@ConfigurationService.ApplicationName v@(Model.Version) was put together with help from the following awesome open source projects.</div>
+            <div class="pt-3">@T["{0} v{1} was put together with help from the following awesome open source projects.", @ConfigurationService.ApplicationName, Model.Version]</div>
         </div>
     </div>
 
     <table class="table table-hover">
         <thead>
             <tr>
-                <th>Name</th>
-                <th class="text-right" style="width:175px;">License</th>
+                <th>@T["Name"]</th>
+                <th class="text-right" style="width:175px;">@T["License"]</th>
             </tr>
         </thead>
         <tbody>

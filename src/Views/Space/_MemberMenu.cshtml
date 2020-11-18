@@ -2,7 +2,7 @@
 @model Member
 
 <div class="dropdown d-inline-block">
-    <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+    <button type="button" class="btn btn-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
         @Svg.Icon("dots-vertical")
     </button>
     <div class="dropdown-menu dropdown-menu-right" prevent-modal>
@@ -12,10 +12,10 @@
                 @Html.HttpMethodOverride(HttpVerbs.Put)
                 @if (Model.Access == Access.Admin) {
                     <input type="hidden" name="access" value="@Access.Write" />
-                    <button type="submit" class="dropdown-item">@Svg.Icon("shield-star") Remove as admin</button>
+                    <button type="submit" class="dropdown-item">@Svg.Icon("shield-star") @T["Remove as admin"]</button>
                 } else {
                     <input type="hidden" name="access" value="@Access.Admin" />
-                    <button type="submit" class="dropdown-item">@Svg.Icon("shield-star", "primary") Make admin</button>
+                    <button type="submit" class="dropdown-item">@Svg.Icon("shield-star", "primary") @T["Make admin"]</button>
                 }
             </form>
         }
@@ -23,12 +23,12 @@
         @if (Model.Id == User.Id) {
             <form action="@(Url.Action<SpaceController>(c => c.Leave(WeavyContext.Space.Id)))" method="post" data-turboform>
                 @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <button type="submit" class="dropdown-item">@Svg.Icon("close") Leave space</button>
+                <button type="submit" class="dropdown-item">@Svg.Icon("close") @T["Leave space"]</button>
             </form>
         } else if (WeavyContext.Space.HasPermission(Permission.Members)) {
             <form action="@(Url.Action<SpaceController>(c => c.RemoveMember(WeavyContext.Space.Id, Model.Id )))" method="post" data-turboform>
                 @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <button type="submit" class="dropdown-item">@Svg.Icon("close") Remove from space</button>
+                <button type="submit" class="dropdown-item">@Svg.Icon("close") @T["Remove from space"]</button>
             </form>
         }
 

@@ -126,7 +126,7 @@
          */
         weavy.options = weavy.extendDefaults(Weavy.defaults);
 
-        // Extend default options with the passed in arugments
+        // Extend default options with the passed in arguments
         for (var arg in arguments) {
             if (arguments[arg] && typeof arguments[arg] === "object") {
                 weavy.options = weavy.extendDefaults(weavy.options, arguments[arg], true);
@@ -503,6 +503,12 @@
                     plugins: weavy.options.plugins,
                     version: weavy.options.version
                 }
+                if (weavy.options.lang) {
+                    initData.lang = weavy.options.lang;
+                }
+                if (weavy.options.tz) {
+                    initData.tz = weavy.options.tz;
+                }
 
                 weavy.ajax(authUrl, initData, "POST", null, true).then(function (clientData) {
                     weavy.triggerEvent("clientdata", clientData);
@@ -804,31 +810,7 @@
         });
 
 
-        // MESSAGE EVENTS
-        // listen for dispatched messages from weavy (close/resize etc.)
-        weavy.on(wvy.postal, "message", weavy.getId(), function (message) {
-            /**
-                * THIS IS DEPRECATED. Use the weavy.on(wvy.postal, "message-name", weavy.getId(), function(e) { ... }); instead
-                * 
-                * Event for window messages directed to the current weavy instance, such as messages sent from panels belonging to the weavy instance.
-                * The original message event is attached as event.originalEvent.
-                * 
-                * Use e.data.name to determine which type of message theat was receivied.
-                * 
-                * @deprecated
-                * @category events
-                * @event Weavy#message
-                * @returns {Object.<string, data>}
-                * @property {string} name - The name of the message
-                * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
-            */
-            weavy.triggerEvent("message", message.data, message);
-
-        });
-
-
         // REALTIME EVENTS
-
 
         weavy.on(weavy.connection, "badge.weavy", function (e, data) {
 

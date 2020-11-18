@@ -11,9 +11,11 @@
     display: inline-flex;
     flex-shrink: 0;
     flex-grow: 0;
-    
+
     .eo {
-        margin: .125rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin: auto 0;
     }
 
     > * {
@@ -121,8 +123,8 @@
     height: 3rem;
     padding: 0;
 
-    > .i {
-        margin: auto;
+    > .i, > .eo {
+        margin: auto !important;
         transition: transform .3s;
         transform: rotate(0deg);
     }
@@ -133,8 +135,8 @@
     }
 
     &.btn-lg {
-        width: 3.5rem;
-        height: 3.5rem;
+        width: 4rem;
+        height: 4rem;
     }
 }
 

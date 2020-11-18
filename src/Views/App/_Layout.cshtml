@@ -26,7 +26,13 @@
     @if (IsSectionDefined("navbar_secondary")) {
         @RenderSection("navbar_secondary")
     } else {
-        Html.RenderPartial("~/Views/Space/_Tabs.cshtml");
+        Html.RenderPartial("~/Views/Space/_Navbar.cshtml");
+    }
+}
+
+@if (IsSectionDefined("navbar_tertiary")) {
+    @section navbar_tertiary {
+        @RenderSection("navbar_tertiary")
     }
 }
 

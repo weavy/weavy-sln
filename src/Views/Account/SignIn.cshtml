@@ -3,7 +3,7 @@
 @model Weavy.Web.Models.SignInModel
 @{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    Title = "Sign in";
+    Title = T["Sign in"].ToString();
 }
 <div class="container mt-5">
     <div class="row justify-content-sm-center">
@@ -17,27 +17,27 @@
                     <div class="form-group">
                         @Html.EditorFor(x => x.Username, new { HideSurroundingHtml = true })
                     </div>
-                    <div class="form-group">
-                        @Html.ActionLink("Recover password", nameof(AccountController.RecoverPassword), typeof(AccountController).ControllerName(), null, new { tabindex = "-1", @class = "float-right" })
+                    <div class="form-group">                        
+                        @(Html.ActionLink<AccountController>(c => c.RecoverPassword(), text: T["Recover password"], htmlAttributes: new { tabindex = "-1", @class = "float-right" }))
                         @Html.EditorFor(x => x.Password, new { HideSurroundingHtml = true })
                     </div>
                     <div class="form-buttons align-items-baseline">
                         @Html.EditorFor(x => x.RememberMe)
-                        <button type="submit" class="btn btn-primary btn-load ml-auto">Sign in</button>
+                        <button type="submit" class="btn btn-primary btn-load ml-auto">@T["Sign in"]</button>
                     </div>
                 }
             }
 
             @if (Model.AuthenticationTypes.Any()) {
                 if (ConfigurationService.FormsAuthentication) {
-                    <p class="text-center mt--3">&ndash; or &ndash;</p>
+                    <p class="text-center mt--3">&ndash; @T["or"] &ndash;</p>
                 }
 
                 <div class="d-standalone">
                     @using (Html.BeginForm(nameof(AccountController.SignInExternal), typeof(AccountController).ControllerName(), new { path = ViewBag.Path }, FormMethod.Post)) {
                         <div class="buttons text-center">
                             @foreach (AuthenticationDescription ad in Model.AuthenticationTypes) {
-                                <button type="submit" class="btn btn-primary mb-3" id="@ad.AuthenticationType" name="provider" value="@ad.AuthenticationType">@Svg.Icon(ad.AuthenticationType) Sign in with @ad.Caption</button>
+                                <button type="submit" class="btn btn-primary mb-3" id="@ad.AuthenticationType" name="provider" value="@ad.AuthenticationType">@Svg.Icon(ad.AuthenticationType) @T["Sign in with {0}", ad.Caption]</button>
                             }
                         </div>
                     }
@@ -47,7 +47,7 @@
                     @using (Html.BeginForm(nameof(AccountController.SignInExternal), typeof(AccountController).ControllerName(), new { path = "/sign-in-embedded" }, FormMethod.Post, new { id = "embedded-providers", data_weavy_event_notify = "signing-in" })) {
                         <div class="buttons text-center">
                             @foreach (AuthenticationDescription ad in Model.AuthenticationTypes) {
-                                <button type="submit" class="btn btn-primary mb-3 embedded-provider" id="@(ad.AuthenticationType)_embedded" name="provider" value="@ad.AuthenticationType">@Svg.Icon(ad.AuthenticationType) Sign in with @ad.Caption</button>
+                            <button type="submit" class="btn btn-primary mb-3 embedded-provider" id="@(ad.AuthenticationType)_embedded" name="provider" value="@ad.AuthenticationType">@Svg.Icon(ad.AuthenticationType) @T["Sign in with {0}", ad.Caption]</button>
                             }
                         </div>
                     }

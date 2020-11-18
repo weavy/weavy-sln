@@ -1,27 +1,30 @@
 ﻿@model object
 @{
-    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
-    var meta = ViewData.ModelMetadata;
-    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
-    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
-    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
-    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
-    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
     var attrs = new Dictionary<string, object>();
     attrs["type"] = "url";
     attrs["class"] = "form-control";
-    if (feedback != null) {
-        attrs.Append("class", "is-invalid");
-    }
-    if (!prop.IsEditable()) {
-        attrs["class"] = "form-control-plaintext";
+
+    var meta = ViewData.ModelMetadata;
+    if (meta.IsReadOnly) {
         attrs["readonly"] = null;
     }
 
-    var placeholder = label ? meta.Watermark : meta.Watermark ?? meta.DisplayName;
+    if (meta.IsRequired) {
+        attrs["required"] = null;
+    }
+
+    var error = ViewData.ErrorMessage();
+    if (error != null) {
+        attrs.Append("class", "is-invalid");
+    }
+
+    var placeholder = ViewData.PlaceholderText();
     if (placeholder != null) {
         attrs["placeholder"] = placeholder;
     }
+
+    var prop = meta.Property();
+
     if (prop.MinLength() != null) {
         attrs["minlength"] = prop.MinLength();
     }
@@ -31,22 +34,19 @@
     if (prop.Pattern() != null) {
         attrs["pattern"] = prop.Pattern();
     }
-    if (prop.IsRequired()) {
-        attrs["required"] = null;
-    }
 }
-@if (group) {
+@if (ViewData.RenderSurroundingHtml()) {
     WriteLiteral(@"<div class=""form-group"">");
 }
-@if (label) {
+@if (ViewData.RenderLabel()) {
     @Html.LabelFor(m => m)
 }
 @Html.TextBox("", ViewData.TemplateInfo.FormattedModelValue, attrs)
-@if (feedback != null) {
-    <div class="invalid-feedback">@feedback</div>
-} else if (text) {
+@if (error != null) {
+    <div class="invalid-feedback">@error</div>
+} else if (ViewData.RenderDescription()) {
     <div class="form-text">@meta.Description</div>
 }
-@if (group) {
+@if (ViewData.RenderSurroundingHtml()) {
     WriteLiteral(@"</div>");
 }

@@ -4,7 +4,7 @@
 }
 
 <!DOCTYPE html>
-<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<html @RenderHtmlAttributes()>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
@@ -21,7 +21,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="@Request.QueryString["clienturl"]/javascript/weavy.js"></script>
 </head>
-<body class="@BodyClasses()" @BodyAttributes>
+<body @RenderBodyAttributes()>
     <section id="client">
         <div class="row">
             <div class="col-md-12 text-right">

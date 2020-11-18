@@ -10,16 +10,16 @@
             <td class="text-right"><span class="badge badge-info">@dir.Members</span></td>
             <td class="table-icon">
                 <div class="dropdown">
-                    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
                         @Svg.Icon("dots-vertical")
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="@(Url.Action<DirectoriesController>(c => c.Get(dir.Id)))">@Svg.Icon("pencil", "primary") Edit</a>
-                        <a class="dropdown-item" href="@url">@Svg.Icon("account-multiple", "success") People</a>
+                        <a class="dropdown-item" href="@(Url.Action<DirectoriesController>(c => c.Get(dir.Id)))">@Svg.Icon("pencil", "primary") @T["Edit"]</a>
+                        <a class="dropdown-item" href="@url">@Svg.Icon("account-multiple", "success") @T["People"]</a>
                         <div class="dropdown-divider"></div>
                         <form action="@(Url.Action<DirectoriesController>(c => c.Delete(dir.Id)))" method="post" data-turboform>
                             @Html.HttpMethodOverride(HttpVerbs.Delete)
-                            <button class="dropdown-item" type="submit">@Svg.Icon("delete", "danger") Delete</button>
+                            <button class="dropdown-item" type="submit">@Svg.Icon("delete", "danger") @T["Delete"]</button>
                         </form>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
         </tr>
     }
 
-    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+    <tr class="scroll-next" data-next="@Url.ScrollNext(Model)">
         <td colspan="4"></td>
     </tr>
 }

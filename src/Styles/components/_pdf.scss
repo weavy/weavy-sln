@@ -1,0 +1,355 @@
+﻿/// <reference path="../_core.scss" />
+
+// adapted to scss from https://github.com/mozilla/pdfjs-dist/blob/master/web/pdf_viewer.css
+// and https://github.com/mozilla/pdf.js/blob/master/web/viewer.css
+
+
+// backdrop for file previews
+.pdf-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(100vh - 3rem);
+    //z-index: $zindex-tooltip+1;
+    //background-color: rgba(mix($black, #000), $opacity-panel);
+    display: none;
+    padding: 0;
+}
+
+// custom navbar for photoswipe and file preview
+.navbar-preview {
+    display: none;
+    color: color-yiq($black);
+    background-color: rgba($black, $opacity-backdrop);
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+
+    .btn-icon {
+        color: color-yiq($black);
+    }
+
+    .nav-link {
+        color: color-yiq($black);
+        padding: .25rem 0;
+        // make text as long as possible before clipping (considering icons and padding)
+        @include text-truncate;
+        max-width: calc(100vw - 11rem);
+
+        .area-messenger & {
+            max-width: calc(100vw - 5.5rem);
+        }
+
+        &.active {
+            color: color-yiq($black);
+        }
+    }
+
+    .navbar-nav {
+        padding-left: .5rem;
+        flex-direction: row;
+    }
+}
+
+// loading icon when rendering pdf preview
+.loadingIcon {
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../img/spinner.svg') center no-repeat;
+    background-size: 3rem;
+
+    &.global {
+        position: fixed;
+    }
+}
+
+#pdfToolbar {
+    position: absolute;
+    bottom: 0;
+    z-index: $zindex-sticky - 1;
+    margin: 1.5rem;
+    pointer-events: none;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    width: 125px;
+
+    > div {
+        display: flex;
+        background-color: $gray-600;
+        opacity: .95;
+        padding: .25rem;
+        border-radius: $border-radius;
+    }
+
+    .btn {
+        pointer-events: auto;
+
+        @extend .btn-black, .btn-sm;
+        box-shadow: none !important;
+
+        &:not(:first-child) {
+            margin-left: .25rem;
+        }
+
+        &.btn-icon {
+            color: $white;
+            min-width: 1.5rem;
+            min-height: 1.5rem;
+        }
+
+        svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    }
+}
+
+#pdfViewer {
+    padding: $spacer 0;
+
+    .canvasWrapper {
+        overflow: hidden;
+    }
+
+    .page {
+        direction: ltr;
+        width: 816px; // Default value set by pdfViewer
+        height: 1056px; // Default value set by pdfViewer
+        position: relative;
+        overflow: visible;
+        background-clip: content-box;
+        background-color: white;
+        border: 0;
+        margin: $spacer auto $spacer auto;
+        box-shadow: .125rem .125rem .625rem rgba(0,0,0,.25);
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        canvas {
+            margin: 0;
+            display: block;
+        }
+
+        &.loading {
+            max-width: 100%;
+            max-height: 100%;
+            width: 15rem;
+            height: 15rem;
+            box-shadow: none;
+            overflow: hidden;
+            background-color: transparent;
+
+            img {
+                opacity: .5;
+            }
+        }
+    }
+}
+
+// no pdf thumbnails
+#pdfThumbs {
+    display: none;
+}
+
+// wrapper for #pdfViewer and #pdfThumbs
+.pdf-document {
+    margin-top: 0;
+    overflow-x: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0;
+
+    @include scroll-y;
+
+    [hidden], template {
+        display: none !important;
+    }
+
+    .pdfPresentationMode {
+        &:fullscreen {
+            .pdfViewer {
+                .page {
+                    margin-bottom: 100%;
+                    border: 0;
+                }
+            }
+        }
+    }
+
+    .textLayer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        opacity: $opacity-faded;
+        line-height: 1.0;
+
+        > div {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+
+        .highlight {
+            margin: -$border-width;
+            padding: $border-width;
+            background-color: rgb(180, 0, 170);
+            border-radius: .25rem;
+
+            &.begin {
+                border-radius: .25rem 0 0 .25rem;
+            }
+
+            &.end {
+                border-radius: 0 .25rem .25rem 0;
+            }
+
+            &.middle {
+                border-radius: 0;
+            }
+
+            &.selected {
+                background-color: rgb(0, 100, 0);
+            }
+        }
+
+        ::selection {
+            background: rgb(0,0,255);
+        }
+
+        ::-moz-selection {
+            background: rgb(0,0,255);
+        }
+
+        .endOfContent {
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            cursor: default;
+            user-select: none;
+
+            &.active {
+                top: 0;
+            }
+        }
+    }
+
+    .annotationLayer {
+        section {
+            position: absolute;
+        }
+
+        .linkAnnotation {
+            > a {
+                position: absolute;
+                font-size: 1em;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat;
+            }
+        }
+
+        .textAnnotation {
+            img {
+                position: absolute;
+                cursor: pointer;
+            }
+        }
+
+        .textWidgetAnnotation input,
+        .textWidgetAnnotation textarea,
+        .choiceWidgetAnnotation select,
+        .buttonWidgetAnnotation.checkBox input,
+        .buttonWidgetAnnotation.radioButton input {
+            background-color: rgba(0, 54, 255, 0.13);
+            border: $border-width solid transparent;
+            box-sizing: border-box;
+            font-size: .5625rem; // 9px
+            height: 100%;
+            padding: 0 .1875rem;
+            vertical-align: top;
+            width: 100%;
+
+            &[disabled] {
+                background: none;
+                border: $border-width solid transparent;
+                cursor: not-allowed;
+            }
+
+            &:hover {
+                border: $border-width solid #000;
+            }
+        }
+
+        .textWidgetAnnotation textarea {
+            font: message-box;
+            font-size: .5625rem; // 9px
+            resize: none;
+        }
+
+        .textWidgetAnnotation input:focus,
+        .textWidgetAnnotation textarea:focus,
+        .choiceWidgetAnnotation select:focus {
+            background: none;
+            border: $border-width solid transparent;
+        }
+
+        .textWidgetAnnotation input.comb {
+            font-family: monospace;
+            padding-left: .125rem;
+            padding-right: 0;
+
+            &:focus {
+                /*
+                Letter spacing is placed on the right side of each character. Hence, the
+                letter spacing of the last character may be placed outside the visible
+                area, causing horizontal scrolling. We avoid this by extending the width
+                when the element has focus and revert this when it loses focus.
+                */
+                width: 115%;
+            }
+        }
+
+        .buttonWidgetAnnotation.checkBox input,
+        .buttonWidgetAnnotation.radioButton input {
+            appearance: none;
+        }
+
+        .highlightAnnotation,
+        .underlineAnnotation,
+        .squigglyAnnotation,
+        .strikeoutAnnotation,
+        .fileAttachmentAnnotation {
+            cursor: pointer;
+        }
+    }
+}
+
+html.embedded .controller-preview {
+    background: transparent !important;
+
+    .pdf-container {
+        background: none;
+    }
+}

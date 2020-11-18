@@ -2,7 +2,7 @@
 
 @if (Model.IsNullOrEmpty()) {
     <div class="container-fluid mt-3 empty">
-        <p class="text-muted">Your recycle bin is empty!</p>
+        <p class="text-muted">@T["Your recycle bin is empty!"]</p>
     </div>
 }
 
@@ -21,7 +21,7 @@
                     </td>
                     <td>@item.Title.Ellipsis(128)</td>
                     <td class="table-icon">
-                        <button type="button" class="btn btn-icon btn-success btn-load" title="Restore" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore")</button>
+                        <button type="button" class="btn btn-icon btn-success btn-load" title="@T["Restore"]" data-recycle="@item.Type.ToString().ToLower()" data-id="@item.Id">@Svg.Icon("backup-restore")</button>
                     </td>
                 </tr>
             }

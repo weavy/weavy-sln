@@ -16,7 +16,7 @@
     <div class="facepile">
         @Model.Members.Facepile(size: 32, link: true, presence: true)
         @if (WeavyContext.Space.HasPermission(Permission.Members)) {
-            <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="Add members">@Svg.Icon("plus")</button>
+            <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="@T["Add members"]">@Svg.Icon("plus")</button>
         }
     </div>
 </div>
@@ -26,7 +26,7 @@
         <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
     }
     <p class="small text-center text-muted">
-        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
+        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null)))">@T[Model.Members.TotalCount.Value, "{0} member"]</a>
     </p>
 </div>
 
@@ -36,19 +36,22 @@
         <form class="card post post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform>
             <div class="weavy-editor weavy-editor-placeholder minimized">
                 <div class="emojionearea form-control" role="application">
-                    <div class="emojionearea-editor" contenteditable="false" placeholder="What's on your mind?" tabindex="0" dir="ltr" spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="on"></div>
+                    <div class="emojionearea-editor" contenteditable="false" placeholder="@T["What's on your mind?"]" tabindex="0" dir="ltr" spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="on"></div>
                     <div class="emojionearea-picker emojionearea-picker-position-top emojionearea-filters-position-top emojionearea-search-position-top hidden" style="display: none;">
                         <div class="emojionearea-wrapper"></div>
                     </div>
                 </div>
                 <div class="poll-options"></div>
                 <div class="emojionearea-button-container">
-                    <div class="btn-file btn btn-icon" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" accept="@ConfigurationService.BlobWhitelist" multiple=""></div>
-                    <button type="button" class="btn btn-icon btn-poll" title="Add poll">@Svg.Icon("poll-box")</button>
+                    <button class="btn btn-icon">@Svg.Icon("attachment")</button>
+                    @if ((ConfigurationService.TeamsMeetings || ConfigurationService.ZoomMeetings) && !WeavyContext.Browser.Mobile) {
+                        <button type="button" class="btn btn-icon btn-video" title="@T["Add meeting"]">@Svg.Icon("video")</button>
+                    }                    
+                    <button type="button" class="btn btn-icon btn-poll" title="@T["Add poll"]">@Svg.Icon("poll-box")</button>
                     @if (!ConfigurationService.HtmlPosts) {
-                        <div class="emojionearea-button" title="Insert emoji"><div class="emojionearea-button-open"></div><div class="emojionearea-button-close"></div></div>
+                        <div class="emojionearea-button" title="@T["Insert emoji"]"><div class="emojionearea-button-open"></div><div class="emojionearea-button-close"></div></div>
                     }
-                    <button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit">@Svg.Icon("send")</button>
+                    <button type="submit" class="btn-submit btn btn-icon btn-primary" title="@T["Submit"]">@Svg.Icon("send")</button>
                 </div>
             </div>
             <textarea id="@(ConfigurationService.HtmlPosts ? "html" : "text")" class="form-control" name="@(ConfigurationService.HtmlPosts ? "html" : "text")" data-editor="post" style="display: none;"></textarea>
@@ -76,6 +79,8 @@
         @Html.ScrollMore(Model.Posts)
     }
 </div>
+
+@Html.Filebrowser(true, ConfigurationService.BlobWhitelist, "posts", cssClass: "d-none", htmlAttributes: new { data_dropzone = ".weavy-editor" })
 
 @section footer {
     @{

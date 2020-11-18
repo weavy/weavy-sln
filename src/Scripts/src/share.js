@@ -23,6 +23,7 @@ wvy.share = (function ($) {
             emojis: false,
             embeds: false,
             polls: false,
+            meetings: false,
             fileupload: false,
             submitButton: $submit,
             onSubmit: function (e, d) {

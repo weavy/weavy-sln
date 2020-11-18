@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html class="@HtmlClasses()" lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName">
+<html @RenderHtmlAttributes()>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, maximum-scale=1, user-scalable=no"> @* Viewport must contain width=device-width, minimum-scale=1.0 to trigger GPU Rasterization https://www.chromium.org/developers/design-documents/chromium-graphics/how-to-get-gpu-rasterization *@
@@ -10,7 +10,7 @@
     @Bundler.Scripts("~/scripts/pickers.bundle")
     @RenderSection("scripts", required: false)
 </head>
-<body class="@ControllerName.ToLower()-@ActionName.ToLower() no-navbar dialog">
+<body class="@ControllerName.ToLower()-@ActionName.ToLower() dialog">
     <script>@Html.ContextInfo()@Html.UserSettings()</script>
     <div class="alerts">
         @Html.AlertMessages()

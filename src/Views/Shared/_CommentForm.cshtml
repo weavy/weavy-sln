@@ -7,11 +7,12 @@
 }
 
 @if (Model.HasPermission(Permission.Comment)) {
-    <form action="@url" method="post" id="comment-form-@id" data-type="@type" data-id="@id" data-comments-container="@commentsContainer">
-        <textarea class="form-control comments-form" data-editor="comment" name="@(ConfigurationService.HtmlComments ? "html" : "text")" placeholder="Your comment..."></textarea>
-    </form>
+<form action="@url" method="post" id="comment-form-@id" class="my-3" data-type="@type" data-id="@id" data-comments-container="@commentsContainer">
+    <textarea class="form-control comments-form" data-editor="comment" name="@(ConfigurationService.HtmlComments ? "html" : "text")" placeholder="@T["Your comment..."]" style="display: none;"></textarea>
+</form>
+    @Weavy.Utils.HtmlUtils.Filebrowser(null, true, ConfigurationService.BlobWhitelist, "posts", cssClass: "d-none", align: "dropdown-menu-right", htmlAttributes: new { data_dropzone = ".weavy-editor" })
 
 } else if (!Model.CommentIds.Any()) {
-    <span class="text-muted">No comments yet...</span>
+    <span class="text-muted">@T["No comments yet..."]</span>
 }
 

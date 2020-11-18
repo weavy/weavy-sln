@@ -254,9 +254,8 @@
                 eventChain.push(root);
                 return eventChain;
             } else {
-                // No complete chain, return root only
-                // Would it be better to return currentTarget instead of root?
-                return [root];
+                // No complete chain, return currentTarget and root
+                return [currentTarget, root];
             }
         }
 

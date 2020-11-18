@@ -1,6 +1,6 @@
 ﻿@model App
 @{
-    Title = "Add tab";
+    Title = T["Add tab"].ToString();
     Back = ViewData.ModelState.IsValid ? Url.Back(Model.Url()) : WeavyContext.Space.Url();
     ViewData["turboform"] = true;
 }

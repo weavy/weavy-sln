@@ -1,0 +1,30 @@
+﻿@model Blob
+@{
+    var attrs = Html.PreviewAttributes(Model);
+}
+<a class="list-group-item list-group-item-action" href="@Model.DownloadUrl()" @Html.Raw(attrs.AsHtmlAttributes())>
+    <div class="media">
+        @if (Model.Link == null && FileUtils.IsWebImage(Model.Name)) {
+            <img class="img-48" src="@Model.ThumbUrl(48, 48, fit: FitMode.Crop)" />
+        } else {
+            @Svg.Icon(FileUtils.GetIcon(Model.Name))
+        }
+        <div class="media-body">
+            <h6 class="media-title">
+                @Model.Name
+                @if (Model.Link != null) {
+                    @Svg.Icon("open-in-new", "icon", 18)
+                }
+            </h6>
+            <small class="text-muted">
+                @if (Model.Width != null && Model.Height != null) {
+                    <text>@(Model.Width)x@(Model.Height) ·</text>
+                }
+                @FileUtils.FileSizeAsString(Model.Size)
+                @if (Model.Provider != null) {
+                    <text>- @FileUtils.GetKind(Model.Name, Model.MediaType) from @Model.Provider</text>
+                }
+            </small>
+        </div>
+    </div>
+</a>

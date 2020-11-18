@@ -59,7 +59,7 @@ $md-menu-fade-duration: 0.2s;
     padding-right: 1.25rem;
 
     &:hover {
-        transition: background-color $md-animation-duration $md-animation-curve-fast-out-slow-in;
+        transition: background-color $md-animation-duration-fast $md-animation-curve-fast-out-slow-in;
     }
 
     &:focus {
@@ -130,13 +130,12 @@ $md-menu-fade-duration: 0.2s;
 
     &::before {
         content: "";
-        @include overscroll-behavior-contain;
         position: fixed;
         z-index: -1;
         top: 0;
         left: 0;
-        bottom: 0;
-        right: 0;
+        width: 100vw;
+        height: 100vh;
         //z-index: $zindex-drawer-backdrop;
         visibility: hidden;
         background-color: transparent;

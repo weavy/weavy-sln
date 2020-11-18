@@ -21,7 +21,17 @@ wvy.posts = (function ($) {
 
                         // simple check to see that post contains any data
                         var json = $form.serializeObject(false);
-                        if (json.text || json.html || json.blobs || json.embeds) {
+                        if (json.text || json.html || json.blobs || json.embeds || json.meetings) {
+
+                            // check meetings authentication            
+                            if (json.meetings) {
+                                var auth = $("a[data-meeting-authenticated='0']");
+
+                                if (auth.length) {
+                                    wvy.alert.info(wvy.t("Please sign in to the meeting provider before you submit the post!"), 3000)
+                                    return false;
+                                }
+                            }
 
                             // remove .is-invalid
                             $form.removeClass("is-invalid");
@@ -148,7 +158,7 @@ wvy.posts = (function ($) {
         var id = this.dataset.id;
         wvy.api.trash("post", id).then(function () {
             $("[data-type=post][data-id=" + id + "]").slideUp("fast");
-            wvy.alert.alert("success", "Post was trashed. <button type='button' class='btn btn-link alert-link' data-restore='post' data-id='" + id + "'>Undo</button>.", 5000, "alert-trash-post-" + id);
+            wvy.alert.alert("success", wvy.t("Post was trashed.") + " <button type='button' class='btn btn-link alert-link' data-restore='post' data-id='" + id + "'>" + wvy.t("Undo") + "</button>.", 5000, "alert-trash-post-" + id);
         });
     });
 
@@ -158,7 +168,7 @@ wvy.posts = (function ($) {
         var id = this.dataset.id;
         wvy.api.restore("post", id).then(function () {
             $("[data-type=post][data-id=" + id + "]").slideDown("fast");
-            wvy.alert.alert("success", "Post was restored.", 5000, "alert-trash-post-" + id);
+            wvy.alert.alert("success", wvy.t("Post was restored."), 5000, "alert-trash-post-" + id);
         });
     });
 
@@ -332,18 +342,20 @@ wvy.posts = (function ($) {
             });
             delete data["options.Index"];
         }
-
+        
         // fetch modal content from server
         $.ajax({
             contentType: "application/json; charset=utf-8",
             url: $form.attr("action"),
             type: "PUT",
             data: JSON.stringify(data)
-        }).then(function (html) {
+        }).then(function (html) {            
             if (typeof (html) === "string") {
+                // must remove editor before binding the new one
+                $("#edit-post-modal [data-editor=post]").weavyEditor("destroy");
                 $form.replaceWith(html);
 
-                $("#edit-post-modal [data-editor='post']").weavyEditor({
+                $("#edit-post-modal [data-editor=post]").weavyEditor({
                     accept: wvy.config.blobWhitelist,
                     collapsed: true,
                     pickerCss: 'collapsed-static',
@@ -388,7 +400,19 @@ wvy.posts = (function ($) {
         });
     });
 
+    var showUploadedBlobs = function ($input, blobs) {
+        return new Promise(function (resolve, reject) {
+            // call server to get partial html for uploaded files
+            var qs = "?" + blobs.map(x => "ids=" + x.id).join("&");
+            $.get(wvy.url.resolve("/content/blobs" + qs), function (html) {
+                $input.closest(".weavy-editor").find(".uploads .table-attachments").append(html);
+                resolve();
+            });
+        });
+    }
+
     return {
-        updateFeedback: updateFeedback
+        updateFeedback: updateFeedback,
+        showUploadedBlobs: showUploadedBlobs
     }
 })(jQuery);

@@ -1,3 +1,6 @@
+// Overlay scroll
+@import 'vendor/overlayscrollbars/OverlayScrollbars';
+
 // Custom bootstrap loader
 @import 'bootstrap';
 
@@ -18,28 +21,25 @@
 @import 'components/custom_form';
 @import 'components/drawer';
 @import 'components/dropdown';
+@import 'components/drop';
 @import 'components/editor';
 @import 'components/emojione';
 @import 'components/fab';
 @import 'components/facepile';
 @import 'components/file-list';
 @import 'components/forms';
-@import 'components/grid';
 @import 'components/display';
 @import 'components/icons';
 @import 'components/image-grid';
 @import 'components/images';
 @import 'components/media';
-@import 'components/menu';
 @import 'components/modal';
 @import 'components/nav';
 @import 'components/navbar';
-@import 'components/note';
+@import 'components/overlay';
 @import 'components/pagination';
-@import 'components/photoswipe';
-@import 'components/pincode';
+@import 'components/pdf';
 @import 'components/presence';
-@import 'components/preview';
 @import 'components/prism';
 @import 'components/progress';
 @import 'components/search';

@@ -70,7 +70,13 @@
         var _origin = extractOrigin(window.location.href);
 
         function extractOrigin(url) {
-            return /^(https?:\/\/[^/]+)\//.exec(url)[1] || null;
+            var extractOrigin = null;
+            try {
+                extractOrigin = /^((?:https?:\/\/[^/]+)|(?:file:\/\/))\/?/.exec(url)[1]
+            } catch (e) {
+                console.error("wvy.postal: Unable to resolve location origin. Make sure you are using http, https or file protocol and have a valid location URL.");
+            }
+            return extractOrigin;
         }
 
         function distributeMessage(e) {

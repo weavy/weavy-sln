@@ -44,13 +44,3 @@
         }
     }
 }
-
-
-@include media-breakpoint-down(xs) {
-    html:not(.framed) {
-        .list-group-item.notification {
-            padding-left: $list-group-item-padding-x + $edge-margin;
-            padding-right: $list-group-item-padding-x + $edge-margin;
-        }
-    }
-}

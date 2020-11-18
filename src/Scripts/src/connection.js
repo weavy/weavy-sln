@@ -236,6 +236,7 @@
         }
 
         function triggerEvent(name) {
+            console.debug("triggering event " + name);
             var event = $.Event(name);
 
             // trigger event (with json object instead of string), handle any number of json objects passed from hub (args)
@@ -382,9 +383,9 @@
 
             _reconnectTimeout = setTimeout(function () {
                 if (wvy.alert) {
-                    wvy.alert.alert("primary", "Reconnecting...", null, "connection-state");
+                    wvy.alert.alert("primary", wvy.t("Reconnecting..."), null, "connection-state");
                 } else {
-                    triggerToChildren("alert", "show", { type: "primary", title: "Reconnecting...", id: "connection-state" });
+                    triggerToChildren("alert", "show", { type: "primary", title: wvy.t("Reconnecting..."), id: "connection-state" });
                 }
             }, 2000);
         });
@@ -418,6 +419,7 @@
         // generic callback used by server to notify clients that a realtime event happened
         // NOTE: we only need to hook this up in standalone, in the weavy client we wrap realtime events in the cross-frame-event and post to the frames
         function rtmEventRecieved(name, args) {
+            console.debug("received event " + name);
             name = name.indexOf(".rtmweavy" === -1) ? name + ".rtmweavy" : name;
             triggerEvent(name, args);
         }
@@ -571,7 +573,12 @@
 
     connections.get = function (url) {
         var sameOrigin = false;
-        var urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
+        var urlExtract;
+        try {
+            urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
+        } catch (e) {
+            console.error("wvy.connection: Unable to parse connection URL, make sure to connect to a valid domain.")
+        }
         if (urlExtract) {
             sameOrigin = window.location.origin === urlExtract[1]
             url = urlExtract[1];

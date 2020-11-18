@@ -1,11 +1,11 @@
 /// <reference path="../_core.scss" />
-.form-control {
-    &::placeholder {
-        font-size: $font-size-sm;
-        line-height: $font-size-base * $line-height-base;
-        font-weight: $font-weight-light;
+
+html.scrollbars {
+    textarea.form-control {
+        @include custom-scrollbar;
     }
 }
+
 
 .form-text {
     font-size: .875rem;
@@ -32,6 +32,80 @@ legend {
     font-size: 1.25rem;
 }
 
+.form-group.autosize {
+    position: relative;
+
+    > input.form-control {
+        position: absolute;
+        opacity: 1;
+        z-index: 1;
+    }
+
+    > span.form-control {
+        visibility: hidden;
+        pointer-events: none;
+        overflow: hidden;
+        white-space: pre;
+    }
+
+    .form-control.hover {
+        opacity: 0;
+
+        &:hover, &:focus {
+            opacity: 1;
+
+            & + span.form-control {
+                visibility: hidden;
+            }
+        }
+
+        & + span.form-control {
+            background: none;
+            border-color: transparent;
+            box-shadow: none;
+            overflow: hidden;
+            pointer-events: none;
+            visibility: visible;
+        }
+    }
+}
+
+.form-control.hover {
+    &:not(:hover, :focus) {
+        background: none;
+        border-color: transparent;
+        box-shadow: none;
+    }
+}
+
+
+// rename content form in navbar
+.navbar-form {
+    width: 100%;
+
+    .form-group {
+        margin: 0;
+
+        &.autosize {
+            > span.form-control {
+                @include text-truncate;
+                white-space: pre;
+            }
+        }
+    }
+
+    .form-control {
+        padding: $input-padding-y;
+        min-width: 6rem;
+        text-align: center;
+
+        &.is-invalid {
+            ~ .invalid-feedback {
+                display: none;
+            }
+        }
+    }
+}
 // form for live search (used in add space members etc.)
 .search-form {
 
@@ -53,7 +127,7 @@ legend {
     .btn-icon {
         color: $text-muted;
         position: absolute;
-        top: .25rem;
+        top: .125rem;
         right: .25rem;
 
         &:active {
@@ -75,7 +149,7 @@ legend {
 
             .spinner {
                 display: inline-flex;
-                margin:0;
+                margin: 0;
             }
 
             .i-close {

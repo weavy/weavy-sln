@@ -1,4 +1,5 @@
-﻿~/scripts/src/postal.js
+﻿~/scripts/src/resources.js
+~/scripts/src/postal.js
 ~/scripts/src/authentication.js
 ~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/src/connection.js

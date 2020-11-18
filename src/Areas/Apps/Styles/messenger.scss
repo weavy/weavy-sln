@@ -45,16 +45,19 @@
 @import "../../../styles/utilities/color";
 @import "../../../styles/utilities/scroll";
 
+@import '../../../styles/vendor/overlayscrollbars/OverlayScrollbars';
+
 // Custom components
 @import "../../../styles/components/buttons";
 @import "../../../styles/components/cover";
+@import "../../../styles/components/drop";
 @import "../../../styles/components/emojione";
 @import "../../../styles/components/icons";
 @import "../../../styles/components/images";
 @import "../../../styles/components/image-grid";
-@import "../../../styles/components/photoswipe";
+@import '../../../styles/components/overlay';
 @import "../../../styles/components/presence";
-@import "../../../styles/components/preview";
+//@import "../../../styles/components/pdf";
 @import "../../../styles/components/spinner";
 @import "../../../styles/components/togglers";
 
@@ -64,27 +67,53 @@
 // custom modal
 @import "messenger_modal";
 
+.scroll-y {
+    @include media-breakpoint-down(sm) {
+        &:not(.scroll-x) {
+            overflow-y: visible;
+            overflow-x: visible;
+        }
+    }
+}
+
+.file-ctrl {
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    cursor: pointer;
+}
+
+body.dual.os-host > .os-padding > .os-viewport > .os-content,
+body.dual.os-host > .os-padding > .os-viewport > .os-content-arrange {
+    @include media-breakpoint-up(md) {
+        display: flex;
+    }
+}
+
+html.os-html {
+    body.os-host > .os-scrollbar-vertical {
+        top: $navbar-height;
+    }
+
+    body.two.os-host > .os-scrollbar-vertical {
+        bottom: $navbar-height + .5rem;
+    }
+
+}
 
 .turbolinks-progress-bar {
     display: none;
-}
-
-body {
-    html:not(.mobile) & {
-        overflow: hidden;
-        height: 100vh;
-    }
 }
 
 .pane {
     display: flex;
     flex-direction: column;
     position: relative;
-
-    html:not(.mobile) & {
-        height: 100vh;
-        overflow: hidden;
-    }
 }
 
 .pane-header {
@@ -94,14 +123,12 @@ body {
     height: $navbar-height;
     flex: 0 0 $navbar-height;
     border-bottom: 1px solid $border-color;
-    padding: 0 .5rem;
+    padding: 0 $navbar-padding-x;
     background: $body-bg;
 
-    html.mobile & {
-        position: sticky;
-        top: 0;
-        z-index: $zindex-sticky;
-    }
+    position: sticky;
+    top: 0;
+    z-index: $zindex-sticky;
 }
 
 .pane-actions {
@@ -135,11 +162,6 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    // for scroll
-    html:not(.mobile) & {
-        @include scrollbar;
-        @include scroll-y;
-    }
 }
 
 .alerts {
@@ -243,6 +265,7 @@ body {
         float: right;
         font-size: $font-size-xs;
         margin-top: .25rem;
+        margin-right: .5rem;
     }
 }
 
@@ -250,21 +273,20 @@ body {
 #conversation {
     width: 100%;
 
-    html.mobile & {
-        display: flex;
-        flex-direction: column;
-        min-height: calc(100vh - #{$navbar-height});
-    }
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - #{$navbar-height});
+}
+
+#messages-scroll {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    min-height: 1.5rem;
 }
 
 // div with messages
 #messages {
-
-
-    html:not(.mobile) & {
-        @include scrollbar;
-        @include scroll-y;
-    }
 
     > .spinner {
         position: absolute;
@@ -275,7 +297,6 @@ body {
     }
 
     padding: $spacer 9% 0 9%;
-    margin-top: auto;
     padding-left: .75rem;
     padding-right: .75rem;
 
@@ -611,38 +632,38 @@ body {
         display: none;
     }
 
-    .conversation.starred & {
+    .conversation.starred &, #main.conversation.starred ~ .modal & {
         [data-action=unstar] {
             display: block;
         }
     }
 
-    .conversation:not(.starred) & {
+    .conversation:not(.starred) &, #main.conversation:not(.starred) ~ .modal & {
         [data-action=star] {
             display: block;
         }
     }
 
-    .conversation.unread & {
+    .conversation.unread &, #main.conversation.unread ~ .modal & {
         [data-action=read] {
             display: block;
         }
     }
 
-    .conversation:not(.unread) & {
+    .conversation:not(.unread) &, #main.conversation:not(.unread) ~ .modal & {
         [data-action=unread] {
             display: block;
         }
     }
 
-    .conversation.room & {
+    .conversation.room &, #main.conversation.room ~ .modal & {
         [data-action=leave] {
             display: block;
         }
     }
 
 
-    #main.conversation.room & {
+    #main.conversation.room &, #main.conversation.room ~ .modal & {
         [data-action=add-people] {
             display: block;
         }
@@ -693,6 +714,7 @@ button.dropdown-item {
     position: absolute;
     bottom: .5rem;
     right: 0;
+    right: $navbar-padding-x;
     display: flex;
 }
 
@@ -708,7 +730,7 @@ button.dropdown-item {
 
 .media-text {
     // make room for dropdown and star
-    padding-right: 3.25rem;
+    padding-right: 4.25rem;
 }
 // typing indicators
 .typing-hide {
@@ -730,6 +752,24 @@ button.dropdown-item {
 }
 // change some styles when loading
 body.loading {
+
+    #messages-scroll.os-host  {
+        margin-bottom: auto;
+
+        > .os-scrollbar {
+            display: none;
+        }
+
+        > .os-padding {
+            > .os-viewport {
+                overflow: visible;
+            
+                > .os-content {
+                    position: static;
+                }
+            }
+        }
+    }
 
     #messages {
         > .spinner {
@@ -764,65 +804,8 @@ body.sending {
     #sidebar {
         display: none;
     }
-
-    #conversation {
-
-        html:not(.mobile) & {
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-    }
 }
-// single pane layout
-body.single {
-    // show info pane side-by-side with conversation, also move scrollbar from body to the individual panes (even on mobile)
-    @include media-breakpoint-up(md) {
-        &.two {
-            display: flex;
-            flex-wrap: wrap;
-            height: 100vh;
-            overflow: hidden;
 
-            .pane {
-                height: 100vh;
-                overflow: hidden;
-            }
-
-            .pane-header {
-                position: static;
-                top: auto;
-                z-index: unset;
-            }
-
-            #main {
-                display: flex;
-                flex: 3;
-
-                .pane-body {
-                    height: 100%;
-                }
-            }
-
-            #conversation {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                height: 100%;
-            }
-
-            #messages {
-                min-height: 0;
-                @include scroll-y;
-            }
-
-            .message-form {
-                position: static;
-            }
-        }
-    }
-}
 // responsive two pane layout
 body.dual {
 
@@ -872,7 +855,6 @@ body.dual {
 
         #messages {
             min-height: 0;
-            @include scroll-y;
         }
 
         .message-form {
@@ -885,10 +867,6 @@ body.dual {
                 display: flex;
                 flex: 0 0 40%;
                 max-width: 420px;
-
-                .pane-body {
-                    @include scroll-y;
-                }
             }
 
             #main {
@@ -905,152 +883,83 @@ body.dual {
 }
 // tables
 .table {
-    table-layout: fixed;
     margin: 0;
+    table-layout: fixed;
 
     th, td {
         border: none;
-        padding-left: .25rem;
-        padding-right: .25rem;
-
-        &:first-child {
-            padding-left: .5rem;
-        }
-
-        &:last-child {
-            padding-right: .5rem;
-        }
+        padding: $table-cell-padding $table-cell-padding-sm;
 
         &.table-icon {
-            // cell with .img-32 or .btn-icon
+            // cell with icon or avatar
             line-height: 0;
             color: $icon-color;
             text-align: center;
             vertical-align: middle;
             position: relative;
-            width: 2.5rem;
+            padding: 0 $table-cell-padding-sm;
+            width: 2rem + $table-cell-padding-sm * 2;
 
             > :only-child {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                margin: auto;
             }
 
-            &:first-child {
-                padding: .25rem 0 .25rem .5rem;
-
-                > :only-child {
-                    margin: auto;
-                    justify-content: flex-start;
-                }
-            }
-
-            &:last-child {
-                padding: .25rem .5rem .25rem 0;
-
-                > :only-child {
-                    margin-left: auto;
-                    justify-content: flex-end;
-                }
+            &:last-child > :only-child {
+                margin-left: auto;
+                margin-right: 0;
+                justify-content: flex-end;
             }
         }
 
-        .btn-icon {
-            margin-top: -.25rem;
-            margin-bottom: -.25rem;
+        &:first-child {
+            padding-left: $navbar-padding-x;
+
+            &.table-icon {
+                width: $navbar-padding-x + 2rem + $table-cell-padding-sm;
+            }
+        }
+
+        &:last-child {
+            padding-right: $navbar-padding-x;
+
+            &.table-icon {
+                width: $table-cell-padding-sm + 2rem + $navbar-padding-x;
+            }
+        }
+
+        > .btn-icon, > svg.i {
+            margin-top: -$table-cell-padding;
+            margin-bottom: -($table-cell-padding - $table-cell-padding-sm);
+        }
+    }
+
+    thead {
+        th, td {
+            font-size: $font-size-xs;
+            text-transform: uppercase;
+            border-top-color: transparent;
+            border-bottom: $table-border-width solid $table-border-color;
         }
     }
 }
 
-.table-meetings {
-    // close icon
-    td.table-icon:nth-child(3) {
-        padding: .25rem;
-    }
-
+// attached files and meetings in new message
+.table-uploads, .table-meetings {
     tr:last-child td {
-        border-bottom: $border-width solid rgba(0, 0, 0, .08);
+        border-bottom: $border-width solid $border-color;
     }
 }
 
-// attached files in new message
-.table-uploads {
-
-    td {
-        background-color: $gray-100;
-    }
-    // file type icon
-    td:nth-child(1) {
-        padding: .25rem .25rem .25rem .75rem;
-    }
-    // name
-    td:nth-child(2), th:nth-child(2) {
-        width: 100%;
-        @include text-truncate;
-    }
-    // close icon
-    td.table-icon:nth-child(3) {
-        padding: .25rem;
-    }
-
-    tr:last-child td {
-        border-bottom: $border-width solid rgba(0, 0, 0, .08);
-    }
-}
-// room members
-.table-members {
-
-    td, th {
-        // avatar
-        &.table-icon:nth-child(1) {
-            padding-left: 1rem;
-            padding-right: .25rem;
-            width: 3.25rem;
-        }
-        // name
-        &:nth-child(2) {
-            width: 100%;
-            @include text-truncate;
-        }
-        // icon
-        &.table-icon:nth-child(3) {
-            padding-left: .25rem;
-            padding-right: .5rem;
-            width: 2.75rem;
-        }
-    }
-}
-// select people
+// add people to conversation
 .table-people {
-
-    tr {
+    tr:not(.info) {
         cursor: pointer;
     }
-
-    td, th {
-        // avatar
-        &.table-icon:nth-child(1) {
-            padding-left: 1rem;
-            padding-right: .25rem;
-            width: 3.25rem;
-        }
-        // name
-        &:nth-child(2) {
-            width: 100%;
-            @include text-truncate;
-        }
-        // icon
-        &.table-icon:nth-child(3) {
-            padding-left: .25rem;
-            padding-right: 1rem;
-            width: 3.25rem;
-        }
-    }
-
-    tr.info {
-        cursor: default;
-    }
 }
+
 // forms
 .form-text {
     color: $text-muted;
@@ -1065,7 +974,12 @@ body.dual {
     background: $white;
     @extend .border-top;
 
+    textarea {
+        resize: none;
+    }
+
     .form-container {
+        padding: $navbar-padding-y $navbar-padding-x;
         // relative so that we can position the file upload progress bar and emoji picker
         position: relative;
     }
@@ -1084,47 +998,48 @@ body.dual {
         position: relative;
         display: flex;
         flex-direction: row;
-
-        .emojionearea {
-            z-index: 10;
-        }
-
-        .emojionearea-editor {
-            padding: .5rem 2rem .5rem .5rem;
-            background-color: $gray-100;
-            margin: 0.25rem 0.25rem 0.25rem 0.5rem;
-            word-break: break-word;
-        }
+        align-items: flex-end;
     }
 
     .form-control {
         border: 0;
-        border-radius: 0;
+        //border-radius: 0;
+        background-color: $gray-100;
         box-shadow: none;
-        padding: .75rem 2.75rem;
+        margin: 0 .75rem;
+        padding: .5rem .75rem;
 
         &:disabled {
             background-color: $input-bg;
         }
     }
 
-    .dropup {
-        display: flex;
-        align-items: center;
-        margin: 0 0 0.25rem 0.25rem;
-        align-self: flex-end;
+    .emojionearea {
+        z-index: 10;
+        position: relative;
     }
-    
-    .btn-tool {
-        align-self: flex-end;
-        margin: 0 0 0.5rem 0.25rem;
-        cursor: pointer;
 
-        &:hover {
-            opacity: 1;
+    .emojionearea-editor {
+        margin: 0;
+        // make room for emoji button (unless mobile)
+        padding: .5rem 2.75rem .5rem .75rem;
+
+        html.mobile & {
+            padding-right: .75rem;
         }
+
+        word-break: break-word;
     }
 
+
+    .emojionearea-button {
+        bottom: .5rem;
+        right: .75rem;
+    }
+
+    .btn-icon {
+        margin-bottom: .25rem;
+    }
     // file upload button
     .btn-file > input {
         position: absolute;
@@ -1139,26 +1054,13 @@ body.dual {
         cursor: pointer;
         overflow: hidden;
     }
-
-    // submit button
-    .btn-primary {
-        align-self: flex-end;
-        margin: 0 0.25rem 0.5rem 0;
-    }
 }
 
-body:not(.embedded) {
-    @include media-breakpoint-down(xs) {
-        .emojionearea-editor {
-            padding: .5rem !important;
-        }
-    }
-}
 
 .search-form {
 
     .form-group {
-        margin: .5rem;
+        margin: $navbar-padding-y $navbar-padding-x;
         position: relative;
     }
 
@@ -1233,7 +1135,7 @@ body:not(.embedded) {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: .5rem 0 1.5rem 0;
+        padding: .875rem 0 1rem 0;
     }
 
     .form-group {

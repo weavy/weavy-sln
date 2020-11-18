@@ -19,27 +19,30 @@
         @Html.HttpMethodOverride(HttpVerbs.Put)
 
         <fieldset>
-            <legend>Date and time</legend>
-            @Html.EditorsForModel(Model, group: "settings", formText: false)
+            <legend>@T["Regional settings"]</legend>
+            @if (ConfigurationService.Languages.Count() > 1) {
+            @Html.EditorsForModel(Model, group: "language")
+            }
+            @Html.EditorsForModel(Model, group: "region")
         </fieldset>
         <fieldset>
-            <legend>Notification settings</legend>
+            <legend>@T["Notification settings"]</legend>
             @Html.EditorsForModel(Model, group: "notifications")
         </fieldset>
         <fieldset>
-            <legend>Notification delivery</legend>
+            <legend>@T["Notification delivery"]</legend>
             <div class="notification-alerts">
-                <div class="alert alert-warning notification-required">We <a href="#" class="alert-link notification-required">need your permission</a> to enable desktop notifications in this browser.</div>
-                <div class="alert alert-danger notification-denied">Desktop notifications have been disabled in this browser.</div>
-                <div class="alert alert-info notification-missing">This browser does not support desktop notifications.</div>
+                <div class="alert alert-warning notification-required"><a href="#" class="alert-link notification-required">@T["We need your permission to enable desktop notifications in this browser."]</a> </div>
+                <div class="alert alert-danger notification-denied">@T["Desktop notifications have been disabled in this browser."]</div>
+                <div class="alert alert-info notification-missing">@T["This browser does not support desktop notifications."]</div>
             </div>
             @Html.EditorFor(model => model.DesktopNotifications)
             @Html.EditorsForModel(Model, group: "channel", exclude: new[] { "DesktopNotifications" })
         </fieldset>
        
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load" title="@T["Save"]">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>@T["Cancel"]</a>
         </div>
     }
 </div>

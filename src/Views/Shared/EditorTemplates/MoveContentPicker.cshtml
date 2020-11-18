@@ -1,21 +1,7 @@
 ﻿@model int?
 @{
-    var prop = ViewData.ModelMetadata.ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName);
     var meta = ViewData.ModelMetadata;
-    var state = ViewData.ModelState[ViewData.ModelMetadata.PropertyName];
-    var feedback = state?.Errors?.FirstOrDefault()?.ErrorMessage;
-    bool group = ViewData["FormGroup"] as bool? ?? !meta.HideSurroundingHtml;
-    bool label = ViewData["FormLabel"] as bool? ?? !meta.HideSurroundingHtml;
-    bool text = (ViewData["FormText"] as bool? ?? true) && meta.Description != null;
-
-    var attrs = new Dictionary<string, object>();
-    if (feedback != null) {
-        attrs.Append("class", "is-invalid");
-    }
-    if (prop.IsRequired()) {
-        attrs["required"] = null;
-    }
-
+    var error = ViewData.ErrorMessage();
     var source = ViewData["Source"] as Content;
     var app = source?.App() as Files;
 
@@ -23,22 +9,22 @@
     IEnumerable<App> apps = null;
 }
 
-@* don't show other apps if embedded *@
-@if (!IsEmbedded) {
-
+@if (IsEmbedded) {
+    @* don't show other apps if embedded *@
+    <input type="hidden" name="AppId" value="@(WeavyContext?.App.Id)" />
+} else {
     // get spaces where we have content permission
     spaces = SpaceService.Search(new SpaceQuery() { Archived = false, OrderBy = "Name" }).Where(x => x.HasPermission(Permission.Content));
 
     // get Files apps for each space above
     apps = spaces.Select(s => AppService.GetApps<Files>(s.Id).FirstOrDefault()).Where(a => a != null);
 
-
-    if (group) {
+    if (ViewData.RenderSurroundingHtml()) {
         WriteLiteral(@"<div class=""form-group"">");
     }
 
-    if (label) {
-        <label for="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")">Space</label>
+    if (ViewData.RenderLabel()) {
+        <label for="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")">@T["Space"]</label>
     }
 
     <select class="form-control custom-select app-picker" id="@ViewData.TemplateInfo.GetFullHtmlFieldId("AppId")" name="AppId" data-content-picker="@ViewData.TemplateInfo.GetFullHtmlFieldId("")">
@@ -47,18 +33,16 @@
         }
     </select>
 
-    if (group) {
+    if (ViewData.RenderSurroundingHtml()) {
         WriteLiteral(@"</div>");
     }
-} else {
-    <input type="hidden" name="AppId" value="@(WeavyContext?.App.Id)" />
 }
 
-@if (group) {
+@if (ViewData.RenderSurroundingHtml()) {
     WriteLiteral(@"<div class=""form-group"">");
 }
 
-@if (label) {
+@if (ViewData.RenderLabel()) {
     @Html.LabelFor(m => m)
 }
 
@@ -70,13 +54,13 @@
     }
 </select>
 
-@if (feedback != null) {
-    <div class="invalid-feedback">@feedback</div>
-} else if (text) {
+@if (error != null) {
+    <div class="invalid-feedback">@error</div>
+} else if (ViewData.RenderDescription()) {
     <div class="form-text">@meta.Description</div>
 }
 
-@if (group) {
+@if (ViewData.RenderSurroundingHtml()) {
     WriteLiteral(@"</div>");
 }
 

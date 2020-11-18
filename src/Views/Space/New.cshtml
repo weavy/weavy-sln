@@ -1,7 +1,7 @@
 ﻿@model Space
 @using Weavy.Web.Models
 @{
-    Title = "Spaces";
+    Title = T["Spaces"].ToString();
     Back = Url.Back(Url.Action<SpaceController>(c => c.Index(null, null)));
 }
 
@@ -16,10 +16,10 @@
         <div class="text-center">
             @Html.EditorFor(x => Model.Avatar, additionalViewData: new { Avatar = Model })
         </div>
-        @Html.EditorsForModel()
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.Avatar) })
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load" title="Save">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">@T["Cancel"]</a>
         </div>
     }
 </div>

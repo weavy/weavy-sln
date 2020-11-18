@@ -2,8 +2,8 @@
 
 @if (Model.UnreadNotifications.Count + Model.ReadNotifications.Count == 0) {
     <div class="container-fluid mt-3 empty">
-        <p class="text-center text-muted">All caught up :)</p>
-    </div>
+        <p class="text-center text-muted">@T["All caught up :)"]</p>
+</div>
 }
 
 <div class="list-group list-group-flush">

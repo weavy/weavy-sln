@@ -1,7 +1,7 @@
 /// <reference path="../_core.scss" />
 
 .media {
-    white-space: normal; // To behave normally inside .btn
+    white-space: normal; // to behave normally inside .btn
 
     > img, > .i {
         margin-left: 0 !important;
@@ -25,5 +25,4 @@
     display: flex;
     flex: 0 0 auto;
     margin: -.25rem;
-    margin-right: -.5rem;
 }

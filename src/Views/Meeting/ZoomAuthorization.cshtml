@@ -2,11 +2,11 @@
     <div class="container text-center py-3">
         @Svg.Icon("zoom", color: "native", size: 48)
         @if (Model.Authenticated) {
-            <h3>Successfully authenticated with Zoom</h3>
-            <p>Please wait while we redirect you back to Weavy...</p>
+            <h3>@T["Successfully authenticated with Zoom"]</h3>
+            <p>@T["Please wait, redirecting..."]</p>
             @Svg.Spinner(spin: true)
         } else {
-            <div class="alert alert-danger my-2">Zoom authentication failed. Please make sure the Zoom settings in Weavy are correct.</div>
+            <div class="alert alert-danger my-2">@T["Zoom authentication failed. Please make sure the Zoom settings are correct."]</div>
         }
 
     </div>
@@ -16,7 +16,7 @@
         @if (Model.Authenticated) {
             <text>
             if (window.opener !== null && !wvy.browser.mobile) {
-                window.opener.postMessage({ name: "zoom-signed-in" });
+                window.opener.postMessage({ name: "zoom-signed-in", guid: "@Model.State" });
                 window.close();
             } else {
                 location.href = wvy.url.resolve('/messenger/@Model.State')

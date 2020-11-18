@@ -12,10 +12,13 @@
     font-size: 1rem !important;
 }
 
-/* PADDING */
+.action-newroot .CodeMirror {
+    height: 459px;
+}
 
+/* PADDING */
 .CodeMirror-lines {
-  padding: .25rem 0; /* Vertical padding around content */
+    padding: .25rem 0; /* Vertical padding around content */
 }
 .CodeMirror pre {
   padding: 0 .25rem; /* Horizontal padding of content */

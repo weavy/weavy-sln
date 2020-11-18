@@ -29,11 +29,11 @@
         @Html.EditorFor(x => Model.Email)
         @Html.EditorFor(x => Model.Username)
 
-        @Html.EditorsForModel(Model.Profile, exclude: new string[] { nameof(Model.Profile.Name) })
+        @Html.EditorsForModel(Model.Profile, exclude: new string[] { nameof(Model.Profile.Avatar), nameof(Model.Profile.Name) })
 
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load" title="@T["Save"]">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-link>@T["Cancel"]</a>
         </div>
     }
 
@@ -42,8 +42,8 @@
             <thead>
                 <tr>
                     <th class="table-icon"></th>
-                    <th>Linked logins</th>
-                    <th>Account</th>
+                    <th>@T["Linked logins"]</th>
+                    <th>@T["Account"]</th>
                     <th class="table-icon"></th>
                 </tr>
             </thead>
@@ -57,7 +57,7 @@
                             @using (Html.BeginForm(nameof(AccountController.RemoveLogin), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
                                 @Html.HttpMethodOverride(HttpVerbs.Delete)
                                 @Html.Hidden(nameof(Login.Id), login.Id)
-                                <button type="submit" class="btn btn-icon" title="Remove">@Svg.Icon("close")</button>
+                                <button type="submit" class="btn btn-icon" title="@T["Remove"]">@Svg.Icon("close")</button>
                             }
                         </td>
                     </tr>

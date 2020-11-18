@@ -1,5 +1,5 @@
 ﻿@model Messenger
- 
+
 @* different actions depending on if we are rendering full messenger or conversation only *@
 <form class="message-form" action="@(Model.IsMessenger ? Url.Action<MessengerController>(c => c.InsertMessengerMessage(Model.Conversation.Id, null)) : Url.Action<MessengerController>(c => c.InsertMessage(Model.Conversation.Id, null)))" method="post">
     <table class="table table-meetings"></table>
@@ -9,33 +9,23 @@
             <div class="progress-bar" role="progressbar"></div>
         </div>
         <div class="form-group">
-            <button type="button" class="btn btn-file btn-tool  btn-icon" title="Add files">@Svg.Icon("attachment")<input type="file" name="files" accept="@ConfigurationService.BlobWhitelist" multiple /></button>
+            @Html.Filebrowser(true, ConfigurationService.BlobWhitelist, "messenger", htmlAttributes: new { data_dropzone = "main" })
             @if (Model.TeamsEnabled && Model.ZoomEnabled) {
                 <div class="dropup">
-                    <button type="button" class="btn btn-meeting btn-icon dropup mx-0" data-toggle="dropdown" title="Add meeting">@Svg.Icon("video")</button>
-
+                    <button type="button" class="btn btn-icon btn-meeting dropup" data-toggle="dropdown">@Svg.Icon("video")</button>
                     <div class="dropdown-menu">
-                        @if (Model.TeamsEnabled) {
-                            <button type="button" class="btn dropdown-item btn-add-meeting" data-provider="teams" title="Teams Meeting">@Svg.Icon("microsoft-teams", color: "native") Teams meeting</button>
-                        }
-                        @if (Model.ZoomEnabled) {
-                            <button type="button" class="btn dropdown-item btn-add-meeting" data-provider="zoom" title="Zoom Meeting">@Svg.Icon("zoom", color: "native") Zoom meeting</button>
-                        }
+                        <button type="button" class="dropdown-item btn-add-meeting" data-provider="teams">@Svg.Icon("microsoft-teams", color: "native") @T["Teams meeting"]</button>
+                        <button type="button" class="dropdown-item btn-add-meeting" data-provider="zoom">@Svg.Icon("zoom", color: "native") @T["Zoom meeting"]</button>
                     </div>
                 </div>
-            } else if (Model.TeamsEnabled || Model.ZoomEnabled) {
-
-                if (Model.TeamsEnabled) {
-                    <button type="button" class="btn btn-icon btn-tool btn-add-meeting" data-provider="teams" title="Teams Meeting">@Svg.Icon("video")</button>
-                }
-                if (Model.ZoomEnabled) {
-                    <button type="button" class="btn btn-icon btn-tool btn-add-meeting" data-provider="zoom" title="Zoom Meeting">@Svg.Icon("video")</button>
-                }
+            } else if (Model.TeamsEnabled) {
+                <button type="button" class="btn btn-icon btn-add-meeting" data-provider="teams">@Svg.Icon("video")</button>
+            } else if (Model.ZoomEnabled) {
+                <button type="button" class="btn btn-icon btn-add-meeting" data-provider="zoom">@Svg.Icon("video")</button>
             }
 
-            @Html.TextArea("text", string.Empty, new { placeholder = "Type a message...", rows = "1", @class = "form-control" })
-            <button type="submit" class="btn btn-icon btn-primary" title="Send message">@Svg.Icon("send")</button>
-
+            @Html.TextArea("text", string.Empty, new { placeholder = T["Type a message..."], rows = "1", @class = "form-control" })
+            <button type="submit" class="btn btn-icon btn-primary" title="@T["Send message"]">@Svg.Icon("send")</button>
         </div>
     </fieldset>
 </form>

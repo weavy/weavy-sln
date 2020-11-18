@@ -1,6 +1,6 @@
 ﻿@model Space
 @{
-    Title = "Edit space";
+    Title = T["Edit space"].ToString();
     Back = Model.Url();
 }
 
@@ -17,11 +17,11 @@
             @Html.EditorFor(x => Model.Avatar)
         </div>
 
-        @Html.EditorsForModel()
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.Avatar)})
 
         <div class="form-buttons">
-            <button type="submit" name="button" value="@(nameof(SpaceController.Update))" class="btn btn-primary btn-load" title="Save">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto">Cancel</a>
+            <button type="submit" name="button" value="@(nameof(SpaceController.Update))" class="btn btn-primary btn-load" title="@T["Save"]">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto">@T["Cancel"]</a>
         </div>
 
     }

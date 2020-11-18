@@ -3,6 +3,15 @@
     Layout = null;
     Space space = Model.Item1;
     App app = Model.Item2;
+
+    var settings = User.GetSettings();
+    var ci = new System.Globalization.CultureInfo(settings.Language ?? "en");
+    if (settings.Region != null) {
+        ci = new System.Globalization.CultureInfo(ci.TwoLetterISOLanguageName + "-" + settings.Region);
+    }
+
+    var lang = ci.Name;
+    var tz = settings.TimeZone;
 }
 
 <!DOCTYPE html>
@@ -86,9 +95,18 @@
             }
 
         .panel {
-            padding: 15px;
-            height: calc(100vh - 3.625rem);
+            margin: .5rem;
+            padding: 0;
+            height: calc(100vh - 3.625rem - 2 * .5rem);
         }
+
+            .panel:not(:first-child) {
+                margin-left: .25rem;
+            }
+
+            .panel:not(:last-child) {
+                margin-right: .25rem;
+            }
 
         .panel-close {
         }
@@ -99,8 +117,14 @@
     <nav class="navbar  navbar-expand navbar-dark bg-dark text-light">
         <a class="navbar-brand" href="~/test/client">@Html.IconImg(24)</a>
         <a id="btn-sign-in" class="nav-link">Sign in</a>
+        <a id="btn-jwt-1" class="nav-link">JWT 1</a>
+        <a id="btn-jwt-2" class="nav-link">JWT 2</a>
+        <a id="btn-jwt-f" class="nav-link">JWT function()</a>
+        <a id="btn-jwt-p" class="nav-link">JWT promise()</a>
         <a id="btn-sign-out" class="nav-link">Sign out</a>
-        <a id="btn-toggle-files" class="nav-link mr-auto">Toggle Files</a>
+        <a id="btn-destroy" class="nav-link">Destroy</a>
+        <a id="btn-init" class="nav-link">Init</a>
+        <a id="btn-toggle" class="nav-link mr-auto">Toggle Comments</a>
         <a id="notifications" class="nav-link p-2">@Svg.Icon("bell")</a>
         <a id="messenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
     </nav>
@@ -109,6 +133,7 @@
         <div class="row">
             <div id="panel-files" class="col panel"></div>
             <div id="panel-posts" class="col panel"></div>
+            <div id="panel-tasks" class="col panel"></div>
             <div id="panel-comments" class="col panel"></div>
         </div>
     </div>
@@ -119,41 +144,73 @@
     <script>
         (function ($) {
 
-            var weavy = window.weavy = new Weavy({
-                id: "ctx",
-                @if (ViewBag.Token != null) {
-                <text>jwt: "@ViewBag.Token",</text>
-                }
-                spaces: [
-                    {
-                        key: "client-test-global",
-                        name: "Client Test Global",
-                        container: $("#drawer"),
-                        tabbed: true,
-                        apps: [
-                            { key: "notifications", type: "notifications" },
-                            { key: "messenger", type: "messenger" }
-                        ]
-                    },
-                    {
-                        id: @space.Id,
-                        apps: [
-                            {
-                                id: @app.Id
-                            },
-                            {
-                                key: "files",
-                                type: "files"
-                            }
-                        ]
+            var weavy;
+
+            var jwts = ["@ViewBag.Token", "@ViewBag.TokenTest"];
+            var currentJwt = 0;
+
+            function init() {
+
+                weavy = window.weavy = new Weavy({
+                    id: "ctx",
+                    @if (ViewBag.Token != null) {
+                    <text>jwt: "@ViewBag.Token",</text>
                     }
-                ]
+                    lang: "@lang",
+                    tz: "@tz",
+                    spaces: [
+                        {
+                            key: "client-test-global",
+                            name: "Client Test Global",
+                            container: $("#drawer"),
+                            tabbed: true,
+                            apps: [
+                                { key: "notifications", type: "notifications" },
+                                { key: "messenger", type: "messenger" }
+                            ]
+                        },
+                        {
+                            id: @space.Id,
+                            apps: [
+                                {
+                                    id: @app.Id
+                            },
+                                {
+                                    key: "files",
+                                    type: "files"
+                                }
+                            ]
+                        }
+                    ]
+                });
+
+                var space = weavy.space({ key: "client-test-demo" });
+                var files = space.app({ key: "files", type: "files", container: "#panel-files" });
+                var posts = space.app({ key: "posts", type: "posts", container: "#panel-posts" });
+                var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments" });
+                var tasks = space.app({ key: "tasks", type: "tasks", container: "#panel-tasks" });
+            }
+
+            init();
+
+            function alternateJwt() {
+                currentJwt++;
+                if (currentJwt === jwts.length) {
+                    currentJwt = 0;
+                }
+                return jwts[currentJwt];
+            }
+
+            $("#btn-init").on("click", function () {
+                console.log("click init");
+                init();
             });
 
-            var space = weavy.space({ key: "client-test-demo" });
-            var files = space.app({ key: "files", type: "files", container: "#panel-files"});
-            var posts = space.app({ key: "posts", type: "posts", container: "#panel-posts" });
-            var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments" });
+            $("#btn-destroy").on("click", function () {
+                console.log("click destroy");
+                weavy.destroy();
+            });
+
 
             $("#btn-sign-out").on("click", function () {
                 console.log("click signOut");
@@ -165,9 +222,35 @@
                 weavy.authentication.signIn();
             });
 
-            $("#btn-toggle-files").on("click", function () {
-                console.log("toggle files");
-                weavy.space("client-test-demo").app(files).toggle();
+            $("#btn-jwt-1").on("click", function () {
+                console.log("click jwt 1");
+                currentJwt = 0;
+                weavy.authentication.setJwt(jwts[currentJwt]);
+                weavy.authentication.signIn();
+            });
+
+            $("#btn-jwt-2").on("click", function () {
+                console.log("click jwt 2");
+                currentJwt = 1;
+                weavy.authentication.setJwt(jwts[currentJwt]);
+                weavy.authentication.signIn();
+            });
+
+            $("#btn-jwt-f").on("click", function () {
+                console.log("click jwt function()");
+                weavy.authentication.setJwt(alternateJwt);
+                weavy.authentication.signIn();
+            });
+
+            $("#btn-jwt-p").on("click", function () {
+                console.log("click jwt promise()");
+                weavy.authentication.setJwt(() => new Promise((resolve) => resolve(alternateJwt())));
+                weavy.authentication.signIn();
+            });
+
+            $("#btn-toggle").on("click", function () {
+                console.log("toggle comments");
+                weavy.space("client-test-demo").app("comments").toggle();
             });
 
             $("#notifications").on("click", function () {

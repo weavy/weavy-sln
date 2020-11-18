@@ -18,11 +18,13 @@
 
 @if (tabs.Count > 1) {
     @section navbar_secondary {
-        <nav class="nav nav-tabs" role="tablist">
-            <a class="nav-link@(activetab == tabs[0].Slugify() ? " active":"")" href="#tab-@(tabs[0].Slugify())" data-toggle="tab" role="tab">@tabs[0]</a>
-            @foreach (var tab in tabs.Skip(1)) {
-                <a class="nav-link@(activetab == tab.Slugify() ? " active":"")" href="#tab-@(tab.Slugify())" data-toggle="tab" role="tab">@tab</a>
-            }
+        <nav class="navbar navbar-theme">
+            <nav class="nav nav-tabs" role="tablist">
+                <a class="nav-link@(activetab == tabs[0].Slugify() ? " active":"")" href="#tab-@(tabs[0].Slugify())" data-toggle="tab" role="tab">@tabs[0]</a>
+                @foreach (var tab in tabs.Skip(1)) {
+                    <a class="nav-link@(activetab == tab.Slugify() ? " active":"")" href="#tab-@(tab.Slugify())" data-toggle="tab" role="tab">@tab</a>
+                }
+            </nav>
         </nav>
     }
 }
@@ -40,8 +42,8 @@
             </fieldset>
         }
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary btn-load" data-shortcut="Ctrl+Shift+S">Save</button>
-            <a href="@Back" class="btn btn-outline-secondary" data-shortcut="Esc">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-load" data-shortcut="Ctrl+Shift+S">@T["Save"]</button>
+            <a href="@Back" class="btn btn-outline-secondary" data-shortcut="Esc">@T["Cancel"]</a>
         </div>
     </form>
 </div>

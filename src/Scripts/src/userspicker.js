@@ -9,13 +9,13 @@ wvy.userspicker = (function ($) {
 
     function formatUser(user) {
         if (user.loading) return user.text;
-        if (user.invite) return user.email + " <span class='badge badge-info'>invite</span>";
-        return "<img class='img-32 avatar' src='" + wvy.url.thumb(user.thumb_url, "32") + "'/> " + (user.profile && user.profile.name ? user.profile.name : user.username) + ' <small>@' + user.username + '</small>'+ (user.is_external ? " <span class='badge badge-warning'>external</span>" : "");
+        if (user.invite) return user.email + " <span class='badge badge-info'>" + wvy.t("invite") + "</span>";        
+        return "<img class='img-32 avatar' src='" + wvy.url.thumb(user.thumb, "32") + "'/> " + (user.profile && user.profile.name ? user.profile.name : user.username) + ' <small>@' + user.username + '</small>'+ (user.is_external ? " <span class='badge badge-warning'>external</span>" : "");
     }
 
     function formatUserSelection(user) {                
         var name = (user.profile && user.profile.name ? user.profile.name : user.username || user.text);
-        if (user.invite) return user.email + " <span class='badge badge-info'>invite</span>";
+        if (user.invite) return user.email + " <span class='badge badge-info'>" + wvy.t("invite") + "</span>";
         return name;
     }
 
@@ -29,7 +29,7 @@ wvy.userspicker = (function ($) {
         } else {
             $el = $("select[data-role=users]");
         }
-
+        
         return $el.select2({
             ajax: {
                 url: wvy.url.resolve("a/users"),

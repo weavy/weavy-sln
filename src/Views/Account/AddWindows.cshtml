@@ -1,7 +1,7 @@
 ﻿@model Weavy.Web.Models.RegisterWindowsModel
 @{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    Title = "Associate account";
+    Title = T["Associate account"].ToString();
 }
 <div class="container mt-5">
     <div class="row justify-content-sm-center">
@@ -11,25 +11,25 @@
                     @Html.IconImg(48)
                 </div>
                 @if (Model.First) {
-                    <h1 class="display-3">Confirm switch to Windows authentication</h1>
-                    <p>Hi <strong>@Model.SamAccountName</strong>, it looks like you recently switched from using local accounts to windows authentication.</p>
-                    <p>To complete the switch we need you to enter the credentials of a local administrator account.</p>
+                    <h1 class="display-3">@T["Confirm switch to Windows authentication"]</h1>
+                    <p>@T["Hi <strong>{0}</strong>, it looks like you recently switched from using local accounts to windows authentication.", Model.SamAccountName]</p>
+                    <p>@T["To complete the switch we need you to enter the credentials of a local administrator account."]</p>
                 } else {
-                    <h1 class="display-3">Associate with existing account</h1>
-                    <p>In order to avoid duplicate accounts we need you to enter your username and password and associate <strong>@Model.SamAccountName</strong> with your existing local account.</p>
+                    <h1 class="display-3">@T["Associate with existing account"]</h1>
+                    <p>@T["In order to avoid duplicate accounts we need you to enter your username and password and associate <strong>{0}</strong> with your existing local account.", Model.SamAccountName]</p>
                 }
             </header>
 
             @using (Html.BeginForm(nameof(AccountController.AddWindows), typeof(AccountController).ControllerName(), FormMethod.Post, new { data_turboform = true, novalidate = "" })) {
                 @Html.EditorsForModel()
-                <div class="form-buttons">
-                    @if (Model.First) {
-                        <button type="submit" class="btn btn-primary btn-load">Confirm</button>
-                    } else {
-                        <button type="submit" class="btn btn-primary btn-load">Associate</button>
-                        @Html.ActionLink("Cancel", nameof(AccountController.RegisterWindows), typeof(AccountController).ControllerName(), null, new { @class = "btn btn-secondary" })
-                    }
-                </div>
+        <div class="form-buttons">
+            @if (Model.First) {
+                <button type="submit" class="btn btn-primary btn-load">@T["Confirm"]</button>
+            } else {
+                <button type="submit" class="btn btn-primary btn-load">@T["Associate"]</button>                
+                @(Html.ActionLink<AccountController>(c => c.RegisterWindows(), text: T["Cancel"], htmlAttributes: new { @class = "btn btn-secondary" }))
+            }
+        </div>
             }
         </div>
     </div>

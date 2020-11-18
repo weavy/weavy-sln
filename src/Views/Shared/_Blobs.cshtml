@@ -1,0 +1,15 @@
+﻿@model IEnumerable<Blob>
+@foreach (var blob in Model) {
+    var thumburl = blob.ThumbUrl(24, 24, fit: FitMode.Crop);
+    <tr class="blob" data-id="@blob.Id">
+        <td class="table-icon">
+            @if (FileUtils.IsWebImage(blob.Name) && thumburl != null) {
+                <img class="img-24" src="@thumburl" />
+            } else {
+                @Svg.Icon(FileUtils.GetIcon(blob.Name))
+            }
+        </td>
+        <td>@blob.Name (@FileUtils.FileSizeAsString(blob.Size))<input type="hidden" name="blobs" value="@blob.Id"></td>
+        <td class="table-icon"><button type="button" class="btn btn-icon" data-action="remove-blob" data-id="@blob.Id">@Svg.Icon("close")</button></td>
+    </tr>
+}

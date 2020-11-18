@@ -5,38 +5,30 @@
         <div class="modal-content">
             <div class="modal-header pane-header">
                 <button type="button" class="btn btn-icon btn-primary" data-dismiss="modal">@Svg.Icon("arrow-left")</button>
-                <div class="pane-title text-truncate">Settings</div>
-
-                @if (WeavyContext.Browser.Mobile) {
-                    <button type="button" class="btn btn-icon btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Svg.Icon("dots-vertical")</button>
-                    <div class="dropdown-menu dropdown-menu-right conversation-menu">
-                        <a class="dropdown-item" href="~/sign-out?path=/@Weavy.Areas.Apps.Controllers.MessengerController.MESSENGER_PREFIX" id="signout">Sign out</a>
-                    </div>
-                } else {
-                    <button type="button" class="btn btn-icon" data-dismiss="modal"></button>
-                }
+                <div class="pane-title text-truncate">@T["Settings"]</div>
+                <button type="button" class="btn btn-icon" data-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="settings-form" action="@(Url.Action<MessengerController>(x => x.UpdateSettings(null)))" method="post">
                     <fieldset class="my-3">
-                        <label>Message settings</label>
-                        @Html.EditorsForModel(group: "Message", formGroups: false, formText: true)
+                        <label>@T["Message settings"]</label>
+                        @Html.EditorsForModel(group: "Message", surroundingHtml: false, descriptions: true)
                     </fieldset>
 
                     <fieldset class="my-3">
-                        <label>Notification settings</label>
+                        <label>@T["Notification settings"]</label>
                         <div class="desktop-notification-settings">
-                            <p class="notification-required d-none"><a href="javascript:;" class="text-warning">We need your permission to enable desktop notifications in this browser.</a></p>
-                            <p class="text-danger notification-denied d-none">Desktop notifications have been disabled in this browser.</p>
-                            <p class="text-info notification-missing d-none">This browser does not support desktop notifications.</p>
+                            <p class="notification-required d-none"><a href="javascript:;" class="text-warning">@T["We need your permission to enable desktop notifications in this browser."]</a></p>
+                            <p class="text-danger notification-denied d-none">@T["Desktop notifications have been disabled in this browser."]</p>
+                            <p class="text-info notification-missing d-none">@T["This browser does not support desktop notifications."]</p>
                         </div>
-                        @Html.EditorsForModel(group: "Notifications", formGroups: false, formText: false)
+                        @Html.EditorsForModel(group: "Notifications", surroundingHtml: false, descriptions: false)
 
                     </fieldset>
 
                     <fieldset class="my-3">
-                        <label>Time zone</label>
-                        @Html.EditorFor(x => Model.Timezone, additionalViewData: new { FormLabel = false, FormText = false })
+                        <label>@T["Time zone"]</label>
+                        @Html.EditorFor(x => Model.Timezone, additionalViewData: new { __label = false, __desc = false })
                     </fieldset>
                 </form>
             </div>

@@ -5,14 +5,14 @@
 
     .top-right {
         position: absolute;
-        top: .5rem;
-        right: .5rem;
+        top: $navbar-padding-y;
+        right: $navbar-padding-x;
     }
 
     .top-left {
         position: absolute;
-        top: .5rem;
-        left: .5rem;
+        top: $navbar-padding-y;
+        left: $navbar-padding-x;
     }
 
     &.cover-bg {
@@ -30,16 +30,25 @@
             padding-top: $navbar-height;
 
             .top-right, .top-left {
-                top: $navbar-height + .5rem;
+                top: $navbar-height + $navbar-padding-y;
             }
         }
 
-        .has-navbar-secondary & {
+        .has-navbar-2 & {
             margin-top: -2 * $navbar-height;
             padding-top: 2 * $navbar-height;
 
             .top-right, .top-left {
-                top: 2 * $navbar-height + .5rem;
+                top: 2 * $navbar-height + $navbar-padding-y;
+            }
+        }
+
+        .has-navbar-3 & {
+            margin-top: -3 * $navbar-height;
+            padding-top: 3 * $navbar-height;
+
+            .top-right, .top-left {
+                top: 3 * $navbar-height + $navbar-padding-y;
             }
         }
     }

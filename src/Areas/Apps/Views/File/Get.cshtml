@@ -2,120 +2,82 @@
 @using System.Collections.Specialized
 
 @{
-    Title = Model.Name ?? "Untitled";
-    var current = Model is IVersionable versionable ? versionable.IsCurrent() : true;
-    if (!current)
-    {
-        Layout = "~/Views/Shared/_Layout.cshtml";
-        Back = Url.Action<ContentController>(c => c.Versions(Model.Id));
-    }
+    Title = Model.GetTitle();
+    //Layout = WeavyContext.Current.IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Content/_Layout.Embedded.cshtml";
 
-    var fmt = FileUtils.GetPreviewFormat(Model.Blob.Name);
+    var versionable = Model as IVersionable;
+    var current = versionable != null ? versionable.IsCurrent() : true;
+
+    var (prev, next) = ContentService.GetPreviousAndNextSiblings(Model);
+
+    var fmt = Model.Blob.Link != null ? PreviewFormat.Icon : FileUtils.GetPreviewFormat(Model.Blob.Name);
     NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(WeavyContext.App, Model) : null;
+    var versions = ViewBag.Versions as VersionsModel;
+    BodyAttributes.Add("class", "has-sidebar");
 }
 
-@if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)
-{
+@if (current && Model is ICommentable && ConfigurationService.HtmlComments) {
     @section scripts{
         @Html.InitHtmlEditor()
     }
 }
 
-<article class="container" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+@section navbar_left {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarClose")
+    </div>
+}
 
-    <section class="content-section preview">
+@section navbar_middle {
+    <div class="navbar-middle">
+        @Html.Partial("_NavbarTitle")
+    </div>
+}
 
-        @if (fmt == PreviewFormat.Text)
-        {
-            var lang = FileUtils.SyntaxHighlight(Model.Name);
-            if (lang != null)
-            {
-                <pre class="language-@lang"><code class="language-@lang">@System.IO.File.ReadAllText(BlobService.GetContent(Model.Blob).FullName)</code></pre>
-            }
-            else
-            {
-                <pre class="document">@System.IO.File.ReadAllText(BlobService.GetContent(Model.Blob).FullName)</pre>
-            }
+@section navbar_right {
+    <div class="navbar-icons">
+        @Html.Partial("_NavbarIcons")
+    </div>
+}
 
-        }
-        else if (fmt == PreviewFormat.Image || fmt == PreviewFormat.Document)
-        {            
-            <div class="text-center">
-                <figure class="figure">
-                    <a href="@Model.ContentUrl()" @Html.Raw(attrs?.AsHtmlAttributes())><img src="@Model.ThumbUrl(480, 480)" class="figure-img img-fluid d-block mx-auto" alt="@Model.Name" /></a>
-                </figure>
+<!-- File -->
+
+<aside class="content-drawer" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+    @if (current) {
+        <header class="content-drawer-header sticky-top t-0">
+            <nav class="nav nav-tabs">
+                <a class="nav-link active" href="#tab-content-comments" data-toggle="tab" role="tab" title="@T["Comments"]">@T["Comments"]</a>
+                @if (versions != null) {
+                    <a class="nav-link" href="#tab-content-versions" data-toggle="tab" role="tab" title="@T["Versions"]">@T["Versions"]</a>
+                }
+                <button class="nav-close btn btn-icon">@Svg.Icon("close", size: 18)</button>
+            </nav>
+        </header>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="tab-content-comments" role="tabpanel">
+                @Html.Partial("_Comments")
             </div>
-        }
-    </section>
-
-    <section class="content-section">
-        <h4 class="display-4"><span>Details</span></h4>
-        <table class="table table-bordered mx-auto">
-            <tr>
-                <th>Name</th>
-                <td><a href="@Model.ContentUrl()" @(attrs != null ? Html.Raw(attrs.AsHtmlAttributes()): MvcHtmlString.Empty)>@Model.Name</a></td>
-            </tr>
-
-            @if (Model.GetExcerpt() != null)
-            {
-                <tr>
-                    <th>Description</th>
-                    <td>@Model.GetExcerpt()</td>
-                </tr>
+            @if (versions != null) {
+                <div class="tab-pane fade" id="tab-content-versions" role="tabpanel">
+                    @Html.Partial("_Versions", versions)
+                </div>
             }
-
-            @if (Model is ITaggable taggable && taggable.Tags.Any())
-            {
-                <tr>
-                    <th>Tags</th>
-                    <td>@Html.Raw(taggable.Tags.Join(" ", tag => $@"<span class=""badge badge-primary"">{tag}</span>"))</td>
-                </tr>
-            }
-
-            <tr>
-                <th>Type</th>
-                <td>@Model.Blob.MediaType</td>
-            </tr>
-
-            <tr>
-                <th>Kind</th>
-                <td>@Model.Kind()</td>
-            </tr>
-
-            <tr>
-                <th>Size</th>
-                <td>@FileUtils.FileSizeAsString(Model.Blob.Size)</td>
-            </tr>
-
-            @if (FileUtils.IsImage(Model.Blob.Name))
-            {
-                <tr>
-                    <th>Dimensions</th>
-                    <td>@(Model.Blob.Width)x@(Model.Blob.Height)</td>
-                </tr>
-            }
-
-            <tr>
-                <th>Modified</th>
-                <td>@Html.Time(Model.ModifiedAt, format: "g") by @Model.ModifiedBy().Link()</td>
-            </tr>
-
-        </table>
-    </section>
-
-    @{
-        if (current)
-        {
-            Html.RenderPartial("~/Views/Content/_ContentAttachments.cshtml");
-            Html.RenderPartial("_Comments");
-            Html.RenderPartial("_Subscribers");
-        }
-        else
-        {
-            @Html.Partial("_Meta")
-        }
+        </div>
+    } else {
+        @Html.Partial("_Meta")
     }
+</aside>
 
+<article class="content-area px-0" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+    @Html.Partial("_NavArrows")
+
+    @{ Html.RenderPartial("_File", Model); }
 </article>
 
 
+@section footer {
+    @{
+        Html.RenderPartial("_FilesModals");
+    }
+}

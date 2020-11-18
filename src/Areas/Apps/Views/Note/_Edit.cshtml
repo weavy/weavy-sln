@@ -1,0 +1,56 @@
+﻿@model Note
+@{
+    var draftable = Model as IDraftable;
+
+    var htmlAttributes = new Dictionary<string, object>(){
+        { "class", draftable != null ? "autosave" : "" },
+        { "autocomplete", "off" },
+        { "novalidate", "" },
+        { "data-is-draft", draftable?.IsDraft.ToString().ToLower() },
+        { "data-status", "#autosave-status" },
+        { "data-id", Model.Id }
+    };
+
+    if (ViewData["turboform"] != null) {
+        htmlAttributes.Add("data-turboform", "");
+    }
+    BodyAttributes.Add("class", "has-sidebar");
+}
+
+<!-- note edit -->
+<form id="content-form" action="@Model.Url()" method="post" @Html.Attributes(htmlAttributes)>
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+    @Html.Hidden(nameof(Model.Name), Model.Name)
+
+    <aside class="content-drawer">
+        <header class="content-drawer-header sticky-top t-0">
+            <nav class="nav nav-tabs" role="tablist">
+                <a class="nav-link active" href="#tab-content-attachments" data-toggle="tab" role="tab" title="@T["Attachments"]">@T["Attachments"]</a>
+                <button class="nav-close btn btn-icon">@Svg.Icon("close", size: 18)</button>
+            </nav>
+        </header>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="tab-content-attachments" role="tabpanel">
+                @Html.Partial("_ContentAttachments")
+            </div>
+        </div>
+    </aside>
+
+    <article class="content-area px-0" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
+        <section class="content-editor">
+            @Html.EditorFor(x => Model.Body, additionalViewData: new { __label = false, __html = false })
+        </section>
+
+        @* hidden, triggered from navbar *@
+        <div class="d-none">
+            <button type="submit" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
+            <button type="submit" name="operation" value="draft">@T["Save draft"]</button>
+            @* always enable discard - could be used when discarding after autosave *@
+            <button type="submit" name="operation" value="discard">@T["Discard changes"]</button>
+        </div>
+    </article>
+
+    <div id="blobs">
+        @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
+    </div>
+</form>

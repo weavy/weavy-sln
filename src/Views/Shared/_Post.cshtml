@@ -4,10 +4,9 @@
     bool details = ViewData["details"] as bool? ?? false;
     var creator = Model.CreatedBy();
     var attachments = Model.AttachmentIds.Any() ? Model.Attachments() : new List<Attachment>();
-
-    var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
-    var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
-
+    var images = attachments.Where(x => FileUtils.IsImage(x.Blob.Name) && x.ThumbPlaceholderUrl() != null);
+    var files = attachments.Except(images);
+    var meetings = Model.MeetingIds.Any() ? Model.Meetings() : new List<Meeting>();
     var embeds = Model.EmbedIds.Any() ? Model.Embeds() : new List<Embed>();
     var embed = embeds.FirstOrDefault(x => !x.IsLink);
 }
@@ -19,7 +18,7 @@
             <h6 class="media-title">@creator.Link() <small>@@@creator.Username</small></h6>
             <small class="text-muted">
                 @Html.Time(Model.CreatedAt)
-                @if (Model.ModifiedAt != Model.CreatedAt) {<text>&middot;</text> @Html.Time(Model.ModifiedAt, @"e\di\te\d")}
+                @if (Model.ModifiedAt != Model.CreatedAt) {<text>&middot;</text> @Html.Time(Model.ModifiedAt, text: T["edited"].ToString())}
             </small>
         </div>
         <div class="media-icons">
@@ -55,6 +54,12 @@
     @if (files.Any()) {
         <div class="card-files">
             @{ Html.RenderPartial("_Attachments", files, new ViewDataDictionary { { "Parent", Model } }); }
+        </div>
+    }
+
+    @if (meetings.Any()) {
+        <div class="card-meetings">
+            @{ Html.RenderPartial("_Meetings", meetings, new ViewDataDictionary { { "Parent", Model } }); }
         </div>
     }
 

@@ -1,0 +1,43 @@
+/// <reference path="../_core.scss" />
+
+.dragging {
+    &.dropzone, .dropzone {
+        // highlight dropzone when dragging in files
+        &::after {
+            content: "Drop files here.";
+            background-color: rgba(color("amber", 100), .8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: $card-border-width*2 dashed $amber;
+            font-weight: $font-weight-bold;
+            z-index: $zindex-fixed + 1;
+        }
+
+        &.drop-over::after {
+            background-color: rgba(color("green", 100), .8);
+        }
+    }
+
+    .dropzone {
+        position: relative;
+
+        &::after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+    }
+
+    &.dropzone {
+        &::after {
+            position: fixed;
+            top: .5rem;
+            left: .5rem;
+            bottom: .5rem;
+            right: .5rem;
+        }
+    }
+}

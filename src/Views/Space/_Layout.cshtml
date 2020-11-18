@@ -14,15 +14,33 @@
     }
 }
 
+@if (IsSectionDefined("navbar_left")) {
+    @section navbar_left {
+        @RenderSection("navbar_left")
+    }
+}
+
 @if (IsSectionDefined("navbar_middle")) {
     @section navbar_middle {
-        @RenderSection("navbar_middle", required: false)
+        @RenderSection("navbar_middle")
+    }
+}
+
+@if (IsSectionDefined("navbar_right")) {
+    @section navbar_right {
+        @RenderSection("navbar_right")
     }
 }
 
 @if (IsSectionDefined("navbar_secondary")) {
     @section navbar_secondary {
         @RenderSection("navbar_secondary")
+    }
+}
+
+@if (IsSectionDefined("navbar_tertiary")) {
+    @section navbar_tertiary {
+        @RenderSection("navbar_tertiary")
     }
 }
 

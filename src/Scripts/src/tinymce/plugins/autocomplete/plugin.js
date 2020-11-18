@@ -122,7 +122,7 @@ tinymce.PluginManager.add("weavy_autocomplete", function (editor, url) {
                 },
                 index: 1,
                 template: function (item) {
-                    var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" />';
+                    var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb, "48") + '" alt="" />';
                     if (item.member) {
                         html += '<span>';
                     } else {

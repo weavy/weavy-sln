@@ -1,0 +1,16 @@
+﻿@model Content
+@{
+    var versionable = Model as IVersionable;
+    var creator = Model.CreatedBy();
+    var editor = Model.ModifiedBy();
+}
+
+@Html.Partial("_Meta")
+
+<section class="content-section my-3" data-type="content" data-id="@Model.Id">
+    @Html.DisplayGroups(Model, "Details")
+
+    @Html.Partial("_Subscribers")
+</section>
+
+

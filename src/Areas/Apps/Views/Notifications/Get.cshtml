@@ -4,14 +4,14 @@
 }
 
 <header class="navbar navbar-light sticky-top">
-    <h6 class="navbar-title mr-auto px-1">Notifications</h6>
-    <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="Mark all as read">@Svg.Icon("check-all")</button>
+    <h6 class="navbar-title mr-auto px-1">@T["Notifications"]</h6>
+    <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="@T["Mark all as read"]">@Svg.Icon("check-all")</button>
 </header>
 
 <div data-notifications>
     @if (Model.Result.Count == 0) {
         <div class="container-fluid mt-3 empty">
-            <p class="text-center text-muted">All caught up :)</p>
+            <p class="text-center text-muted">@T["All caught up :)"]</p>
         </div>
     }
 

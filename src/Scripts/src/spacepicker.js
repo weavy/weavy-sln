@@ -3,7 +3,7 @@
 wvy.spacepicker = (function ($) {
     function formatSpace(space) {
         if (space.loading) return space.text;
-        return "<img class='avatar-32' src='" + wvy.url.thumb(space.thumb_url, "32") + "'/> " + space.title;
+        return "<img class='avatar-32' src='" + wvy.url.thumb(space.thumb, "32") + "'/> " + space.title;
     }
 
     function formatSpaceSelection(space) {

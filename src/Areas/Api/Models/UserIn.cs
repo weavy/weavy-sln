@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Weavy.Core.Models;
-using Weavy.Core.Services;
 using Weavy.Core.Utils;
+using DA = System.ComponentModel.DataAnnotations;
 
 namespace Weavy.Areas.Api.Models {
 
     /// <summary>
     ///  An object used to create and update a user.
     /// </summary>
-    public class UserIn : IValidatableObject {
+    public class UserIn : DA.IValidatableObject {
 
         /// <summary>
         /// The blob id of avatar to use for the profile image.
@@ -65,11 +64,11 @@ namespace Weavy.Areas.Api.Models {
         /// <summary>
         /// 
         /// </summary>
-        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public virtual IEnumerable<DA.ValidationResult> Validate(DA.ValidationContext validationContext) {
             // validate password complexity
             if (Password != null) {
                 foreach (var res in ValidationUtils.ValidatePassword(Password)) {
-                    yield return new ValidationResult(res.ErrorMessage, new[] { nameof(Password) });
+                    yield return new DA.ValidationResult(res.ErrorMessage, new[] { nameof(Password) });
                 }
             }
         }

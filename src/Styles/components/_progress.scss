@@ -21,4 +21,10 @@
         height: 0.2rem;
         background-color: $progress-bar-bg;
     }
+
+    &.progress-files {
+        position: fixed;
+        height: 0.2rem;
+        width: 100%;
+    }
 }

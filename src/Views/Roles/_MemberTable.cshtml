@@ -16,13 +16,13 @@
                 @using (Html.BeginForm(nameof(RolesController.RemoveMember), null, new { Model.Role.Id })) {
                     @Html.HttpMethodOverride(HttpVerbs.Delete)
                     @Html.Hidden("UserId", user.Id)
-                    <button type="submit" class="btn btn-icon" title="Remove member" data-remove-from-role>@Svg.Icon("close")</button>
+                    <button type="submit" class="btn btn-icon" title="@T["Remove member"]" data-remove-from-role>@Svg.Icon("close")</button>
                 }
             </td>
         </tr>
     }
 
-    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model.Members)">
+    <tr class="scroll-next" data-next="@Url.ScrollNext(Model.Members)">
         <td colspan="3"></td>
     </tr>
 }

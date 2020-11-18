@@ -16,6 +16,7 @@ wvy.editor = (function ($) {
         var $el = $(element);
         var _emojiarea, $wrapper;
         var embedAdded = false;
+        var _meetingContainerId = null;
         var removedEmbeds = [];
 
         // Extend default options with those supplied by user.
@@ -96,7 +97,7 @@ wvy.editor = (function ($) {
                 if (dataTransfer) {
                     var items = dataTransfer.items;
 
-                    //Check that we're only pasting image data
+                    // check that we're only pasting image data
                     for (var i = 0; i < items.length; i++) {
                         if (!/^image\/(jpg|jpeg|png|gif|bmp)$/.test(items[i].type)) {
                             imageDataOnly = false;
@@ -116,8 +117,8 @@ wvy.editor = (function ($) {
                             }
 
                             var fileOfBlob = new File([file], "image-" + wvy.guid.get() + type, { type: item.type });
-                            $wrapper.fileupload('add', { files: fileOfBlob });
-                        }
+                            wvy.fileupload.uploadBlobs([].concat(fileOfBlob), $wrapper.find("input[type=file]"));
+                       }
                     }
                 }
             }
@@ -129,7 +130,7 @@ wvy.editor = (function ($) {
                 autoresize_bottom_margin: 0,
                 skin_url: window.tinymceSkinURL,
                 content_css: window.tinymceContentURL,
-                body_class: 'weavy_tiny_body',
+                body_class: 'weavy_tiny_body weavy_html_editor',
                 convert_urls: false,
                 statusbar: false,
                 placeholder: options.placeholder,
@@ -196,7 +197,7 @@ wvy.editor = (function ($) {
                 if (options.polls) {
 
                     // add options button
-                    var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
+                    var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="' + wvy.t("Add poll") + '"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
                     $optionsbutton.prependTo($buttoncontainer);
 
                     // add options container
@@ -215,16 +216,14 @@ wvy.editor = (function ($) {
                                     var optIndexer = "opt_" + index;
                                     var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
                                         "<input type='hidden' name='options[" + optIndexer + "].Id'  value='" + option.id + "'/>" +
-                                        "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='+add an option' />" +
+                                        "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='" + wvy.t("+add an option") + "' />" +
                                         "</div>");
                                     $options.append(opt);
                                 });
                                 $options.show();
                             }
                         });
-
                     }
-
 
                     // show options
                     $wrapper.on("click", ".btn-poll", function (evt) {
@@ -240,7 +239,7 @@ wvy.editor = (function ($) {
                                 var optIndexer = "opt_" + randomNumber();
                                 var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
                                     "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
-                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='" + wvy.t("+add an option") + "' />" +
                                     "</div>");
                                 options.append(opt);
                             }
@@ -260,79 +259,40 @@ wvy.editor = (function ($) {
                             var optIndexer = "opt_" + randomNumber();
                             var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
                                 "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
-                                "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='" + wvy.t("+add an option") + "' />" +
                                 "</div>");
                             options.append(opt);
                         }
                     });
                 }
 
+                // meetings                    
+                if (options.meetings && !wvy.browser.mobile) {                    
+                    initMeetings($wrapper, $buttoncontainer);
+                }
+
                 // file upload
                 if (options.fileupload) {
                     // add file button
-                    var $file = $('<div class="btn-file btn btn-icon" title="Add files">' +
-                        //'<svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg>' +
-                        '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>' +
-                        '<input type="file" name="files" accept="' + options.accept + '" multiple /></div>');
-                    $file.prependTo($buttoncontainer);
+                    var $filebrowser = $(".filebrowser.d-none:last");
+                    var $input = $filebrowser.clone().removeClass("d-none");
+
+                    if ($el.data("editor") === "comment") {
+                        $input.find(".dropdown-menu").addClass("dropdown-menu-right");
+                    }
+
+                    $input.prependTo($buttoncontainer);
 
                     // add upload container
-                    var $uploads = $("<div class='uploads'><table class='table table-name table-attachments'></table><div class='progress d-none'></div></div>");
+                    var $uploads = $("<div class='uploads'><table class='table table-name table-attachments'></table><div class='progress d-none'><div class='progress-bar' role='progressbar'></div></div></div>");
                     $uploads.appendTo($wrapper);
 
-                    // init file upload                
-                    $wrapper.fileupload({
-                        url: wvy.url.resolve("/a/blobs"),
-                        dropZone: $wrapper,
-                        dataType: "json",
-                        paramName: "blobs",
-                        singleFileUploads: false,
-                        add: function (e, data) {
-                            data.submit();
-                        },
-                        start: function (e) {
-                            // disable submit button while upload in progress
-                            $wrapper.find(".uploads").show();
-                            $wrapper.find("button[type=submit]").attr("disabled", true);
-                        },
-                        progressall: function (e, data) {
-                            // update progress bar
-                            var percentage = parseInt(data.loaded / data.total * 100, 10);
-                            $wrapper.find(".progress").css("width", percentage + "%").removeClass("d-none");
-                        },
-                        done: function (e, data) {
-                            var blobs = data.result;
-                            $.each(blobs.data, function (index, blob) {
-                                $wrapper.find(".uploads .table-attachments").append('<tr>' +
-                                    '<td class="table-icon">' + (blob.kind === 'image' ? '<img class="img-24" src="' + wvy.url.thumb(blob.thumb_url, "48-crop") + '"/>' : '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>') + '</td>' +
-                                    '<td>' + blob.name + '</td>' +
-                                    '<td class="table-icon"><a class="btn btn-icon remove"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg></a><input type="hidden" name="blobs" value="' + blob.id + '" /></td>' +
-                                    '</tr>');
-                            });
+                    wvy.drop.initSingle($input.find("[data-dropzone]"));
 
-                            toggleMore(false);
-                        },
-                        fail: function (e, data) {
-                            console.error(data);
-                        },
-                        always: function (e, data) {
-
-                            // reset and hide progress bar
-                            $wrapper.find(".progress").css("width", "0%").addClass("d-none");
-
-                            // enable submit button
-                            $wrapper.find("button[type=submit]").attr("disabled", false);
-
-                        }
-                    });
-
-                    $wrapper.on("click", ".table-attachments .remove", function (e) {
+                    $wrapper.on("click", ".table-attachments [data-action=remove-blob]", function (e) {                        
                         e.preventDefault();
                         $(this).closest("tr").remove();
                     });
-
-
-
                 }
 
                 // embeds            
@@ -375,7 +335,7 @@ wvy.editor = (function ($) {
             }
 
             // add submit button
-            var $submit = $('<button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"/></svg></button>');
+            var $submit = $('<button type="submit" class="btn-submit btn btn-icon btn-primary" title="' + wvy.t("Submit") + '"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"/></svg></button>');
             if (options.submitButton) {
                 $submit = options.submitButton;
             } else {
@@ -393,6 +353,7 @@ wvy.editor = (function ($) {
          * Initialize plugin.
          */
         function init() {
+
             // Add any initialization logic here...
             $wrapper = $("<div class='weavy-editor'/>");
             $wrapper.insertBefore($el);
@@ -414,7 +375,7 @@ wvy.editor = (function ($) {
                     autocorrect: "on",
                     autocapitalize: "on"
                 },
-                buttonTitle: "Insert emoji",
+                buttonTitle: wvy.t("Insert emoji"),
                 container: $wrapper,
                 events: {
                     "picker.show": function (picker, evt) {
@@ -430,7 +391,7 @@ wvy.editor = (function ($) {
                 pickerPosition: options.mode === 'default' ? (options.inline ? "bottom" : "top") : options.mode,
                 placeholder: options.placeholder,
                 saveEmojisAs: "shortname",
-                searchPlaceholder: "Search...",
+                searchPlaceholder: wvy.t("Search..."),
                 shortcuts: false,
                 textcomplete: {
                     maxCount: 5,
@@ -508,7 +469,7 @@ wvy.editor = (function ($) {
                         },
                         index: 1,
                         template: function (item) {
-                            var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" />';
+                            var html = '<img class="img-24 avatar" src="' + wvy.url.thumb(item.thumb, "48") + '" alt="" />';
                             if (item.member) {
                                 html += '<span>';
                             } else {
@@ -579,7 +540,7 @@ wvy.editor = (function ($) {
                     if (options.polls) {
 
                         // add options button
-                        var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="Add poll"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
+                        var $optionsbutton = $('<button type="button" class="btn btn-icon btn-poll" title="' + wvy.t("Add poll") + '"><svg class="i i-poll-box" height="24" viewBox="0 0 24 24" width="24"><path d="m17 17h-2v-4h2m-4 4h-2v-10h2m-4 10h-2v-7h2m10-7h-14c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.11-.9-2-2-2z"/></svg></button>');
                         $optionsbutton.prependTo($buttoncontainer);
 
                         // add options container
@@ -598,7 +559,7 @@ wvy.editor = (function ($) {
                                         var optIndexer = "opt_" + index;
                                         var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
                                             "<input type='hidden' name='options[" + optIndexer + "].Id'  value='" + option.id + "'/>" +
-                                            "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='+add an option' />" +
+                                            "<input type='text' name='options[" + optIndexer + "].Text' value='" + option.text + "' class='form-control' placeholder='" + wvy.t("+add an option") + "' />" +
                                             "</div>");
                                         $options.append(opt);
                                     });
@@ -607,7 +568,6 @@ wvy.editor = (function ($) {
                             });
 
                         }
-
 
                         // show options
                         $wrapper.on("click", ".btn-poll", function (evt) {
@@ -623,7 +583,7 @@ wvy.editor = (function ($) {
                                     var optIndexer = "opt_" + randomNumber();
                                     var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
                                         "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
-                                        "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                        "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='" + wvy.t("+add an option") + "' />" +
                                         "</div>");
                                     options.append(opt);
                                 }
@@ -643,73 +603,38 @@ wvy.editor = (function ($) {
                                 var optIndexer = "opt_" + randomNumber();
                                 var opt = $("<div class='form-group'><input type='hidden' name='options.Index' value='" + optIndexer + "'/>" +
                                     "<input type='hidden' name='options[" + optIndexer + "].Id'  value='0'/>" +
-                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='+add an option' />" +
+                                    "<input type='text' name='options[" + optIndexer + "].Text' value='' class='form-control' placeholder='" + wvy.t("+add an option") + "' />" +
                                     "</div>");
                                 options.append(opt);
                             }
                         });
                     }
 
+                    // meetings                    
+                    if (options.meetings && !wvy.browser.mobile) {
+                        initMeetings($wrapper, $buttoncontainer);
+                    }
+
                     // file upload
                     if (options.fileupload) {
+
                         // add file button
-                        var $file = $('<div class="btn-file btn btn-icon" title="Add files">' +
-                            //'<svg class="i i-image" height="24" viewBox="0 0 24 24" width="24"><path d="m8.5 13.5 2.5 3 3.5-4.5 4.5 6h-14m16 1v-14c0-1.11-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg>' +
-                            '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>' +
-                            '<input type="file" name="files" accept="' + options.accept + '" multiple /></div>');
-                        $file.prependTo($buttoncontainer);
+                        var $filebrowser = $(".filebrowser.d-none:last");
+                        var $input = $filebrowser.clone().removeClass("d-none");
+
+                        if ($el.data("editor") === "comment") {
+                            $input.find(".dropdown-menu").addClass("dropdown-menu-right");
+                        }
+
+                        $input.prependTo($buttoncontainer);
 
                         // add upload container
-                        var $uploads = $("<div class='uploads'><table class='table table-name table-attachments'></table><div class='progress d-none'></div></div>");
+                        var $uploads = $("<div class='uploads'><table class='table table-name table-attachments'></table><div class='progress d-none'><div class='progress-bar' role='progressbar'></div></div></div>");
                         $uploads.appendTo($wrapper);
 
-                        // init file upload                
-                        $wrapper.fileupload({
-                            url: wvy.url.resolve("/a/blobs"),
-                            dropZone: $wrapper,
-                            dataType: "json",
-                            paramName: "blobs",
-                            singleFileUploads: false,
-                            add: function (e, data) {
-                                data.submit();
-                            },
-                            start: function (e) {
-                                // disable submit button while upload in progress
-                                $wrapper.find(".uploads").show();
-                                $wrapper.find("button[type=submit]").attr("disabled", true);
-                            },
-                            progressall: function (e, data) {
-                                // update progress bar
-                                var percentage = parseInt(data.loaded / data.total * 100, 10);
-                                $wrapper.find(".progress").css("width", percentage + "%").removeClass("d-none");
-                            },
-                            done: function (e, data) {
-                                var blobs = data.result;
-                                $.each(blobs.data, function (index, blob) {
-                                    $wrapper.find(".uploads .table-attachments").append('<tr>' +
-                                        '<td class="table-icon">' + (blob.kind === 'image' ? '<img class="img-24" src="' + wvy.url.thumb(blob.thumb_url, "48-crop") + '"/>' : '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>') + '</td>' +
-                                        '<td>' + blob.name + '</td>' +
-                                        '<td class="table-icon"><a class="btn btn-icon remove"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg></a><input type="hidden" name="blobs" value="' + blob.id + '" /></td>' +
-                                        '</tr>');
-                                });
+                        wvy.drop.initSingle($input.find("[data-dropzone]"));
 
-                                toggleMore(false);
-                            },
-                            fail: function (e, data) {
-                                console.error(data);
-                            },
-                            always: function (e, data) {
-
-                                // reset and hide progress bar
-                                $wrapper.find(".progress").css("width", "0%").addClass("d-none");
-
-                                // enable submit button
-                                $wrapper.find("button[type=submit]").attr("disabled", false);
-
-                            }
-                        });
-
-                        $wrapper.on("click", ".table-attachments .remove", function (e) {
+                        $wrapper.on("click", ".table-attachments [data-action=remove-blob]", function (e) {                            
                             e.preventDefault();
                             $(this).closest("tr").remove();
                         });
@@ -725,9 +650,8 @@ wvy.editor = (function ($) {
                             // convert it to a blob to upload
                             var blob = b64toBlob(realData, contentType);
                             var fileOfBlob = new File([blob], data.name, { type: contentType });
-                            $wrapper.fileupload('add', { files: fileOfBlob });
+                            wvy.fileupload.uploadBlobs([].concat(fileOfBlob), editor.closest(".weavy-editor").find("input[type=file]"));
                         });
-
                     }
 
                     // embeds                
@@ -831,12 +755,10 @@ wvy.editor = (function ($) {
                             embedAdded = false;
                         })
                     }
-
-
                 }
 
                 // add submit button
-                var $submit = $('<button type="submit" class="btn-submit btn btn-icon btn-primary" title="Submit"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"/></svg></button>');
+                var $submit = $('<button type="submit" class="btn-submit btn btn-icon btn-primary" title="' + wvy.t("Submit") + '"><svg class="i i-send" height="24" viewBox="0 0 24 24" width="24"><path d="m2 21 21-9-21-9v7l15 2-15 2z"/></svg></button>');
                 if (options.submitButton) {
                     $submit = options.submitButton;
                 } else {
@@ -886,6 +808,10 @@ wvy.editor = (function ($) {
             embedAdded = false;
             removedEmbeds = [];
 
+            // reset meetings
+            $wrapper.find(".table-meetings tr").remove();
+            
+
             // reset polls
             $wrapper.find(".poll-options").hide().empty();
 
@@ -928,6 +854,9 @@ wvy.editor = (function ($) {
                 _emojiarea = null;
                 $wrapper.remove();
 
+                // remove listener
+                window.removeEventListener("message", messageListener)
+
                 hook('onDestroy');
                 // Remove WeavyEditor instance from the element.
                 $el.removeData('plugin_' + pluginName);
@@ -965,6 +894,160 @@ wvy.editor = (function ($) {
             }
         }
 
+
+        // add listener for meeting authentication
+        window.addEventListener("message", messageListener)
+
+        function initMeetings($w, $b) {
+            var $videobutton = null;
+            if (wvy.config.zoomAuthUrl && wvy.config.teamsAuthUrl) {
+                $videobutton = $(`<div class="dropup meeting-dropup"><button type="button" class="btn btn-icon btn-meeting dropup" data-toggle="dropdown" title="` + wvy.t("Add meeting") + `"><svg class="i i-video" height="24" viewBox="0 0 24 24" width="24"><path d="M17,10.5V7C17,6.45 16.55,6 16,6H4C3.45,6 3,6.45 3,7V17C3,17.55 3.45,18 4,18H16C16.55,18 17,17.55 17,17V13.5L21,17.5V6.5L17,10.5Z" /></svg></button>
+                    <div class="dropdown-menu">
+                        <button type="button" class="dropdown-item btn-add-meeting" data-provider="teams"><svg class="i i-teams text-native" height="24" viewBox="0 0 48 48" width="24"><path d="m31.993 19h11.107a1.9 1.9 0 0 1 1.9 1.9v10.117a6.983 6.983 0 0 1 -6.983 6.983h-.033a6.983 6.983 0 0 1 -6.984-6.983v-11.024a.993.993 0 0 1 .993-.993z" fill="#5059c9"/><circle cx="39.5" cy="12.5" fill="#5059c9" r="4.5"/><circle cx="25.5" cy="10.5" fill="#7b83eb" r="6.5"/><path d="m34.167 19h-18.334a1.88 1.88 0 0 0 -1.833 1.923v11.539a11.279 11.279 0 0 0 11 11.538 11.279 11.279 0 0 0 11-11.538v-11.539a1.88 1.88 0 0 0 -1.833-1.923z" fill="#7b83eb"/><path d="m0 0h48v48h-48z" fill="none"/><path d="m26 19v16.17a1.841 1.841 0 0 1 -1.14 1.69 1.772 1.772 0 0 1 -.69.14h-9.29c-.13-.33-.25-.66-.35-1a12.179 12.179 0 0 1 -.53-3.54v-11.54a1.877 1.877 0 0 1 1.83-1.92z" opacity=".1"/><path d="m25 19v17.17a1.772 1.772 0 0 1 -.14.69 1.841 1.841 0 0 1 -1.69 1.14h-7.82c-.17-.33-.33-.66-.47-1s-.25-.66-.35-1a12.179 12.179 0 0 1 -.53-3.54v-11.54a1.877 1.877 0 0 1 1.83-1.92z" opacity=".2"/><path d="m25 19v15.17a1.844 1.844 0 0 1 -1.83 1.83h-8.64a12.179 12.179 0 0 1 -.53-3.54v-11.54a1.877 1.877 0 0 1 1.83-1.92z" opacity=".2"/><path d="m24 19v15.17a1.844 1.844 0 0 1 -1.83 1.83h-7.64a12.179 12.179 0 0 1 -.53-3.54v-11.54a1.877 1.877 0 0 1 1.83-1.92z" opacity=".2"/><path d="m26 13.83v3.15c-.17.01-.33.02-.5.02s-.33-.01-.5-.02a5.489 5.489 0 0 1 -1-.16 6.5 6.5 0 0 1 -4.5-3.82 5.556 5.556 0 0 1 -.32-1h4.99a1.837 1.837 0 0 1 1.83 1.83z" opacity=".1"/><path d="m25 14.83v2.15a5.489 5.489 0 0 1 -1-.16 6.5 6.5 0 0 1 -4.5-3.82h3.67a1.837 1.837 0 0 1 1.83 1.83z" opacity=".2"/><path d="m25 14.83v2.15a5.489 5.489 0 0 1 -1-.16 6.5 6.5 0 0 1 -4.5-3.82h3.67a1.837 1.837 0 0 1 1.83 1.83z" opacity=".2"/><path d="m24 14.83v1.99a6.5 6.5 0 0 1 -4.5-3.82h2.67a1.837 1.837 0 0 1 1.83 1.83z" opacity=".2"/><rect fill="#4b53bc" height="22" rx="1.833" width="22" x="2" y="13"/><path d="m17.824 19.978h-3.665v9.98h-2.335v-9.98h-3.648v-1.936h9.648z" fill="#fff"/></svg> ` + wvy.t("Teams meeting") + `</button>
+                        <button type="button" class="dropdown-item btn-add-meeting" data-provider="zoom" ><svg class="i i-zoom text-native" height="24" viewBox="0 0 24 24" width="24"><path d="m12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm-6.52 11.57v-4.7c0-.19.16-.35.35-.35h6.85c1.06 0 1.93.85 1.93 1.91v4.7c0 .19-.16.35-.35.35h-6.85c-1.06 0-1.93-.85-1.93-1.91zm12.83 1.58c0 .42-.23.37-.44.22l-2.83-2.06v-2.6l2.83-2.07c.25-.2.44-.15.44.22z" fill="#4a8cff"/><g fill="#fff"><path d="m17.87 8.63-2.83 2.07v2.6l2.83 2.06c.2.15.44.2.44-.22v-6.3c0-.36-.19-.41-.44-.21z"/><path d="m14.26 15.48c.19 0 .35-.16.35-.35v-4.7c0-1.06-.87-1.92-1.93-1.91h-6.85c-.19 0-.35.16-.35.35v4.7c0 1.06.87 1.92 1.93 1.91z"/></g></svg> ` + wvy.t("Zoom meeting") + `</button>
+                    </div>
+                </div>`);
+            } else if (wvy.config.zoomAuthUrl) {
+                $videobutton = $('<button type="button" class="btn btn-icon btn-add-meeting" data-provider="zoom"><svg class="i i-video" height="24" viewBox="0 0 24 24" width="24"><path d="M17,10.5V7C17,6.45 16.55,6 16,6H4C3.45,6 3,6.45 3,7V17C3,17.55 3.45,18 4,18H16C16.55,18 17,17.55 17,17V13.5L21,17.5V6.5L17,10.5Z" /></svg></button>');
+            } else if (wvy.config.teamsAuthUrl) {
+                $videobutton = $('<button type="button" class="btn btn-icon btn-add-meeting" data-provider="teams"><svg class="i i-video" height="24" viewBox="0 0 24 24" width="24"><path d="M17,10.5V7C17,6.45 16.55,6 16,6H4C3.45,6 3,6.45 3,7V17C3,17.55 3.45,18 4,18H16C16.55,18 17,17.55 17,17V13.5L21,17.5V6.5L17,10.5Z" /></svg></button>');
+            }
+
+            if ($videobutton != null) {
+                $videobutton.prependTo($b);
+
+                // add meetings container
+                _meetingContainerId = wvy.guid.get();
+                var $meetings = $("<div class='meetings'><table class='table table-name table-meetings' data-meetings-container='" + _meetingContainerId + "'></table></div>");
+                $meetings.appendTo($w);
+
+                // show meeting options
+                $w.on("click", ".btn-add-meeting", function (evt) {
+                    evt.preventDefault();
+                    var provider = $(this).data("provider");
+                    createMeeting(provider);
+                });
+
+                // remove meeting
+                $w.on("click", "[data-action='remove-meeting']", function (evt) {
+                    evt.preventDefault();                    
+                    removeMeeting(this);
+                });
+
+                // zoom authentication
+                $w.on("click", ".btnZoomAuthentication", function (e) {
+                    e.preventDefault();
+
+                    var zoomAuthUrl = wvy.config.zoomAuthUrl + "&state=" + _meetingContainerId;
+
+                    if (!wvy.browser.mobile) {
+                        window.open(zoomAuthUrl,
+                            "zoomAuthWin",
+                            "height=640,width=480");
+                    } else {
+                        clearMeetings();
+                        location.href = zoomAuthUrl;
+                    }
+
+                });
+
+                // teams authentication
+                $w.on("click", ".btnTeamsAuthentication", function (e) {
+                    e.preventDefault();
+
+                    var teamsAuthUrl = wvy.config.teamsAuthUrl + "&state=" + _meetingContainerId;
+
+                    if (!wvy.browser.mobile) {
+                        window.open(teamsAuthUrl,
+                            "teamsAuthWin",
+                            "height=640,width=480");
+                    } else {
+                        clearMeetings();
+                        location.href = teamsAuthUrl;
+                    }
+                });
+
+                // sign out from meeting providers
+                $w.on("click", "[data-meeting-sign-out]", function () {
+                    var provider = $(this).data("meeting-sign-out");
+                    var qs = "?provider=" + provider;
+                    $.post(wvy.url.resolve("/a/meetings/sign-out" + qs), function (response) {
+                        clearMeetings(provider);
+                    });
+                });
+            }
+        }
+
+        // meeting message listener
+        function messageListener(e) {
+
+            switch (e.data.name) {
+                case "zoom-signed-in":
+                    if (e.data.guid != _meetingContainerId) return false;
+                    recreateMeeting("zoom", e.data.guid);
+                    break;
+
+                case "teams-signed-in":
+                    if (e.data.guid != _meetingContainerId) return false;
+                    recreateMeeting("teams");
+                    break;
+            }
+        };
+
+        // create new meeting
+        function createMeeting(provider) {
+            // check if already added
+            if ($("[data-meeting-provider='" + provider + "']", $wrapper).length > 0) {
+                return false;
+            }
+
+            // dummy html
+            var $dummyHtml = $(`<tr class="blob" data-dummy-meeting="zoom">
+    <td class="table-icon">
+        <svg class="spinner spin" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <g><circle fill="none" cx="12" cy="12" r="11" stroke-linecap="butt" stroke-width="2"></circle><g>
+            </g></g></svg>
+    </td>
+    <td>` + provider.charAt(0).toUpperCase() + provider.slice(1) + ` meeting</td>
+    <td class="table-icon"></td>
+</tr>`);
+            $(".table-meetings[data-meetings-container='" + _meetingContainerId + "']").append($dummyHtml);
+
+            var qs = "?provider=" + provider + "&guid=" + _meetingContainerId;
+            $.get(wvy.url.resolve("/posts/meeting" + qs), function (html) {
+                $dummyHtml.remove();
+                $(".table-meetings[data-meetings-container='" + _meetingContainerId + "']").append(html);
+                //saveMessageForm(false);
+            });
+        }
+
+        // remove a meeting
+        function removeMeeting(el) {
+            $(el).closest("tr").remove();
+        }
+
+        // recreate meeting after successful authentication
+        function recreateMeeting(provider) {
+            removeMeeting($("[data-meeting-provider='" + provider + "']", $wrapper));
+            createMeeting(provider);
+        }
+
+        // clear all meetings
+        function clearMeetings(provider) {
+
+            // clear meetings
+            if (provider == null) {
+                $(".table-meetings").empty();
+                //if (storageAvailable()) {
+                //    localStorage.removeItem("meetings:" + _id);
+                //}
+            } else {
+                $(".table-meetings tr[data-meeting-provider='" + provider + "']").remove();
+                //saveMessageForm();
+            }
+
+        }
+
         // Initialize the plugin instance.
         var location = $el.data("editor");
         if ((location === "post" && wvy.config.htmlPosts) || (location === "comment" && wvy.config.htmlComments)) {
@@ -973,12 +1056,28 @@ wvy.editor = (function ($) {
             init();
         }
 
+        // called from fileupload.js when blobs are created
+        var processBlobs = function(blobs) {
+            return new Promise(function (resolve, reject) {
+                $.each(blobs.data, function (index, blob) {
+                    $wrapper.find(".uploads .table-attachments").append('<tr>' +
+                        '<td class="table-icon">' + (blob.kind === 'image' ? '<img class="img-24" src="' + wvy.url.thumb(blob.thumb, "48-crop") + '"/>' : '<svg class="i i-attachment" height="24" viewBox="0 0 24 24" width="24"><path d="m7.5 18c-3.04 0-5.5-2.46-5.5-5.5s2.46-5.5 5.5-5.5h10.5c2.21 0 4 1.79 4 4s-1.79 4-4 4h-8.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5h7.5v1.5h-7.5c-.55 0-1 .45-1 1s.45 1 1 1h8.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-10.5c-2.21 0-4 1.79-4 4s1.79 4 4 4h9.5v1.5z"/></svg>') + '</td>' +
+                        '<td>' + blob.name + '</td>' +
+                        '<td class="table-icon"><a class="btn btn-icon remove"><svg class="i i-close" height="24" viewBox="0 0 24 24" width="24"><path d="m19 6.41-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></svg></a><input type="hidden" name="blobs" value="' + blob.id + '" /></td>' +
+                        '</tr>');
+                });
+                toggleMore(false);
+                resolve();
+            });
+        }
+
         // Expose methods of WeavyEditor we wish to be public.
         return {
             option: option,
             destroy: destroy,
             reset: reset,
-            focus: focus
+            focus: focus,
+            processBlobs: processBlobs
         };
     }
 
@@ -1034,6 +1133,7 @@ wvy.editor = (function ($) {
         quicklinks: true,
         embeds: true,
         polls: true,
+        meetings: true,
         fileupload: true,
         inline: false,
         collapsed: false,
@@ -1041,7 +1141,7 @@ wvy.editor = (function ($) {
         textonly: false,
         mode: 'default',
         pickerCss: '',
-        placeholder: 'What\'s on your mind?',
+        placeholder: wvy.t("What's on your mind?"),
         submitButton: null,
         onInit: function () { },
         onDestroy: function () { },

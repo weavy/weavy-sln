@@ -9,19 +9,19 @@
             <td class="text-right"><span class="badge badge-info">@role.MemberIds.Count()</span></td>
             <td class="table-icon">
                 <div class="dropdown">
-                    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+                    <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
                         @Svg.Icon("dots-vertical")
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="@(Url.Action<RolesController>(c => c.Edit(role.Id)))">@Svg.Icon("pencil", "primary") Edit</a>
+                        <a class="dropdown-item" href="@(Url.Action<RolesController>(c => c.Edit(role.Id)))">@Svg.Icon("pencil", "primary") @T["Edit"]</a>
                         @if (role.IsTrashed()) {
                             <form action="@(Url.Action<RolesController>(c => c.Restore(role.Id)))" method="post" data-turboform>
-                                <button class="dropdown-item" type="submit">@Svg.Icon("backup-restore", "success") Restore</button>
+                                <button class="dropdown-item" type="submit">@Svg.Icon("backup-restore", "success") @T["Restore"]</button>
                             </form>
                         } else {
                             <form action="@(Url.Action<RolesController>(c => c.Trash(role.Id)))" method="post" data-turboform>
                                 @Html.HttpMethodOverride(HttpVerbs.Delete)
-                                <button class="dropdown-item" type="submit">@Svg.Icon("delete", "danger") Trash</button>
+                                <button class="dropdown-item" type="submit">@Svg.Icon("delete", "danger") @T["Trash"]</button>
                             </form>
                         }
                     </div>
@@ -32,7 +32,7 @@
         </tr>
     }
 
-    <tr class="scroll-next d-none" data-next="@Url.ScrollNext(Model)">
+    <tr class="scroll-next" data-next="@Url.ScrollNext(Model)">
         <td colspan="4"></td>
     </tr>
 }

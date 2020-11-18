@@ -139,6 +139,124 @@ wvy.messenger = (function ($) {
         return blob;
     }
 
+    function initTextarea() {
+        var typing;
+
+        // enable fieldset
+        var $fieldset = $(".message-form fieldset").prop("disabled", false);
+
+        // upgrade textarea to emojionearea
+        var $textarea = $("textarea", $fieldset);
+        if ($textarea.length) {
+            $textarea = $textarea.emojioneArea({
+                attributes: {
+                    dir: "ltr",
+                    spellcheck: true,
+                    autocomplete: "on",
+                    autocorrect: "on",
+                    autocapitalize: "on"
+                },
+                buttonTitle: wvy.t("Insert emoji"),
+                container: null,
+                imageType: "svg",
+                pickerPosition: "top",
+                searchPlaceholder: wvy.t("Search..."),
+                shortcuts: false,
+                textcomplete: {
+                    maxCount: 5,
+                    placement: "top"
+                },
+                tones: true,
+                tonesStyle: "bullet",
+                useInternalCDN: false,
+                events: {
+                    // hide emoji picker on ESC
+                    keydown: function (editor, evt) {
+                        var key = evt.which || evt.keyCode;
+                        if (key === 27) {
+                            if (_textarea) {
+                                evt.preventDefault();
+                                _textarea.hidePicker();
+                            }
+                        }
+                    },
+                    // submit on enter or ctrl+enter depending on settings
+                    keypress: function (editor, evt) {
+                        var key = evt.which || evt.keyCode;
+                        if ((key === 10 || key === 13) && !evt.shiftKey && !wvy.browser.mobile) {
+                            if (wvy.settings.enter || evt.ctrlKey) {
+                                evt.preventDefault();
+                                editor.blur(); // blur to update underlying textarea
+                                $(editor).closest("form").submit();
+                            }
+                        }
+                    },
+                    // save message form and send typing event on keypress (throttled to avoid sending every keypress)
+                    keyup: function () {
+                        typing = typing || _.throttle(function () {
+                            $.post({ url: wvy.url.resolve(_prefix + "/c/" + _id + "/typing") });
+                        }, 3000, { trailing: false })
+
+                        typing();
+                        saveMessageForm(false);
+                    },
+                    // configure autocomplete for @mentions
+                    ready: function (editor, evt) {
+                        editor.textcomplete([{
+                            match: /\B@([a-zA-Z0-9_]+)$/,
+                            search: function (term, callback) {
+                                $.getJSON(wvy.url.resolve("/a/autocomplete/mentions"), {
+                                    q: term,
+                                    top: 5
+                                }).done(function (resp) {
+                                    callback(resp);
+                                }).fail(function () {
+                                    callback([]);
+                                });
+
+                                    },
+                                    index: 1,
+                                    template: function (item) {
+                                        var html = '<img class="img-24 avatar mr-1" src="' + wvy.url.thumb(item.thumb, "48") + '" alt="" /><span>' + (item.name || item.username);
+                                        if (item.username) {
+                                            html += ' <small>@' + item.username + '</small>';
+                                        }
+                                        if (item.directory) {
+                                            html += ' <span class="badge badge-success">' + item.directory + '</small>';
+                                        }
+                                        html += "</span>";
+                                        return html;
+                                    },
+                                    replace: function (mention) {
+                                        return '@' + mention.username + " ";
+                                    },
+                                    cache: false
+                                }]);
+                            }
+                        }
+                    });
+
+            // get the textarea (which is now an emojionearea)
+            _textarea = $textarea[0].emojioneArea;
+
+                    // handle pasted image
+                    _textarea.on("pasteImage", function (editor, data, html) {
+                        var file = data.dataURL;
+                        var block = file.split(";");
+                        // get the content type of the image
+                        var contentType = block[0].split(":")[1];// In this case "image/gif"
+                        // get the real base64 content of the file
+                        var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
+                        // convert it to a blob to upload
+                        var blob = b64toBlob(realData, contentType);
+                        var fileOfBlob = new File([blob], data.name, { type: contentType });
+                        wvy.fileupload.uploadBlobs([].concat(fileOfBlob), $(".message-form input[type=file]"));
+                    });
+                    // restore pending message
+                    restoreMessageForm();
+                }
+            }
+
     ////////// Document events //////////
 
     document.addEventListener("turbolinks:visit", function (e) {
@@ -176,23 +294,14 @@ wvy.messenger = (function ($) {
         }
 
     });
-
-    document.addEventListener("turbolinks:before-render", function (e) {
-        //console.debug(e.type);
-
-        // destroy existing file upload
-        var $uploader = $(".message-form input[type=file]");
-        if ($uploader.fileupload("instance") !== undefined) {
-            $uploader.fileupload("destroy");
-        }
-    });
-
+    
     document.addEventListener("turbolinks:render", function (e) {
         //console.debug(e.type);
 
         // restore scroll position
         restoreScroll();
-    });
+    }, true);
+
 
     document.addEventListener("turbolinks:load", function (e) {
         //if (e.data.timing.visitEnd) {
@@ -201,179 +310,13 @@ wvy.messenger = (function ($) {
         //    console.log(e.type, e.data.url);
         //}
 
-
         var $main = $("#main");
         if ($main.length) {
             // set current conversation
             _id = Number($main.data("id")) || -1;
-            var typing;
             console.debug("conversation " + _id + " was loaded");
 
-            // enable fieldset
-            var $fieldset = $(".message-form fieldset").prop("disabled", false);
-
-            // upgrade textarea to emojionearea
-            var $textarea = $("textarea", $fieldset);
-            if ($textarea.length) {
-                $textarea = $textarea.emojioneArea({
-                    attributes: {
-                        dir: "ltr",
-                        spellcheck: true,
-                        autocomplete: "on",
-                        autocorrect: "on",
-                        autocapitalize: "on"
-                    },
-                    buttonTitle: "Insert emoji",
-                    container: null,
-                    imageType: "svg",
-                    pickerPosition: "top",
-                    searchPlaceholder: "Search...",
-                    shortcuts: false,
-                    textcomplete: {
-                        maxCount: 5,
-                        placement: "top"
-                    },
-                    tones: true,
-                    tonesStyle: "bullet",
-                    useInternalCDN: false,
-                    events: {
-                        // hide emoji picker on ESC
-                        keydown: function (editor, evt) {
-                            var key = evt.which || evt.keyCode;
-                            if (key === 27) {
-                                if (_textarea) {
-                                    evt.preventDefault();
-                                    _textarea.hidePicker();
-                                }
-                            }
-                        },
-                        // submit on enter or ctrl+enter depending on settings
-                        keypress: function (editor, evt) {
-                            var key = evt.which || evt.keyCode;
-                            if ((key === 10 || key === 13) && !evt.shiftKey && !wvy.browser.mobile) {
-                                if (wvy.settings.enter || evt.ctrlKey) {
-                                    evt.preventDefault();
-                                    editor.blur(); // blur to update underlying textarea
-                                    $(editor).closest("form").submit();
-                                }
-                            }
-                        },
-                        // save message form and send typing event on keypress (throttled to avoid sending every keypress)
-                        keyup: function () {
-                            typing = typing || _.throttle(function () {
-                                $.post({ url: wvy.url.resolve(_prefix + "/c/" + _id + "/typing") });
-                            }, 3000, { trailing: false })
-
-                            typing();
-                            saveMessageForm(false);
-                        },
-                        // configure autocomplete for @mentions
-                        ready: function (editor, evt) {
-                            editor.textcomplete([{
-                                match: /\B@([a-zA-Z0-9_]+)$/,
-                                search: function (term, callback) {
-                                    $.getJSON(wvy.url.resolve("/a/autocomplete/mentions"), {
-                                        q: term,
-                                        top: 5
-                                    }).done(function (resp) {
-                                        callback(resp);
-                                    }).fail(function () {
-                                        callback([]);
-                                    });
-
-                                },
-                                index: 1,
-                                template: function (item) {
-                                    var html = '<img class="img-24 avatar mr-1" src="' + wvy.url.thumb(item.thumb_url, "48") + '" alt="" /><span>' + (item.name || item.username);
-                                    if (item.username) {
-                                        html += ' <small>@' + item.username + '</small>';
-                                    }
-                                    if (item.directory) {
-                                        html += ' <span class="badge badge-success">' + item.directory + '</small>';
-                                    }
-                                    html += "</span>";
-                                    return html;
-                                },
-                                replace: function (mention) {
-                                    return '@' + mention.username + " ";
-                                },
-                                cache: false
-                            }]);
-                        }
-                    }
-                });
-
-                // get the textarea (which is now an emojionearea)
-                _textarea = $textarea[0].emojioneArea;
-
-                // configure file upload
-                $(".message-form input[type=file]").fileupload({
-                    url: wvy.url.resolve("/a/blobs"),
-                    dataType: "json",
-                    paramName: "blobs",
-                    singleFileUploads: false,
-                    add: function (e, data) {
-                        data.submit();
-                    },
-                    start: function (e) {
-                        // show progress bar and disable submit button while upload in progress
-                        $(".message-form .progress").removeClass("d-none");
-                        $(".message-form button[type=submit]").attr("disabled", true);
-                    },
-                    progressall: function (e, data) {
-                        // update progress bar
-                        var percentage = parseInt(data.loaded / data.total * 100, 10);
-                        $(".message-form .progress-bar").css("width", percentage + "%");
-                    },
-                    done: function (e, data) {
-                        if (data.result.data) {
-                            // animate progress bar to indicate that we are doing some kind of processing
-                            $(".message-form .progress-bar").addClass("progress-bar-striped progress-bar-animated");
-
-                            // call server to get partial html for uploaded files
-                            var qs = "?" + data.result.data.map(x => "ids=" + x.id).join("&");
-                            $.get(wvy.url.resolve(_prefix + "/blobs" + qs), function (html) {
-                                $(".table-uploads").append(html);
-
-                                // hide and reset progress bar
-                                $(".message-form .progress").addClass("d-none");
-                                $(".message-form .progress-bar").removeClass("progress-bar-striped progress-bar-animated").css("width", "0%");
-
-                                saveMessageForm(false);
-                            });
-                        } else {
-                            // hide and reset progress bar
-                            $(".message-form .progress").addClass("d-none");
-                            $(".message-form .progress-bar").removeClass("progress-bar-striped progress-bar-animated").css("width", "0%");
-                        }
-                    },
-                    fail: function (e, data) {
-                        console.error(e);
-                    },
-                    always: function (e, data) {
-                        // enable submit button
-                        $(".message-form button[type=submit]").attr("disabled", false);
-                        $(".message-form .dropdown-menu").removeClass("show");
-                    }
-                });
-
-
-                // handle pasted image
-                _textarea.on("pasteImage", function (editor, data, html) {
-                    var file = data.dataURL;
-                    var block = file.split(";");
-                    // get the content type of the image
-                    var contentType = block[0].split(":")[1];// In this case "image/gif"
-                    // get the real base64 content of the file
-                    var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
-                    // convert it to a blob to upload
-                    var blob = b64toBlob(realData, contentType);
-                    var fileOfBlob = new File([blob], data.name, { type: contentType });
-                    $(".message-form input[type=file]").fileupload('add', { files: fileOfBlob });
-                });
-                // restore pending message
-                restoreMessageForm();
-            }
+            setTimeout(initTextarea, 0);
         }
 
         // remove sending and loading classes
@@ -390,19 +333,6 @@ wvy.messenger = (function ($) {
         el = document.querySelector(".loader[data-prev]")
         if (el) {
             prevObserver.observe(el);
-        }
-
-        // scroll messages when .message-form is resized
-        el = document.querySelector(".message-form");
-        if (el) {
-            if (typeof ResizeObserver === "function") {
-                var resizeObserver = new ResizeObserver(function (entries, observer) {
-                    scrollToBottomOfMessages();
-                });
-                resizeObserver.observe(el);
-            } else {
-                console.debug("No ResizeObserver :(")
-            }
         }
 
         // show/hide correct dektop notification message
@@ -485,7 +415,7 @@ wvy.messenger = (function ($) {
         e.preventDefault();
 
         var teamsAuthUrl = wvy.config.teamsAuthUrl + "&state=" + _id;
-
+        
         if (!wvy.browser.mobile) {
             window.open(teamsAuthUrl,
                 "teamsAuthWin",
@@ -567,7 +497,7 @@ wvy.messenger = (function ($) {
     });
 
     // toggle star
-    $(document).on("click", "[data-toggle=star][data-entity=conversation]", function (e) {
+    $(document).on("click", "[data-toggle=star][data-type=conversation]", function (e) {
         e.preventDefault();
         e.stopPropagation();
         if ($(this).hasClass("on")) {
@@ -623,7 +553,7 @@ wvy.messenger = (function ($) {
         document.body.classList.add("one");
 
         // and restore scroll position
-        restoreScroll();
+        setTimeout(restoreScroll, 0);
     });
 
     // let server know that user is typing in conversation
@@ -813,7 +743,6 @@ wvy.messenger = (function ($) {
         var $input = $form.find(".form-control");
         var oldname = $(".name-label div", $form).text();
         var newname = $input.val();
-        //console.debug(oldname, "->", newname);
 
         $.ajax({
             method: $form.attr("method"),
@@ -821,13 +750,13 @@ wvy.messenger = (function ($) {
             data: $form.serialize(),
             beforeSend: function (xhr) {
                 // update ui with what we think is the new name
-                $(".conversation[data-id=" + _id + "] .name-label div").text(newname);
+                $(".name-label", $form).find("div").text(newname);
                 $(".conversation[data-id=" + _id + "] .media-title").text(newname);
                 $(".conversation[data-id=" + _id + "] .pane-title .typing-hide a").text(newname);
             }
         }).done(function (data) {
             // update ui with the actual new name
-            $(".conversation[data-id=" + _id + "] .name-label div").text(data.name);
+            $(".name-label", $form).find("div").text(data.name);
             $(".conversation[data-id=" + _id + "] .media-title").text(data.name);
             $(".conversation[data-id=" + _id + "] .pane-title .typing-hide a").text(data.name);
 
@@ -835,7 +764,7 @@ wvy.messenger = (function ($) {
             $input.removeClass("is-invalid");
         }).fail(function (xhr) {
             // restore old name on error
-            $(".conversation[data-id=" + _id + "] .name-label div").text(oldname);
+            $(".name-label", $form).find("div").text(oldname);
             $(".conversation[data-id=" + _id + "] .media-title").text(oldname);
             $(".conversation[data-id=" + _id + "] .pane-title .typing-hide a").text(oldname);
 
@@ -859,7 +788,7 @@ wvy.messenger = (function ($) {
                 var auth = $("a[data-meeting-authenticated='0']");
                 
                 if (auth.length) {
-                    wvy.alert.info("Please sign in to the meeting provider before you submit the message!", 3000)
+                    wvy.alert.info(wvy.t("Please sign in to the meeting provider before you submit the message!"), 3000)
                     return false;
                 }
             }
@@ -1217,7 +1146,7 @@ wvy.messenger = (function ($) {
 
     function star(id, ajax) {
         $(".conversation[data-id=" + id + "]").addClass("starred");
-        $("[data-toggle=star][data-entity=conversation][data-id=" + id + "]").addClass("on").removeClass("d-none");
+        $("[data-toggle=star][data-type=conversation][data-id=" + id + "]").addClass("on").removeClass("d-none");
 
         if (ajax) {
             $.post({ url: wvy.url.resolve(_prefix + "/c/" + id + "/star") });
@@ -1226,7 +1155,7 @@ wvy.messenger = (function ($) {
 
     function unstar(id, ajax) {
         $(".conversation[data-id=" + id + "]").removeClass("starred");
-        $("[data-toggle=star][data-entity=conversation][data-id=" + id + "]").removeClass("on");
+        $("[data-toggle=star][data-type=conversation][data-id=" + id + "]").removeClass("on");
 
         if (ajax) {
             $.post({ url: wvy.url.resolve(_prefix + "/c/" + id + "/unstar") });
@@ -1350,7 +1279,11 @@ wvy.messenger = (function ($) {
         } else if (el) {
             _p1 = _p1 || 0;
             //console.debug("scrolling #conversations to " + _p1);
-            el.scrollTop = _p1;
+            if (el.classList.contains("os-viewport")) {
+                $(el).closest(".os-host").overlayScrollbars().scroll({ y: _p1 });
+            } else {
+                el.scrollTop = _p1;
+            }
         }
     }
 
@@ -1363,8 +1296,13 @@ wvy.messenger = (function ($) {
                 el.scrollTop = el.scrollHeight;
             }
         } else if (el) {
-            //console.debug("scrolling #messages to " + el.scrollHeight);
-            el.scrollTop = el.scrollHeight;
+            //console.debug("scrolling #messages to " + el.scrollHeight, el);
+            if (el.classList.contains("os-viewport")) {
+                $(el).closest(".os-host").overlayScrollbars().scroll({ y: el.scrollHeight });
+            } else {
+                el.scrollTop = el.scrollHeight;
+            }
+            
         }
     }
 
@@ -1408,7 +1346,7 @@ wvy.messenger = (function ($) {
                     for (var i = 0; i < names.length; i++) {
                         if (i > 0) {
                             if (i === (names.length - 1)) {
-                                text += " and ";
+                                text += " " + wvy.t("and") + " ";
                             } else {
                                 text += ", ";
                             }
@@ -1416,9 +1354,9 @@ wvy.messenger = (function ($) {
                         text += names[i];
                     }
                     if (names.length === 1) {
-                        text += " is typing";
+                        text += " " + wvy.t("is typing");
                     } else {
-                        text += " are typing";
+                        text += " " + wvy.t("are typing");
                     }
 
                     // update gui
@@ -1621,13 +1559,13 @@ wvy.messenger = (function ($) {
         if (window.Notification) {
 
             if (Notification.permission === "granted" && wvy.settings.notify) {
-                var title = "Message from " + (message.createdBy.name || message.createdBy.username);
+                var title = wvy.t("Message from") + " " + (message.createdBy.name || message.createdBy.username);
                 var options = {
                     body: message.text,
                     // tag notification with message id to avoid multiple open tabs displaying individual notifications for the same message
                     tag: message.id,
                     // there aren't any solid guidelines for what type and size image to use for an icon, but a 192px png seems to work well in most browsers
-                    icon: message.createdBy.thumbUrl.replace("{options}", "192").replace(".svg", ".png")
+                    icon: message.createdBy.thumb.replace("{options}", "192").replace(".svg", ".png")
                 }
 
                 // modify title and body if message was in a room
@@ -1658,8 +1596,21 @@ wvy.messenger = (function ($) {
         Turbolinks.visit(document.location.href, { action: 'replace' });
     }
 
+    var showUploadedBlobs = function (blobs) {
+        return new Promise(function (resolve, reject) {
+            // call server to get partial html for uploaded files
+            var qs = "?" + blobs.map(x => "ids=" + x.id).join("&");
+            $.get(wvy.url.resolve("/content/blobs" + qs), function (html) {
+                $(".table-uploads").append(html);
+                saveMessageForm(false);
+                resolve();
+            });
+        });
+    }
+
     return {
-        reload: reload
+        reload: reload,
+        showUploadedBlobs: showUploadedBlobs
     };
 })(jQuery);
 

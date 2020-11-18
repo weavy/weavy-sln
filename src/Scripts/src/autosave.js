@@ -9,33 +9,37 @@ wvy.autosave = (function ($) {
 
     var _id = null;
     var _force = true;
-    var _message = "Are you sure you want to leave this page? There are some unsaved changes.";
+    //var _message = wvy.t("Are you sure you want to leave this page? There are some unsaved changes.");
     var $form = null;
     var $status = null;
+    var _label = null;
+    var _minDuration = 400;
+
+    // NOTE: removed onbeforeunload message if form is dirty. Does not play nice in overlays and also not embedded in iframe.
 
     // catch :before-visit
-    document.addEventListener("turbolinks:before-visit", function (e) {
-        var dirtyForm = $("form.autosave.dirty");
+    //    document.addEventListener("turbolinks:before-visit", function (e) {
+    //        var dirtyForm = $("form.autosave.dirty");
 
-        if (dirtyForm.length) {
-            e.returnValue = confirm(_message);
-        }
-    });
+    //        if (dirtyForm.length) {
+    //            e.returnValue = confirm(_message);
+    //        }
+    //    });
 
     // catch window onbeforeunload
-    window.onbeforeunload = function (e) {
-        e = e || window.event;
+    //window.onbeforeunload = function (e) {
+    //    e = e || window.event;
 
-        var dirtyForm = $("form.autosave.dirty");
+    //    var dirtyForm = $("form.autosave.dirty");
 
-        if (dirtyForm.length) {
-            if (e) {
-                e.returnValue = _message;
-            }
-            // safari
-            return _message;
-        }
-    };
+    //    if (dirtyForm.length) {
+    //        if (e) {
+    //            e.returnValue = _message;
+    //        }
+    //        // safari
+    //        return _message;
+    //    }
+    //};
 
     document.addEventListener("turbolinks:load", function () {
         $form = $("form.autosave");
@@ -64,6 +68,8 @@ wvy.autosave = (function ($) {
                 change();
             });
 
+            _label = $status.text();
+
             _started = isInt(_id);
         }
     });
@@ -71,7 +77,7 @@ wvy.autosave = (function ($) {
     // triggered from tiny when all editors are loaded
     function registerEditor() {
         for (var ed in tinyMCE.editors) {
-            tinyMCE.editors[ed].on("keydown", function (e) {                
+            tinyMCE.editors[ed].on("keydown", function (e) {
                 change();
             });
         }
@@ -94,13 +100,15 @@ wvy.autosave = (function ($) {
 
     // serialize and persist
     function save() {
-        $status.html('Saving');
+        var start = new Date();
+
+        transition(true);
 
         _typing = false;
         clearTimeout(_timer);
 
         // make sure tiny sets content before serializing
-        if (window.tinyMCE !== undefined) {            
+        if (window.tinyMCE !== undefined) {
             tinyMCE.triggerSave();
         }
 
@@ -115,7 +123,7 @@ wvy.autosave = (function ($) {
         // remove unwanted properties
         delete properties.x_http_method_override;
 
-        var url = "/a/content/" + _id + "/draft?force=" + _force;        
+        var url = "/a/content/" + _id + "/draft?force=" + _force;
 
         if (!_cancel) {
             $.ajax({
@@ -125,29 +133,66 @@ wvy.autosave = (function ($) {
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (data, status, xhr) {
-                    _force = false; 
+                    if (typeof (data.is_transient) !== "undefined") {
+                        if (data.is_transient) {
+                            $(".draft-transient").removeClass("d-none");
+                            $(".draft-not-transient").addClass("d-none");
+                        } else {
+                            $(".draft-not-transient").removeClass("d-none");
+                            $(".draft-transient").addClass("d-none");
+                        }
+                    }                    
+                    _force = false;
                     var now = new Date();
-                    $status.html('Saved ' + (now.getHours() < 10 ? "0" : "") + now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes());
+                    $status.attr("title", wvy.t('Saved') + ' ' + (now.getHours() < 10 ? "0" : "") + now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes());
+                    $(".is-invalid").removeClass('is-invalid');
+                    $(".alerts .alert").alert('close');
                 },
                 error: function (xhr, status, err) {
-                    $status.html('');
-
                     // conflict - item has been taken over by someone else
                     if (xhr.status === 409) {
                         $form.removeClass("dirty");
                         document.location.href = wvy.url.resolve("~/content/" + _id + "/edit");
                     } else {
                         var json = JSON.parse(xhr.responseText);
-                        wvy.alert.warning(json.message);
+                        if (json.model_state) {
+                            for (var key in json.model_state) {
+                                if (json.model_state.hasOwnProperty(key)) {
+                                    wvy.alert.danger(json.model_state[key], 4000);
+                                }
+                            }
+                        } else {
+                            wvy.alert.warning(json.message);
+                        }
                     }
                 },
                 complete: function (xhr, status) {
+                    var end = new Date();
+                    var diff = end.getTime() - start.getTime();
+
+                    // reset after minDuration to prevent the button from just flickering
+                    if (diff > _minDuration) {
+                        transition(false);
+                    } else {
+                        setTimeout(function () { transition(false); }, _minDuration - diff);
+                    }
                     $form.removeClass("dirty");
                 }
             });
         } else {
-            // autosave was cancelled 
-            $status.html('');
+            transition(false);
+        }
+    }
+
+    function transition(lock) {
+        if (lock) {
+            // change label and disable buttons during save
+            $status.siblings(".dropdown-toggle-split").attr("disabled", true);
+            $status.text(wvy.t('Saving') + "...").attr("disabled", true);
+        } else {
+            // restore
+            $status.siblings(".dropdown-toggle-split").removeAttr("disabled");
+            $status.text(_label).removeAttr("disabled");
         }
     }
 

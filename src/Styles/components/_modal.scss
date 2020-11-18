@@ -16,7 +16,6 @@
     flex-direction: column;
     display: none;
     padding: $modal-dialog-margin; // TODO: Rename to $modal-padding
-    @include scroll-y;
     // custom click handling to close modal
     pointer-events: all;
     // Prevent Chrome on Windows from adding a focus outline. For details, see
@@ -53,7 +52,6 @@
     background-color: $modal-content-bg;
     background-clip: padding-box;
     border: $modal-content-border-width solid $modal-content-border-color;
-    @include scroll-y;
     @include border-radius($border-radius-lg);
     @include box-shadow($modal-content-box-shadow-xs);
 }
@@ -185,10 +183,6 @@
             right: .5rem;
         }
     }
-
-    .emojionearea-editor {
-        @include overscroll-behavior-contain;
-    }
 }
 
 /* fix for IE11 */
@@ -228,4 +222,19 @@ html.ie .modal-content .emojionearea {
         margin-left: .25rem;
         margin-right: 0;
     }
+}
+
+.modal .content-drawer .form-buttons:last-child {
+    background: unset;
+    flex: 1;
+    padding-top: 1rem;
+}
+
+
+#task-details-modal {
+    z-index: $zindex-modal - 2
+}
+
+#profile-modal {
+    z-index: $zindex-modal + 1
 }

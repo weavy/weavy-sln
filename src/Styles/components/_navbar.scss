@@ -1,32 +1,54 @@
 /// <reference path="../_core.scss" />
 
-.navbar-theme {
-    background-color: rgba($theme-700, $opacity-panel);
-    color: color-yiq($theme-700);
-    //box-shadow: $md-shadow-2dp;
+.navbar {
     backface-visibility: hidden;
+    flex-wrap: nowrap;
+    height: $navbar-height;
 
-    .btn-icon {
-        color: color-yiq($theme-700);
-    }
-
-    .navbar-secondary {
-        .fab {
-            position: absolute;
-            right: 1rem;
-            top: 1.25rem;
-
-            .btn-round {
-                box-shadow: $md-shadow-2dp !important;
-            }
+    @if($enable-backdrop-filter) {
+        @supports(backdrop-filter: $backdrop-filter) {
+            backdrop-filter: $backdrop-filter;
         }
     }
+    //justify-content: flex-start;
+    // fix for .dropdown-menu-right in navbar, see https://github.com/twbs/bootstrap/issues/23308
+    .dropdown-menu-right {
+        left: auto;
+        right: 0;
+    }
+
+    > .nav-tabs:first-child {
+        margin-left: -$navbar-padding-x;
+    }
+
+    > .nav-tabs:last-child {
+        margin-right: -$navbar-padding-x;
+    }
+
+    > .nav-tabs {
+        margin-top: -$navbar-padding-y;
+        margin-bottom: -$navbar-padding-y;
+    }
+    /*
+    // According to MD, but aligns badly with layout
+    > .nav-tabs-cluster:first-child, .navbars & > .nav-tabs:first-child {
+        padding-left: $navbar-padding-x;
+    }
+
+    > .nav-tabs-cluster:last-child, .navbars & > .nav-tabs:last-child {
+        padding-right: $navbar-padding-x;
+    }
+*/
 }
 
-@include media-breakpoint-down(xs) {
-    html:not(.framed) {
-        .navbar {
-            padding: $navbar-padding-y #{$navbar-padding-x + $edge-margin} !important;
+.navbars {
+    @if($enable-backdrop-filter) {
+        @supports(backdrop-filter: $backdrop-filter) {
+            backdrop-filter: $backdrop-filter;
+
+            > .navbar {
+                backdrop-filter: none;
+            }
         }
     }
 }
@@ -34,62 +56,64 @@
 .navbar-light {
     background-color: rgba($panel-bg, $opacity-panel);
     color: $panel-color;
-    //box-shadow: 0 1px 4px 0px rgba(0,0,0,0.05), inset 0 -1px 0px 0 $border-color;
     border-bottom: $border-width solid $border-color;
-    
-    .btn-icon {
-        color: $panel-color;
-    }
-}
 
-.navbar-panel {
-    background-color: rgba($panel-bg, $opacity-panel);
-    color: $panel-color;
-
-    .btn-icon {
-        color: $panel-color;
-    }
-}
-
-.navbar-primary {
-    z-index: 3;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    height: $navbar-height;
-}
-
-.navbar-secondary {
-    z-index: 2;
-    flex-wrap: nowrap;
-    min-height: $navbar-height;
-    // fix for .dropdown-menu-right in navbar, see https://github.com/twbs/bootstrap/issues/23308
-    .dropdown-menu-right {
-        left: auto;
-        right: 0;
-    }
-}
-
-.navbar-content {
-    @extend .navbar-light;
-    padding: .5rem;
-    display: flex;
-    flex-wrap: nowrap;
-    //color: $panel-color;
-    min-height: $navbar-height;
-}
-
-@include media-breakpoint-down(xs) {
-    html:not(.framed) {
-        .navbar-content {
-            padding: .5rem #{.5rem + $edge-margin};
+    @if($enable-backdrop-filter) {
+        @supports(backdrop-filter: $backdrop-filter) {
+            background-color: rgba($panel-bg, $opacity-backdrop);
         }
+    }
+}
+
+.navbar-dark {
+    background-color: rgba($black, $opacity-backdrop);
+    color: color-yiq($black);
+    border-bottom: $border-width solid $border-color-dark;
+    //justify-content: flex-start;
+    .btn-icon {
+        color: color-yiq($black);
+    }
+
+    .nav-link {
+        color: color-yiq($black);
+        padding: .25rem 0;
+
+        &.active {
+            color: color-yiq($black);
+        }
+    }
+}
+
+.navbar-theme {
+    $backdrop-theme-color: mix(saturate($theme-700, 42%), saturate($theme-900, 42%), 58%);
+
+    background: linear-gradient(to bottom, $theme-700, rgba($backdrop-theme-color, $opacity-panel));
+    color: color-yiq($theme-700);
+
+    @if($enable-backdrop-filter) {
+        @supports(backdrop-filter: $backdrop-filter) {
+            background: linear-gradient(to bottom, $theme-700, rgba($backdrop-theme-color, $opacity-backdrop-theme));
+        }
+    }
+
+    .navbar + & {
+        background: rgba($backdrop-theme-color, $opacity-panel);
+
+        @if($enable-backdrop-filter) {
+            @supports(backdrop-filter: $backdrop-filter) {
+                background: rgba($backdrop-theme-color, $opacity-backdrop-theme);
+            }
+        }
+    }
+
+    .btn-icon {
+        color: color-yiq($theme-700);
     }
 }
 
 .navbar-icons {
     display: flex;
     flex: 1 0 2rem;
-
     // fix for .dropdown-menu-right in navbar, see https://github.com/twbs/bootstrap/issues/23308
     .dropdown-menu-right {
         left: auto;
@@ -98,6 +122,14 @@
 
     &:not(:first-child):last-child {
         justify-content: flex-end;
+
+        > :not(:first-child) {
+            margin-left: .5rem;
+        }
+    }
+
+    .badge{
+        align-self:center;
     }
 }
 
@@ -114,6 +146,7 @@
         display: inline-block;
         @include text-truncate();
         color: inherit !important;
+        user-select: none;
     }
 
     .dropdown {
@@ -146,19 +179,22 @@
         }
 
         .dropdown-menu {
-            @extend .scroll-y;
             top: 0;
             left: .25rem;
             right: .25rem;
             margin-left: auto;
             margin-right: auto;
             max-width: none;
-            max-height: calc(100vh - .5rem);
-            padding-top: 0;
+            padding: 0;
 
             @include media-breakpoint-up(sm) {
                 max-width: 20rem;
                 width: 20rem;
+            }
+
+            .scroll-y {
+                max-height: calc(100vh - .5rem);
+                padding-bottom: $dropdown-padding-y;
             }
         }
 
@@ -187,64 +223,6 @@
                 }
             }
         }
-
-        .active-spaces {
-            &:not(:empty) {
-                &::before {
-                    content: '';
-                    display: block;
-                    height: 0;
-                    margin: 0.25rem 0;
-                    overflow: hidden;
-                    border-top: 1px solid #E0E0E0;
-                }
-            }
-        }
-
-        .active-spaces + .dropdown-item {
-            margin-bottom: calc(.5rem + 1px);
-            position: relative;
-
-            &::after {
-                content: '';
-                display: block;
-                height: 1px;
-                margin: 0;
-                overflow: hidden;
-                border-top: .25rem solid $dropdown-bg;
-                background: $dropdown-divider-bg;
-                border-bottom: .25rem solid $dropdown-bg;
-                box-sizing: content-box;
-                position: absolute;
-                top: 100%;
-                left: -.75rem;
-                right: -.75rem;
-            }
-        }
-
-        .active-spaces:not(:empty) + .dropdown-item {
-            span {
-                text-transform: lowercase;
-
-                &::first-letter {
-                    text-transform: uppercase;
-                }
-
-                &::before {
-                    content: "All ";
-                }
-            }
-        }
-
-        .active-spaces:empty + .dropdown-item {
-            margin-top: calc(.5rem + 1px);
-            margin-bottom: 0;
-
-            &::after {
-                top: auto;
-                bottom: 100%;
-            }
-        }
     }
 
     @include media-breakpoint-up(md) {
@@ -259,5 +237,39 @@
 }
 
 .navbar-title {
-    @extend .nav-title;
+    line-height: 2rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.offset-navbar {
+    margin-top: -$navbar-height;
+}
+
+.offset-navbar-secondary {
+    margin-top: #{-2 * $navbar-height};
+}
+
+.padding-navbar {
+    padding-top: $navbar-height;
+
+    &.os-host > .os-scrollbar-vertical {
+        top: $navbar-height;
+    }
+}
+
+.padding-navbar-secondary {
+    padding-top: #{2 * $navbar-height};
+
+    &.os-host > .os-scrollbar-vertical {
+        top: #{2 * $navbar-height};
+    }
+}
+
+.compensate-navbar {
+    @extend .offset-navbar, .padding-navbar;
+}
+
+.compensate-navbar-secondary {
+    @extend .offset-navbar-secondary, .padding-navbar-secondary;
 }

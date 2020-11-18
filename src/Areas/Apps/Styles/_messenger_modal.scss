@@ -5,11 +5,11 @@
 
 
 .modal-open {
-    // Kill the scroll on the body
+    // kill the scroll on the body
     overflow: hidden;
 
     .modal {
-        @include scrollbar;
+        //@include scrollbar;
         @include scroll-y;
     }
 }
@@ -162,9 +162,7 @@
     top: -9999px;
     width: 50px;
     height: 50px;
-    //overflow: scroll;
-    @include scrollbar;
-    @include scroll;
+    overflow: scroll;
 }
 
 // Scale up the modal

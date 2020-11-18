@@ -9,9 +9,11 @@
 
 @if (WeavyContext.Space.HasPermission(Permission.Apps)) {
     @section navbar_secondary {
-        <div class="navbar-icons">
-            <a href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" class="btn btn-icon ml-auto" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="Add tab" title="Add tab">@Svg.Icon("plus") Add tab</a>
-        </div>
+        <nav class="navbar navbar-theme">
+            <div class="navbar-icons">
+                <a href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" class="btn btn-icon ml-auto" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="@T["Add tab"]" title="@T["Add tab"]">@Svg.Icon("plus") @T["Add tab"]</a>
+            </div>
+        </nav>
     }
 }
 
@@ -22,7 +24,7 @@
     <div class="facepile">
         @Model.Members.Facepile(size: 32, link: true, presence: true)
         @if (WeavyContext.Space.HasPermission(Permission.Members)) {
-            <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="Add members">@Svg.Icon("plus")</button>
+            <button type="button" class="btn btn-round btn-primary btn-sm" data-toggle="modal" data-target="#members-modal" data-keyboard="true" title="@T["Add members"]">@Svg.Icon("plus")</button>
         }
     </div>
 </div>
@@ -32,10 +34,10 @@
         <p class="lead text-center text-muted mb-2">@WeavyContext.Space.Description</p>
     }
     <p class="small text-center text-muted">
-        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null)))">@Model.Members.TotalCount.SingularizeOrPluralize("member", "members")</a>
+        <a href="@(Url.Action<SpaceController>(c=>c.Members(WeavyContext.Space.Id, null)))">@T[Model.Members.TotalCount.Value, "{0} member"]</a>
     </p>
 
     @if (!Model.Space.IsMember) {
-        <p class="text-center text-danger">Only members have access to apps and content in the space.</p>
+        <p class="text-center text-danger">@T["Only members have access to apps and content in the space."]</p>
     }
 </div>

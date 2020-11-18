@@ -1,0 +1,17 @@
+﻿<div class="preview-container">
+    <div id="pdfToolbar">
+        <div>
+            <button type="button" id="zoomOut" class="btn btn-icon" title="@T["Zoom out"]">@Svg.Icon("minus")</button>
+            <button type="button" id="zoom" class="btn btn-icon" title="@T["Fit width"]">@Svg.Icon("fullscreen")</button>
+            <button type="button" id="zoomIn" class="btn btn-icon" title="@T["Zoom in"]">@Svg.Icon("plus")</button>
+        </div>
+    </div>
+    <div id="pdfPreview" class="pdf-document custom-scrollbar">
+        <div id="pdfViewer">
+            <div class="page loading">
+                <div class="loadingIcon"></div>
+            </div>
+        </div>
+        <div id="pdfThumbs"></div>
+    </div>
+</div>

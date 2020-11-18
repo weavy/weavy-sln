@@ -1,5 +1,8 @@
 ﻿@model Entity
-<tr data-href="@Model.Url()">
+@{
+    string target = Model.Type == EntityType.Content || Model.Type == EntityType.Attachment ? "overlay" : "";
+}
+<tr data-href="@Model.Url()" data-target="@target">
   <td class="table-icon">
     @if ((Model.Type == EntityType.Space || Model.Type == EntityType.User) && Model.Value is IHasAvatar entity) {
       @entity.AvatarImg(24)
@@ -7,9 +10,9 @@
       @Svg.Icon(Model)
     }
   </td>
-  <td><a href="@Model.Url()">@Model.GetTitle()</a></td>
+  <td><a href="@Model.Url()" target="@target">@Model.GetTitle()</a></td>
   <td class="table-icon">
-    <button type="button" class="btn btn-icon on" data-entity="@Model.Type.ToString().ToLower()" data-id="@Model.Id" data-toggle="star">
+    <button type="button" class="btn btn-icon on" data-type="@Model.Type.ToString().ToLower()" data-id="@Model.Id" data-toggle="star">
       @Svg.Icon("star-outline", "yellow", htmlAttributes: new { @class = "d-block" })
       @Svg.Icon("star", "yellow", htmlAttributes: new { @class = "d-none" })
     </button>

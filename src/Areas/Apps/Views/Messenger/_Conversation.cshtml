@@ -12,7 +12,7 @@
             @Model.AvatarImg(size:48, presence: true)
         </div>
         <div class="media-body">
-            @Html.TimeWhen(lastMessage?.CreatedAt, abbrev: true)
+            @Html.TimeWhen(lastMessage?.CreatedAt)
             <div class="media-title">@Model.GetTitle()</div>
             <div class="media-text">
                 <span class="typing-hide">
@@ -20,7 +20,7 @@
                         <text>&nbsp;</text>
                     } else {
                         if (lastMessage.CreatedById == User.Id) {
-                            <text>You:</text>
+                            <text>@T["You"]:</text>
                         } else if (Model.IsRoom) {
                             <text>@lastMessage.CreatedBy().GetTitle():</text>
                         }

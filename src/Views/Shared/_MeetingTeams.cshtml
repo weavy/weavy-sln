@@ -1,0 +1,18 @@
+﻿@model PartialMeetingModel
+
+<tr class="blob" data-meeting-provider="teams">
+    <td class="table-icon">
+        @Svg.Icon("microsoft-teams", color: "native")
+    </td>
+    <td>
+        @T["Teams meeting"]
+        @if (Model.Meeting != null) {
+            <a href="javascript:;" data-meeting-sign-out="teams">(@T["Sign out"])</a>
+        } else {
+            <a href="javascript:;" class="btnTeamsAuthentication" data-meeting-authenticated="0">(@T["Sign in"])</a>
+        }
+        <input type="hidden" name="meetings" value="@(Model.Meeting?.Id ?? -1)">
+    </td>
+    <td class="table-icon"><button type="button" class="btn btn-icon" data-action="remove-meeting">@Svg.Icon("close")</button></td>
+</tr>
+

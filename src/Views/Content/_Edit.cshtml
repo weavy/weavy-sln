@@ -1,6 +1,7 @@
 ﻿@model Content
 @{
     var draftable = Model as IDraftable;
+    var modifyMode = Model.MetaData().ModifyMode;
 
     var htmlAttributes = new Dictionary<string, object>(){
         { "class", draftable != null ? "autosave" : "" },
@@ -10,27 +11,43 @@
         { "data-status", "#autosave-status" },
         { "data-id", Model.Id }
     };
-    
+
     if (ViewData["turboform"] != null) {
         htmlAttributes.Add("data-turboform", "");
     }
 }
 
-<form action="@Model.Url()" method="post" @Html.Attributes(htmlAttributes)>
+<form id="content-form" action="@Model.Url()" method="post" @Html.Attributes(htmlAttributes)>
     @Html.HttpMethodOverride(HttpVerbs.Put)
-    @Html.EditorsForModel()
-    <div class="form-buttons">
-        <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
-        @if (draftable != null) {
-            <button type="submit" class="btn btn-outline-secondary" name="operation" value="draft">Save draft</button>
-            if (draftable.IsDraft) {
-                <button type="submit" class="btn btn-outline-secondary" name="operation" value="discard">Discard changes</button>
+
+    @if (modifyMode == UpsertMode.Modal) {
+        @Html.EditorsForModel()
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
+            @if (draftable != null) {
+                <button type="submit" class="btn btn-outline-secondary" name="operation" value="draft">@T["Save draft"]</button>
+                if (draftable.IsDraft) {
+                    <button type="submit" class="btn btn-outline-secondary" name="operation" value="discard">@T["Discard changes"]</button>
+                }
             }
-        }
-        <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel">Cancel</button>
-        <div class="text-muted ml-auto" id="autosave-status"></div>
-    </div>
+        </div>
+    } else if (modifyMode == UpsertMode.Page) {
+        @Html.Hidden(nameof(Model.Name), Model.Name)
+        @Html.EditorsForModel(exclude: new string[] { nameof(Model.Name) })
+
+        @* hidden, triggered from navbar *@
+        <div class="d-none">
+            <button type="submit" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
+            @if (draftable != null) {
+                <button type="submit" name="operation" value="draft">@T["Save draft"]</button>
+                @* always enable discard - could be used when discarding after autosave *@
+                <button type="submit" name="operation" value="discard">@T["Discard changes"]</button>
+            }
+        </div>
+    }
+
     <div id="blobs">
         @* container for blobs uploaded during edit, they will be converted to attachments on successfull insert/update *@
     </div>
 </form>
+

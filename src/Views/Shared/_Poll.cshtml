@@ -25,16 +25,13 @@
                     @if (option.VoteCount > 0) {
                         @option.Voters.Take(max).Facepile(size: 32, link: true)
                         if (more > 0) {
-                            <a href="#votes" class="more" title="@StringUtils.SingularizeOrPluralize(more, "other person", "other people")" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="People who voted on this option"><img src="@(WeavyContext.ApplicationPath)img/pixel.png" class="img-32 avatar" alt="" /><span>+@more</span></a>
-                            @*<button class="btn btn-sm btn-round btn-light justify-content-center" type="button" data-modal-title="People who voted on this option" data-path="/posts/@Model.Id/votes/@option.Id" data-target="#feedback-modal" data-toggle="modal" title="">
-                                <span>+@more</span>
-                            </button>*@
+                            <a href="#votes" class="more" title="@T[more, "{0} other person"]" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="People who voted on this option"><img src="@(WeavyContext.ApplicationPath)img/pixel.png" class="img-32 avatar" alt="" /><span>+@more</span></a>                            
                         }
                     }
             </td>
             <td class="votes">
                 @if (option.VoteCount > 0) {
-                    <a href="#votes" class="more" title="@StringUtils.SingularizeOrPluralize(option.VoteCount, "vote", "votes")" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="People who voted on this option"><img src="@(WeavyContext.ApplicationPath)img/pixel.png" class="img-32 avatar" alt="" /><span>@option.VoteCount</span></a>
+                    <a href="#votes" class="more" title="@T[option.VoteCount, "{0} vote"]" data-path="@($"/posts/{Model.Id}/votes/{option.Id}")" data-toggle="modal" data-target="#feedback-modal" data-modal-title="@T["People who voted on this option"]"><img src="@(WeavyContext.ApplicationPath)img/pixel.png" class="img-32 avatar" alt="" /><span>@option.VoteCount</span></a>
                 }
         </td>
     </tr>

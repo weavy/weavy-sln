@@ -7,13 +7,13 @@ tinymce.PluginManager.add("weavy_link", function (editor, url) {
 
     editor.ui.registry.addMenuItem("weavy_link", {
         icon: "link",
-        text: "Insert/edit link",
+        text: wvy.t("Insert/edit link"),
         context: "insert",
         onAction: function () { weavyLink() },
     });
 
     editor.ui.registry.addButton("weavy_link", {
-        tooltip: "Insert/edit link",
+        tooltip: wvy.t("Insert/edit link"),
         icon: "link",
         onAction: function () { weavyLink() },
     });
@@ -105,7 +105,7 @@ tinymce.PluginManager.add("weavy_link", function (editor, url) {
         });
 
         editor.windowManager.openUrl({
-            title: "Insert/edit link",
+            title: wvy.t("Insert/edit link"),
             url: wvy.url.resolve("ui/insertlink?q=" + textSelection + "&url=" + encodeURIComponent(url) + params),
             width: 800,
             height: 600,

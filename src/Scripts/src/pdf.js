@@ -2222,11 +2222,11 @@ wvy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
 
                 this.appConfig = {
                     eventBus: null,
-                    mainContainer: document.getElementById('preview'),
+                    mainContainer: document.getElementById('pdfPreview'),
                     viewerContainer: document.getElementById('pdfViewer'),
                     thumbnailContainer: document.getElementById('pdfThumbs'),
                     // NOTE: body element is not scrolling so set main container as scrollcontainer also
-                    scrollContainer: document.getElementById('preview') || document.body,
+                    scrollContainer: document.getElementById('pdfPreview') || document.body,
                     toolbar: {
                         container: document.getElementById('pdfToolbar'),
                         zoomOut: document.getElementById('zoomOut'),

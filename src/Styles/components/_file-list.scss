@@ -5,5 +5,19 @@
 
     .list-group-item {
         background-color: #fff;
+        padding: .5rem;
+
+        .media {
+            align-items: center;
+        }
+
+        .media-body {
+            line-height: $line-height-base;
+        }
+
+        .media-title {
+            font-weight: 500;
+            margin: 0;
+        }
     }
 }

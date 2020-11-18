@@ -14,17 +14,20 @@
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
                                         <td valign="top" class="textContent">
-                                            @if (Model.Messages.Count() > 1) {
-                                                <text>Hi, you have some new messages</text>
+                                            @if (Model.Messages.Count() == 1) {
+                                                if (Model.Conversation.IsRoom) {
+                                                    @T["Hi, you have a new message in"]
+                                                } else {
+                                                    @T["Hi, you have a new message from"]
+                                                }                                                
                                             } else {
-                                                <text>Hi, you have a new message</text>
+                                                if (Model.Conversation.IsRoom) {
+                                                    @T["Hi, you have some new messages in"]
+                                                } else {
+                                                    @T["Hi, you have some new messages from"]
+                                                }
                                             }
-                                            @if (Model.Conversation.IsRoom) {
-                                                <text>in <a href="@Model.Conversation.Url()">@Model.Conversation.Name</a>.</text>
-                                            } else {
-                                                <text>from <a href="@Model.Conversation.Url()">@Model.Conversation.GetTitle()</a>.</text>
-                                            }
-
+                                            <a href="@Model.Conversation.Url()">@Model.Conversation.GetTitle()</a>.
                                         </td>
                                     </tr>
                                 </table>
@@ -85,7 +88,7 @@
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
             <td valign="top" class="footerContent">
-                Not interested in these emails anymore? Edit your <a href="/settings">notification settings</a>.
+                @T["Not interested in these emails anymore?"] <a href="/settings">@T["Edit your notification settings"]</a>.
             </td>
         </tr>
     </table>

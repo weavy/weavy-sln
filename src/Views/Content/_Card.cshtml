@@ -1,6 +1,77 @@
 ﻿@model Content
 
-<div class="card">
-    <a href="@Model.Url()">@Model.Name (content card)</a>
+@{
+    var isFolder = Model is IFolder;
+    var meta = Model.MetaData();
+    var thumbcss = "card-image";
+    var thumburl = Model.ThumbUrl(160, 160);
+    if (thumburl != null) {
+        // looks like there could be a thumbnail for this content item
+        thumburl = Model.ThumbUrl(160, 160);
+
+        // get thumbnail dimensions
+        int? width = null;
+        int? height = null;
+        if (Model is IFile file) {
+            if (file.Blob.Link == null) {
+                width = file.Blob?.Width;
+                height = file.Blob?.Height;
+            }
+        } else if (Model is IHasThumb hasthumb) {
+            var thumb = FileUtils.GetThumb(hasthumb, 160, 160);
+            if (thumb != null) {
+                var im = FileUtils.GetImageMetadata(thumb);
+                width = im?.Width;
+                height = im?.Height;
+            } else {
+                thumburl = null;
+            }
+        }
+
+        // use aspect ratio and size to decide how to display the thumbnail
+        if (width != null && height != null) {
+            var ar = (float)width / height;
+            if (ar > 1.55f) {
+                // horizontal
+                thumbcss += " hz";
+            } else if (ar < 0.8f) {
+                // vertical
+                thumbcss += " vt";
+            }
+
+            if (width < 160 && height < 160) {
+                // small
+                thumbcss += " sm";
+            }
+        }
+    }
+
+    var attrs = Html.PreviewAttributes(WeavyContext.App, Model as IFile);
+    var href = attrs?["data-href"] ?? Model.Url();
+    var target = attrs?["target"] ?? (Model is IFolder ? null : "overlay");
+    var prev = ViewData["prev"] as int?;
+    var next = ViewData["next"] as int?;
+}
+
+<div class="card" data-id="@Model.Id" @Html.Raw(prev != null ? ("data-prev=" + prev) : null) @Html.Raw(next != null ? ("data-next=" + next) : null) data-content-guid="@Model.ContentGuid" data-allowed-children="@meta.AllowedChildren()" @(Model.HasPermission(Permission.Edit) ? "draggable=true" : "")>
+    <a href="@href" target="@target" draggable="false">
+        @Html.Badge(Model)
+        @if (thumburl != null) {
+            <div class="@thumbcss" style="background-image:url(@thumburl)"><img class="content-thumb-hidden" src="@thumburl" loading="lazy" decoding="async" /></div>
+        } else {
+            <div class="card-icon">@Svg.Icon(Model, size: 72)</div>
+        }
+        <div class="card-footer">
+            @Svg.Icon(Model)
+            <div class="text-truncate ml-1" title="@Model.Name">@Model.Name</div>
+        </div>
+    </a>
+
+    @if (Model is IStarrable starrable) {
+        @Html.StarToggle(starrable)
+    }
+    @{ Html.RenderPartial("_ContentMenu", Model);}
 </div>
+
+
 

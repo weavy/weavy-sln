@@ -1,6 +1,6 @@
 ﻿@model SpaceSearchResult
 @{
-    Title = "Spaces";
+    Title = T["Spaces"].ToString();
     var tab = ViewContext.RouteData.Values["tab"] as string;
 }
 
@@ -8,50 +8,49 @@
     @Html.Partial("_NavbarMenu")
 }
 
-<div class="container-fluid my-3">
-    @(Html.FilterForm<SpaceController>(c => c.Index(null, tab), Model.Query))
 
-    @if (Model.HasItems()) {
-        <table class="table table-hover table-name-desc-count">
-            <thead>
-                <tr>
-                    <th class="table-icon"></th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th class="text-right">Members</th>
-                    <th class="table-icon"></th>
-                </tr>
-            </thead>
-            <tbody id="infinite-scroll-target">
-                @{ Html.RenderPartial("_SpaceTable"); }
-            </tbody>
-        </table>
-        @Html.ScrollMore(Model)
+@(Html.FilterForm<SpaceController>(c => c.Index(null, tab), Model.Query))
 
-    } else if (!Model.Query.Text.IsNullOrWhiteSpace()) {
-        <p class="mt-3">@Html.SearchResultText(Model)</p>
-    } else {
-        <p class="text-muted text-center">
-            Nothing to see here.
-            Why don't you <a href="@(Url.Action<SpaceController>(c => c.New()))">add a new space</a>?
-        </p>
-    }
+@if (Model.HasItems()) {
+    <table class="table table-hover table-name-desc-count">
+        <thead>
+            <tr>
+                <th class="table-icon"></th>
+                <th>@T["Name"]</th>
+                <th>@T["Description"]</th>
+                <th class="text-right">@T["Members"]</th>
+                <th class="table-icon"></th>
+            </tr>
+        </thead>
+        <tbody id="infinite-scroll-target">
+            @{ Html.RenderPartial("_SpaceTable"); }
+        </tbody>
+    </table>
+    @Html.ScrollMore(Model)
 
-    @if ((Model.Query.Archived ?? false) || (Model.Query.Trashed ?? false)) {
-        <p class="text-muted text-center"><small>Back to <a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">active</a> spaces.</small></p>
-    } else if ((ViewBag.Archived ?? false) && (ViewBag.Trashed ?? false)) {
-        <p class="text-muted text-center"><small>See <a href="@(Url.Action<SpaceController>(c => c.Index(null, "archived")))">archived</a> or <a href="@(Url.Action<SpaceController>(c => c.Index(null, "trashed")))">trashed</a> spaces.</small></p>
-    } else if (ViewBag.Archived ?? false) {
-        <p class="text-muted text-center"><small>See <a href="@(Url.Action<SpaceController>(c => c.Index(null, "archived")))">archived</a> spaces.</small></p>
-    } else if (ViewBag.Trashed ?? false) {
-        <p class="text-muted text-center"><small>See <a href="@(Url.Action<SpaceController>(c => c.Index(null, "trashed")))">trashed</a> spaces.</small></p>
-    }
-</div>
+} else if (!Model.Query.Text.IsNullOrWhiteSpace()) {
+    <p class="mt-3">@Html.SearchResultText(Model)</p>
+} else {
+<p class="text-muted text-center">
+    @T[@"Nothing to see here."]  <a href="@(Url.Action<SpaceController>(c => c.New()))">@T["Why don't you add a new space?"]</a>
+</p>
+}
+
+@if ((Model.Query.Archived ?? false) || (Model.Query.Trashed ?? false)) {
+    <p class="text-muted text-center"><small><a href="@(Url.Action<SpaceController>(c => c.Index(null, null)))">@T["Back to active spaces."]</a></small></p>
+} else if ((ViewBag.Archived ?? false) && (ViewBag.Trashed ?? false)) {
+    <p class="text-muted text-center"><small><a href="@(Url.Action<SpaceController>(c => c.Index(null, "archived")))">@T["See archived"]</a> @T["or"] <a href="@(Url.Action<SpaceController>(c => c.Index(null, "trashed")))">@T["trashed spaces."]</a></small></p>
+} else if (ViewBag.Archived ?? false) {
+    <p class="text-muted text-center"><small><a href="@(Url.Action<SpaceController>(c => c.Index(null, "archived")))">@T["See archived spaces."]</a></small></p>
+} else if (ViewBag.Trashed ?? false) {
+    <p class="text-muted text-center"><small><a href="@(Url.Action<SpaceController>(c => c.Index(null, "trashed")))">@T["See trashed spaces."]</a></small></p>
+}
+
 
 
 @section fab {
     <div class="fab">
-        <a class="btn btn-round btn-primary" href="@(Url.Action<SpaceController>(c => c.New()))" title="Add space">@Svg.Icon("plus")</a>
+        <a class="btn btn-round btn-primary" href="@(Url.Action<SpaceController>(c => c.New()))" title="@T["Add space"]">@Svg.Icon("plus")</a>
     </div>
 }
 

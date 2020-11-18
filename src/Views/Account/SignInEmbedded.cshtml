@@ -1,11 +1,11 @@
 ﻿@{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    ViewBag.Title = "Signing in, please wait...";
+    ViewBag.Title = T["Signing in, please wait..."].ToString();
 }
 
 <div class="container">
     <div class="text-center my-5">
-        <p>Signing in...</p>
+        <p>@T["Signing in..."]</p>
         @Svg.Spinner(spin: true, size: 48)
     </div>
 </div>

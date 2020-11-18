@@ -5,8 +5,8 @@
 
     // get attachments
     var attachments = Model.AttachmentIds.Any() ? Model.Attachments() : new List<Attachment>();
-    var images = attachments.Where(x => FileUtils.IsWebImage(x.Blob.Name));
-    var files = attachments.Where(x => !FileUtils.IsWebImage(x.Blob.Name));
+    var images = attachments.Where(x => FileUtils.IsImage(x.Blob.Name) && x.ThumbPlaceholderUrl() != null);
+    var files = attachments.Except(images);
 
     // get meetings
     var meetings = Model.MeetingIds.Any() ? Model.Meetings() : new List<Meeting>();
@@ -101,16 +101,16 @@
             <div class="status status-read">
                 @foreach (var member in seenby) {
                     <a href="@member.Url()">
-                        @member.AvatarImg(18, htmlAttributes: new { title = $"Seen by {member.GetTitle()} {member.ReadAt.Value.When()}" })
+                        @member.AvatarImg(18, htmlAttributes: new { title = T["Seen by {0} {1}", member.GetTitle(), member.ReadAt.Value.When()] })
                     </a>
                 }
             </div>
         } else if (last && Model.Conversation.Members.Any(x => x.Id != Model.CreatedById && x.DeliveredAt >= Model.CreatedAt)) {
-            <div class="status status-delivered" title="Delivered">
+            <div class="status status-delivered" title="@T["Delivered"]">
                 @Svg.Icon("check-circle", size: 18)
             </div>
         } else if (last) {
-            <div class="status status-sent" title="Sent">
+            <div class="status status-sent" title="@T["Sent"]">
                 @Svg.Icon("check-circle-outline", size: 18)
             </div>
         }
@@ -175,7 +175,7 @@
         <div class="status status-read">
             @foreach (var member in seenby) {
                 <a href="@member.Url()">
-                    @member.AvatarImg(18, htmlAttributes: new { title = $"Seen by {member.GetTitle()} {member.ReadAt.Value.When()}" })
+                    @member.AvatarImg(18, htmlAttributes: new { title = T["Seen by {0} {1}", member.GetTitle(), member.ReadAt.Value.When()] })
                 </a>
             }
         </div>

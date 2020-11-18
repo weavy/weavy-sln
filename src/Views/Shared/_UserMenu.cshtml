@@ -1,17 +1,17 @@
 ﻿@model User
 @if (Model.IsTrashed() && Model.HasPermission(Permission.Delete)) {
     <form action="@(Url.Action<PeopleController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
-        <button type="submit" class="btn btn-icon" title="Restore user">@Svg.Icon("backup-restore", "success")</button>
+        <button type="submit" class="btn btn-icon" title="@T["Restore user"]">@Svg.Icon("backup-restore", "success")</button>
     </form>
 } else if (Model.HasPermission(Permission.Edit)) {
     <div class="dropdown" prevent-modal>
-        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">
+        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
             @Svg.Icon("dots-vertical")
         </button>
         <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Edit(Model.Id)))">@Svg.Icon("pencil", "primary") Edit</a>
+            <a class="dropdown-item" href="@(Url.Action<PeopleController>(c => c.Edit(Model.Id)))">@Svg.Icon("pencil", "primary") @T["Edit"]</a>
             @if (Model.Id != User.Id && Model.HasPermission(Permission.Delete)) {
-                <button type="button" class="dropdown-item" data-trash="user" data-id="@Model.Id">@Svg.Icon("delete", "danger") Trash</button>
+                <button type="button" class="dropdown-item" data-trash="user" data-id="@Model.Id">@Svg.Icon("delete", "danger") @T["Trash"]</button>
             }
         </div>
     </div>

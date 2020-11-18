@@ -35,7 +35,7 @@ tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
 
     function showDialog() {
         var dlg = editor.windowManager.open({
-            title: "Keyboard shortcuts",
+            title: wvy.t("Keyboard shortcuts"),
             width: 350,
             height: 400,
             autoScroll: true,
@@ -74,13 +74,13 @@ tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
 
     editor.ui.registry.addMenuItem("help", {
         icon: "help",
-        text: "Keyboard shortcuts",
+        text: wvy.t("Keyboard shortcuts"),
         context: 'tools',
         onAction: showDialog
     });
 
     editor.ui.registry.addButton("help", {
-        tooltip: "Keyboard shortcuts",
+        tooltip: wvy.t("Keyboard shortcuts"),
         icon: "help",
         onAction: showDialog
     });
@@ -89,66 +89,66 @@ tinymce.PluginManager.add("weavy_shortcuts", function (editor, url) {
 
     // formatting
     editor.addShortcut("Meta+Shift+190", "Strikethrough", function () {
-        editor.execCommand("Strikethrough");
+        editor.execCommand(wvy.t("Strikethrough"));
     });
 
     // headings
-    editor.addShortcut("Meta+Shift+1", "Heading 1", function () {
+    editor.addShortcut("Meta+Shift+1", wvy.t("Heading 1"), function () {
         editor.execCommand("formatBlock", false, "h1");
     });
 
-    editor.addShortcut("Meta+Shift+2", "Heading 2", function () {
+    editor.addShortcut("Meta+Shift+2", wvy.t("Heading 2"), function () {
         editor.execCommand("formatBlock", false, "h2");
     });
 
-    editor.addShortcut("Meta+Shift+3", "Heading 3", function () {
+    editor.addShortcut("Meta+Shift+3", wvy.t("Heading 3"), function () {
         editor.execCommand("formatBlock", false, "h3");
     });
 
-    editor.addShortcut("Meta+Shift+4", "Heading 4", function () {
+    editor.addShortcut("Meta+Shift+4", wvy.t("Heading 4"), function () {
         editor.execCommand("formatBlock", false, "h4");
     });
 
-    editor.addShortcut("Meta+Shift+5", "Heading 5", function () {
+    editor.addShortcut("Meta+Shift+5", wvy.t("Heading 5"), function () {
         editor.execCommand("formatBlock", false, "h5");
     });
 
-    editor.addShortcut("Meta+Shift+6", "Heading 6", function () {
+    editor.addShortcut("Meta+Shift+6", wvy.t("Heading 6"), function () {
         editor.execCommand("formatBlock", false, "h6");
     });
 
-    editor.addShortcut("Meta+Shift+9", "Heading 9", function () {
+    editor.addShortcut("Meta+Shift+9", wvy.t("Heading 9"), function () {
         editor.execCommand("formatBlock", false, "p");
     });
 
     // alignment
-    editor.addShortcut("Meta+Shift+l", "Align left", function () {
+    editor.addShortcut("Meta+Shift+l", wvy.t("Align left"), function () {
         editor.execCommand("JustifyLeft");
     });
 
-    editor.addShortcut("Meta+Shift+r", "Align right", function () {
+    editor.addShortcut("Meta+Shift+r", wvy.t("Align right"), function () {
         editor.execCommand("JustifyRight");
     });
 
-    editor.addShortcut("Meta+Shift+e", "Align center", function () {
+    editor.addShortcut("Meta+Shift+e", wvy.t("Align center"), function () {
         editor.execCommand("JustifyCenter");
     });
 
-    editor.addShortcut("Meta+Shift+j", "Justify", function () {
+    editor.addShortcut("Meta+Shift+j", wvy.t("Justify"), function () {
         editor.execCommand("JustifyFull");
     });
 
     // lists
-    editor.addShortcut("Meta+Shift+7", "Toggle bulleted list", function () {
+    editor.addShortcut("Meta+Shift+7", wvy.t("Toggle bulleted list"), function () {
         editor.execCommand("insertunorderedlist");
     });
 
-    editor.addShortcut("Meta+Shift+8", "Toggle numbered list", function () {
+    editor.addShortcut("Meta+Shift+8", wvy.t("Toggle numbered list"), function () {
         editor.execCommand("insertorderedlist");
     });
 
     // misc
-    editor.addShortcut("Meta+Shift+32", "Remove format", function () {
+    editor.addShortcut("Meta+Shift+32", wvy.t("Remove format"), function () {
         editor.execCommand("removeformat");
     });
 

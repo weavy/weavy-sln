@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading;
 using System.Web;
+using Weavy.Core;
 using Weavy.Core.Utils;
 
 namespace Weavy {
@@ -11,24 +11,20 @@ namespace Weavy {
     public class Global : System.Web.HttpApplication {
 
         /// <summary>
-        /// Occurs as the first event in the HTTP pipeline chain of execution when ASP.NET responds to a request.
+        /// Set culture for the request.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void Application_BeginRequest(object sender, EventArgs e) {
-            // set preferred culture based on Accept-Language header
-            if (sender is HttpApplication app && app.Context?.Request?.Headers != null) {
-                Thread.CurrentThread.CurrentCulture = CultureUtils.GetCultureFromHeader(app.Context.Request.Headers["Accept-Language"]) ?? Thread.CurrentThread.CurrentCulture;
-            }
+        protected void Application_PreRequestHandlerExecute(object sender, EventArgs e) {
+            CultureUtils.SetCulture(WeavyContext.Current.User);
         }
 
         /// <summary>
-        /// Occurs just before ASP.NET sends content to the client.
+        /// Remove some HTTP Headers for a little extra security (by obscurity)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected void Application_PreSendRequestHeaders(object sender, EventArgs e) {
-            // remove some HTTP Headers for a little extra security (by obscurity)
             if (sender is HttpApplication app && app.Context?.Response?.Headers != null) {
                 // remove the "Server" HTTP Header added by ASP.NET
                 app.Context.Response.Headers.Remove("Server");

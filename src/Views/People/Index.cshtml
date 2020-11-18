@@ -1,6 +1,6 @@
 ﻿@model UserSearchResult
 @{
-    Title = "People";
+    Title = T["People"].ToString();
     var tab = ViewContext.RouteData.Values["tab"] as string;
 }
 
@@ -9,7 +9,7 @@
 }
 
 
-<div class="container-fluid my-3">
+
     @(Html.FilterForm<PeopleController>(c => c.Index(null, tab), Model.Query))
 
     @if (Model.HasItems()) {
@@ -17,8 +17,8 @@
             <thead>
                 <tr>
                     <th class="table-icon"></th>
-                    <th><a href="@Url.OrderBy("name")">Name</a></th>
-                    <th><a href="@Url.OrderBy("email")">Email</a></th>
+                    <th><a href="@Url.OrderBy("name")">@T["Name"]</a></th>
+                    <th><a href="@Url.OrderBy("email")">@T["Email"]</a></th>
                     <th class="table-icon"></th>
                 </tr>
             </thead>
@@ -33,21 +33,21 @@
     }
 
     @if ((Model.Query.Suspended ?? false) || (Model.Query.Trashed ?? false)) {
-        <p class="text-muted text-center"><small>Back to <a href="@(Url.Action<PeopleController>(c => c.Index(null, null)))">active</a> user accounts.</small></p>
+        <p class="text-muted text-center"><small><a href="@(Url.Action<PeopleController>(c => c.Index(null, null)))">@T[@"Back to active user accounts."]</a></small></p>
     } else if ((ViewBag.Suspended ?? false) && (ViewBag.Trashed ?? false)) {
-        <p class="text-muted text-center"><small>See <a href="@(Url.Action<PeopleController>(c => c.Index(null, "suspended")))">suspended</a> or <a href="@(Url.Action<PeopleController>(c => c.Index(null, "trashed")))">trashed</a> user accounts.</small></p>
+        <p class="text-muted text-center"><small><a href="@(Url.Action<PeopleController>(c => c.Index(null, "suspended")))">@T["See suspended"]</a> @T["or"] <a href="@(Url.Action<PeopleController>(c => c.Index(null, "trashed")))">@T[@"trashed user accounts."]</a></small></p>
     } else if ((ViewBag.Suspended ?? false)) {
-        <p class="text-muted text-center"><small>See <a href="@(Url.Action<PeopleController>(c => c.Index(null, "suspended")))">suspended</a> user accounts.</small></p>
+        <p class="text-muted text-center"><small><a href="@(Url.Action<PeopleController>(c => c.Index(null, "suspended")))">@T[@"See suspended user accounts."]</a></small></p>
     } else if ((ViewBag.Trashed ?? false)) {
-        <p class="text-muted text-center"><small>See <a href="@(Url.Action<PeopleController>(c => c.Index(null, "trashed")))">trashed</a> user accounts.</small></p>
+        <p class="text-muted text-center"><small><a href="@(Url.Action<PeopleController>(c => c.Index(null, "trashed")))">@T[@"See trashed user accounts."]</a></small></p>
     }
 
-</div>
+
 
 @if (PermissionService.HasPermission(Permission.Manage)) {
     @section fab {
         <div class="fab">
-            <a class="btn btn-round btn-primary" href="@(Url.Action<PeopleController>(c => c.New()))" title="Add user">@Svg.Icon("plus")</a>
+            <a class="btn btn-round btn-primary" href="@(Url.Action<PeopleController>(c => c.New()))" title="@T["Add user"]">@Svg.Icon("plus")</a>
         </div>
 
     }

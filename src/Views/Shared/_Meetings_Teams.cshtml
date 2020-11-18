@@ -4,13 +4,13 @@
     <div class="media">
         @Svg.Icon("microsoft-teams", color: "native", size: 48)
         <div class="media-body">
-            <h6 class="media-title">Teams Online Meeting</h6>
+            <h6 class="media-title">@T["Teams meeting"]</h6>
             @if (Model.EndedAt != null) {
-                <small class="text-muted">Meeting ended: @Html.Time(Model.EndedAt, "t")</small>
+                <small class="text-muted">@T["Meeting ended"]: @Html.Time(Model.EndedAt, "t")</small>
             } else if (Model.CreatedById == WeavyContext.User.Id) {
-                <p class="mb-1"><a href="@Model.JoinUrl" target="_blank" class="btn btn-sm btn-primary mt-2">Start meeting</a></p>
+                <p class="mb-1"><a href="@Model.JoinUrl" target="_blank" class="btn btn-sm btn-primary mt-2">@T["Start meeting"]</a></p>
             } else {
-                <p class="mb-1"><a href="@Model.JoinUrl" target="_blank" class="btn btn-sm btn-primary mt-2">Join meeting</a></p>
+                <p class="mb-1"><a href="@Model.JoinUrl" target="_blank" class="btn btn-sm btn-primary mt-2">@T["Join meeting"]</a></p>
             }
         </div>
     </div>

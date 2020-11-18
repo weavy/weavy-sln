@@ -1,0 +1,22 @@
+﻿<nav class="navbar navbar-theme">
+    @if (WeavyContext.Space.HasPermission(Permission.List)) {
+        string sortableOptions = WeavyContext.Space.HasPermission(Permission.Apps) ? @"{""items"":"".nav-link"",""forcePlaceholderSize"":true,""sortField"":""input[name=appId]"",""ajaxPost"":""" + Url.Action<AppController>(c => c.Sort(WeavyContext.Space.Id, null)) + @"""}" : null;
+        <nav class="nav nav-tabs scroll-x" @if (sortableOptions != null) { <text> data-sortable="@sortableOptions" </text> }>
+            @foreach (var app in AppService.GetApps(WeavyContext.Space.Id)) {
+                <a href="@app.Url()" class="nav-link@(app.Id == WeavyContext.App?.Id ? " active": "")" title="@(app.Name)">
+                    <span>@app.Name</span>
+                    <input type="hidden" name="appId" value="@app.Id" />
+                </a>
+            }
+        </nav>
+        if (WeavyContext.Space.HasPermission(Permission.Apps)) {
+            <div class="navbar-icons">
+                @if (WeavyContext.App.HasPermission(Permission.Edit)) {
+                    @Html.Partial("_AppMenu", WeavyContext.App)
+                } else {
+                    <a href="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" class="btn btn-icon" data-toggle="modal" data-target="#ajax-modal" data-path="@(Url.Action<AppController>(c => c.Add(WeavyContext.Space.Id)))" data-title="@T["Add tab"]" title="@T["Add tab"]">@Svg.Icon("plus")</a>
+                }
+            </div>
+        }
+    }
+</nav>

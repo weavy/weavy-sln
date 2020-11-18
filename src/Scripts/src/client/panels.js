@@ -135,6 +135,7 @@
             }
 
             panel.appendChild(frame);
+            panel.frame = frame;
 
             if (panelsRoot) {
                 weavy.debug("Appending panel", panelId)
@@ -193,6 +194,12 @@
                 }
             });
 
+            // Frame handling
+
+            // Close the panel from the inside
+            weavy.on(wvy.postal, "request:close", { weavyId: weavy.getId(), windowName: frame.name }, function () {
+                panel.close();
+            });
 
             // External controls
 
@@ -551,10 +558,14 @@
                         panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
                     }
 
-                    panel.postMessage({ name: 'hide' });
+                    panel.postMessage({ name: 'close' });
 
                     // Return timeout promise
                     _whenClosed = weavy.timeout(250);
+
+                    _whenClosed.then(function () {
+                        panel.postMessage({ name: 'closed' });
+                    });
                 } 
 
                 return _whenClosed();
@@ -764,7 +775,7 @@
             if (options.controls) {
                 if (options.controls === true || options.controls.close) {
                     var close = document.createElement("div");
-                    close.className = "weavy-icon";
+                    close.className = "weavy-icon" + (typeof options.controls.close === "string" ? " " + options.controls.close : "");
                     close.title = "Close";
                     close.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>';
                     weavy.on(close, "click", panel.close.bind(panel));

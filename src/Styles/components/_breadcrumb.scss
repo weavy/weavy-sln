@@ -9,21 +9,53 @@
     display: flex;
     flex-wrap: nowrap;
     flex: 0 10 auto;
-    min-width: 4.75rem; // Use 3rem to only make room for 2 icons
+    min-width: 2rem;
     max-width: 10rem;
 
     a {
+        position: relative;
         display: flex;
-        min-width: 1.625rem; // needed for text-truncate
+        min-width: 0; // needed for text-truncate
         color: $panel-color;
+        padding: 0 .25rem;
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
 
         .i {
-            margin-left: .25rem;
-            margin-right: .5rem;
+            display: none; // hide folder icons
+            margin-right: $navbar-padding-x;
         }
 
         span {
             @include text-truncate();
+        }
+        // highlight drop-target
+        &.drop-target {
+            background-color: color("amber", 100);
+
+            &::after {
+                border: $card-border-width*2 dashed $amber;
+            }
+        }
+    }
+    // display folder icon for "root" folder
+    &:first-child {
+        min-width: 4rem;
+
+        a {
+            .i {
+                display: block;
+            }
+            span {
+                padding:0;
+            }
         }
     }
 
@@ -40,6 +72,10 @@
     @include text-truncate();
     color: inherit;
     font-weight: $headings-font-weight;
+
+    span {
+        padding: 0 .25rem;
+    }
 }
 
 // hide all ancestors except immediate parent on small devices
@@ -50,5 +86,11 @@
 
     .breadcrumb-item:nth-last-child(2) {
         display: flex;
+        min-width: 4rem;
+
+        a .i {
+            // display folder icon
+            display: block;
+        }
     }
 }

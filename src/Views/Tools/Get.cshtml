@@ -1,44 +1,44 @@
 ﻿@model ITool
 @{
-    Title = "Tools";
+    Title = T["Tools"].ToString();
     Back = Url.Action<ToolsController>(c => c.Index());
 }
 
 <div class="container my-3">
     @using (Html.BeginForm(nameof(ToolsController.Run), null, FormMethod.Post, new { data_turboform = "" })) {
         <div class="form-group">
-            <label class="control-label">Id</label>
+            <label class="control-label">@T["Id"]</label>
             <p class="form-control-static">@Model.Id</p>
         </div>
         <div class="form-group">
-            <label class="control-label">Type</label>
+            <label class="control-label">@T["Type"]</label>
             <p class="form-control-static">@Model.FullName</p>
         </div>
         <div class="form-group">
-            <label class="control-label">Desciption</label>
+            <label class="control-label">@T["Description"]</label>
             <p class="form-control-static">@Model.Description</p>
         </div>
         if (!Model.IsLoaded()) {
             <div class="form-group">
-                <label class="control-label">Status</label>
+                <label class="control-label">@T["Status"]</label>
                 <p class="form-control-static">
-                    <span class="badge badge-danger">missing</span>
+                    <span class="badge badge-danger">@T["missing"]</span>
                 </p>
             </div>
         }
 
         @Html.EditorsForModel()
         <div class="form-buttons">
-            <button type="submit" name="button" value="@nameof(ToolsController.Run)" class="btn btn-primary btn-load">Run</button>
-            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">Cancel</a>
+            <button type="submit" name="button" value="@nameof(ToolsController.Run)" class="btn btn-primary btn-load">@T["Run"]</button>
+            <a href="@Back" class="btn btn-outline-secondary mr-auto" data-shortcut="Esc">@T["Cancel"]</a>
             @if (!Model.IsLoaded()) {
-                <button type="submit" name="button" value="@nameof(ToolsController.Delete)" class="btn btn-danger btn-load">Delete</button>
+                <button type="submit" name="button" value="@nameof(ToolsController.Delete)" class="btn btn-danger btn-load">@T["Delete"]</button>
             }
         </div>
 
         if (Model.IsEnabled) {
             <div class="form-group">
-                <label class="control-label">Log</label>
+                <label class="control-label">@T["Log"]</label>
                 <pre class="log">
 @Model.Status()
 @if (!Model.Log.IsNullOrWhiteSpace()) {

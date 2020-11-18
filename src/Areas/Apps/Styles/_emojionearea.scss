@@ -17,6 +17,9 @@ $search-height: 40px;
 
     .#{$css-prefix}-editor {
         @include scroll-y;
+        html.scrollbars & {
+            @include custom-scrollbar;
+        }
         padding: .75rem 4.75rem .75rem 3rem;
         cursor: text;
         display: block;

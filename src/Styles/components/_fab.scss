@@ -1,7 +1,11 @@
 /// <reference path="../_core.scss" />
 
 .fab {
-    z-index: $zindex-dropdown + 1;
+    z-index: $zindex-dropdown + 2;
+
+    &.add {
+        z-index: $zindex-dropdown + 1;
+    }
 
     .btn-round {
         box-shadow: $md-shadow-6dp;
@@ -20,10 +24,31 @@
             }
         }
     }
+
+    .dropdown-header svg {
+        margin-right: .5rem;
+    }
+
+    .dropdown-item {
+
+        &[data-toggle=menu] {
+            padding-right: 0;
+
+            > span {
+                flex: 1 1 100%;
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+
+        > span {
+            flex: 0 1 auto;
+        }
+    }
 }
 
 .fab-upload {
-    position: relative;    
+    position: relative;
     cursor: pointer;
 
     input[type=file] {
@@ -39,13 +64,27 @@
 }
 
 main.has-fab {
-    padding-bottom: 4rem;
-
+    padding-bottom: 7rem;
+    
     .fab {
         position: fixed;
         bottom: 1rem;
         right: 1rem;
         padding-top: .5rem;
+
+        &.add {
+            bottom: 5rem;
+        }
+    }
+
+    // Fix for jumping fabs when scrollbars disappear
+    .fabs {
+        position: fixed;
+        left: 100vw;
+        bottom: 0;
+
+        .fab {
+            position: absolute;
+        }
     }
 }
-

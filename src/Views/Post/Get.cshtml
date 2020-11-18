@@ -1,6 +1,6 @@
 ﻿@model Post
 @{
-    Title = "Post details";
+    Title = T["Post details"].ToString();
     Back = Model.App().Url();
 }
 @if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments)

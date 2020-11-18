@@ -1,8 +1,8 @@
 ﻿@model Content
 
-<tr data-href="@Model.Url()">
+<tr data-href="@Model.Url()" data-target="overlay">
     <td class="table-icon">@Svg.Icon(Model)</td>
-    <td><a href="@Model.Url()">@Model.Name</a></td>
-    <td class="table-icon"><a class="btn btn-icon" href="@Model.Url()/edit" title="Continue editing">@Svg.Icon("pencil")</a></td>
+    <td><a href="@Model.Url()" target="overlay">@Model.Name</a></td>
+    <td class="table-icon"><a class="btn btn-icon" href="@Model.Url()/edit" target="overlay" title="@T["Continue editing"]">@Svg.Icon("pencil")</a></td>
 </tr>
 

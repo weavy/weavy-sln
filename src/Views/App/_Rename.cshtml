@@ -11,7 +11,7 @@
     @Html.EditorsForModel(include: new List<string> { "Name" })
 
     <div class="form-buttons">
-        <button type="submit" class="btn btn-primary" name="operation" value="update">Update</button>
-        <a class="btn btn-outline-secondary" href="@Back" data-dismiss="modal">Cancel</a>
-    </div>
+        <button type="submit" class="btn btn-primary" name="operation" value="update">@T["Update"]</button>
+        <a class="btn btn-outline-secondary" href="@Back" data-dismiss="modal">@T["Cancel"]</a>
+</div>
 }

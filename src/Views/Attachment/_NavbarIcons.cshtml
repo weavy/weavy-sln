@@ -1,8 +1,0 @@
-﻿@model Attachment
-@{
-    if (Model is IFile file && ((IFile)Model).Blob.Link == null && FileUtils.IsOfficeDocument(file.Name)) {
-        <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model, "inherit")</a>
-    }
-    Html.RenderPartial("_AttachmentMenu", Model);
-} 
-

@@ -118,6 +118,9 @@
         var _isUpdating = false;
         var _isNavigating = false;
 
+        var _whenSignedOut = $.Deferred();
+        var _isSigningOut = false;
+
         window.addEventListener('beforeunload', function () {
             _isNavigating = true;
         });
@@ -207,8 +210,14 @@
             });
         }
 
+        function clearJwt() {
+            console.debug("wvy.authentication: clearing jwt");
+            _jwt = null;
+            _jwtProvider = null;
+        }
+
         function init(jwt) {
-            if (_isAuthenticated === null) {
+            if (_isAuthenticated === null || jwt && jwt !== _jwtProvider) {
                 if (typeof jwt === "string" || typeof jwt === "function") {
                     setJwt(jwt);
                 }
@@ -255,9 +264,12 @@
                 if (isAuthorized(user)) {
                     _whenAuthorized.resolve();
                 } else {
+                    // Authenticated but still awaiting auhorization
                     if (_whenAuthorized.state() !== "pending") {
                         _whenAuthorized = $.Deferred();
                     }
+                    _isSigningOut = false;
+                    _whenSignedOut.resolve();
                 }
 
                 _whenAuthenticated.resolve(user);
@@ -338,14 +350,31 @@
         // AUTHENTICATION
 
         /**
-         * Sign in using Single Sign On JWT token
+         * Sign in using Single Sign On JWT token. 
+         * 
+         * A new JWT provider will replace the current JWT provider, then the JWT will be validated.
+         * 
+         * @param {string|function} [jwt] - Optional JWT token string or JWT provider function returning a Promise or JWT token string
          */
-        function signIn() {
-            return wvy.postal.whenLeader.always(validateJwt);
+        function signIn(jwt) {
+            if (typeof jwt === "string" || typeof jwt === "function") {
+                setJwt(jwt);
+            }
+            return wvy.postal.whenLeader.always(function () { return validateJwt(); });
         }
 
-        function signOut() {
+        /**
+         * Sign out the current user.
+         * 
+         * @param {boolean} [clear] - Clears JWT provider after signOut
+         */
+        function signOut(clear) {
             var authUrl = resolveUrl(signOutUrl);
+            _isSigningOut = true;
+
+            if (clear) {
+                clearJwt();
+            }
 
             triggerEvent("clear-user");
 
@@ -362,6 +391,8 @@
 
                 processUser({ id: -1 }, "signOut()");
             });
+
+            return _whenSignedOut.promise();
         }
 
         function processUser(user, originSource) {
@@ -487,6 +518,15 @@
             var whenSSO = $.Deferred();
             var authUrl = resolveUrl(ssoUrl);
 
+            if (_isSigningOut) {
+                // Wait for signout to complete
+                console.log("wvy.authentication: vaildate jwt awaiting sign-out");
+                return _whenSignedOut.then(function () { return validateJwt(refresh); });
+            } else if (_whenSignedOut.state() !== "pending") {
+                // Reset signed out promise
+                _whenSignedOut = $.Deferred();
+            }
+
             console.log("wvy.authentication: validating jwt");
 
             if (!refresh) {
@@ -608,6 +648,7 @@
         this.signOut = signOut;
         this.setJwt = setJwt;
         this.getJwt = getJwt;
+        this.clearJwt = clearJwt;
         this.updateUserState = updateUserState;
         this.user = function () { return _user };
         this.destroy = destroy;

@@ -1,9 +1,0 @@
-﻿@model Attachment
-@{  
-    if (Model.Parent != null) {
-        Back = Model.Parent.Url();
-    }
-}
-
-
-<a class="btn btn-icon d-standalone" href="@Back" data-link>@Svg.Icon("close")</a>

@@ -9093,12 +9093,11 @@
             <param name="content">The entity for which to generate a badge.</param>
             <returns>A badge (span element).</returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.IEntity,Weavy.Core.Models.Attachment)">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.Attachment)">
             <summary>
             Gets html attributes needed for triggering image and document preview.
             </summary>
             <param name="html"></param>
-            <param name="parent">Parent entity, used to create a unique photoswipe group, e.g. post-37, message-189.</param>
             <param name="attachment"></param>
             <returns></returns>
         </member>
@@ -9110,12 +9109,11 @@
             <param name="blob"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Utils.HtmlUtils.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.IEntity,Weavy.Core.Models.IFile)">
+        <member name="M:Weavy.Web.Utils.HtmlUtils.PreviewAttributes(System.Web.Mvc.HtmlHelper,Weavy.Core.Models.IFile)">
             <summary>
             Gets html attributes needed for triggering image and document preview.
             </summary>
             <param name="html"></param>
-            <param name="parent">Parent entity, used to create a unique photoswipe group, e.g. content-37, space-6.</param>
             <param name="file"></param>
             <returns></returns>
         </member>

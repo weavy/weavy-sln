@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 8.0.1 (2020-11-19)
+
+* Fixed some issues with client authentication and user change.
+* Fixed issue with downloading files being corrupted.
+* Fixed issue with attachments shown in double overlays.
+* Fixed issue with clipped menu in messenger.
+
 ## 8.0.0 (2020-11-18)
 
 * Added Tasks app for to-do lists etc.

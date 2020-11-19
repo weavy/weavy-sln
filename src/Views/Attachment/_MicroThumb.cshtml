@@ -1,6 +1,5 @@
-﻿@model Attachment
+﻿@*@model Attachment
 @{
-    /*
     // meta = Model.MetaData();
 
     // get thumbnail dimensions
@@ -26,7 +25,8 @@
 
         thumburl = Model.ThumbUrl(microSize, microSize, retina: false, quality: 40);
     }
-    
-    if (thumburl != null) {<img class="content-thumb-hidden" src="@thumburl" loading="lazy" decoding="async" />}
-    */
-}
+
+    if (thumburl != null) {
+        <img class="content-thumb-hidden" src="@thumburl" loading="lazy" decoding="async" />
+    }
+}*@

@@ -404,19 +404,40 @@ wvy.overlay = (function ($) {
 
     // Photoswipe legacy wrapper
     $(document).on("click", "[data-photoswipe]", function (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+        if (!e.isPropagationStopped() && !e.isDefaultPrevented) {
+            e.preventDefault();
+            e.stopPropagation();
 
-        var $item = $(this);
-        var href = $item.data("src") || $item.attr("href");
-        // TODO: microthumb, find a better transfer
-        var thumbImage = null; //$item.find("> img") || $item.data("thumb-src") && $("<img src='" + $item.data("thumb-src") + "' />");
-
-        overlayLinkOpen(href, thumbImage);
+            var $item = $(this);
+            var href = $item.data("src") || $item.attr("href");
+            // TODO: microthumb, find a better transfer
+            var thumbImage = null; //$item.find("> img") || $item.data("thumb-src") && $("<img src='" + $item.data("thumb-src") + "' />");
+            console.debug("wvy.overlay: photoswipe click");
+            overlayLinkOpen(href, thumbImage);
+        }
     })
 
     function isOverlay() {
         return $("body").is(".controller-content, .controller-attachment");
+    }
+
+    function isContentOverlay() {
+        return $("body").is(".controller-content");
+    }
+
+    function isAttachmentOverlay() {
+        return $("body").is(".controller-attachment");
+    }
+
+    function inOtherOverlay(url) {
+        var overlayUrl = getOverlayUrl(url);
+        if (overlayUrl) {
+            var isAttachmentUrl = overlayUrl.includes("/attachments/");
+            if (isContentOverlay() && isAttachmentUrl || isAttachmentOverlay() && !isAttachmentUrl) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function isEmbedded() {
@@ -436,7 +457,10 @@ wvy.overlay = (function ($) {
         close: closeOverlay,
         closeTop: closeTopOverlay,
         closeAll: closeAllOverlays,
+        inOtherOverlay: inOtherOverlay,
         isOverlay: isOverlay,
+        isContentOverlay: isContentOverlay,
+        isAttachmentOverlay: isAttachmentOverlay,
         isEmbedded: isEmbedded,
         maybeOpen: maybeOpen
     }

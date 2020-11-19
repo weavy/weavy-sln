@@ -46,7 +46,7 @@
         }
     }
 
-    var attrs = Html.PreviewAttributes(WeavyContext.App, Model as IFile);
+    var attrs = Html.PreviewAttributes(Model as IFile);
     var href = attrs?["data-href"] ?? Model.Url();
     var target = attrs?["target"] ?? (Model is IFolder ? null : "overlay");
     var prev = ViewData["prev"] as int?;

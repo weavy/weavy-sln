@@ -3,14 +3,13 @@
     var count = Model?.Count() ?? 0;
     var index = 0;
     var limit = 3;
-    // check if parent and width is passed in
-    var parent = ViewBag.Parent as IEntity;
+    // check if width is passed in
     var width = ViewBag.Width as double?;
 }
 
 <div class="image-grid" data-image-count="@count">
     @foreach (var img in Model.Take(limit)) {
-        var attrs = Html.PreviewAttributes(parent, img);
+        var attrs = Html.PreviewAttributes(img);
         var ext = FileUtils.GetExtension(img.Blob.Name);
         var gif = ext.Equals(".gif");
         var svg = ext.Equals(".svg");
@@ -40,7 +39,7 @@
     }
 
     @foreach (var img in Model.Skip(limit)) {
-        var attrs = Html.PreviewAttributes(parent, img);
+        var attrs = Html.PreviewAttributes(img);
         <a href="@img.DownloadUrl()" @Html.Raw(attrs.AsHtmlAttributes())></a>
     }
 </div>

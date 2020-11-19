@@ -6,7 +6,7 @@
     var editor = Model.ModifiedBy();
 
     var fmt = Model.Blob.Link != null ? PreviewFormat.Icon : FileUtils.GetPreviewFormat(Model.Blob.Name);
-    NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(WeavyContext.App, Model) : null;
+    NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(Model) : null;
 }
 
 <section class="content-section" data-type="content" data-id="@Model.Id">

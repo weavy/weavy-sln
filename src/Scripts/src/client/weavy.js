@@ -291,14 +291,21 @@
 
             if (/^signed-in|signed-out|changed-user|user-error$/.test(auth.state)) {
 
+                if (!weavy.isLoading) {
+                    if (weavy.isLoaded) {
+                        weavy.whenLoaded.reset();
+                    }
+                    weavy.isLoaded = false;
+                    weavy.data = null;
+                }
+
+
                 if (auth.state === "changed-user") {
                     weavy.triggerEvent("signed-out", { id: -1 });
                     weavy.triggerEvent("signed-in", auth);
                 } else {
                     weavy.triggerEvent(auth.state, auth);
                 }
-
-                weavy.data = null;
 
                 // Refresh client data
                 loadClientData();
@@ -499,10 +506,13 @@
                 var authUrl = weavy.httpsUrl("/client/init", weavy.options.url);
 
                 var initData = {
-                    spaces: weavy.options.spaces,
+                    spaces: weavy.spaces.map(function (space) {
+                        return space.options;
+                    }),
                     plugins: weavy.options.plugins,
                     version: weavy.options.version
                 }
+
                 if (weavy.options.lang) {
                     initData.lang = weavy.options.lang;
                 }

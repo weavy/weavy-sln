@@ -227,7 +227,7 @@
             }
         });
 
-        weavy.on("signed-in", function () {
+        weavy.on("after:signed-in", function () {
             if (app.autoOpen) {
                 // Reopen on sign in
                 app.open();
@@ -240,7 +240,9 @@
 
     WeavyApp.prototype.open = function (destination) {
         var app = this;
-        return app.whenBuilt().then(function () {
+        var weavy = app.weavy;
+        var whenBuiltAndLoaded = $.when(app.whenBuilt(), weavy.whenLoaded());
+        return whenBuiltAndLoaded.then(function () {
             var openPromises = [app.panel.open(destination)];
 
             // Sibling apps should be closed if the space is a tabbed space

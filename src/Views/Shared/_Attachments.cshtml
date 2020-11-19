@@ -11,10 +11,8 @@
     }
 
     @foreach (var attachment in Model) {
-        var attrs = Html.PreviewAttributes(parent, attachment);
-        // TODO: open attachment overlay
-        //var href = attachment.DownloadUrl() ?? attachment.Blob.Link;
-        <a class="list-group-item list-group-item-action" href="@(attrs?["data-href"] ?? attachment.Url())" @Html.Raw(attrs.AsHtmlAttributes())>
+        var attrs = Html.PreviewAttributes(attachment);
+        <a class="list-group-item list-group-item-action" href="@attachment.DownloadUrl()" @Html.Attributes(attrs)>
             <div class="media">
                 @if (attachment.Blob.Link == null && FileUtils.IsWebImage(attachment.Blob.Name)) {
                     <img class="img-48" src="@attachment.ThumbUrl(48, 48, fit: FitMode.Crop)" />

@@ -9,10 +9,6 @@
     var versionable = Model as IVersionable;
     var current = versionable != null ? versionable.IsCurrent() : true;
 
-    var (prev, next) = ContentService.GetPreviousAndNextSiblings(Model);
-
-    var fmt = Model.Blob.Link != null ? PreviewFormat.Icon : FileUtils.GetPreviewFormat(Model.Blob.Name);
-    NameValueCollection attrs = fmt == PreviewFormat.Image || fmt == PreviewFormat.Document ? Html.PreviewAttributes(WeavyContext.App, Model) : null;
     var versions = ViewBag.Versions as VersionsModel;
     BodyAttributes.Add("class", "has-sidebar");
 }
@@ -42,7 +38,6 @@
 }
 
 <!-- File -->
-
 <aside class="content-drawer" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
     @if (current) {
         <header class="content-drawer-header sticky-top t-0">

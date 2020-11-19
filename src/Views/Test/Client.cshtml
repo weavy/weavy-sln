@@ -149,13 +149,20 @@
             var jwts = ["@ViewBag.Token", "@ViewBag.TokenTest"];
             var currentJwt = 0;
 
-            function init() {
+            function alternateJwt() {
+                currentJwt++;
+                if (currentJwt === jwts.length) {
+                    currentJwt = 0;
+                }
+                return jwts[currentJwt];
+            }
+
+            function init(jwt) {
+                console.log("init()", jwt);
 
                 weavy = window.weavy = new Weavy({
                     id: "ctx",
-                    @if (ViewBag.Token != null) {
-                    <text>jwt: "@ViewBag.Token",</text>
-                    }
+                    jwt: jwt,
                     lang: "@lang",
                     tz: "@tz",
                     spaces: [
@@ -191,19 +198,11 @@
                 var tasks = space.app({ key: "tasks", type: "tasks", container: "#panel-tasks" });
             }
 
-            init();
-
-            function alternateJwt() {
-                currentJwt++;
-                if (currentJwt === jwts.length) {
-                    currentJwt = 0;
-                }
-                return jwts[currentJwt];
-            }
+            init("@ViewBag.Token");
 
             $("#btn-init").on("click", function () {
                 console.log("click init");
-                init();
+                init(alternateJwt());
             });
 
             $("#btn-destroy").on("click", function () {
@@ -225,6 +224,7 @@
             $("#btn-jwt-1").on("click", function () {
                 console.log("click jwt 1");
                 currentJwt = 0;
+                weavy.authentication.signOut();
                 weavy.authentication.setJwt(jwts[currentJwt]);
                 weavy.authentication.signIn();
             });
@@ -232,8 +232,7 @@
             $("#btn-jwt-2").on("click", function () {
                 console.log("click jwt 2");
                 currentJwt = 1;
-                weavy.authentication.setJwt(jwts[currentJwt]);
-                weavy.authentication.signIn();
+                weavy.authentication.signIn(jwts[currentJwt]);
             });
 
             $("#btn-jwt-f").on("click", function () {
@@ -244,8 +243,7 @@
 
             $("#btn-jwt-p").on("click", function () {
                 console.log("click jwt promise()");
-                weavy.authentication.setJwt(() => new Promise((resolve) => resolve(alternateJwt())));
-                weavy.authentication.signIn();
+                weavy.authentication.signIn(() => new Promise((resolve) => resolve(alternateJwt())));
             });
 
             $("#btn-toggle").on("click", function () {

@@ -795,11 +795,11 @@
          * @returns {external:Promise} [callback] - Function called when the frame has loaded
          */
         function preloadPanel(panelId) {
-            weavy.debug("preloading panel:", panelId);
             var panel = _panels.get(panelId);
 
             var delayedFrameLoad = function () {
                 if (!panel.isLoading && !panel.isLoaded) {
+                    weavy.debug("preloading panel:", panelId);
                     panel.load();
                 }
             };

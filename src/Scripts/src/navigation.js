@@ -57,8 +57,9 @@ wvy.navigation = (function ($) {
                     var noAppMatch = route.app && wvy.context.app !== route.app.id;
                     var notOverlay = wvy.overlay.isOverlay() && route.target !== "overlay";
                     var inOverlay = !wvy.overlay.isOverlay() && route.target === "overlay";
+                    var inOtherOverlay = wvy.overlay.inOtherOverlay(url) && route.target === "overlay";
 
-                    if (notOverlay || inOverlay || noApp || noAppMatch) {
+                    if (notOverlay || inOverlay || noApp || noAppMatch || inOtherOverlay) {
                         currentUrl = null;
                         wvy.postal.postToParent({ name: "navigation-open", route: route });
                     } else {

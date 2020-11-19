@@ -1,7 +1,7 @@
 ﻿@model Content
 @{
     var meta = Model.MetaData();
-    var attrs = Html.PreviewAttributes(Model.Parent(), Model as IFile);
+    var attrs = Html.PreviewAttributes(Model as IFile);
     var href = attrs?["data-href"] ?? Model.Url();
     var target = attrs?["target"] ?? (Model is IFolder ? null : "overlay");
     var prev = ViewData["prev"] as int?;

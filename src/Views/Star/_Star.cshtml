@@ -1,6 +1,6 @@
 ﻿@model Entity
 @{
-    string target = Model.Type == EntityType.Content || Model.Type == EntityType.Attachment ? "overlay" : "";
+    string target = Model.Type == EntityType.Content && !(Model.Value is IFolder) || Model.Type == EntityType.Attachment ? "overlay" : "";
 }
 <tr data-href="@Model.Url()" data-target="@target">
   <td class="table-icon">

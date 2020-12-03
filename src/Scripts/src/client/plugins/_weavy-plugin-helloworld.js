@@ -71,7 +71,7 @@
         // Add a one-time load event listener
         weavy.one("load", function (e) {
             weavy.debug("Hello World oneload");
-            weavy.info("Weavy ver:", weavy.options.version);
+            weavy.info("Weavy ver:", Weavy.version);
 
             // Check if this plugin is enabled.
             // Not necessary here, but useful if you reference another plugin instead

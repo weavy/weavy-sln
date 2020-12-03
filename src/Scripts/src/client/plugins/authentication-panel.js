@@ -33,17 +33,9 @@
      * 
      * @mixin AuthenticationPanelPlugin
      * @returns {Weavy.plugins.authenticationPanel}
-     * @typicalname weavy
+     * @typicalname weavy.plugins.authenticationPanel
      */
     var AuthenticationPanelPlugin = function (options) {
-        /**
-         * The nodes placeholder in [Weavy]{@link Weavy#nodes}
-         * @instance
-         * @member nodes
-         * @memberof AuthenticationPanelPlugin
-         * @extends Weavy#nodes
-         * @typicalname weavy.nodes
-         */
 
         /**
          *  Reference to this instance
@@ -62,13 +54,12 @@
          */
         var signInUrl = weavy.httpsUrl("sign-in?path=" + options.redirect, weavy.options.url);
 
-
         /**
-         * Panel displaying the authentication page
-         * 
-         * @alias AuthenticationPanelPlugin#nodes#authenticationPanel
-         * @type {?Element}
-         * @created Client event: {@link Weavy#event:build}
+         * The sign in panel
+         * @member AuthenticationPanelPlugin~authenticationPanel
+         * @type {?WeavyPanels~panel}
+         * @returns {weavy.nodes.authenticationPanel}
+         * @see {@link Weavy#nodes}
          */
         weavy.nodes.authenticationPanel = null;
 
@@ -82,9 +73,11 @@
          * }).catch(function() {
          *     weavy.warn("User sign-in failed");
          * });
+         * 
+         * @memberof AuthenticationPanelPlugin#
          * @returns {external:Promise}
-         * @resolves - On successful sign-in
-         * @rejects - On authentication error if [username] and [password] is provided
+         * @resolved On successful sign-in
+         * @rejected On authentication error if [username] and [password] is provided
          * @fires Weavy#signed-in
          * @fires Weavy#authentication-error
          */
@@ -136,6 +129,7 @@
              * Event triggered when signing in process has begun. The user is still not authenticated. The authentication may result in {@link Weavy#event:signed-in} or {@link Weavy#event:authentication-error}.
              * This event may be triggered from anywhere, not only the Weavy instance.
              * 
+             * @ignore
              * @category events
              * @event Weavy#signing-in
              * @returns {Object}
@@ -152,6 +146,7 @@
              * Event triggered when a sign-in attempt was unsuccessful.
              * This event may be triggered from anywhere, not only the Weavy instance.
              * 
+             * @ignore
              * @category events
              * @event Weavy#authentication-error
              */
@@ -234,6 +229,7 @@
     /**
      * Non-optional dependencies.
      * 
+     * @ignore
      * @name dependencies
      * @memberof AuthenticationPanelPlugin
      * @type {string[]}

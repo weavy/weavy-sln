@@ -26,17 +26,31 @@
     console.debug("navigation.js");
 
     /**
-     * Class for handling internal/external navigation
-     * 
-     * @module navigation
-     * @returns {WeavyNavigation}
+     * @class WeavyNavigation
+     * @classdesc Class for handling internal/external navigation
      */
-    var WeavyNavigation = function (weavy, options) {
 
-        var navigation = this;
+    /**
+     * Class for handling internal/external navigation.
+     * 
+     * @constructor
+     * @hideconstructor
+     * @param {Weavy} weavy - Weavy instance
+     */
+    var WeavyNavigation = function (weavy) {
+        /**
+         *  Reference to this instance
+         *  @lends WeavyNavigation#
+         */
+        var weavyNavigation = this;
 
-        this.options = options = weavy.extendDefaults(WeavyNavigation.defaults, options);
-
+        /**
+         * Tries to open a navigation request.
+         * @param {WeavyNavigation~navigationRequest} request - The navigation request object to open
+         * @returns {external:Promise}
+         * @resolved When the request successfully is opened
+         * @rejected When the request can't be opened
+         */
         function openRequest(request) {
             var whenOpened = new WeavyPromise();
 
@@ -95,11 +109,15 @@
             return whenOpened();
         }
         /**
-         * Try to open an url in the app where it belongs. Automatically finds out where to open the url unless routing data is provided in a {NavigationRequest} object.
+         * Try to open an url in the app where it belongs. 
+         * Automatically finds out where to open the url via a server call unless routing data is directly provided in a {@link WeavyNavigation~navigationRequest} object.
          * 
-         * @param {string|NavigationRequest} request - String Url or a {NavigationRequest} object with route data.
+         * @param {string|WeavyNavigation~navigationRequest} request - String Url or a {@link WeavyNavigation~navigationRequest} object with route data.
+         * @returns {external:Promise}
+         * @resolved When the request successfully is opened
+         * @rejected When the request can't be opened
          */
-        this.open = function (request) {
+        weavyNavigation.open = function (request) {
             var isUrl = typeof request === "string";
             var isNavigationRequest = $.isPlainObject(request) && request.url;
 
@@ -114,14 +132,14 @@
             /**
              * Navigation event triggered when a page should be opened in another space or app.
              * 
-             * @event navigate
-             * @property {NavigationRequest} route - Data about the requested navigation
+             * @event WeavyNavigation#navigate
+             * @property {WeavyNavigation~navigationRequest} route - Data about the requested navigation
              * 
              */
             var eventResult = weavy.triggerEvent("before:navigate", e.data.route);
             if (eventResult !== false) {
                 weavy.info("navigate: trying internal auto navigation");
-                navigation.open(eventResult).catch(function () {
+                weavyNavigation.open(eventResult).catch(function () {
                     // Only trigger on: and after: if .open was unsuccessful
                     eventResult = weavy.triggerEvent("on:navigate", eventResult);
                     if (eventResult !== false) {
@@ -133,41 +151,47 @@
 
     };
 
-
-    /**
-     * Default class options
-     * 
-     * @example
-     * WeavyNavigation.defaults = {
-     *     sound: {
-     *         preload: "none",
-     *         src: "/media/notification.mp3"
-     *     }
-     * };
-     * 
-     * @name defaults
-     * @memberof navigation
-     * @type {Object}
-     * @property {string} sound.preload=none - Preload setting for the {@link notifications#nodes#notificationSound}
-     * @property {url} sound.src - Url to the notification sound
-     */
-    WeavyNavigation.defaults = {
-        
-    };
-
     return WeavyNavigation;
 }));
 
 /**
- * @typedef navigationRequest
+ * The data for a navigation request. Some of the data is provided from the server just as meta data. It's received through the {@link WeavyNavigation#event:navigate} event and can be passed into the {@link WeavyNavigation#open} method.
+ * 
+ * @example
+ * var navigationRoute = {
+ *   "entity": {
+ *     "id": 203,
+ *     "type": "content"
+ *   },
+ *   "app": {
+ *     "id": 2149,
+ *     "key": "files",
+ *     "name": "Files"
+ *   },
+ *   "space": {
+ *     "id": 1077,
+ *     "key": "client-test-demo",
+ *     "name": "Demo Space"
+ *   },
+ *   "target": "overlay",
+ *   "url": "/e/content/203"
+ * };
+ * 
+ * @typedef WeavyNavigation~navigationRequest
  * @type Object
- * @property space
+ * @property {Object} space
  * @property {int} space.id - The server generated id for the space
  * @property {string} space.key - The key identifier the space
- * @property app
+ * @property {string} [space.name] - The name of the space
+ * @property {Object} app
  * @property {int} app.id - The server generated id for the app
  * @property {string} app.key - The key identifier for the app
+ * @property {string} [app.name] - The name of the app
+ * @property {Object} entity
+ * @property {int} entity.id - The server generated id for the item 
+ * @property {string} [entity.type] - The type of the item
  * @property {string} url - The url to open
+ * @property {string} target - Recommended target to open the url in, for instance "overlay", which may oven the preview overlay.
  */ 
 
 

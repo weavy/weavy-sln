@@ -33,21 +33,11 @@
      * 
      * @mixin MyPlugin
      * @returns {Weavy.plugins.myplugin}
-     * @typicalname weavy
      */
     var MyPlugin = function (options) {
         /**
-         * The nodes placeholder in [Weavy]{@link Weavy#nodes}
-         * @instance
-         * @member nodes
-         * @memberof MyPlugin
-         * @extends Weavy#nodes
-         * @typicalname weavy.nodes
-         */
-
-        /**
          *  Reference to this instance
-         *  @lends MyPlugin#
+         *  @lends Weavy#
          */
         var weavy = this;
 

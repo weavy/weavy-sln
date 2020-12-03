@@ -34,48 +34,243 @@
 }(typeof self !== 'undefined' ? self : this, function ($, WeavyApp, utils, WeavyPromise) {
     console.debug("space.js");
 
-    var WeavySpace = function (weavy, options, data) {
+    /**
+     * @class WeavySpace
+     * @classdesc Base class for representation of spaces in Weavy.
+     * @example
+     * var space = weavy.space({ key: "myspace1" });
+     */
+
+    /**
+     * This class is automatically instantiated when defining spaces in weavy. 
+     * All the methods and properties are accessible in each instance. 
+     * The passed options will fetch the space or create it. 
+     * 
+     * @constructor
+     * @hideconstructor
+     * @param {Weavy} weavy - Weavy instance the space belongs to.
+     * @param {WeavySpace#options} options - Options defining the space
+     * @param {Object} [data] - Initial data populating the space
+     */
+    function WeavySpace(weavy, options, data) {
         /** 
          *  Reference to this instance
          *  @lends WeavySpace#
          */
         var space = this;
 
-        this.id = null;
-        this.name = null;
-        this.key = null;
-
-        this.weavy = weavy;
+        /**
+         * The server id of the space, received from space data.
+         * @category properties
+         * @type {int}
+         */
+        space.id = null;
 
         /**
-         * Options for the space
-         * @member {Object} space.options
-         * @property {} space.options.apps
-         * @property {} space.options.container
-         * @property {boolean} space.options.tabbed
+         * The name of the space, defined in options or received from space data.
+         * @category properties
+         * @type {string}
          */
-        this.options = options;
-        this.data = data;
+        space.name = null;
 
-        this.apps = new Array();
+        /**
+         * The key of the space, defined in options or recieved from space data.
+         * @category properties
+         * @type {string}
+         */
+        space.key = null;
 
-        // Event handlers
-        this.eventParent = weavy;
-        this.on = weavy.events.on.bind(space);
-        this.one = weavy.events.one.bind(space);
-        this.off = weavy.events.off.bind(space);
-        this.triggerEvent = weavy.events.triggerEvent.bind(space);
+        /**
+         * The {@link Weavy} instance the space belongs to.
+         * @category properties
+         * @type {Weavy}
+         */
+        space.weavy = weavy;
 
-        this.isLoaded = false;
-        this.isBuilt = false;
+        /**
+         * Options for defining the space. Key (or existing id) is required.
+         * 
+         * @example
+         * weavy.space({
+         *     key: "myspace",
+         *     name: "My space",
+         *     description: "A tabbed space for the team",
+         *     container: "#space-area",
+         *     controls: true,
+         *     tabbed: true,
+         *     apps: [
+         *         { key: "myposts", type: "posts", open:: true },
+         *         { key: "myfiles", type: "files" }
+         *     ]
+         * })
+         * 
+         * @category options
+         * @typedef
+         * @member
+         * @type {Object}
+         * @property {int} [id] - The server id of the space. Usually only used to reference a specific space on the server.
+         * @property {string} key - The id representing the space in the context environment.
+         * @property {string} [name] - User readable title for the space.
+         * @property {string} [description] - Description of the space.
+         * @property {Element|jQuery|string} [container] - Container for all apps in the space. May be overridden in individual apps.
+         * @property {boolean} controls - Show or hide the panel controls for the apps in the space. May be overridden in individual apps.
+         * @property {boolean} tabbed - Makes the apps in the space act as {@link WeavySpace#tabbed}, so that only one is open at the time.
+         * @property {Array.<WeavyApp#options>} apps - List of app definitions for the space.
+         */
+        space.options = options;
 
-        this.whenLoaded = new WeavyPromise();
-        this.whenBuilt = new WeavyPromise();
+        /**
+         * The server data for the space.
+         * 
+         * @example
+         * {
+		 *   id: 1081,
+		 *   key: "test-space",
+		 *   name: "Test space",
+		 *   tags: ["test"],
+		 *   thumb: "/spaces/1081/avatar-{options}.svg?v=f2ae1b0",
+		 *   apps: [{
+		 *     id: 2150,
+		 *     guid: "f667c9ee-b1f1-49e6-b32f-8a363f5cdb96",
+	     *     key: "notifications",
+		 *     name: "Notifications",
+		 *     url: "/e/apps/2150",
+		 *     typeName: "Weavy.Areas.Apps.Models.Notifications",
+		 *     options: {
+		 *       key: "notifications",
+		 *       type: "notifications"
+		 *     }
+		 *   }],
+		 *   options: {
+		 *     key: "test-space",
+		 *     name: "Test space"
+		 *   }
+         * }
+         * 
+         * @category properties
+         * @typedef
+         * @member
+         * @type {Object}
+         * @property {int} id - The server id for the space.
+         * @property {string} key - The client key for the space.
+         * @property {string} name - User readable title for the space.
+         * @property {Array.<string>} tags - List of tags for the space.
+         * @property {string} thumb - Server relative URL to the thumb for the space. \{options\} must be replaced with thumb options.
+         * @property {Array.<WeavyApp#data>} apps - List of data for apps in the space.
+         * @property {WeavySpace#options} [options] - Any space definition sent to the server. Should match {@link WeavySpace#options}.
+         */
+        space.data = data;
+
+        /**
+         * Array of all the apps defined in the space 
+         * @category apps
+         * @type {Array.<WeavyApp>}
+         */
+        space.apps = new Array();
+
+        // EVENT HANDLERS
+
+        /** 
+         * The parent which the events bubbles to.
+         * @category events
+         * @type {Weavy}
+         * @ignore
+         */
+        space.eventParent = weavy;
+
+        /**
+         * Event listener registration for the specific space. Only recieves events that belong to the space or any descendant apps.
+         * 
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").on("open", function(e) { ... })
+         */
+        space.on = weavy.events.on.bind(space);
+
+        /**
+         * One time event listener registration for the specific space. Is only triggered once and only recieves events that belong to the space or any descendant apps.
+         *
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").one("open", function(e) { ... })
+         */
+        space.one = weavy.events.one.bind(space);
+
+        /**
+         * Event listener unregistration for the specific space.
+         * 
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").off("open", function(e) { ... })
+         */
+        space.off = weavy.events.off.bind(space);
+
+        /**
+         * Triggers events on the specific app. The events will also bubble up to the space and then the weavy instance.
+         *
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").triggerEvent("myevent", [eventData])
+         */
+        space.triggerEvent = weavy.events.triggerEvent.bind(space);
+
+        /**
+         * Has the space loaded?
+         * @category properties
+         * @type {boolean}
+         */
+        space.isLoaded = false;
+
+        /**
+         * Is the space built? 
+         * @category properties
+         * @type {boolean}
+         */
+        space.isBuilt = false;
+
+        /**
+         * Promise that resolves when the space is loaded.
+         * 
+         * @category promises
+         * @type {WeavyPromise}
+         */
+        space.whenLoaded = new WeavyPromise();
+
+        /**
+         * Promise that resolves when the space is built.
+         * 
+         * @category promises
+         * @type {WeavyPromise}
+         */
+        space.whenBuilt = new WeavyPromise();
 
         // Use tabbed option otherwise false.
-        this.tabbed = options.tabbed !== undefined ? options.tabbed : false;
+        /**
+         * Is the space tabbed? Defined in {@link WeavySpace#options}. If true only one app will be open at the time in the space.
+         * 
+         * Defaults to false.
+         * 
+         * @category properties
+         * @type {boolean}
+         */
+        space.tabbed = options.tabbed !== undefined ? options.tabbed : false;
 
-        this.configure = function (options, data) {
+        /**
+         * Configure the space with options or data. If the space has data it will also be built. 
+         * Currently existing options are extended with new options.
+         * Data will resolve {@link WeavySpace#whenLoaded} promise.
+         * 
+         * @category methods
+         * @function
+         * @param {WeavySpace#options} options
+         * @param {WeavySpace#data} data
+         * @resolves {WeavySpace#whenLoaded}
+         */
+        space.configure = function (options, data) {
 
             if (options && typeof options === "object") {
                 space.options = space.weavy.extendDefaults(space.options, options, true);
@@ -145,7 +340,17 @@
             }
         }
 
-        this.fetchOrCreate = function (options) {
+        /**
+         * Sets options and fetches (or creates) the space on the server. Options will replace existing options.
+         * When data is fetched, the {@link WeavySpace#whenLoaded} promise is resolved.
+         * 
+         * @category methods
+         * @function
+         * @param {WeavySpace#options} [options] - Optional new space options
+         * @returns {WeavySpace#whenLoaded}
+         * @resolves {WeavySpace#whenLoaded}
+         */
+        space.fetchOrCreate = function (options) {
             if (options && typeof options === "object") {
                 space.options = options;
             }
@@ -166,7 +371,15 @@
             return space.whenLoaded();
         }
 
-        this.build = function (e, build) {
+        /**
+         * Builds the space. Creates a shadow root if needed. Is executed on the {@link Weavy#event:build} event.
+         * 
+         * @category methods
+         * @function
+         * @resolves {WeavySpace#whenBuilt}
+         */
+        space.build = function (e, build) {
+            // TODO: return whenBuilt promise
             var space = this;
             var weavy = this.weavy;
             if (weavy.authentication.isAuthorized() && space.data && typeof space.data === "object") {
@@ -185,33 +398,64 @@
         space.weavy.on("build", space.build.bind(space));
 
         space.configure();
+    }
 
-    };
-
-    function getAppSelector(appOptions) {
-        var isId = Number.isInteger(appOptions);
+    /**
+     * Function for making an id/key/object in to an app definition object
+     * 
+     * @category apps
+     * @ignore
+     * @function WeavySpace~getAppSelector
+     * @param {int|string|WeavyApp#options} options - The id/key/object to parse
+     * @returns {Object} appSelector
+     * @returns {boolean} appSelector.isId - Is appOptions parsed as id (int)?
+     * @returns {boolean} appSelector.isKey - Is appOptions parsed as a key (string)?
+     * @returns {boolean} appSelector.isConfig - Is AppOptions parsed as an app definition (Object)?
+     * @returns {Object} appSelector.selector - App definition object
+     */
+    function getAppSelector(options) {
+        var isId = Number.isInteger(options);
         var isKey = typeof appOptions === "string";
-        var isConfig = $.isPlainObject(appOptions);
+        var isConfig = $.isPlainObject(options);
 
-        var selector = isConfig && appOptions || isId && { id: appOptions } || isKey && { key: appOptions };
+        var selector = isConfig && options || isId && { id: options } || isKey && { key: options };
 
         if (!selector) {
-            if ('id' in appOptions) {
-                selector = { id: appOptions.id };
-            } else if ('key' in appOptions) {
-                selector = { key: appOptions.key };
+            if ('id' in options) {
+                selector = { id: options.id };
+            } else if ('key' in options) {
+                selector = { key: options.key };
             }
         }
 
         return { isId: isId, isKey: isKey, isConfig: isConfig, selector: selector };
     }
 
-    WeavySpace.prototype.app = function (appOptions) {
+    /**
+     * Selects, fetches or creates an app in the space. 
+     * 
+     * The app needs to be defined using an app definition object containing at least a key, which will fetch or create the app on the server. 
+     * If the defined app already has been defined, the app will only be selected in the client. 
+     * After the app is defined it can be quickly selected in the client using only the id (int) or the key (string) of the app, which never will create nor fetch the app from the server.
+     * 
+     * @example
+     * // Define an app that will be fetched or created on the server
+     * var app = space.app({ key: "mykey", type: "files", container: "#mycontainer" });
+     * 
+     * // Select the newly defined app
+     * var appAgain = space.app("mykey");
+     * 
+     * @category apps
+     * @function WeavySpace#app
+     * @param {int|string|WeavyApp#options} options - app id, app key or app definition object.
+     * @returns {WeavyApp}
+     */
+    WeavySpace.prototype.app = function (options) {
         var space = this;
         var weavy = this.weavy;
         var app;
 
-        var appSelector = getAppSelector(appOptions);
+        var appSelector = getAppSelector(options);
 
         if (appSelector.selector) {
             try {
@@ -220,19 +464,27 @@
 
             if (!app) {
                 if (appSelector.isConfig) {
-                    app = new WeavyApp(weavy, space, appOptions);
+                    app = new WeavyApp(weavy, space, options);
                     space.apps.push(app);
                     $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded(), space.whenLoaded()).then(function () {
                         app.fetchOrCreate();
                     });
                 } else {
-                    weavy.warn("App " + (appSelector.isConfig ? JSON.stringify(appSelector) : appOptions) + " does not exist." + (appSelector.isId ? "" : " \n Use weavy.space(" + (space.key && "\"" + space.key + "\"" || space.id || "...") + ").app(" + JSON.stringify(appSelector.selector) + ") to create the app."))
+                    weavy.warn("App " + (appSelector.isConfig ? JSON.stringify(appSelector) : options) + " does not exist." + (appSelector.isId ? "" : " \n Use weavy.space(" + (space.key && "\"" + space.key + "\"" || space.id || "...") + ").app(" + JSON.stringify(appSelector.selector) + ") to create the app."))
                 }
             }
         }
 
         return app;
     }
+
+    /**
+     * Removes the space and all it's apps from the client and the DOM. The space will not be removed on the server and can be added and fetched at any point again.
+     * 
+     * @category methods
+     * @function WeavySpace#remove
+     * @returns {external:Promise}
+     */
 
     WeavySpace.prototype.remove = function () {
         var space = this;
@@ -256,6 +508,16 @@
         });
     }
 
+    /**
+     * Check if another space or an object is matching this space. It checks for a match of the id property or the key property.
+     * 
+     * @category methods
+     * @function WeavySpace#match
+     * @param {WeavySpace|Object} options
+     * @param {int} [options.id] - Optional id to match.
+     * @param {string} [options.key] - Optional key to match.
+     * @returns {boolean}
+     */
     WeavySpace.prototype.match = function (options) {
         if (options) {
             if (options.id && this.id) {

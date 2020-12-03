@@ -36,7 +36,7 @@
      * 
      * @mixin FileBrowserPlugin
      * @returns {Weavy.plugins.filebrowser}
-     * @typicalname weavy
+     * @typicalname weavy.plugins.filebrowser
      */
     var FileBrowserPlugin = function (options) {
         /** 

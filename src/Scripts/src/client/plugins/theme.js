@@ -29,7 +29,7 @@
 }(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
 
     /**
-     * Inject additional styles into the sealed weavy shadow dom. You may define styles by either setting weavy plugin options or by injecting them via {@link theme#addStyles}
+     * Inject additional styles into the sealed weavy shadow dom. You may define styles by either setting weavy plugin options or by injecting them via {@link ThemePlugin#addCss}
      * 
      * @example
      * ```html
@@ -38,17 +38,17 @@
      *     ...
      * </style>
      * <script>
-     *     weavy.plugins.theme.createStyleSheet(weavy.nodes.container, ".weavy-panel{ background: red; }");
+     *     if (weavy.plugins.theme) {
+     *         weavy.plugins.theme.createStyleSheet(weavy.nodes.container, ".weavy-panel{ background: red; }");
+     *         weavy.plugins.theme.addCss(weavy.nodes.container, document.getElementById("weavyStyleOverrides").textContent);
+     *     }
      *
-     *     weavy.plugins.theme.addCss(weavy.nodes.container, document.getElementById("weavyStyleOverrides").textContent);
      * </script>
      * ```
      * 
      * @mixin ThemePlugin
      * @returns {Weavy.plugins.theme}
-     * @property {function} .createStyleSheet() - {@link ThemePlugin#createStyleSheet}
-     * @property {function} .addCss() - {@link ThemePlugin#addCss}
-     * @typicalname weavy
+     * @typicalname weavy.plugins.theme
      */
     var ThemePlugin = function (options) {
          /** 
@@ -64,6 +64,7 @@
          * together with styles provided in options or by using {@link ThemePlugin#addCss}.
          * This function is automatically called on [before:build]{@link Weavy#event:build}
          * 
+         * @memberof ThemePlugin#
          * @param {HTMLElement} root - The dom node where the stylesheet should be attached.
          * @param {string} css - CSS for the stylesheet.
          */
@@ -96,6 +97,7 @@
         /**
          * Add styles to an existing weavy stylesheet.
          * 
+         * @memberof ThemePlugin#
          * @param {HTMLElement} root - The root containing the stylesheet
          * @param {string} css - The styles to apply. Full css including selectors etc may be used.
          */
@@ -137,6 +139,7 @@
      * @example
      * Weavy.plugins.theme.defaults = {
      * };
+     * @ignore
      * @name defaults
      * @memberof ThemePlugin
      * @type {Object}

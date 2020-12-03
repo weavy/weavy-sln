@@ -23,8 +23,27 @@
         root.WeavyPanels = factory(jQuery, root.WeavyPromise);
     }
 }(typeof self !== 'undefined' ? self : this, function ($, WeavyPromise) {
+
     console.debug("panels.js");
 
+    /**
+     * @class WeavyPanels
+     * @classdesc 
+     * Panel manager for handling for iframes and their communication.
+     * 
+     * The panel management is split up into a panels container which can contain multiple panels. 
+     * Each panel is essentialy a wrapped iframe. 
+     * The panels container provides the possibility to have multiple panels in the same client container
+     * and adds the possibility to shift between which panel that is visible in the container as a tab behavior.
+     **/
+
+    /**
+     * Creates an instance of the panel manager.
+     * 
+     * @constructor
+     * @hidecontructor
+     * @param {Weavy} weavy - The weavy instance the panel manager belongs to.
+     */
     var WeavyPanels = function (weavy) {
 
         var _panelsContainers = new Map();
@@ -33,15 +52,46 @@
 
         var _whenClosed = WeavyPromise.resolve();
 
+        var _isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        /**
+         * Creates a new [panel container]{@link WeavyPanels~container}. The container must be attached to the DOM after being created.
+         * 
+         * @function
+         * @name WeavyPanels#createContainer
+         * @param {string} containerId=global - The id of the container.
+         * @returns {WeavyPanels~container}
+         */
         function createPanelsContainer(containerId) {
             containerId = containerId || "global";
             var containerElementId = weavy.getId("panels-" + containerId);
+
+            /**
+             * Container for multiple panels with common functionality for the panels.
+             * 
+             * Use {@link WeavyPanels~container#addPanel} to create a panel in the container.
+             * 
+             * Each child panel will propagate it's events to the panel container and all the panel container events will propagate to the weavy instance.
+             * 
+             * @typedef WeavyPanels~container
+             * @typicalname ~container
+             * @type {HTMLElement}
+             * @property {string} id - Unique id for the container. Using containerId processed with {@link Weavy#getId}
+             * @property {string} containerId - The provided id unprocessed.
+             * @property {string} className - DOM class: "weavy-panels"
+             * @property {function} addPanel - {@link WeavyPanels~container#addPanel} creates a {@link WeavyPanels~panel} in the panel container and returns it.
+             * @property {Object} eventParent - Unset. Set the eventParent as a reference to a parent to provide event propagation to that object.
+             * @property {function} on - Binding to the [.on()]{@link WeavyEvents#on} eventhandler of the weavy instance.
+             * @property {function} one - Binding to the [.one()]{@link WeavyEvents#one} eventhandler of the weavy instance.
+             * @property {function} off - Binding to the [.off()]{@link WeavyEvents#off} eventhandler of the weavy instance.
+             * @property {function} triggerEvent - Using {@link WeavyEvents#triggerEvent} of the weavy instance to trigger events on the panel container that propagates to the weavy instance.
+             **/
             var panels = document.createElement("div");
             panels.id = containerElementId;
             panels.className = "weavy-panels";
             panels.addPanel = addPanel.bind(panels);
-            //panels.preload = preloadPanels.bind(panels);
 
+            panels.containerId = containerId;
             panels.dataset.containerId = containerId;
 
             // Events
@@ -56,15 +106,18 @@
 
 
         /**
-         * Create a panel that has frame handling. If the panel already exists it will return the existing panel.
+         * Create a {@link WeavyPanels~panel} that has frame handling. If the panel already exists it will return the existing panel.
          * 
+         * @function
+         * @name WeavyPanels~container#addPanel
          * @param {string} panelId - The id of the panel.
-         * @param {url} [url] - Optional url. The page will not be loaded until {@link panels#preloadFrame} or {@link Weavy#open} is called.
+         * @param {url} [url] - Optional url. The page will not be loaded until {@link WeavyPanels~panel#preload} or {@link WeavyPanels~panel#open} is called.
          * @param {Object} [attributes] - All panel attributes are optional
-         * @param {string} attributes.type - Type added as data-type attribute.
-         * @param {boolean} attributes.persistent - Should the panel remain when {@link panels#removePanel} or {@link panels#clearPanels} are called?
-         * @returns {Element}
-         * @emits panels#event:panel-added
+         * @param {string} [attributes.type] - Type added as data-type attribute.
+         * @param {boolean} [attributes.persistent] - Should the panel remain when {@link WeavyPanels~panel#remove} or {@link WeavyPanels#clearPanels} are called?
+         * @param {boolean} [attributes.preload] - Should the panel be preloaded when idle?
+         * @returns {WeavyPanels~panel}
+         * @emits WeavyPanels#panel-added
          */
         function addPanel(panelId, url, attributes) {
             if (!panelId) {
@@ -94,7 +147,34 @@
                 attributes = {};
             }
 
-            // panel
+            /**
+             * Wrapped iframe with event handling, states, preloading and postMessage communication.
+             * 
+             * @typedef WeavyPanels~panel
+             * @type {HTMLElement}
+             * @typicalname ~panel
+             * @property {string} id - Unique id for the container. Using panelId processed with {@link Weavy#getId}.
+             * @property {string} panelId - Unprocessed id for the panel.
+             * @property {string} className - DOM class: "weavy-panel".
+             * @property {string} [dataset.type] - Any provided type.
+             * @property {boolean} [dataset.persistent] - Will the panel remain when {@link WeavyPanels~panel#remove} or {@link WeavyPanels#clearPanels} are called?
+             * @property {boolean} [dataset.preload] - Should the panel be preloaded when idle
+             * @property {IFrame} frame - Reference to the child iframe
+             * @property {string} frame.id - Id of the iframe
+             * @property {string} frame.className - DOM class: "weavy-panel-frame"
+             * @property {string} frame.name - Window name for the frame
+             * @property {string} frame.dataset.src - The original url for the panel.
+             * @property {string} frame.dataset.weavyId - The id of the weavy instance the frame belongs to. Provided for convenience.
+             * @property {string} [frame.dataset.type] - Any provided type.
+             * @property {Object} eventParent - Reference to the parent panels container.
+             * @property {function} on() - Binding to the [.on()]{@link WeavyEvents#on} eventhandler of the weavy instance.
+             * @property {function} one() - Binding to the [.one()]{@link WeavyEvents#one} eventhandler of the weavy instance.
+             * @property {function} off() - Binding to the [.off()]{@link WeavyEvents#off}  eventhandler of the weavy instance.
+             * @property {function} triggerEvent() - Using {@link WeavyEvents#triggerEvent} of the weavy instance to trigger events on the panel container that propagates to the weavy instance.
+             * @property {boolean} isOpen - Get if the panel is open.
+             * @property {boolean} isLoading - Get if the panel is loading. Set to true to visually indicate that the panel is loading. Set to false to turn off the visual indication.
+             * @property {boolean} isLoaded - Get if the panel is loaded. Set to true to visually indicate that the panel is loading. Set to false to turn off the visual indication.
+             **/
             var panel = document.createElement("div");
             panel.className = "weavy-panel";
             panel.id = panelElementId;
@@ -118,6 +198,9 @@
             panel.triggerEvent = weavy.events.triggerEvent.bind(panel);
 
             if (url) {
+                // Stores the provided url as data src for load when requested later.
+                // If the frame src is unset it means that the frame is unloaded
+                // If both data src and src are set it means it's loading
                 frame.dataset.src = weavy.httpsUrl(url, weavy.options.url);
             }
 
@@ -145,23 +228,138 @@
                 weavy.error("Could not append panel", panelId)
             }
 
+            /**
+             * Open a the panel. The open waits for the [weavy.whenReady]{@link Weavy#whenReady} to complete, then opens the panel.
+             *
+             * Returns a promise that is resolved when the panel is opened and fully loaded.
+             * 
+             * @function
+             * @name WeavyPanels~panel#open
+             * @param {string} [destination] - Tells the panel to navigate to a specified url.
+             * @emits WeavyPanels#panel-open
+             * @returns {external:Promise}
+             */
             panel.open = openPanel.bind(panelsRoot, panelId);
+
+            /**
+             * [Open]{@link WeavyPanels~panel#open} or [close]{@link WeavyPanels~panel#close} the panel.
+             * 
+             * Returns promise that is resolved when the panel is opened and loaded or closed.
+             * 
+             * @function
+             * @name WeavyPanels~panel#toggle
+             * @param {string} [destination] - Tells the panel to navigate to a specified url when opened.
+             * @emits WeavyPanels#panel-toggle
+             * @returns {external:Promise}
+             */
             panel.toggle = togglePanel.bind(panelsRoot, panelId);
+
+            /**
+             * Closes the panel.
+             * 
+             * Returns a promise that is resolved when the panel is closed.
+             * 
+             * @function
+             * @name WeavyPanels~panel#close
+             * @returns {external:Promise}
+             * @emits WeavyPanels#panel-close
+             */
             panel.close = closePanel.bind(panelsRoot, panelId);
+
+            /**
+             * Load an url with data directly in the panel. Uses turbolinks forms if the panel is loaded and a form post to the frame if the panel isn't loaded.
+             *          
+             * Loads the predefined panel url if url parameter is omitted.
+             * 
+             * Returns a promise that is resolved when the panel is loaded.
+             *
+             * @function
+             * @name WeavyPanels~panel#load
+             * @param {string} [url] - The url to load in the panel.
+             * @param {any} [data] -  URL/form-encoded data to send
+             * @param {string} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
+             * @param {bool} [replace] - Replace the content in the panel and load it fresh.
+             * @returns {external:Promise}
+             */
             panel.load = loadPanel.bind(panelsRoot, panelId);
+
+            /**
+             * Preload the panel. The frame needs to have data-src attribute set.
+             * 
+             * Returns a promise that is resolved when the panel is loaded.
+             *
+             * @function
+             * @name WeavyPanels~panel#preload
+             * @returns {external:Promise}
+             **/
             panel.preload = preloadPanel.bind(panelsRoot, panelId);
+
+            /**
+             * Tells the panel that it needs to reload it's content.
+             * 
+             * Returns a promise that is resolved when the panel is loaded.
+             *
+             * @function
+             * @name WeavyPanels~panel#reload
+             * @emits Weavy#panel-reload
+             * @returns {external:Promise}
+             **/
             panel.reload = reloadPanel.bind(panelsRoot, panelId);
+
+            /** 
+             * Creates a new panel iframe and resets the panel to its original url. This can be used if the panel has ended up in an incorrect state.
+             * 
+             * @function
+             * @name WeavyPanels~panel#reset
+             * @returns {external:Promise}
+             **/
             panel.reset = resetPanel.bind(panelsRoot, panelId);
+
+            /**
+             * Sends a postMessage to the panel iframe.
+             * 
+             * @function
+             * @name WeavyPanels~panel#postMessage
+             * @param {object} message - The Message to send
+             * @param {Transferable[]} [transfer] - A sequence of Transferable objects that are transferred with the message.
+             * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
+             * @returns {external:Promise}
+             */
             panel.postMessage = postMessage.bind(panelsRoot, panelId);
+
+            /**
+             * Removes a panel. If the panel is open it will be closed before it's removed.
+             * 
+             * @function
+             * @name WeavyPanels~panel#remove
+             * @param {boolean} [force] - True will remove the panel even if it's persistent
+             * @emits WeavyPanels#panel-removed
+             */
             panel.remove = removePanel.bind(panelsRoot, panelId);
 
             // Promises
 
+            /**
+             * Promise that resolves when the panel iframe has connected via postMessage.
+             * 
+             * @type {WeavyPromise}
+             * @name WeavyPanels~panel#whenReady
+             * @property {string} panelId - The id of the panel
+             * @property {string} windowName -  the name of the frame
+             **/
             panel.whenReady = new WeavyPromise();
             weavy.on(wvy.postal, "ready", { weavyId: weavy.getId(), windowName: frame.name }, function () {
                 panel.whenReady.resolve({ panelId: panelId, windowName: frame.name });
             });
 
+            /**
+             * Promise that resolves when the panel iframe has fully loaded.
+             * 
+             * @type {WeavyPromise}
+             * @name WeavyPanels~panel#whenLoaded
+             * @property {string} panelId - The id of the panel
+             * @property {string} windowName -  the name of the frame
+             **/
             panel.whenLoaded = new WeavyPromise();
             weavy.on(wvy.postal, "load", { weavyId: weavy.getId(), windowName: frame.name }, function () {
                 panel.whenLoaded.resolve({ panelId: panelId, windowName: frame.name });
@@ -208,7 +406,7 @@
             /**
              * Triggered when a panel is added
              * 
-             * @event panels#panel-added
+             * @event WeavyPanels#panel-added
              * @category events
              * @returns {Object}
              * @property {Element} panel - The created panel
@@ -216,13 +414,18 @@
              * @property {url} url - The url for the frame.
              * @property {Object} attributes - Panel attributes
              * @property {string} attributes.type - Type of the panel.
-             * @property {boolean} attributes.persistent - Will the panel remain when {@link panels#removePanel} or {@link panels#clearPanels} are called?
+             * @property {boolean} attributes.persistent - Will the panel remain when {@link WeavyPanels~panel#remove} or {@link WeavyPanels#clearPanels} are called?
              */
             panelsRoot.triggerEvent("panel-added", { panel: panel, panelId: panelId, url: url, attributes: attributes });
 
             return panel;
         }
 
+        /**
+         * Registers the panel frame window in wvy.postal and adds a ready listener for the panel and inits the loading indication.
+         * 
+         * @param {string} panelId - The id of the panel
+         */
         function registerLoading(panelId) {
             var frame = $(_panels.get(panelId)).find("iframe").get(0);
             if (frame && !frame.registered) {
@@ -247,7 +450,6 @@
         /**
          * Check if a panel is currently loading.
          * 
-         * @category panels
          * @param {string} panelId - The id of the panel to check.
          * @returns {boolean} True if the panel curerently is loading
          */
@@ -259,7 +461,6 @@
         /**
          * Check if a panel has finished loading.
          * 
-         * @category panels
          * @param {string} panelId - The id of the panel to check.
          * @returns {boolean} True if the panel has finished loading.
          */
@@ -271,11 +472,10 @@
         /**
          * Set the loading indicator on the specified panel. The loading indicatior is automatically removed on loading. It also makes sure the panel is registered and sets up frame communication when loaded.
          * 
-         * @category panels
          * @param {string} panelId - The id of the panel that is loading.
          * @param {boolean} isLoading - Sets whether the panel is loading or not.
          * @param {boolean} [fillBackground] - Sets an opaque background that hides any panel content during loading.
-         * @emits Weavy#panel-loading
+         * @emits WeavyPanels#panel-loading
          */
         function setPanelLoading(panelId, isLoading, fillBackground) {
             if (isLoading) {
@@ -295,7 +495,7 @@
              * Event triggered when panel is starting to load or stops loading.
              * 
              * @category events
-             * @event Weavy#panel-loading
+             * @event WeavyPanels#panel-loading
              * @returns {Object}
              * @property {string} panelId - The id of the panel loading.
              * @property {boolean} isLoading - Indicating wheter the panel is loading or not.
@@ -307,9 +507,8 @@
         /**
          * Tells a panel that it need to reload it's content.
          * 
-         * @category panels
-         * @param {string} panelId - The id of the panel to refresh.
-         * @emits Weavy#refresh
+         * @param {string} panelId - The id of the panel to reload.
+         * @emits WeavyPanel#panel-reload
          */
         function reloadPanel(panelId) {
             return weavy.whenReady().then(function () {
@@ -320,12 +519,12 @@
                 panel.postMessage({ "name": "reload" })
 
                 /**
-                 * Event triggered when a panel is resfreshed and needs to reload it's content.
+                 * Event triggered when a panel is reloading it's content.
                  * 
                  * @category events
-                 * @event Weavy#refresh
+                 * @event WeavyPanels#panel-reload
                  * @returns {Object}
-                 * @property {string} panelId - The id of the panel being refreshed.
+                 * @property {string} panelId - The id of the panel being reloaded.
                  */
                 panel.triggerEvent("panel-reload", { panelId: panelId });
             });
@@ -335,7 +534,6 @@
          * Loads an url in a frame or sends data into a specific frame. Will replace anything in the frame.
          * 
          * @ignore
-         * @category panels
          * @param {HTMLIFrameElement} frame - The frame element
          * @param {any} url - URL to load.
          * @param {any} [data] - URL/form encoded data.
@@ -416,11 +614,12 @@
         /**
          * Load an url with data directly in a specific panel. Uses turbolinks forms if the panel is loaded and a form post to the frame if the panel isn't loaded.
          * 
-         * @category panels
+         * Loads the predefined panel url if url parameter is omitted.
+         * 
          * @param {string} panelId - The id of the panel to load in.
          * @param {string} [url] - The url to load in the panel.
          * @param {any} [data] -  URL/form-encoded data to send
-         * @param {any} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
+         * @param {string} [method=GET] - HTTP Request Method {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods}
          * @param {bool} [replace] - Replace the content in the panel and load it fresh.
          * @returns {external:Promise}
          */
@@ -467,10 +666,11 @@
          * Open a specific panel. The open waits for the [weavy.whenReady]{@link Weavy#whenReady} to complete, then opens the panel.
          * Adds the `weavy-open` class to the {@link Weavy#nodes#container}.
          * 
-         * @category panels
+         * Returns a promise that is resolved when the panel is opened and fully loaded.
+         * 
          * @param {string} panelId - The id of the panel to open.
          * @param {string} [destination] - Tells the panel to navigate to a specified url.
-         * @emits Weavy#open
+         * @emits WeavyPanels#panel-open
          * @returns {external:Promise}
          */
         function openPanel(panelId, destination) {
@@ -503,10 +703,11 @@
                  * Event triggered when a panel is opened.
                  * 
                  * @category events
-                 * @event Weavy#open
+                 * @event WeavyPanels#panel-open
                  * @returns {Object}
                  * @property {string} panelId - The id of the panel being openened.
                  * @property {string} [destination] - Any url being requested to open in the panel.
+                 * @property {WeavyPanels~container} panels - The panels container for the panel
                  */
                 var openResult = panel.triggerEvent("panel-open", { panelId: panelId, destination: destination, panels: panelsRoot });
 
@@ -519,12 +720,12 @@
         }
 
         /**
-         * Closes all panels and removes the `weavy-open` class from the {@link Weavy#nodes#container}. Sets the {@link Weavy#whenClosed} Promise if not already closing.
+         * Closes a panel.
          * 
          * @category panels
          * @param {string} [panelId] - The id of any specific panel to close. If that panel is open, the panel will be closed, otherwise no panel will be closed.
-         * @returns {external:Promise} {@link Weavy#whenClosed}
-         * @emits Weavy#close
+         * @returns {external:Promise}
+         * @emits WeavyPanels#panel-close
          */
         function closePanel(panelId, silent) {
 
@@ -550,10 +751,13 @@
 
                     if (silent !== true) {
                         /**
-                         * Event triggered when weavy closes all panels. Wait for the {@link Weavy#whenClosed} Promise to do additional things when weavy has finished closing.
+                         * Event triggered when weavy closes all panels.
                          * 
                          * @category events
-                         * @event Weavy#close
+                         * @event WeavyPanels#panel-close
+                         * @returns {Object}
+                         * @property {string} panelId - The id of the panel
+                         * @property {WeavyPanels~container} panels - The panels container for the panel
                          */
                         panel.triggerEvent("panel-close", { panelId: panelId, panels: panelsRoot });
                     }
@@ -561,6 +765,7 @@
                     panel.postMessage({ name: 'close' });
 
                     // Return timeout promise
+                    // TODO: Each panel should keep track of their own closing promise
                     _whenClosed = weavy.timeout(250);
 
                     _whenClosed.then(function () {
@@ -573,12 +778,12 @@
         }
 
         /**
-         * [Open]{@link Weavy#open} or [close]{@link Weavy#close} a specific panel.
+         * [Open]{@link WeavyPanels#open} or [close]{@link WeavyPanels#close} a specific panel.
          * 
-         * @category panels
          * @param {string} panelId - The id of the panel toggled.
          * @param {string} [destination] - Tells the panel to navigate to a specified url when opened.
-         * @emits Weavy#toggle
+         * @returns {external:Promise}
+         * @emits WeavyPanels#panel-toggle
          */
         function togglePanel(panelId, destination) {
 
@@ -603,7 +808,7 @@
                     * Event triggered when a panel is toggled open or closed.
                     * 
                     * @category events
-                    * @event Weavy#toggle
+                    * @event WeavyPanels#panel-toggle
                     * @returns {Object}
                     * @property {string} panelId - The id of the panel toggled.
                     * @property {boolean} closed - True if the panel is closed.
@@ -625,6 +830,7 @@
          * @param {string} panelId - If the frame is a panel, the panelId may also be provided.
          * @param {object} message - The Message to send
          * @param {Transferable[]} [transfer] - A sequence of Transferable objects that are transferred with the message.
+         * @returns {external:Promise}
          * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage}
          */
         function postMessage(panelId, message, transfer) {
@@ -641,12 +847,19 @@
         }
 
         /** 
-         * Resets a panel to its original url. This can be used if the panel has ended up in an incorrect state.
+         * Creates a new panel iframe and resets the panel to its original url. This can be used if the panel has ended up in an incorrect state.
          * 
-         * @category panels
          * @param {string} panelId - The id of the panel to reset.
+         * @returns {external:Promise}
          */
         function resetPanel(panelId) {
+            if (!(this instanceof HTMLElement)) {
+                weavy.warn("removePanel: No valid panel root defined for " + panelId);
+                return Promise.reject();
+            }
+
+            var panelsRoot = this;
+
             return weavy.whenReady().then(function () {
                 var panel = _panels.get(panelId);
                 if (panel) {
@@ -670,10 +883,24 @@
                     panel.removeChild(frame);
                     panel.appendChild(newFrame);
 
+                    /**
+                     * Triggered when a panel has been reset.
+                     * 
+                     * @event WeavyPanels#panel-reset
+                     * @category events
+                     * @returns {Object}
+                     * @property {string} panelId - Id of the reset panel
+                     */
+                    panelsRoot.triggerEvent("panel-reset", { panelId: panelId });
+
                     if (isOpen) {
-                        loadPanel(panelId, frameSrc, null, null, true)
+                        return loadPanel(panelId, frameSrc, null, null, true)
                     }
+
+                    return Promise.resolve();
                 }
+
+                return Promise.reject(new Error("removePanel(): Panel " + panelId + " not found"));
             });
         }
 
@@ -682,7 +909,8 @@
          * 
          * @param {string} panelId - The id of the panel to remove
          * @param {boolean} [force] - True will remove the panel even if it's persistent
-         * @emits panels#panel-removed
+         * @returns {external:Promise}
+         * @emits WeavyPanels#panel-removed
          */
         function removePanel(panelId, force) {
             if (!(this instanceof HTMLElement)) {
@@ -712,7 +940,7 @@
                             /**
                              * Triggered when a panel has been removed.
                              * 
-                             * @event panels#panel-removed
+                             * @event WeavyPanels#panel-removed
                              * @category events
                              * @returns {Object}
                              * @property {string} panelId - Id of the removed panel
@@ -732,6 +960,8 @@
 
         /**
          * Closes all panels except persistent panels.
+         * @memberof WeavyPanels#
+         * @function
          */
         function closePanels() {
             weavy.debug("closing panels")
@@ -742,6 +972,8 @@
 
         /**
          * Removes all panels except persistent panels.
+         * @memberof WeavyPanels#
+         * @function
          * @param {boolean} force - Forces all panels to be removed including persistent panels
          */
         function clearPanels(force) {
@@ -753,6 +985,8 @@
 
         /**
          * Resets all panels to initial state.
+         * @memberof WeavyPanels#
+         * @function
          */
         function resetPanels() {
             weavy.debug("resetting panels")
@@ -788,11 +1022,11 @@
 
         /**
          * Preload a frame. The frame needs to have data-src attribute set instead of src attribute. 
-         * Panels created using {@link panels#addPanel} have the appropriate settings for preload.
+         * Panels created using {@link WeavyPanels#addPanel} have the appropriate settings for preload.
          * If the frame belongs to a panel it will triggger loading animations.
          * 
          * @param {string} panelId - The frame that should be preloaded.
-         * @returns {external:Promise} [callback] - Function called when the frame has loaded
+         * @returns {external:Promise}
          */
         function preloadPanel(panelId) {
             var panel = _panels.get(panelId);
@@ -821,10 +1055,13 @@
         /**
          * Preload all frames. Frames will be loaded sequentially starting with system frames. 
          * Preloading is ignored on mobile devices.
+         * 
+         * @name WeavyPanels#preload
+         * @function
          * @param {boolean} [force] - Force preloading for all frames, otherwise only system frames will be preloaded.
          */
         function preloadPanels(force) {
-            if (weavy.options.isMobile) {
+            if (_isMobile) {
                 return Promise.reject();
             }
 
@@ -894,9 +1131,27 @@
         this.clearPanels = clearPanels;
         this.closePanels = closePanels;
         this.createContainer = createPanelsContainer;
+
+        /**
+         * Get a panels container.
+         * 
+         * @memberof WeavyPanels#
+         * @function
+         * @param {string} containerId=global - The id of the panels container
+         * @returns {WeavyPanels~container}
+         */
         this.getContainer = function (containerId) {
             return _panelsContainers.get(containerId || "global");
         };
+
+        /**
+         * Get a panel.
+         * 
+         * @memberof WeavyPanels#
+         * @function
+         * @param {string} panelId - The id of the panel
+         * @returns {WeavyPanels~panel}
+         */
         this.getPanel = function (panelId) {
             return _panels.get(panelId);
         };
@@ -916,7 +1171,7 @@
      * };
      *
      * @name defaults
-     * @memberof panels
+     * @memberof WeavyPanels
      * @type {Object}
      * @property {Object} controls - Set to `false` to disable control buttons
      * @property {boolean} controls.close - Render a close panel control button.

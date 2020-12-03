@@ -48,6 +48,10 @@
 
     // DEFINE CUSTOM ELEMENTS AND STYLES
 
+    /**
+     * Three custom elements are used <weavy>, <weavy-root> and <weavy-container>
+     * <weavy> can't be defined and acts only as a DOM placeholder.
+     **/
     if ('customElements' in window) {
         try {
             window.customElements.define('weavy-root', HTMLElement.prototype);
@@ -55,17 +59,21 @@
         } catch(e) { }
     } 
 
+    // <weavy> and <weavy-root> should have no layout of their own.
     var weavyElementCSS = 'weavy, weavy-root { display: contents; }';
 
+    // <weavy> and <weavy-root> gets layout only if needed 
     if (!('CSS' in window && CSS.supports('display', 'contents'))) {
         weavyElementCSS = 'weavy, weavy-root { display: flex; position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }';
     }
 
+    // Prefer modern CSS registration
     if (document.adoptedStyleSheets) {
         var sheet = new CSSStyleSheet();
         sheet.replaceSync(weavyElementCSS);
         document.adoptedStyleSheets = Array.prototype.concat.call(document.adoptedStyleSheets, [sheet]);
     } else {
+        // Fallback CSS registration
         var elementStyleSheet = document.createElement("style");
         elementStyleSheet.type = "text/css";
         elementStyleSheet.styleSheet ? elementStyleSheet.styleSheet.cssText = weavyElementCSS : elementStyleSheet.appendChild(document.createTextNode(weavyElementCSS));
@@ -88,40 +96,52 @@
      * 
      * @example
      * var weavy = new Weavy();
-     * var coreDevWeavy = new Weavy(Weavy.presets.core, { url: "http://myweavysite.dev" });
+     * 
+     * var devSettings = {
+     *     logging: true
+     * };
+     * 
+     * var coreDevWeavy = new Weavy(Weavy.presets.core, devSettings, { url: "http://myweavysite.dev" });
      * 
      * @class Weavy
-     * @classdesc The core class for Weavy.
+     * @classdesc The core class for the Weavy client.
      * @param {...Weavy#options} options - One or multiple option sets. Options will be merged together in order.
-     * @typicalname weavy
      */
 
     var Weavy = function () {
         /** 
-         *  Reference to this instance
-         *  @lends Weavy#
+         * Reference to this instance
+         * @lends Weavy#
          */
         var weavy = this;
 
         /**
-         * Main options for Weavy. 
-         * When weavy initializes, it connects to the server and processes the options and sends them back to weavy again. The options may then contain additional data. 
-         * Weavy triggers a {@link Weavy#event:options} event when options are recieved from the server.
+         * Main options for Weavy. The JWT option is required.
+         * When weavy initializes, it connects to the server and processes the options as well as using them internally. 
          * 
-         * @category options
+         * @see [Client Options]{@link https://docs.weavy.com/client/development/options}
          * @typedef 
          * @type {Object}
          * @member
-         * @property {Element} [container] - Container where weavy should be placed. If no Element is provided, a &lt;section&gt; is created next to the &lt;body&gt;-element.
+         * @property {Element} [container] - Container where weavy should be placed. If no Element is provided, a &lt;weavy&gt; root is created next to the &lt;body&gt;-element.
          * @property {string} [className] - Additional classNames added to weavy.
          * @property {string} [https=adaptive] - How to enforce https-links. <br> • **force** -  makes all urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **default** - makes no change.
          * @property {string} [id] - An id for the instance. A unique id is always generated.
-         * @property {boolean} [init=true] - Should weavy initialize automatically.
-         * @property {boolean} [isMobile] - Indicates if the browser is mobile. Defaults to the RegExp expression <code>/iPhone&#124;iPad&#124;iPod&#124;Android/i.test(navigator.userAgent)</code>
+         * @property {string} jwt - The JWT token passed to {@link WeavyAuthentication}.
+         * @property {boolean} [init=true] - Should weavy initialize automatically?
          * @property {boolean} [includePlugins=true] - Whether all registered plugins should be enabled by default. If false, then each plugin needs to be enabled in plugin-options.
-         * @property {string} [logColor] - Hex color (#bada55) used for logging. A random color is generated as default.
-         * @property {Element} [overlay] - Element to use for overlay purposes. May for instance use the overlay of another Weavy instance.
-         * @property {Object<string, Object>} [plugins] - Properties with the name of the plugins to configure. Each plugin may be enabled or disabled by setting the options to true or false. Providing an Object instead of true will enable the plugin and pass options to the plugin. See the reference for each plugin for available options.
+         * @property {string} [lang] - [Language code]{@link https://en.wikipedia.org/wiki/ISO_639-1} of preferred user interface language, e.g. <code>en</code> for English. When set, it must match one of your [configured languages]{@link https://docs.weavy.com/server/localization}.
+         * @property {Object|boolean} [logging] - Options for console logging. Set to false to disable.
+         * @property {string} [logging.color] - Hex color (#bada55) used for logging. A random color is generated as default.
+         * @property {boolean} [logging.log] - Enable log messages in console.
+         * @property {boolean} [logging.debug] - Enable debug messages in console.
+         * @property {boolean} [logging.info] - Enable info messages in console.
+         * @property {boolean} [logging.warn] - Enable warn messages in console.
+         * @property {boolean} [logging.error] - Enable error messages in console.
+         * @property {Object.<string, Object>} [plugins] - Properties with the name of the plugins to configure. Each plugin may be enabled or disabled by setting the options to true or false. Providing an Object instead of true will enable the plugin and pass options to the plugin. See the reference for each plugin for available options.
+         * @property {boolean} [preload] - Start automatic preloading after load
+         * @property {Array.<WeavySpace~spaceOptions>} spaces - Array of space definititions with apps to initialize spaces directly at initialization. See {@link Weavy#space}.
+         * @property {string} [tz] - Timezone identifier, e.g. <code>Pacific Standard Time</code>. When specified, this setting overrides the timezone setting on a user´s profile. The list of valid timezone identifiers can depend on the version and operating system of your Weavy server.
          * @property {string} [url] - The URL of the Weavy-installation to connect to. Defaults to the installation where the script came from.
          */
         weavy.options = weavy.extendDefaults(Weavy.defaults);
@@ -149,13 +169,26 @@
 
         // Logging
 
-        this.console = new WeavyConsole(weavy.options.id, weavy.options.loggingColor, weavy.options.logging);
+        /**
+         * Class for wrapping native console logging.
+         * - Options for turning on/off logging
+         * - Optional prefix by id with color
+         * 
+         * @type {WeavyConsole}
+         * @category logging
+         * @borrows WeavyConsole#log as Weavy#log
+         * @borrows WeavyConsole#debug as Weavy#debug
+         * @borrows WeavyConsole#warn as Weavy#warn
+         * @borrows WeavyConsole#error as Weavy#error
+         * @borrows WeavyConsole#info as Weavy#info
+         */
+        weavy.console = new WeavyConsole(weavy.options.id, weavy.options.logging && weavy.options.logging.color, weavy.options.logging);
 
-        this.log = this.console.log;
-        this.debug = this.console.debug;
-        this.warn = this.console.warn;
-        this.error = this.console.error;
-        this.info = this.console.info;
+        weavy.log = weavy.console.log;
+        weavy.debug = weavy.console.debug;
+        weavy.warn = weavy.console.warn;
+        weavy.error = weavy.console.error;
+        weavy.info = weavy.console.info;
 
         // ID functions
 
@@ -184,7 +217,6 @@
          * @member {string} Weavy.version 
          */
         if (Weavy.version) {
-            weavy.options.version = weavy.options.version || Weavy.version;
             weavy.log(Weavy.version);
         }
 
@@ -196,23 +228,31 @@
          * Data about the current user.
          * Use weavy.user.id to get the id of the user.
          * 
-         * @category properties
+         * @category authentication
          * @type {Object}
          */
         weavy.user = null;
 
+
         /**
-         * Loaded data for the current user.
+         * Client configuration data from the server. Based on what is passed in {@link Weavy#options} to the server and currently defined spaces.
          * 
-         * @category properties
+         * @typedef
          * @type {Object}
-         */
+         * @property {Array.<WeavySpace#data>} spaces - List of configured spaces.
+         * @property {Object} plugins - Options for configured plugins.
+         * @property {Object} [plugins.theme] - Options for the theme plugin
+         * @property {string} plugins.theme.logo - Thumb URL for the global installation logo.
+         * @property {string} plugins.theme.themeColor - Primary color for the theme in Hex color.
+         * @property {string} plugins.theme.clientCss - The CSS for the client. Gets injected in weavy roots.
+         * @property {string} status - Status of the server. Should be "ok".
+         * @property {string} version - Semver string of the server version. Should match the script {@link Weavy.version}.
+         **/
         weavy.data = null;
 
         /**
          * True when frames are blocked by Content Policy or the browser
          * 
-         * @category properties
          * @type {boolean}
          */
         weavy.isBlocked = false;
@@ -220,7 +260,6 @@
         /**
          * True when weavy is loading options from the server.
          * 
-         * @category properties
          * @type {boolean}
          */
         weavy.isLoading = false;
@@ -228,49 +267,33 @@
         /**
          * True when weavy has loaded options from the server.
          * 
-         * @category properties
          * @type {boolean}
          */
         weavy.isLoaded = false;
 
 
-        // DOM Elements
-
-        /**
-         * Placeholder for all DOM node references. Put any created elements or DOM related objects here.
-         * 
-         * @alias Weavy#nodes
-         * @typicalname weavy.nodes
-         */
-        weavy.nodes = {}; // TODO: Use weakmap instead?
-
-        /**
-         * The main container under the root. This is where all weavy Elements are placed.
-         * 
-         * @alias Weavy#nodes#container
-         * @type {Element}
-         */
-        weavy.nodes.container = null;
-
-        /**
-         * Container for displaying elements that needs to be full viewport and on top of other elements. Uses [options.overlay]{@link Weavy#options} if specified.
-         * 
-         * @alias Weavy#nodes#overlay
-         * @type {Element}
-         */
-        weavy.nodes.overlay = null;
-
-        /**
-         * Container for all global overlay panels
-         * 
-         * @alias Weavy#nodes#panels
-         * @type {Element}
-         */
-        weavy.nodes.panels = {};
-
         // EVENT HANDLING
-        weavy.events = new WeavyEvents(weavy);
 
+        /**
+         * Instance of {@link WeavyEvents} which enables propagation and before and after phases for events.
+         *
+         * The event system provides event chaining with a bubbling mechanism that propagates all the way from the emitting child trigger to the weavy instance.
+         * 
+         * All events in the client have three phases; before, on and after. Each event phase is a prefix to the event name.
+         * - The before:event-name is triggered in an early stage of the event cycle and is a good point to modify event data or cancel the event.
+         * - The on:event-name is the normal trigger point for the event. It does not need to be prefixed when registering an event listener, you can simly use the event-name when you register a listener. This is the phase you normally use to register event listeners.
+         * - The after:event-name is triggered when everything is processed. This is a good point to execute code that is dependent on that all other listers have been executed.
+         * 
+         * Cancelling an event by calling `event.stopPropagation()` will stop any propagation and cause all the following phases for the event to be cancelled.
+         * 
+         * @type {WeavyEvents}
+         * @category eventhandling
+         * @borrows WeavyEvents#on as Weavy#on
+         * @borrows WeavyEvents#one as Weavy#one
+         * @borrows WeavyEvents#off as Weavy#off
+         * @borrows WeavyEvents#triggerEvent as Weavy#triggerEvent
+         **/
+        weavy.events = new WeavyEvents(weavy);
         weavy.on = weavy.events.on;
         weavy.one = weavy.events.one;
         weavy.off = weavy.events.off;
@@ -278,6 +301,23 @@
 
 
         // AUTHENTICATION & JWT
+
+        /**
+         * Reference to the instance of the WeavyAuthentication for the current server.
+         * 
+         * You always need to define a JWT provider in your {@link Weavy#options}. 
+         * This may be a function that returns a JWT string or returns a promise that resolves a JWT string. 
+         * The function will be called again whenever a new JWT token is needed.
+         * You may also provide a JWT string directly, then you can't benifit from weavy requesting a new token when needed.
+         * 
+         * See [Client Authentication]{@link https://docs.weavy.com/client/authentication} for full authentication documentation.
+         * 
+         * @type {WeavyAuthentication}
+         * @category authentication
+         * @borrows WeavyAuthentication#setJwt as Weavy#authentication#setJwt
+         * @borrows WeavyAuthentication#signIn as Weavy#authentication#signIn
+         * @borrows WeavyAuthentication#signOut as Weavy#authentication#signOut
+         */
         weavy.authentication = wvy.authentication.get(weavy.httpsUrl(weavy.options.url));
 
         if (weavy.options.jwt === undefined) {
@@ -313,32 +353,104 @@
         });
 
         weavy.on(weavy.authentication, "signing-in", function (e) {
+            /**
+             * Triggered when the authentication process has started.
+             * @event Weavy#signing-in
+             * @category authentication
+             */
             weavy.triggerEvent("signing-in");
         });
 
         weavy.on(weavy.authentication, "clear-user", function (e) {
+            /**
+             * Triggered when user data needs to be cleared. For example when a user is signing out.
+             * @event Weavy#clear-user
+             * @category authentication
+             */
             weavy.triggerEvent("clear-user");
         });
 
         weavy.on(weavy.authentication, "authentication-error", function (e, error) {
+            /**
+             * Triggered when the authentication process was unsuccessful.
+             * 
+             * @event Weavy#authentication-error
+             * @category authentication
+             * @returns {Object}
+             * @property {string} method - Which metod that was used to authenticate "jwt" or "panel"
+             * @property {int} status - The HTTP error code from the server, like 401 for an unauthorized user
+             * @property {string} message - The message from the server, like "Unauthorized"
+             */
             weavy.triggerEvent("authentication-error", error);
         });
 
         // WEAVY REALTIME CONNECTION
+
+        /**
+         * Reference to the instance of the realtime connection to the server.
+         * 
+         * @type {WeavyConnection}
+         **/
         weavy.connection = wvy.connection.get(weavy.httpsUrl(weavy.options.url));
 
 
         // PANELS
+
+        /**
+         * Placeholder for all DOM node references. Put any created elements or DOM related objects here.
+         * 
+         * @category panels
+         * @namespace Weavy#nodes
+         * @typicalname .nodes
+         * @type {Object}
+         * @property {Element} container - The main container under the root. This is where all common weavy Elements are placed.
+         * @property {Element} overlay - Container for displaying elements that needs to be full viewport and on top of other elements.
+         */
+        weavy.nodes = {};
+        weavy.nodes.container = null;
+        weavy.nodes.overlay = null;
+
+
+        /**
+         * Placeholder for all panels.
+         * 
+         * @type {Object}
+         * @category panels
+         * @namespace Weavy#nodes#panels
+         * @typicalname .nodes.panels
+         **/
+        weavy.nodes.panels = {};
+
+        /**
+         * Instance of the panel manager for all iframes in the weavy instance.
+         * 
+         * @type {WeavyPanels}
+         * @category panels
+         **/
         weavy.panels = new WeavyPanels(weavy);
 
         weavy.on("before:build", function () {
             if (!weavy.nodes.panels.drawer) {
+                /**
+                 * Side drawer panel container. Slides in/out automatically when a child panel is opened or closed. Attached to {@link Weavy#nodes#overlay}.
+                 * 
+                 * @type {WeavyPanels~container}
+                 * @category panels
+                 * @name Weavy#nodes#panels#drawer
+                 **/
                 weavy.nodes.panels.drawer = weavy.panels.createContainer();
                 weavy.nodes.panels.drawer.classList.add("weavy-drawer");
                 weavy.nodes.overlay.appendChild(weavy.nodes.panels.drawer);
             }
 
             if (!weavy.nodes.panels.preview) {
+                /**
+                 * Preview panel container. Attached to {@link Weavy#nodes#overlay}.
+                 * 
+                 * @type {WeavyPanels~container}
+                 * @category panels
+                 * @name Weavy#nodes#panels#preview
+                 **/
                 weavy.nodes.panels.preview = weavy.panels.createContainer();
                 weavy.nodes.panels.preview.classList.add("weavy-preview");
                 weavy.nodes.overlay.appendChild(weavy.nodes.panels.preview);
@@ -360,16 +472,40 @@
 
         // SPACES
 
+        /**
+         * List of all current defined spaces as an Array.
+         * @category spaces
+         * @type {Array.<WeavySpace>}
+         **/
         weavy.spaces = new Array();
 
         /**
-         * Set up weavy spaces
+         * Selects, fetches or creates a space in the weavy instance.
+         *
+         * The space needs to be defined using a space definition object containing at least a key, which will fetch or create the space on the server.
+         * If the defined space already has been set up, the space will only be selected in the client.
+         * After the space is defined it can be quickly selected in the client using only the id (int) or the key (string) of the space, 
+         * which never will create nor fetch the space from the server.
+         *
+         * @example
+         * // Define a space that will be fetched or created on the server
+         * var space = weavy.space({ key: "mykey", name: "My Space" });
+         *
+         * // Select the newly defined space
+         * var spaceAgain = weavy.space("mykey");
+         * 
+         * @category spaces
+         * @function
+         * @param {int|string|WeavySpace#options} options - space id, space key or space definition object.
+         * @returns {WeavySpace}
+         * @see {@link WeavySpace#options}
          */
+
         weavy.space = function (options) {
             var space;
 
             var isSpaceId = Number.isInteger(options);
-            var isSpaceKey = typeof options === "string";
+            var isSpaceKey = typeof spaceOptions === "string";
             var isSpaceConfig = $.isPlainObject(options);
             var spaceSelector = isSpaceConfig && options || isSpaceId && { id: options } || isSpaceKey && { key: options };
 
@@ -397,6 +533,9 @@
 
         var _timeouts = [];
 
+        /**
+         * Clears all current timouts 
+         **/
         function clearTimeouts() {
             _timeouts.forEach(clearTimeout);
             _timeouts = [];
@@ -411,8 +550,9 @@
          * mytimeout.reject(); // Cancel the timeout
          * 
          * @category promises
+         * @function
          * @param {int} time=0 - Timeout in milliseconds
-         * @returns {external:Promise}
+         * @returns {WeavyPromise}
          */
         weavy.timeout = function (time) {
             var timeoutId;
@@ -436,7 +576,8 @@
          * weavy.whenReady().then(function() { ... })
          *
          * @category promises
-         * @type {external:Promise}
+         * @function
+         * @returns {WeavyPromise}
          * @resolved when frames are not blocked.
          * @rejected when frames are blocked
          * */
@@ -453,7 +594,8 @@
          * weavy.whenLoaded().then(function() { ... })
          *
          * @category promises
-         * @type {external:Promise}
+         * @function
+         * @returns {WeavyPromise}
          * @resolved when init is called, the websocket has connected, data is received from the server and weavy is built and the load event has finished.
          */
         weavy.whenLoaded = new WeavyPromise();
@@ -466,6 +608,8 @@
          * Initializes weavy. This is done automatically unless you specify `init: false` in {@link Weavy#options}.
          * @param {Weavy#options} [options] Any new or additional options.
          * @emits Weavy#init
+         * @returns {WeavyPromise}
+         * @resolved When the weavy instance is initialized, ready and loaded.
          */
         weavy.init = function (options) {
 
@@ -510,7 +654,7 @@
                         return space.options;
                     }),
                     plugins: weavy.options.plugins,
-                    version: weavy.options.version
+                    version: Weavy.version
                 }
 
                 if (weavy.options.lang) {
@@ -521,6 +665,14 @@
                 }
 
                 weavy.ajax(authUrl, initData, "POST", null, true).then(function (clientData) {
+
+                    /**
+                     * Triggered when init data has been loaded from the server.
+                     * 
+                     * @event Weavy#clientdata
+                     * @category events
+                     * @returns {Weavy#data}
+                     **/
                     weavy.triggerEvent("clientdata", clientData);
                 });
             }
@@ -530,6 +682,14 @@
 
         var _roots = new Map();
 
+        /**
+         * Creates an isolated shadow root in the DOM tree to place nodes in.
+         * 
+         * @param {Element|jQuery|string} parentSelector - The node to place the root in.
+         * @param {string} id - Id of the root.
+         * @emits Weavy#create-root
+         * @returns {Weavy~root}
+         */
         weavy.createRoot = function (parentSelector, id) {
             var supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
 
@@ -549,18 +709,35 @@
             var rootSection = document.createElement("weavy");
 
             rootSection.id = rootId;
-            //rootSection.classList.add("weavy");
-            //rootSection.style.display = "contents";
 
             var rootDom = document.createElement("weavy-root");
-            rootDom.setAttribute("data-version", weavy.options.version);
+            rootDom.setAttribute("data-version", Weavy.version);
 
             var rootContainer = document.createElement("weavy-container");
             rootContainer.className = "weavy-container";
             rootContainer.id = weavy.getId("weavy-container-" + weavy.removeId(rootId));     
 
+            /**
+             * Weavy shadow root to enable closed scopes in the DOM that also can be managed and removed.
+             * The shadow root will isolate styles and nodes within the root.
+             * 
+             * Structure:
+             * 
+             * {parent} ➜ &lt;weavy/&gt; ➜ {ShadowDOM} ➜ {container}
+             * 
+             * @typedef Weavy~root 
+             * @type {Object}
+             * @property {Element} parent - The parent DOM node where the root is attached.
+             * @property {Element} section - The &lt;weavy/&gt; node which is the placeholder for the root. Attached to the parent.
+             * @property {ShadowDOM} root - The &lt;weavy-root/&gt; that is a closed ShadowDOM node. Attached to the section.
+             * @property {Element} container - The &lt;weavy-container/&gt; where you safely can place elements. Attached to the root.
+             * @property {string} id - The id of the root.
+             * @property {function} remove() - Function to remove the root from the DOM.
+             * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM
+             **/
             var root = { parent: parentElement, section: rootSection, root: rootDom, container: rootContainer, id: rootId };
 
+            // TODO: use returned/modified data
             weavy.triggerEvent("before:create-root", root);
 
             parentElement.appendChild(rootSection);
@@ -571,6 +748,12 @@
             }
             rootDom.appendChild(rootContainer);
 
+            /**
+             * Triggered when a shadow root is created
+             * 
+             * @event Weavy#create-root
+             * @returns {Weavy~root}
+             **/
             weavy.triggerEvent("on:create-root", root);
 
             root.remove = function () {
@@ -593,10 +776,19 @@
             return root;
         };
 
+        /**
+         * Get a Weavy shadow root by id.
+         * 
+         * @param {string} id - The id of the root.
+         * @returns {Weavy~root}
+         */
         weavy.getRoot = function (id) {
             return _roots.get(weavy.getId(id));
         }
 
+        /**
+         * Checks that frame communication is not blocked.
+         **/
         function frameStatusCheck() {
             var statusUrl = "/client/ping";
 
@@ -611,6 +803,15 @@
                 weavy.one(wvy.postal, "ready", { weavyId: weavy.getId(), windowName: weavy.getId("weavy-status-check") }, function () {
                     weavy.log("Frame status check", "√")
                     weavy.isBlocked = false;
+
+                    /**
+                     * Triggered when the frame check is done.
+                     * 
+                     * @event Weavy#frame-check
+                     * @returns {Object}
+                     * @property {boolean} blocked - Whether iframes communication is blocked or not.
+                     * @resolves {Weavy#whenReady}
+                     **/
                     weavy.triggerEvent("frame-check", { blocked: false });
                 });
 
@@ -631,6 +832,9 @@
             return weavy.whenReady();
         }
 
+        /**
+         * Creates the general weavy root where overlays etc are placed.
+         **/
         function initRoot() {
             // add container
             if (!weavy.getRoot()) {
@@ -833,7 +1037,7 @@
              *     weavy.log("Unread conversations count", data.conversations);
              * });
              * 
-             * @event badge#badge
+             * @event Weavy#badge
              * @category events
              * @returns {Object}
              * @property {int} conversations - Number of unread conversations
@@ -886,7 +1090,7 @@
                     *
                     * If you have dependencies to Elements built by plugins you should also check that they actually exist before attaching to them.
                     *
-                    * Often it's a good idea to check if the user is signed-in using {@link Weavy#isAuthenticated} unless you're building something that doesn't require a signed in user.
+                    * Often it's a good idea to check if the user is signed-in using {@link WeavyAuthentication#isAuthenticated} unless you're building something that doesn't require a signed in user.
                     *
                     * @example
                     * weavy.on("build", function(e, root) {
@@ -897,8 +1101,8 @@
                     * 
                     * weavy.on("after:build", function(e, root) {
                     *     if (weavy.authentication.isAuthorized()) {
-                    *         if (weavy.nodes.dock) {
-                    *             weavy.nodes.dock.appendChild(weavy.nodes.myElement);
+                    *         if (weavy.nodes.overlay) {
+                    *             weavy.nodes.overlay.appendChild(weavy.nodes.myElement);
                     *         }
                     *     }
                     * })
@@ -920,7 +1124,7 @@
                     * @example
                     * weavy.on("load", function() {
                     *     if (weavy.authentication.isAuthorized()) {
-                    *         weavy.alert("Widget successfully loaded");
+                    *         weavy.alert("Client successfully loaded");
                     *     }
                     * });
                     * 
@@ -1047,7 +1251,7 @@
      * // Load the minimal weavy core without any additional plugins.
      * var weavy = new Weavy(Weavy.presets.core, { url: "https://myweavysite.com" });
      * 
-     * @category options
+     * @name Weavy.presets
      * @type {Object}
      * @property {Weavy#options} Weavy.presets.noplugins - Disable all plugins.
      * @property {Weavy#options} Weavy.presets.core - Enable all core plugins only.
@@ -1068,7 +1272,8 @@
     };
 
     /**
-     * Default options. These options are general for all Weavy instances and may be overridden in {@link Weavy#options}. You may add any general options you like here.
+     * Default options. These options are general for all Weavy instances and may be overridden in {@link Weavy#options}. 
+     * You may add any general options you like here. The url is always set to the installation where your weavy.js was generated.
      * 
      * @example
      * // Defaults
@@ -1077,9 +1282,8 @@
      *     className: "",
      *     https: "adaptive",
      *     init: true,
-     *     isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
      *     includePlugins: true,
-     *     overlay: null,
+     *     preload: true,
      *     url: "/"
      * };
      * 
@@ -1087,13 +1291,12 @@
      * Weavy.defaults.url = "https://myweavysite.com";
      * var weavy = new Weavy();
      *
-     * @category options
      * @type {Object}
+     * @name Weavy.defaults
      * @property {Element} [container] - Container where weavy should be placed. If no Element is provided, a &lt;section&gt; is created next to the &lt;body&gt;-element.
      * @property {string} [className=weavy-default] - Additional classNames added to weavy.
      * @property {string} [https=adaptive] - How to enforce https-links. <br>• **force** -  makes all urls https.<br>• **adaptive** -  enforces https if the calling site uses https.<br>• **default** - makes no change.
      * @property {boolean} [init=true] - Should weavy initialize automatically.
-     * @property {boolean} [isMobile] - Indicates if the browser is mobile. Defaults to the RegExp expression <code>/iPhone&#124;iPad&#124;iPod&#124;Android/i.test(navigator.userAgent)</code>
      * @property {boolean} [includePlugins=true] - Whether all registered plugins should be enabled by default. If false, then each plugin needs to be enabled in plugin-options.
      * @property {boolean} [preload] - Start automatic preloading after load
      * @property {string} url - The URL to the Weavy-installation to connect to.
@@ -1102,7 +1305,6 @@
         container: null,
         https: "adaptive", // force, adaptive or default 
         init: true,
-        isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent), // Review?
         includePlugins: true,
         preload: true,
         url: "/"
@@ -1111,6 +1313,8 @@
 
     /**
      * Placeholder for registering plugins. Plugins must be registered and available here to be accessible and initialized in the Weavy instance. Register any plugins after you have loaded weavy.js and before you create a new Weavy instance.
+     * 
+     * @name Weavy.plugins
      * @type {Object.<string, plugin>}
      */
     Weavy.plugins = {};
@@ -1133,7 +1337,7 @@
      * 
      * The original options passed are left untouched. {@link Weavy.httpsUrl} settings is applied to all url options.
      * 
-     * @category options
+     * @name Weavy#extendDefaults
      * @param {Object} source - Original options.
      * @param {Object} properties - Merged options that will replace options from the source.
      * @param {boolean} [recursive=false] True will merge any sub-objects of the options recursively. Otherwise sub-objects are treated as data.
@@ -1171,7 +1375,7 @@
     /**
      * Applies https enforcement to an url. Optionally adds a baseUrl to relative urls.
      * 
-     * @category options
+     * @name Weavy#httpsUrl
      * @param {string} url - The url to process
      * @param {string} [baseUrl] - Url to preprend to relative urls. Ie. `weavy.options.url`
      * @param {string} [https] - How to treat http enforcement for the url. Default to settings from {@link Weavy#options}. <br> • **enforce** - makes all urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **nochange** - makes no change.

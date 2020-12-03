@@ -1,6 +1,6 @@
 ﻿@model UserSearchResult
 @{
-    Title = T["Clients"].ToString();
+    Title = T["Authentication clients"].ToString();
     Back = Url.Action<ManageController>(c => c.Index());
     var category = ViewContext.RouteData.Values["category"] as string;
 }
@@ -29,7 +29,7 @@
     @Html.ScrollMore(Model)
 
 } else {
-    <p class="text-muted text-center pt-3">@T["There are no clients yet."] <a href="@(Url.Action<ClientController>(c=>c.New()))">@T["Do you want to create a client?"]</a></p>
+    <p class="text-muted text-center pt-3">@T["There are no configured authentication clients yet."] <a href="@(Url.Action<ClientController>(c=>c.New()))">@T["Do you want to create an authentication client?"]</a></p>
 }
 
 @if (Model.Query.Trashed ?? false) {

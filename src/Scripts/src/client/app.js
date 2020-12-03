@@ -29,42 +29,248 @@
 }(typeof self !== 'undefined' ? self : this, function ($, WeavyPanels, utils, WeavyPromise) {
     console.debug("app.js");
 
+    /**
+     * @class WeavyApp
+     * @classdesc Base class for representation of apps in Weavy.
+     * @example
+     * var app = weavy.space(...).app({ key: "myapp1", type: "posts" });
+     */
+
+    /**
+     * This class is automatically instantiated when defining apps in weavy. 
+     * All the methods and properties are accessible in each instance. 
+     * The passed options will fetch the app or create it.
+     * 
+     * @constructor
+     * @hideconstructor
+     * @param {Weavy} weavy - Weavy instance the app belongs to
+     * @param {WeavySpace} space - Weavy Space the app belongs to
+     * @param {WeavyApp#options} options - App options
+     * @param {Object} [data] - Initial data belonging to the app
+     */
     var WeavyApp = function (weavy, space, options, data) {
 
         weavy.log("new WeavyApp", options);
 
         /** 
-         *  Reference to this instance
-         *  @lends WeavyApp#
+         * Reference to this instance
+         * @lends WeavyApp#
          */
         var app = this;
 
-        this.container = null;
-        this.root = null;
-        this.panel = null;
-        this.url = null;
+        /** 
+         * The container passed in from {@link WeavyApp#options}.
+         * @category properties
+         * @type {Element|jQuery|string}
+         */
+        app.container = null;
 
-        this.id = null;
-        this.name = null;
-        this.key = null;
-        this.guid = null;
-        this.type = null;
-        this.typeName = null;
+        /** 
+         * The root object for the container of the app. 
+         * @category properties
+         * @type {Object}
+         * @property {Element} container - The inner container to put nodes in.
+         * @property {string} id - The id of the root
+         * @property {Element} parent - The element defined in options to contain the app.
+         * @property {ShadowRoot} root - The isolated ShadowRoot in the section.
+         * @property {Element} section - The &lt;weavy&gt;-section within the parent.
+         * @property {Function} remove() - Method for removing the root from the DOM.
+         */
+        app.root = null;
 
-        this.autoOpen = null;
+        /** 
+         * The Panel displaying the app.
+         * @category properties
+         * @type {WeavyPanel}
+         */
+        app.panel = null;
 
-        this.weavy = weavy;
-        this.space = space;
-        this.options = options;
-        this.data = data;
+        /**
+         * The url of the app, received from app data.
+         * @category properties
+         * @type {string}
+         */
+        app.url = null;
 
-        // Event handlers
-        this.eventParent = space;
-        this.on = weavy.events.on.bind(app);
-        this.one = weavy.events.one.bind(app);
-        this.off = weavy.events.off.bind(app);
-        this.triggerEvent = weavy.events.triggerEvent.bind(app);
+        /**
+         * The server id of the app, received from app data.
+         * @category properties
+         * @type {int}
+         */
+        app.id = null;
 
+        /**
+         * The name of the app, defined in options or received from app data.
+         * @category properties
+         * @type {string}
+         */
+        app.name = null;
+
+        /**
+         * The key of the app, defined in options or recieved from app data.
+         * @category properties
+         * @type {string}
+         */
+        app.key = null;
+
+        /**
+         * The guid of the app type. May also be used to define the app type in options.
+         * @category properties
+         * @type {string}
+         */
+        app.guid = null;
+
+        /** 
+         * The short readable type of the app, such as "files" .
+         * @category properties
+         * @type {string}
+         */
+        app.type = null;
+
+        /** 
+         * The full type name of the app, such as "Weavy.Core.Models.Files".
+         * @category properties
+         * @type {string}
+         */
+        app.typeName = null;
+
+        /** 
+         * Will the app open automatically when loaded? Defaults to true. 
+         * @see WeavyApp#options
+         * @category properties
+         * @type {boolean}
+         */
+        app.autoOpen = null;
+
+        /**
+         * The {@link Weavy} instance the app belongs to.
+         * @category properties
+         * @type {Weavy}
+         */
+        app.weavy = weavy;
+
+        /**
+         * The {@link WeavySpace} the app belongs to.
+         * @category properties
+         * @type {WeavySpace}
+         */
+        app.space = space;
+
+        /**
+         * Options for defining the app. Key and type is required.
+         * 
+         * @example
+         * space.app({
+         *   key: "mykey",
+         *   name: "Posts",
+         *   type: "posts",
+         *   container: "#myappcontainer",
+         *   open: false,
+         *   controls: true
+         * });
+         * 
+         * @category options
+         * @typedef
+         * @member
+         * @type {Object}
+         * @property {int} id - The server id of the app. Usually only used to reference a specific app on the server.
+         * @property {string} key - The id representing the app in the context environment.
+         * @property {string} name - The display name of the app.
+         * @property {boolean} open - Should the app panel open automatically? Looks for the {@link WeavySpace#options} if not defined. Defaults to true unless space.options.tabbed is true
+         * @property {Element|jQuery|string} container - The container where the app should be placed.
+         * @property {string} type - The kind of app. <br> • posts <br> • files <br> • messenger <br> • search <br> • tasks <br> • notifications <br> • posts <br> • comments
+         * @property {boolean} controls - Show or hide the panel controls. Defaults to false unless space.options.controls is true.
+         */
+        app.options = options;
+
+        /**
+         * The server data for the app.
+         * 
+         * @example
+         * {
+		 *   id: 2136,
+		 *   guid: "523edd88-4bbf-4547-b60f-2859a6d2ddc1",
+		 *   key: "files",
+		 *   name: "Files",
+		 *   url: "/e/apps/2136",
+		 *   typeName: "Weavy.Core.Models.Files",
+		 *   options: {
+		 *     key: "files",
+		 *     type: "files"
+         *   }
+		 * }
+         * 
+         * @category properties
+         * @typedef
+         * @member
+         * @type {Object}
+         * @property {int} id - The server id for the app.
+         * @property {string} key - The client key for the app.
+         * @property {string} guid - The GUID for the app type.
+         * @property {string} name - User readable title for the app.
+         * @property {string} url - The base url to the app.
+         * @property {string} typeName - The full app type, e.g. "Weavy.Core.Models.Posts"
+         * @property {WeavyApp#options} [options] - Any app definition passed to the server. Should match {@link WeavyApp#options}.
+         */
+        app.data = data;
+
+        // EVENT HANDLERS
+
+        /** 
+         * The parent which the events bubbles to.
+         * @category events
+         * @type {WeavySpace}
+         * @ignore
+         */
+        app.eventParent = space;
+
+        /**
+         * Event listener registration for the specific app. Only recieves events that belong to the app.
+         * 
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").app("myapp").on("open", function(e) { ... })
+         */
+        app.on = weavy.events.on.bind(app);
+
+        /**
+         * One time event listener registration for the specific app. Is only triggered once and only recieves events that belong to the app.
+         *
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").app("myapp").one("open", function(e) { ... })
+         */
+        app.one = weavy.events.one.bind(app);
+
+        /**
+         * Event listener unregistration for the specific app.
+         * 
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").app("myapp").off("open", function(e) { ... })
+         */
+        app.off = weavy.events.off.bind(app);
+
+        /**
+         * Triggers events on the specific app. The events will also bubble up to the space and then the weavy instance.
+         *
+         * @category events
+         * @function
+         * @example
+         * weavy.space("myspace").app("myapp").triggerEvent("myevent", [eventData])
+         */
+        app.triggerEvent = weavy.events.triggerEvent.bind(app);
+
+        /** 
+         * Is the app currently open? Returns the open status of the app panel.
+         * @category properties
+         * @member isOpen
+         * @memberof WeavyApp#
+         * @type {boolean}
+         */
         Object.defineProperty(this, "isOpen", {
             get: function () {
                 weavy.log("isOpen", app.panel, app.panel && app.panel.isOpen);
@@ -72,13 +278,48 @@
             }
         });
 
-        this.isLoaded = false;
-        this.isBuilt = false;
+        /**
+         * Has the app loaded?
+         * @category properties
+         * @type {boolean}
+         */
+        app.isLoaded = false;
 
-        this.whenLoaded = new WeavyPromise();
-        this.whenBuilt = new WeavyPromise();
+        /**
+         * Is the app built? 
+         * @category properties
+         * @type {boolean}
+         */
+        app.isBuilt = false;
 
-        this.configure = function (options, data) {
+        /**
+         * Promise that resolves when the app is loaded.
+         * 
+         * @category promises
+         * @type {WeavyPromise}
+         */
+        app.whenLoaded = new WeavyPromise();
+
+        /**
+         * Promise that resolves when the app is built.
+         * 
+         * @category promises
+         * @type {WeavyPromise}
+         */
+        app.whenBuilt = new WeavyPromise();
+
+        /**
+         * Configure the app with options or data. If the app has data it will also be built. 
+         * Currently existing options are extended with new options.
+         * Data will resolve {@link WeavyApp#whenLoaded} promise.
+         * 
+         * @category methods
+         * @function
+         * @param {WeavyApp#options} options
+         * @param {WeavyApp#data} data
+         * @resolves {WeavyApp#whenLoaded}
+         */
+        app.configure = function (options, data) {
             if (options && typeof options === "object") {
                 app.options = app.weavy.extendDefaults(app.options, options, true);
             }
@@ -138,7 +379,18 @@
             }
         }
 
-        this.fetchOrCreate = function (options, refresh) {
+
+        /**
+         * Sets options and fetches (or creates) the app on the server. Options will replace existing options.
+         * When data is fetched, the {@link WeavyApp#whenLoaded} promise is resolved.
+         * 
+         * @category methods
+         * @function
+         * @param {WeavyApp#options} [options] - Optional new app options
+         * @returns {WeavyApp#whenLoaded}
+         * @resolves {WeavyApp#whenLoaded}
+         */
+        app.fetchOrCreate = function (options) {
 
             if (options && typeof options === "object") {
                 app.options = options;
@@ -164,6 +416,19 @@
             return app.whenLoaded();
         }
 
+
+        /**
+         * Converts panel events to app events. Copies all the data from the panel event to the app event. 
+         * Set it as an eventhandler to trigger a new event while passing along event data.
+         * 
+         * @ignore
+         * @function
+         * @param {string} eventName - The name of the event to trigger.
+         * @param {string} panelId - The id of the panel
+         * @param {any} triggerData - The additional data to add to the event.
+         * @param {Event} e - The panel event.
+         * @param {any} data - The data from the panel event.
+         */
         function bridgePanelEvent(eventName, panelId, triggerData, e, data) {
             if (data.panelId === panelId) {
                 for (var tProp in triggerData) {
@@ -185,7 +450,15 @@
             }
         }
 
-        this.build = function () {
+        /**
+         * Builds the app. Creates a shadow root and a panel. Is executed on the {@link Weavy#event:build} event.
+         * 
+         * @category methods
+         * @function
+         * @resolves {WeavyApp#whenBuilt}
+         */
+        app.build = function () {
+            // TODO: return whenBuilt promise
             weavy.authentication.whenAuthorized().then(function () {
                 var root = app.root || app.space && app.space.root;
 
@@ -208,8 +481,40 @@
                         var controls = app.options && app.options.controls !== undefined ? app.options.controls : (app.space.options && app.space.options.controls !== undefined ? app.space.options.controls : false);
                         app.panel = root.container.panels.addPanel(panelId, app.url, { controls: controls });
 
+                        /**
+                         * Triggered when the app panel is opened.
+                         * 
+                         * @category events
+                         * @event WeavyApp#open
+                         * @returns {Object}
+                         * @property {WeavySpace} space - The space that the app belongs to
+                         * @property {WeavyApp} app - The app that fires the event
+                         * @extends WeavyPanel#event:panel-open
+                         */
                         weavy.on("panel-open", bridgePanelEvent.bind(app, "open", panelId, { space: app.space, app: app, destination: null }));
+
+                        /**
+                         * Triggered when the app panel is toggled. Is always followed by either {@link WeavyApp#event:open} event or {@link WeavyApp#event:close} event.
+                         * 
+                         * @category events
+                         * @event WeavyApp#toggle
+                         * @returns {Object}
+                         * @property {WeavySpace} space - The space that the app belongs to
+                         * @property {WeavyApp} app - The app that fires the event
+                         * @extends WeavyPanel#event:panel-toggle
+                         */
                         weavy.on("panel-toggle", bridgePanelEvent.bind(app, "toggle", panelId, { space: app.space, app: app, destination: null }));
+
+                        /**
+                         * Triggered when the app panel is closed.
+                         * 
+                         * @category events
+                         * @event WeavyApp#close
+                         * @returns {Object}
+                         * @property {WeavySpace} space - The space that the app belongs to
+                         * @property {WeavyApp} app - The app that fires the event
+                         * @extends WeavyPanel#event:panel-close
+                         */
                         weavy.on("panel-close", bridgePanelEvent.bind(app, "close", panelId, { space: app.space, app: app }));
 
                         app.whenBuilt.resolve();
@@ -221,6 +526,7 @@
 
         weavy.on("build", app.build.bind(app));
 
+        // Opens the app automatically after build
         app.whenBuilt().then(function () {
             if (app.autoOpen) {
                 app.open();
@@ -237,7 +543,15 @@
         app.configure();
     };
 
-
+    /**
+     * Opens the app panel and optionally loads a destination url after waiting for {@link WeavyApp#whenBuilt}.
+     * If the space is {@link WeavySpace#tabbed} it also closes the other apps in the space.
+     * 
+     * @category panels
+     * @function WeavyApp#open
+     * @param {string} [destination] - Destination url to navigate to on open
+     * @returns {external:Promise}
+     */
     WeavyApp.prototype.open = function (destination) {
         var app = this;
         var weavy = app.weavy;
@@ -258,6 +572,13 @@
         });
     }
 
+    /**
+     * Closes the app panel.
+     * 
+     * @category panels
+     * @function WeavyApp#close
+     * @returns {external:Promise}
+     * */
     WeavyApp.prototype.close = function () {
         var app = this;
         app.autoOpen = false;
@@ -266,6 +587,15 @@
         });
     }
 
+    /**
+     * Toggles the app panel open or closed. It optionally loads a destination url on toggle open.
+     * If the space is {@link WeavySpace#tabbed} it also closes the other apps in the space.
+     * 
+     * @category panels
+     * @function WeavyApp#toggle
+     * @param {string} [destination] - Destination url to navigate to on open
+     * @returns {external:Promise}
+     */
     WeavyApp.prototype.toggle = function (destination) {
         var app = this;
 
@@ -286,6 +616,13 @@
         });
     }
 
+    /**
+     * Removes the app in the client and the DOM. The app will not be removed on the server and can be added and fetched at any point again.
+     * 
+     * @category methods
+     * @function WeavyApp#remove
+     * @returns {external:Promise}
+     */
     WeavyApp.prototype.remove = function () {
         var app = this;
         var space = this.space;
@@ -307,6 +644,16 @@
         return whenRemoved;
     }
 
+    /**
+     * Check if another app or an object is matching this app. It checks for a match of the id property or the key property.
+     * 
+     * @category methods
+     * @function WeavyApp#match
+     * @param {WeavyApp|Object} options
+     * @param {int} [options.id] - Optional id to match.
+     * @param {string} [options.key] - Optional key to match.
+     * @returns {boolean} 
+     */
     WeavyApp.prototype.match = function (options) {
         if (options) {
             if (options.id && this.id) {

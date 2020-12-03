@@ -2575,21 +2575,6 @@ wvy.pdf = { pdfjsWebPDFJS: window.pdfjsDistBuildPdf };
                     return;
                 }
             }
-            var cmd = (evt.ctrlKey ? 1 : 0) | (evt.altKey ? 2 : 0) | (evt.shiftKey ? 4 : 0) | (evt.metaKey ? 8 : 0);
-            if (cmd === 0) {
-                switch (evt.keyCode) {
-                    case 82: // r
-                        PDFViewerApplication.rotatePages(90);
-                        break;
-                }
-            }
-            if (cmd === 4) { // shift
-                switch (evt.keyCode) {
-                    case 82: // r
-                        PDFViewerApplication.rotatePages(-90);
-                        break;
-                }
-            }
         }
         exports.PDFViewerApplication = PDFViewerApplication;
     }));

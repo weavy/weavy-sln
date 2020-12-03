@@ -1,5 +1,11 @@
 # Changelog for Weavy
 
+## 8.0.2 (2020-12-03)
+
+* Fixed issue with rotating doc preview.
+* Fixed issue with starred folders opening in overlay.
+* Client API jsdoc documentation.
+
 ## 8.0.1 (2020-11-19)
 
 * Fixed some issues with client authentication and user change.

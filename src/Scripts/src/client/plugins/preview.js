@@ -33,7 +33,7 @@
      * 
      * @mixin PreviewPlugin
      * @returns {Weavy.plugins.preview}
-     * @typicalname weavy
+     * @typicalname weavy.plugins.preview
      */
     var PreviewPlugin = function (options) {
         /** 
@@ -42,6 +42,28 @@
          */
         var weavy = this;
 
+        /**
+         * The panel for previewing Content
+         * @member PreviewPlugin~contentPanel
+         * @type {?WeavyPanels~panel}
+         * @returns {weavy.nodes.contentPanel}
+         * @see {@link Weavy#nodes}
+         */
+        weavy.nodes.contentPanel = null;
+
+        /**
+         * The panel for previewing Attachments
+         * @member PreviewPlugin~previewPanel
+         * @type {?WeavyPanels~panel}
+         * @returns {weavy.nodes.previewPanel}
+         * @see {@link Weavy#nodes}
+         */
+        weavy.nodes.contentPanel = null;
+
+        /**
+         * Requests the topmost open panel to make a prev navigation
+         * @param {Event} e
+         */
         function requestPrev(e) {
             if (weavy.nodes.previewPanel.isOpen) {
                 weavy.nodes.previewPanel.postMessage({ name: "request:prev" });
@@ -52,6 +74,10 @@
             }
         }
 
+        /**
+         * Requests the topmost open panel to make a next navigation
+         * @param {Event} e
+         */
         function requestNext(e) {
             if (weavy.nodes.previewPanel.isOpen) {
                 e.stopImmediatePropagation();
@@ -80,11 +106,17 @@
             }
         })
 
+        /**
+         * Recieves a prev request from a panel and sends it to the topmost open preview panel.
+         **/
         weavy.on(wvy.postal, "request:prev", weavy.getId(), function (e, message) {
             weavy.log("bouncing request:prev");
             requestPrev(e);
         });
 
+        /**
+         * Recieves a next request from a panel and sends it to the topmost open preview panel.
+         **/
         weavy.on(wvy.postal, "request:next", weavy.getId(), function (e, message) {
             weavy.log("bouncing request:next");
             requestNext(e);
@@ -100,15 +132,6 @@
             weavy.nodes.previewPanel.isLoaded = false;
             weavy.nodes.previewPanel.open(previewUrl).then(focus);
         });
-
-        function focus(open) {
-            var panel = open.panelId === options.contentFrameName ? weavy.nodes.contentPanel : weavy.nodes.previewPanel
-            try {
-                panel.frame.contentWindow.focus();
-            } catch (e) {
-                panel.frame.focus();
-            }
-        }
 
         // CONTENT PREVIEW
         weavy.on(wvy.postal, "content-open", weavy.getId(), function (e, message) {
@@ -146,8 +169,29 @@
                     weavy.nodes.previewPanel.isLoaded = false;
                 });
             }
-        })
+        });
 
+        /**
+         * Tries to focus a preview panel frame
+         * 
+         * @param {Object} open - Object with panel data
+         * @property {string} open.panelId - The id of the panel to focus; "content" or "preview".
+         */
+        function focus(open) {
+            var panel = open.panelId === options.contentFrameName ? weavy.nodes.contentPanel : weavy.nodes.previewPanel
+            try {
+                panel.frame.contentWindow.focus();
+            } catch (e) {
+                panel.frame.focus();
+            }
+        }
+
+        /**
+         * Opens a url in a preview panel. If the url is an attachment url it will open in the preview panel.
+         * 
+         * @memberof PreviewPlugin#
+         * @param {string} url - The url to the preview page to open
+         */
         function open(url) {
             var attachmentUrl = /^(.*)(\/attachments\/[0-9]+\/?)(.+)?$/.exec(url);
             if (attachmentUrl) {
@@ -158,6 +202,10 @@
             }
         }
 
+        /**
+         * Closes all open preview panels.
+         * @memberof PreviewPlugin#
+         **/
         function closeAll() {
             return $.when(weavy.nodes.previewPanel.close(), weavy.nodes.contentPanel.close());
         }
@@ -174,7 +222,8 @@
      * 
      * @example
      * Weavy.plugins.preview.defaults = {
-     *     frameName: "preview"
+     *   previewFrameName: "preview",
+     *   contentFrameName: "content"
      * };
      * 
      * @name defaults

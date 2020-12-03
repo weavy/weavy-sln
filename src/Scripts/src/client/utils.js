@@ -28,18 +28,43 @@
 
     var WeavyUtils = {};
 
+    /**
+     * Always returns an Array.
+     * 
+     * @example
+     * WeavyUtils.asArray(1); // [1]
+     * WeavyUtils.asArray([1]); // [1]
+     * 
+     * @param {any} maybeArray
+     */
     WeavyUtils.asArray = function (maybeArray) {
         return maybeArray && ($.isArray(maybeArray) ? maybeArray : [maybeArray]) || [];
     };
 
+    /**
+     * Generate a S4 alphanumeric 4 character sequence suitable for non-sensitive GUID generation etc.
+     */
     WeavyUtils.S4 = function () {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
 
+    /**
+     * Case insensitive string comparison
+     * 
+     * @param {any} str1 - The first string to compare
+     * @param {any} str2 - The second string to compare
+     */
     WeavyUtils.ciEq = function (str1, str2) {
         return typeof str1 === "string" && typeof str2 === "string" && str1.toUpperCase() === str2.toUpperCase();
     };
 
+    /**
+     * Compares two plain objects. Compares all the properties in a to any properties in b.
+     * 
+     * @param {any} a - The plain object to compare with b
+     * @param {any} b - The plain object to compare properties from a to
+     * @param {any} skipLength - Do not compare the number of properties
+     */
     WeavyUtils.eqObjects = function (a, b, skipLength) {
         if (!$.isPlainObject(a) || !$.isPlainObject(b)) {
             return false;

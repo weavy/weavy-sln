@@ -20,24 +20,59 @@
     console.debug("promise.js");
 
     /**
-     * Module for unified promises
-     * 
-     * @module promise
-     * @returns {WeavyPromise}
-     */
-
-
-    /**
-     * Wrapper for jQuery $.Deferred() promise.
+     * Unifying wrapper for jQuery $.Deferred() promise.
      * Use promise.reset() to replace the promise with a new promise.
      * 
+     * @example
+     * // Traditional style promise
+     * new WeavyPromise(function(resolve, reject) {
+     *     resolve()
+     * }).then(function() {
+     *     console.log("resolved");
+     * })
+     * 
+     * @example
+     * // jQuery deferred style promise
+     * var myPromise = new WeavyPromise();
+     * 
+     * myPromise.then(function() {
+     *     console.log("resolved")
+     * });
+     * 
+     * // or function style
+     * myPromise().then(function() {
+     *     console.log("resolved")
+     * });
+     * 
+     * myPromise.resolve();
+     *
+     * @class WeavyPromise
+     * @classdesc Unified promises that can be reset
      * @param {function} executor - Function to be executed while constructing the promise
      * @returns {external:Promise} - A function that acts as the deferred or returns the promise when called
-     * */
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises}
+     **/
     var WeavyPromiseWrapper = function (executor) {
         var deferred;
         var WeavyPromise = function () { return deferred.promise() };
 
+        /**
+         * Resets the promise so that it can be resolved or rejected again.
+         * 
+         * @example
+         * var myPromise = new WeavyPromise();
+         * 
+         * myPromise.resolve(123);
+         * myPromise.reset();
+         * 
+         * myPromise.then(function(num) {
+         *     console.log("the number is", num); // 456
+         * });
+         * myPromise.resolve(456);
+         * 
+         * @name WeavyPromise#reset
+         * @function
+         **/
         (WeavyPromise.reset = function () {
             deferred = $.Deferred();
 
@@ -60,6 +95,14 @@
 
     /**
      * Return an instantly resolved WeavyPromise
+     * 
+     * @example
+     * function doSomething() {
+     *    return WeavyPromise.resolve(1234);
+     * }
+     * 
+     * @name WeavyPromise.resolve
+     * @function
      * @param {any} value
      */
     WeavyPromiseWrapper.resolve = function (value) {
@@ -70,6 +113,14 @@
 
     /**
      * Return an instantly rejected WeavyPromise
+     * 
+     * @example
+     * function doSomething() {
+     *    return WeavyPromise.reject({ errorcode: 404 });
+     * }
+     * 
+     * @name WeavyPromise.reject
+     * @function
      * @param {any} value
      */
     WeavyPromiseWrapper.reject = function (value) {

@@ -140,7 +140,7 @@
          * @property {boolean} [logging.error] - Enable error messages in console.
          * @property {Object.<string, Object>} [plugins] - Properties with the name of the plugins to configure. Each plugin may be enabled or disabled by setting the options to true or false. Providing an Object instead of true will enable the plugin and pass options to the plugin. See the reference for each plugin for available options.
          * @property {boolean} [preload] - Start automatic preloading after load
-         * @property {Array.<WeavySpace~spaceOptions>} spaces - Array of space definititions with apps to initialize spaces directly at initialization. See {@link Weavy#space}.
+         * @property {Array.<WeavySpace#options>} spaces - Array of space definititions with apps to initialize spaces directly at initialization. See {@link Weavy#space}.
          * @property {string} [tz] - Timezone identifier, e.g. <code>Pacific Standard Time</code>. When specified, this setting overrides the timezone setting on a user´s profile. The list of valid timezone identifiers can depend on the version and operating system of your Weavy server.
          * @property {string} [url] - The URL of the Weavy-installation to connect to. Defaults to the installation where the script came from.
          */
@@ -505,7 +505,7 @@
             var space;
 
             var isSpaceId = Number.isInteger(options);
-            var isSpaceKey = typeof spaceOptions === "string";
+            var isSpaceKey = typeof options === "string";
             var isSpaceConfig = $.isPlainObject(options);
             var spaceSelector = isSpaceConfig && options || isSpaceId && { id: options } || isSpaceKey && { key: options };
 

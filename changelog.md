@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.0.3 (2020-12-04)
+
+* Fixed issue with space/app key selector
+
 ## 8.0.2 (2020-12-03)
 
 * Fixed issue with rotating doc preview.

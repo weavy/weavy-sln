@@ -415,7 +415,7 @@
      */
     function getAppSelector(options) {
         var isId = Number.isInteger(options);
-        var isKey = typeof appOptions === "string";
+        var isKey = typeof options === "string";
         var isConfig = $.isPlainObject(options);
 
         var selector = isConfig && options || isId && { id: options } || isKey && { key: options };

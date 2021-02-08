@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 8.0.4 (2021-02-08)
+
+* Fixed issue where user interface was incorrectly updated after file upload.
+* Fixed issue where edit file dialog displayed original, instead of updated filename.
+
 ## 8.0.3 (2020-12-04)
 
 * Fixed issue with space/app key selector

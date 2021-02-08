@@ -17,7 +17,7 @@
     <form id="content-form" action="@(Url.Action<ContentController>(x => x.Update(Model.Id, null, null)))" method="post" @Html.Attributes(htmlAttributes)>
         @Html.HttpMethodOverride(HttpVerbs.Put)
         @Html.EditorsForModel(exclude: new string[] { nameof(Model.Name) })
-        @Html.EditorFor(x => Model.Blob, additionalViewData: new { DisplayName = "Replace file", DisplayDescription = T["Select new file, or leave as is to keep existing."], Required = false, Remove = false, CloudEnabled = true })
+        @Html.EditorFor(x => Model.Blob, additionalViewData: new { Placeholder = Model.Name, Required = false, Remove = false, CloudEnabled = true })
         <div class="form-buttons">
             <button type="submit" class="btn btn-primary" name="operation" value="update">@Model.MetaData().ModifyVerb</button>
             <button type="submit" class="btn btn-outline-secondary" name="operation" value="cancel" data-dismiss="modal">@T["Cancel"]</button>

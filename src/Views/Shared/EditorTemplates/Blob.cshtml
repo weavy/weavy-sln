@@ -76,7 +76,7 @@
             } else {
                 <input @Html.Attributes(attrs) />
             }
-            <input type="text" class="form-control" placeholder="@(Model?.Name)" />
+            <input type="text" class="form-control" placeholder="@(ViewData["Placeholder"] ?? Model?.Name)" />
             <div class="input-group-append">
                 <button class="btn input-group-text" type="button">@T["Browse"]</button>
             </div>

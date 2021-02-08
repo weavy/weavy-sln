@@ -63,7 +63,7 @@ wvy.content = (function ($) {
 
     // update UI when content in files app is inserted
     wvy.connection.on("content-inserted.weavy", function (e, content) {
-        if (wvy.context.appGuid === filesGuid) {
+        if (wvy.context.appGuid === filesGuid && wvy.context.app === content.appId && wvy.context.content === content.parent) {
 
             // insert item in card view or table
             var $existing = $("[data-id=" + content.id + "][data-content-guid=" + content.guid + "]");

@@ -349,17 +349,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.0.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.0.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.0.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.0.4.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>

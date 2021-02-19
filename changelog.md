@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.0.5 (2021-02-19)
+
+* Fixed an issue with the .off() method in the client preventing handlers to unregister properly.
+
 ## 8.0.4 (2021-02-08)
 
 * Fixed issue where user interface was incorrectly updated after file upload.

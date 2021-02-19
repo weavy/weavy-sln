@@ -95,15 +95,18 @@
         function getEventHandler(event, handler, context, selector) {
             var getHandler = Array.from(arguments || []);
             var eventHandler = _eventHandlers.filter(function (eventHandler) {
-                for (var i = 0; i < getHandler.length; i++) {
-                    if (eventHandler[i] === getHandler[i] || utils.eqObjects(eventHandler[i], getHandler[i])) {
-                        return true;
-                    }
-                }
-                return false;
+                // Check if all arguments match
+                var isMatch = getHandler.reduce(function (isMatch, arg, i) {
+                    var arg2 = eventHandler[i];
+                    var argMatch = arg === arg2 || utils.eqJQuery(arg, arg2) || utils.eqObjects(arg, arg2);
+                    return isMatch === null ? argMatch : isMatch && argMatch; 
+                }, null)
+
+                return !!isMatch;
             }).pop();
 
-            return eventHandler && (eventHandler[4] || eventHandler[0]);
+            // Return wrapped handler [4] or original handler [1]
+            return eventHandler && (eventHandler[4] || eventHandler[1]);
         }
 
         /**
@@ -114,17 +117,23 @@
          * @param {function} handler - The registered handler
          * @param {Object} context - The context for the handler
          * @param {string|Object} [selector] - The optional selector for the handler.
+         * @returns {boolean} - True if any handler was removed
          */
         function unregisterEventHandler(event, handler, context, selector) {
             var removeHandler = Array.from(arguments || []);
+            var handlerRemoved = false;
             _eventHandlers = _eventHandlers.filter(function (eventHandler) {
+                var isHandlerMatch = false;
                 for (var i = 0; i < removeHandler.length; i++) {
-                    if (eventHandler[i] !== removeHandler[i] && !utils.eqObjects(eventHandler[i], removeHandler[i])) {
-                        return true;
+                    if (eventHandler[i] === removeHandler[i] || utils.eqObjects(eventHandler[i], removeHandler[i])) {
+                        isHandlerMatch = true;
+                        handlerRemoved = true;
                     }
                 }
-                return false;
+                return !isHandlerMatch; // Keep all handlers that don't match
             });
+
+            return handlerRemoved;
         }
 
         /**
@@ -212,7 +221,7 @@
          * @returns {object} if the context has `.on()` return it, otherwise try to return a jQuery context or lastly return a root context or document context.
          */
         function validateContext(context) {
-            return context && context.on && context || context && $(context) || (context ? $(root) : $(document))
+            return context && context.on && context || context && $(context).length && $(context) || (context ? $(root) : $(document))
         }
 
 
@@ -313,9 +322,9 @@
 
             var offHandler = getEventHandler(args.events, args.handler, args.context, args.selector);
 
-            unregisterEventHandler(args.events, args.handler, args.context, args.selector);
+            var handlerRemoved = unregisterEventHandler(args.events, args.handler, args.context, args.selector);
 
-            if (offHandler) {
+            if (handlerRemoved && offHandler) {
                 if (args.context && typeof args.context.off === "function") {
                     if (typeof args.selector === "string" || $.isPlainObject(args.selector)) {
                         args.context.off(args.events, args.selector, offHandler);
@@ -325,6 +334,8 @@
                 } else {
                     console.warn("event context is missing off handler", offHandler);
                 }
+            } else {
+                console.warn("event off: handler not found", args.events);
             }
         };
 

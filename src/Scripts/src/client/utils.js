@@ -89,6 +89,16 @@
     };
 
     /**
+     * Compares two jQuery objects.
+     *
+     * @param {any} a - The first jQuery object to compare
+     * @param {any} b - The second jQuery object to compare
+     */
+    WeavyUtils.eqJQuery = function (a, b) {
+        return a instanceof $ && b instanceof $ && a.length === b.length && a.length === a.filter(b).length;
+    }
+
+    /**
      * Makes a replaceable returning function of a variable.
      * 
      * @example
@@ -183,6 +193,15 @@
 
         return value;
     };
+
+    WeavyUtils.URL = function (url) {
+        var a;
+        var link = new URL(url) || new window.URL(url) || (a = document.createElement("a")) && (a.href = url) && a;
+        if (link && !link.searchParams) {
+            link.searchParams = new URLSearchParams(link.search);
+        }
+        return link;
+    }
 
     return WeavyUtils;
 }));

@@ -349,17 +349,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.0.5.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -4128,9 +4128,9 @@
     <Content Include="Views\Directories\New.cshtml" />
     <Content Include="Views\Directories\People.cshtml" />
     <Content Include="Views\Email\_Layout.cshtml" />
-    <Content Include="Views\Email\_ViewStart.cshtml" />
     <Content Include="Views\Email\Conversation.cshtml" />
     <Content Include="Views\Email\DailyDigest.cshtml" />
+    <Content Include="Views\Email\Example.cshtml" />
     <Content Include="Views\Email\Notification.cshtml" />
     <Content Include="Views\Email\PasswordReset.cshtml" />
     <Content Include="Views\Email\Test.cshtml" />
@@ -4269,7 +4269,6 @@
     <Content Include="Views\Test\_Localization.cshtml" />
     <Content Include="Views\Test\Api.cshtml" />
     <Content Include="Views\Test\Client.cshtml" />
-    <Content Include="Views\Test\Email.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\LoremIpsum.cshtml" />
     <Content Include="Views\Test\Redirected.cshtml" />

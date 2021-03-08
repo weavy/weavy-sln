@@ -1,4 +1,8 @@
-﻿@model Weavy.Core.Models.TestEmail
+﻿@model TestEmail
+@{ 
+    Layout = "_Layout.cshtml";
+    ViewBag.Title = T["Test message from {0}", Model.Theme.Name]; 
+}
 @* STANDARD MODULE // *@
 <tr>
     <td align="center" valign="top">

@@ -40,13 +40,13 @@
             <div class="dropdown align-self-center ml--4">
                 <button type="button" class="btn btn-sm btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Toggle Dropdown">@Svg.Icon("menu-down")</button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">@Svg.Icon("email") Email Template</a>
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.ConversationEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Conversation</a>
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.DailyDigestEmail(false, null)))" data-turbolinks="false">@Svg.Icon("email") Daily digest</a>
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.NotificationEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Notification</a>
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.PasswordResetEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Password reset</a>
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.TestEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Test</a>
-                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.WelcomeEmail(false)))" data-turbolinks="false">@Svg.Icon("email") Welcome</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.Email()))" data-turbolinks="false">@Svg.Icon("email") Example</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.ConversationEmail(null)))" data-turbolinks="false">@Svg.Icon("email") Conversation</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.DailyDigestEmail(null)))" data-turbolinks="false">@Svg.Icon("email") Daily digest</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.NotificationEmail()))" data-turbolinks="false">@Svg.Icon("email") Notification</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.PasswordResetEmail()))" data-turbolinks="false">@Svg.Icon("email") Password reset</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.TestEmail()))" data-turbolinks="false">@Svg.Icon("email") Test</a>
+                    <a class="dropdown-item" href="@(Url.Action<TestController>(c => c.WelcomeEmail()))" data-turbolinks="false">@Svg.Icon("email") Welcome</a>
                 </div>
             </div>
             <button type="button" class="nav-link nav-icon" title="Nav link with icon and badge">@Svg.Icon("bell") <span class="badge badge-danger">4</span></button>

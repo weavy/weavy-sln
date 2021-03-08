@@ -1,5 +1,11 @@
 # Changelog for Weavy
 
+## 8.1.0 (2021-03-08)
+
+* Added ability to customize email templates for notifications etc.
+* Added fulltext text search option for notifications.
+* Fixed issue with notifications being sent for trashed entities.
+
 ## 8.0.5 (2021-02-19)
 
 * Fixed an issue with the .off() method in the client preventing handlers to unregister properly.

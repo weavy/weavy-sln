@@ -5182,17 +5182,11 @@
               Base class for email models.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.EmailModel.#ctor(System.String,Weavy.Core.Models.User)">
+        <member name="M:Weavy.Core.Models.EmailModel.#ctor(Weavy.Core.Models.User)">
             <summary>
             Creates a new instance of the <see cref="T:Weavy.Core.Models.EmailModel"/> class.
             </summary>
-            <param name="subject">The subject line for the email.</param>
             <param name="to">The recipient of the email.</param>
-        </member>
-        <member name="P:Weavy.Core.Models.EmailModel.Subject">
-            <summary>
-            Gets the email subject.
-            </summary>
         </member>
         <member name="P:Weavy.Core.Models.EmailModel.User">
             <summary>
@@ -5209,11 +5203,10 @@
               A model for notifying users about unread messages in a conversation.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.ConversationEmail.#ctor(System.String,Weavy.Core.Models.User,Weavy.Core.Models.Conversation,System.Collections.Generic.IEnumerable{Weavy.Core.Models.Message})">
+        <member name="M:Weavy.Core.Models.ConversationEmail.#ctor(Weavy.Core.Models.User,Weavy.Core.Models.Conversation,System.Collections.Generic.IEnumerable{Weavy.Core.Models.Message})">
             <summary>
             Creates a new instance of the <see cref="T:Weavy.Core.Models.ConversationEmail"/> class.
             </summary>
-            <param name="subject">The subject line for the email.</param>
             <param name="to">The recipient of the email.</param>
             <param name="conversation">The conversation to display in the email.</param>
             <param name="messages">The messages to display in the email.</param>
@@ -5233,11 +5226,10 @@
               An object representing the daily digest email.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.DailyDigestEmail.#ctor(System.String,Weavy.Core.Models.User,System.Collections.Generic.IList{Weavy.Core.Models.Notification})">
+        <member name="M:Weavy.Core.Models.DailyDigestEmail.#ctor(Weavy.Core.Models.User,System.Collections.Generic.IList{Weavy.Core.Models.Notification})">
             <summary>
             Daily Digest
             </summary>
-            <param name="subject"></param>
             <param name="to"></param>
             <param name="notifications"></param>
         </member>
@@ -5251,11 +5243,10 @@
               An model for notifying users about an unread notification.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.NotificationEmail.#ctor(System.String,Weavy.Core.Models.User,System.Collections.Generic.List{Weavy.Core.Models.Notification})">
+        <member name="M:Weavy.Core.Models.NotificationEmail.#ctor(Weavy.Core.Models.User,System.Collections.Generic.List{Weavy.Core.Models.Notification})">
             <summary>
             
             </summary>
-            <param name="subject"></param>
             <param name="to"></param>
             <param name="notifications"></param>
         </member>
@@ -5269,11 +5260,10 @@
               A model for password reset emails.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.PasswordResetEmail.#ctor(System.String,Weavy.Core.Models.User)">
+        <member name="M:Weavy.Core.Models.PasswordResetEmail.#ctor(Weavy.Core.Models.User)">
             <summary>
             
             </summary>
-            <param name="subject"></param>
             <param name="to"></param>
         </member>
         <member name="T:Weavy.Core.Models.WelcomeEmail">
@@ -5281,11 +5271,10 @@
             An model for welcome emails.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.WelcomeEmail.#ctor(System.String,Weavy.Core.Models.User,System.String)">
+        <member name="M:Weavy.Core.Models.WelcomeEmail.#ctor(Weavy.Core.Models.User,System.String)">
             <summary>
             
             </summary>
-            <param name="subject"></param>
             <param name="to"></param>
             <param name="password">The (generated) password.</param>
         </member>
@@ -5299,11 +5288,10 @@
             
             </summary>
         </member>
-        <member name="M:Weavy.Core.Models.TestEmail.#ctor(System.String,Weavy.Core.Models.User)">
+        <member name="M:Weavy.Core.Models.TestEmail.#ctor(Weavy.Core.Models.User)">
             <summary>
             
             </summary>
-            <param name="subject"></param>
             <param name="to"></param>
         </member>
         <member name="P:Weavy.Core.Models.TestEmail.Body">
@@ -5315,6 +5303,17 @@
             <summary>
             
             </summary>
+        </member>
+        <member name="T:Weavy.Core.Models.ExampleEmail">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Models.ExampleEmail.#ctor(Weavy.Core.Models.User)">
+            <summary>
+            
+            </summary>
+            <param name="to"></param>
         </member>
         <member name="T:Weavy.Core.Models.EntityQuery">
             <summary>
@@ -8012,9 +8011,9 @@
             Gets or sets the type of actions to include in the search.
             </summary>
         </member>
-        <member name="P:Weavy.Core.Models.NotificationQuery.InvertLogEntryTypes">
+        <member name="P:Weavy.Core.Models.NotificationQuery.InvertActions">
             <summary>
-            Gets or sets a flag indicating if the event types should be inverted. All notifications except those specified in the event types are returned.
+            Gets or sets a flag indicating if the actions filter should be inverted. All notifications except those specified in <see cref="P:Weavy.Core.Models.NotificationQuery.Actions"/> are returned.
             </summary>
         </member>
         <member name="P:Weavy.Core.Models.NotificationQuery.LogEntryId">
@@ -12842,15 +12841,14 @@
             Static constructor that configures the razor engine.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Utils.RazorUtils.Run(System.String,System.String,System.Object,System.Object)">
+        <member name="M:Weavy.Core.Utils.RazorUtils.Run(System.String,System.Object,System.Object)">
             <summary>
-            Runs a Razor template using the specified layout, template and model.
+            Runs a Razor template using the specified model.
             </summary>
-            <param name="layout">A Razor layout string, or <c>null</c> of no layout should ne used.</param>
-            <param name="template">A Razor template string</param>
+            <param name="templateName">Filename of template to run.</param>
             <param name="model">The model object.</param>
             <param name="viewbag">An object with additional data for the view.</param>
-            <returns>Returns the result of executing the specified razor template.</returns>
+            <returns></returns>
         </member>
         <member name="T:Weavy.Core.Utils.RazorUtils.HtmlTemplate`1">
             <summary>
@@ -12879,6 +12877,13 @@
             </summary>
         </member>
         <member name="M:Weavy.Core.Utils.RazorUtils.HtmlHelper.Raw(System.String)">
+            <summary>
+            Returns markup that is not HTML encoded.
+            </summary>
+            <param name="value">The HTML markup.</param>
+            <returns>The HTML markup without encoding.</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.RazorUtils.HtmlHelper.Raw(System.Web.IHtmlString)">
             <summary>
             Returns markup that is not HTML encoded.
             </summary>
@@ -15069,28 +15074,6 @@
             <param name="scoreDoc"></param>
             <param name="indexDoc"></param>
         </member>
-        <member name="M:Weavy.Core.Lucene.Features.SearchFeature.AddBooleanFilterClause(Weavy.Core.Lucene.IndexQuery,Lucene.Net.Search.FilterClause)">
-            <summary>
-            Helper method that adds a filter clause to the query.
-            </summary>
-            <param name="query"></param>
-            <param name="filterClause"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Lucene.Features.SearchFeature.GetBooleanFilter(Weavy.Core.Lucene.IndexQuery)">
-            <summary>
-            Helper method that wraps the query filter as a boolean filter.
-            </summary>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Lucene.Features.SearchFeature.GetBooleanQuery(Weavy.Core.Lucene.IndexQuery)">
-            <summary>
-            Helper method that wraps the query as a boolean query.
-            </summary>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
         <member name="T:Weavy.Core.Lucene.Features.CreatorFilter">
             <summary>
             A filter that only returns items created by the specified user.
@@ -15455,7 +15438,7 @@
         </member>
         <member name="P:Weavy.Core.Lucene.IndexQuery.WrappedQuery">
             <summary>
-            Gets the <see cref="T:Lucene.Net.Search.Query"/> used to search the index.
+            Gets the <see cref="T:Weavy.Core.Models.Query"/> used to search the index.
             </summary>
         </member>
         <member name="P:Weavy.Core.Lucene.IndexQuery.LuceneQuery">
@@ -15467,6 +15450,19 @@
             <summary>
             Gets or sets the <see cref="T:Lucene.Net.Search.Filter"/> used to search the index.
             </summary>
+        </member>
+        <member name="M:Weavy.Core.Lucene.IndexQuery.AddFilter(Lucene.Net.Search.Filter)">
+            <summary>
+            Helper method that adds a filter caluse to the query.
+            </summary>
+            <param name="filter"></param>
+        </member>
+        <member name="M:Weavy.Core.Lucene.IndexQuery.AddQuery(Lucene.Net.Search.Query,Lucene.Net.Search.Occur)">
+            <summary>
+            Helper method that adds a query clause to the query.
+            </summary>
+            <param name="query"></param>
+            <param name="occur"></param>
         </member>
         <member name="M:Weavy.Core.Lucene.IndexQuery.ToString">
             <summary>
@@ -22052,11 +22048,18 @@
             <param name="smtp">The <see cref="T:System.Net.Mail.SmtpClient"/> settings to use or <c>null</c> to use default settings.</param>
             <param name="linkResources"><c>true</c> to convert image urls in the message to linked resources, otherwise <c>false</c>.</param>
         </member>
+        <member name="M:Weavy.Core.Services.MailService.Create(Weavy.Core.Models.EmailModel,System.Boolean)">
+            <summary>
+            Creates a mail message from the specified <see cref="T:Weavy.Core.Models.EmailModel"/>.
+            </summary>
+            <param name="model">The emnail model.</param>
+            <param name="linkResources"></param>
+        </member>
         <member name="M:Weavy.Core.Services.MailService.Send(Weavy.Core.Models.EmailModel,System.Net.Mail.SmtpClient)">
             <summary>
-            Sends the specified <see cref="T:Weavy.Core.Models.EmailModel"/>.
+            Creates and sends a message based on the specified <see cref="T:Weavy.Core.Models.EmailModel"/>.
             </summary>
-            <param name="model"></param>
+            <param name="model">The email model</param>
             <param name="smtp">The <see cref="T:System.Net.Mail.SmtpClient"/> settings to use or <c>null</c> to use default settings.</param>
         </member>
         <member name="M:Weavy.Core.Services.MailService.SendMail(System.Net.Mail.MailMessage,System.Net.Mail.SmtpClient,System.Boolean)">

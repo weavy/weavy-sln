@@ -1,4 +1,8 @@
-﻿@model Weavy.Core.Models.ConversationEmail
+﻿@model ConversationEmail
+@{ 
+    Layout = "_Layout.cshtml";
+    ViewBag.Title = T["New message from {0}", Model.Conversation.LastMessage.CreatedBy().GetTitle()];
+}
 @* STANDARD MODULE // *@
 <tr>
     <td align="center" valign="top">

@@ -1,6 +1,7 @@
-﻿@model Weavy.Core.Models.EmailModel
+﻿@model ExampleEmail
 @{
-    Layout = "~/Views/Email/_Layout.cshtml";
+    Layout = "_Layout.cshtml";
+    ViewBag.Title = T["Example email"];
 }
 
 @* STANDARD MODULE // *@
@@ -18,9 +19,9 @@
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
                                         <td valign="top" class="textContent">
-                                            <h3>@Title</h3>
+                                            <h3>@ViewBag.Title</h3>
                                             <br />
-                                            A kitten or kitty is a <a href="http://www.weavy.com">juvenile domesticated cat</a>. A feline <strong>litter</strong> usually consists of two to five kittens. To survive, kittens need the care of their mother for the first several weeks of their life. Kittens are highly social animals and spend most of their waking hours playing and interacting with available companions.
+                                            A kitten or kitty is a <a href="https://www.weavy.com">juvenile domesticated cat</a>. A feline <strong>litter</strong> usually consists of two to five kittens. To survive, kittens need the care of their mother for the first several weeks of their life. Kittens are highly social animals and spend most of their waking hours playing and interacting with available companions.
                                         </td>
                                     </tr>
                                 </table>
@@ -55,7 +56,7 @@
                                         <td valign="top" class="textContent">
                                             <h3>Left Column</h3>
                                             <br />
-                                            A kitten or kitty is a <a href="http://www.weavy.com">juvenile domesticated cat</a>. A feline litter usually consists of two to five kittens. To survive, kittens need the care of their mother for the first several weeks of their life. Kittens are highly social animals and spend most of their waking hours playing and interacting with available companions.
+                                            A kitten or kitty is a <a href="https://www.weavy.com">juvenile domesticated cat</a>. A feline litter usually consists of two to five kittens. To survive, kittens need the care of their mother for the first several weeks of their life. Kittens are highly social animals and spend most of their waking hours playing and interacting with available companions.
                                         </td>
                                     </tr>
                                 </table>
@@ -335,7 +336,7 @@
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
             <td valign="top" class="footerContent">
-                Not interested in these emails anymore? Turn them off in your <a href="http://www.weavy.com">notification settings</a>.
+                Some random footer text. With a <a href="https://www.weavy.com">link</a>.
             </td>
         </tr>
     </table>

@@ -1,17 +1,43 @@
 ﻿@model Notifications
 @{
     Title = Model.Name;
+    bool search = false; // true to enable fulltext search
 }
 
-<header class="navbar navbar-light sticky-top">
-    <h6 class="navbar-title mr-auto px-1">@T["Notifications"]</h6>
-    <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="@T["Mark all as read"]">@Svg.Icon("check-all")</button>
-</header>
+@section navbar_tertiary {
+    <nav class="navbar navbar-light">
+        @if (search) {
+            <div class="navbar-icons">
+                @Svg.Icon("bell")
+            </div>
+            <form action="@(Model.Url() + Request.QueryString.Rebuild("q", null).AsQueryString())" method="get" data-turboform>
+                <div class="form-group m-0" role="search">
+                    <input class="form-control" type="search" name="q" id="search-q" value="@Model.Result.Query.Text" placeholder="@T["Search notifications"]" />
+                    @if (Model.Result.Query.Text.IsNullOrEmpty()) {
+                        <button type="submit" class="btn btn-icon">@Svg.Icon("magnify")</button>
+                    } else {
+                        <a href="@Model.Url()" class="btn btn-icon">@Svg.Icon("close")</a>
+                    }
+                </div>
+            </form>
+            <div class="navbar-icons">
+                <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="@T["Mark all as read"]">@Svg.Icon("check-all")</button>
+            </div>
+        } else {
+            <h6 class="navbar-title mr-auto px-1">@T["Notifications"]</h6>
+            <button type="button" class="btn btn-icon btn-primary mr-1" data-read="notifications" title="@T["Mark all as read"]">@Svg.Icon("check-all")</button>
+        }
+    </nav>
+}
 
 <div data-notifications>
     @if (Model.Result.Count == 0) {
         <div class="container-fluid mt-3 empty">
-            <p class="text-center text-muted">@T["All caught up :)"]</p>
+            @if (!string.IsNullOrEmpty(Model.Result.Query.Text)) {
+                <p class="text-center text-muted">@T["Your search - <strong>{0}</strong> - did not match any notifications.", Model.Result.Query.Text]</p>
+            } else {
+                <p class="text-center text-muted">@T["All caught up :)"]</p>
+            }
         </div>
     }
 
@@ -22,3 +48,4 @@
     @Html.ScrollMore(Model.Result)
 
 </div>
+

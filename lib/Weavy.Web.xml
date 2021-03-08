@@ -5611,52 +5611,46 @@
         </member>
         <member name="M:Weavy.Web.Controllers.TestController.Email">
             <summary>
-            Display generic email template.
+            Display example email with a couple of different modules.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.TestController.ConversationEmail(System.Boolean,System.Nullable{System.Int32})">
+        <member name="M:Weavy.Web.Controllers.TestController.ConversationEmail(System.Nullable{System.Int32})">
             <summary>
             Display conversation email.
             </summary>
-            <param name="send"></param>
             <param name="top"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.TestController.DailyDigestEmail(System.Boolean,System.Nullable{System.Int32})">
+        <member name="M:Weavy.Web.Controllers.TestController.DailyDigestEmail(System.Nullable{System.Int32})">
             <summary>
             Display daily digest email.
             </summary>
-            <param name="send"></param>
             <param name="top"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.TestController.NotificationEmail(System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.TestController.NotificationEmail">
             <summary>
             Display notification email.
             </summary>
-            <param name="send"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.TestController.PasswordResetEmail(System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.TestController.PasswordResetEmail">
             <summary>
             Display password reset email.
             </summary>
-            <param name="send"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.TestController.WelcomeEmail(System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.TestController.WelcomeEmail">
             <summary>
             Display welcome email.
             </summary>
-            <param name="send"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.TestController.TestEmail(System.Boolean)">
+        <member name="M:Weavy.Web.Controllers.TestController.TestEmail">
             <summary>
             Display test email.
             </summary>
-            <param name="send"></param>
             <returns></returns>
         </member>
         <member name="T:Weavy.Web.Controllers.ToolsController">

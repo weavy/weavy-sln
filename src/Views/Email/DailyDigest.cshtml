@@ -1,5 +1,8 @@
-﻿@model Weavy.Core.Models.DailyDigestEmail
-@using Weavy.Core.Models
+﻿@model DailyDigestEmail
+@{ 
+    Layout = "_Layout.cshtml";
+    ViewBag.Title = T["Daily digest"];
+}
 @* STANDARD MODULE // *@
 <tr>
     <td align="center" valign="top">

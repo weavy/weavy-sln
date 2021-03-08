@@ -1,5 +1,8 @@
-﻿@model Weavy.Core.Models.WelcomeEmail
-@using Weavy.Core.Services
+﻿@model WelcomeEmail
+@{ 
+    Layout = "_Layout.cshtml";
+    ViewBag.Title = T["Welcome to {0}", Model.Theme.Name];
+}
 @* STANDARD MODULE // *@
 <tr>
     <td align="center" valign="top">
@@ -17,7 +20,7 @@
                                         <td valign="top" class="textContent">
                                             <h3>@T["Welcome to {0}", Model.Theme.Name]</h3>
                                             <br />
-                                            @T["We are using {0} to collaborate and an account was just created for you. These are your account details:", ConfigurationService.ApplicationName]
+                                            @T["We are using {0} to collaborate and an account was just created for you. These are your account details:", Model.Theme.Name]
                                         </td>
                                     </tr>
                                 </table>

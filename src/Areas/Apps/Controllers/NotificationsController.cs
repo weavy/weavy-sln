@@ -20,9 +20,8 @@ namespace Weavy.Areas.Apps.Controllers {
         public override ActionResult Get(Notifications app, Query query) {
 
             app.Result = NotificationService.Search(new NotificationQuery(query) {
-                UserId = User.Id,
-                SearchRead = null,
                 OrderBy = "Id DESC",
+                SearchRead = null,
                 Top = PageSizes.First()
             });
 

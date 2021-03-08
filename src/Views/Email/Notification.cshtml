@@ -1,5 +1,12 @@
-﻿@model Weavy.Core.Models.NotificationEmail
-@using Weavy.Core.Models
+﻿@model NotificationEmail
+@{ 
+    Layout = "_Layout.cshtml";
+    if (Model.Notifications.Count == 1) {
+        ViewBag.Title = Model.Notifications.Single().GetTitle();
+    } else {
+        ViewBag.Title = T[Model.Notifications.Count, "You have {0} new notifications"];        
+    }
+}
 @* NOTIFICATION MODULE // *@
 <tr>
     <td align="center" valign="top">

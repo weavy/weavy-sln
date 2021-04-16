@@ -18,11 +18,11 @@
     @Html.ThemeStyle("~/styles/weavy.scss", htmlAttributes: new { data_turbolinks_track = "reload" })
     @RenderSection("styles", required: false)
     <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
-    @Bundler.Scripts($"~/scripts/resources/resources.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.js", htmlAttributes: new { data_turbolinks_track = "reload" })
-    @Bundler.Scripts("~/scripts/asap.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     @if (WeavyContext.Browser.Browser == "IE") {
         @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     }
+    @Bundler.Scripts($"~/scripts/resources/resources.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.js", htmlAttributes: new { data_turbolinks_track = "reload" })
+    @Bundler.Scripts("~/scripts/asap.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
     @Bundler.Scripts("~/scripts/wvy.bundle", htmlAttributes: new { data_turbolinks_track = "reload", defer = "" })
     @RenderSection("scripts", required: false)
 </head>

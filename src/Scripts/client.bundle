@@ -3,21 +3,24 @@
 ~/scripts/src/authentication.js
 ~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/src/connection.js
-~/scripts/src/client/promise.js
-~/scripts/src/client/utils.js
-~/scripts/src/client/console.js
+~/scripts/src/utils.js
+~/scripts/src/console.js
+~/scripts/src/promise.js
 ~/scripts/src/client/events.js
 ~/scripts/src/client/panels.js
 ~/scripts/src/client/app.js
 ~/scripts/src/client/space.js
 ~/scripts/src/client/navigation.js
+~/scripts/src/client/history.js
 ~/scripts/src/client/weavy.js
 
 # Plugins may be loaded in any order
 #~/scripts/src/client/plugins/_weavy-plugin-helloworld.js
 #~/scripts/src/client/plugins/_weavy-plugin-template.js
 ~/scripts/src/client/plugins/alert.js
+~/scripts/src/client/plugins/authentication-panel.js
+~/scripts/src/client/plugins/deeplinks.js
 ~/scripts/src/client/plugins/filebrowser.js
 ~/scripts/src/client/plugins/preview.js
-~/scripts/src/client/plugins/authentication-panel.js
 ~/scripts/src/client/plugins/theme.js
+~/scripts/src/client/plugins/maximize.js

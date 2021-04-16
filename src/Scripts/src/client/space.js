@@ -7,31 +7,28 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'jquery',
             './app',
-            './utils',
-            './promise'
+            '../utils',
+            '../promise'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(
-            require('jquery'),
             require('./app'),
-            require('./utils'),
-            require('./promise')
+            require('../utils'),
+            require('../promise')
         );
     } else {
         // Browser globals (root is window)
         root.WeavySpace = factory(
-            jQuery,
             root.WeavyApp,
             root.WeavyUtils,
             root.WeavyPromise
         );
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyApp, utils, WeavyPromise) {
+}(typeof self !== 'undefined' ? self : this, function (WeavyApp, utils, WeavyPromise) {
     console.debug("space.js");
 
     /**
@@ -172,7 +169,7 @@
 
         /** 
          * The parent which the events bubbles to.
-         * @category events
+         * @category eventhandling
          * @type {Weavy}
          * @ignore
          */
@@ -181,7 +178,7 @@
         /**
          * Event listener registration for the specific space. Only recieves events that belong to the space or any descendant apps.
          * 
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").on("open", function(e) { ... })
@@ -191,7 +188,7 @@
         /**
          * One time event listener registration for the specific space. Is only triggered once and only recieves events that belong to the space or any descendant apps.
          *
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").one("open", function(e) { ... })
@@ -201,7 +198,7 @@
         /**
          * Event listener unregistration for the specific space.
          * 
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").off("open", function(e) { ... })
@@ -211,7 +208,7 @@
         /**
          * Triggers events on the specific app. The events will also bubble up to the space and then the weavy instance.
          *
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").triggerEvent("myevent", [eventData])
@@ -331,7 +328,7 @@
                 }
 
                 space.isLoaded = true;
-                space.whenLoaded.resolve(space.data);
+                space.whenLoaded.resolve(space);
 
                 if (space.weavy.isLoaded) {
                     space.build();
@@ -389,8 +386,8 @@
                     space.isBuilt = true;
                     space.root = weavy.createRoot(space.container, "space-" + space.id);
                     space.root.container.panels = weavy.panels.createContainer();
-                    space.root.container.appendChild(space.root.container.panels);
-                    space.whenBuilt.resolve();
+                    space.root.container.appendChild(space.root.container.panels.node);
+                    space.whenBuilt.resolve(space);
                 }
             }
         }
@@ -416,7 +413,7 @@
     function getAppSelector(options) {
         var isId = Number.isInteger(options);
         var isKey = typeof options === "string";
-        var isConfig = $.isPlainObject(options);
+        var isConfig = utils.isPlainObject(options);
 
         var selector = isConfig && options || isId && { id: options } || isKey && { key: options };
 
@@ -466,11 +463,13 @@
                 if (appSelector.isConfig) {
                     app = new WeavyApp(weavy, space, options);
                     space.apps.push(app);
-                    $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded(), space.whenLoaded()).then(function () {
+                    Promise.all([weavy.authentication.whenAuthorized(), weavy.whenInitialized(), space.whenLoaded()]).then(function () {
                         app.fetchOrCreate();
+                    }).catch(function (reason) {
+                        weavy.warn("Could not fetchOrCreate space", reason || "");
                     });
                 } else {
-                    weavy.warn("App " + (appSelector.isConfig ? JSON.stringify(appSelector) : options) + " does not exist." + (appSelector.isId ? "" : " \n Use weavy.space(" + (space.key && "\"" + space.key + "\"" || space.id || "...") + ").app(" + JSON.stringify(appSelector.selector) + ") to create the app."))
+                    weavy.warn("App " + JSON.stringify(appSelector.selector) + " does not exist." + (appSelector.isId ? "" : " \n Use weavy.space(" + (space.key && "\"" + space.key + "\"" || space.id || "...") + ").app(" + JSON.stringify(appSelector.selector) + ") to create the app."))
                 }
             }
         }
@@ -505,6 +504,8 @@
             if (spaceRoot) {
                 spaceRoot.remove();
             }
+        }, function (reason) {
+            weavy.warn("Could not remove apps in space " + space.id + ".", reason);
         });
     }
 
@@ -525,7 +526,7 @@
             }
 
             if (options.key && this.key) {
-                return utils.ciEq(options.key, this.key);
+                return utils.eqString(options.key, this.key);
             }
         }
 

@@ -7,25 +7,22 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'jquery',
-            './utils'
+            '../utils'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(
-            require('jquery'),
-            require('./utils')
+            require('../utils')
         );
     } else {
         // Browser globals (root is window)
         root.WeavyEvents = factory(
-            jQuery,
             root.WeavyUtils
         );
     }
-}(typeof self !== 'undefined' ? self : this, function ($, utils) {
+}(typeof self !== 'undefined' ? self : this, function (utils) {
     console.debug("events.js");
 
     /**
@@ -35,7 +32,7 @@
      * 
      * The event system provides event-chaining with a bubbling mechanism that propagates all the way from the emitting child trigger to the root instance.
      * 
-     * **NOTE:** Each weavy instance has an event handler instance exposed as `weavy.events`. So references to `weavyEvents.triggerEvent()` in this documentation would translate to `weavy.events.triggerEvent()`.
+     * **NOTE:** Each weavy instance has an event handler instance exposed as `weavy.events`. So references to `.triggerEvent()` in this documentation would translate to `weavy.events.triggerEvent()`.
      * For convenience the `.on()`, `.one()` and `.off()` functions are exposed directly on the weavy instance as `weavy.on()`, `weavy.one()` and `weavy.off()`.
      * They are also exposed as child object functions on spaces and apps as `space.on()` and `app.on()` etc.
      * 
@@ -57,9 +54,9 @@
     /**
      * @constructor
      * @hideconstructor
-     * @param {Object} root - The base for all events, usually the Weavy instance. Children may reuse the same methods applying themselves as this.
+     * @param {Object} rootTarget - The base for all events, usually the Weavy instance. Children may reuse the same methods applying themselves as this.
      */
-    var WeavyEvents = function (root) {
+    var WeavyEvents = function (rootTarget) {
         /** 
          *  Reference to this instance
          *  @lends WeavyEvents#
@@ -73,99 +70,110 @@
          * Saves a single eventhandler.
          * 
          * @internal
-         * @param {string} event - One or more events. Multiple events are currently not registered individually.
-         * @param {function} handler - The handler function
+         * @function
          * @param {Object} context - The context for the handler
+         * @param {string} event - One or more events. Multiple events are currently not registered individually.
          * @param {string|Object} [selector] - Optional refinement selector
-         * @param {function} [wrappingHandler] - Optional wrapped event handler. Used when wrapping the event into a once-handler.
+         * @param {function} handler - The handler function. may be wrapped for once-handlers
+         * @param {function} originalHandler - The original non-wrapped event handler.
+         * @param {boolean} external - Is the handler using an external event system
          */
-        function registerEventHandler(event, handler, context, selector, wrappingHandler) {
-            _eventHandlers.push(Array.from(arguments || []));
+        function registerEventHandler(context, events, selector, handler, originalHandler, external) {
+            _eventHandlers.push({ context: context, events: events, selector: selector, handler: handler, originalHandler: originalHandler, external: external });
         }
 
         /**
          * Returns the event handler or wrapped event handler. The arguments must match the registered event handler.
          * 
          * @internal
+         * @function
          * @param {string} event - The events registered
          * @param {function} handler - The registered handler
          * @param {Object} context - The context for the handler
          * @param {string|Object} [selector] - The optional selector for the handler.
          */
-        function getEventHandler(event, handler, context, selector) {
-            var getHandler = Array.from(arguments || []);
+        function getEventHandler(context, events, selector, handler, originalHandler, external) {
+            var getHandler = { context: context, events: events, selector: selector, handler: handler, originalHandler: originalHandler, external: external };
             var eventHandler = _eventHandlers.filter(function (eventHandler) {
                 // Check if all arguments match
-                var isMatch = getHandler.reduce(function (isMatch, arg, i) {
-                    var arg2 = eventHandler[i];
-                    var argMatch = arg === arg2 || utils.eqJQuery(arg, arg2) || utils.eqObjects(arg, arg2);
-                    return isMatch === null ? argMatch : isMatch && argMatch; 
-                }, null)
-
-                return !!isMatch;
+                return utils.eqObjects(getHandler, eventHandler, true);
             }).pop();
 
-            // Return wrapped handler [4] or original handler [1]
-            return eventHandler && (eventHandler[4] || eventHandler[1]);
+            return eventHandler && eventHandler.handler;
         }
 
         /**
          * Unregister an event handler. Arguments must match the registered event handler.
          * 
          * @internal
+         * @function
          * @param {string} event - The events registered
          * @param {function} handler - The registered handler
          * @param {Object} context - The context for the handler
          * @param {string|Object} [selector] - The optional selector for the handler.
          * @returns {boolean} - True if any handler was removed
          */
-        function unregisterEventHandler(event, handler, context, selector) {
-            var removeHandler = Array.from(arguments || []);
+        function unregisterEventHandler(context, events, selector, handler, originalHandler, external) {
+            var removeHandler = { context: context, events: events, selector: selector, handler: handler, originalHandler: originalHandler, external: external };
             var handlerRemoved = false;
-            _eventHandlers = _eventHandlers.filter(function (eventHandler) {
-                var isHandlerMatch = false;
-                for (var i = 0; i < removeHandler.length; i++) {
-                    if (eventHandler[i] === removeHandler[i] || utils.eqObjects(eventHandler[i], removeHandler[i])) {
-                        isHandlerMatch = true;
-                        handlerRemoved = true;
-                    }
+
+            _eventHandlers.forEach(function (eventHandler, eventHandlerIndex) {
+                // Check if all arguments match
+                if (utils.eqObjects(removeHandler, eventHandler, true)) {
+                    handlerRemoved = true;
+                    _eventHandlers.splice(eventHandlerIndex, 1);
                 }
-                return !isHandlerMatch; // Keep all handlers that don't match
             });
 
             return handlerRemoved;
         }
 
         /**
-         * Clears all registered eventhandlers
-         * @category eventhandling
+         * Triggers any local event handlers registered. Each handler may modify the data and return it or return false to cancel the event chain. .stopPropagation() and .preventDefault() may also be used.
+         * 
+         * @example
+         * weavyEvents.on("myevent", function(e, data) { ... })
+         * 
+         * triggerHandler(this, "myevent", { key: 1 })
+         * 
+         * @internal
+         * @function
+         * @param {any} target - The target in the event chain where the event should be triggered.
+         * @param {any} eventName - The name of the event. Event names without prefix will also trigger handlers with the "on:" prefix.
+         * @param {any} data - Any data to pass to the handler as second argument
          */
-        weavyEvents.clear = function () {
-            _eventHandlers.forEach(function (eventHandler) {
-                var events = eventHandler[0];
-                var handler = eventHandler[1];
-                var context = eventHandler[2];
-                var selector = eventHandler[3];
-                var attachedHandler = eventHandler[4];
+        function triggerHandler(target, eventName, data) {
+            var event = new CustomEvent(eventName, { cancelable: true });
+            var isCancelled = false;
+            //TODO: Handle stopImmediatePropagation using wrapper function
 
-                if (context && typeof context.off === "function") {
-                    if (typeof selector === "string" || $.isPlainObject(selector)) {
-                        context.off(events, selector, attachedHandler || handler);
-                    } else {
-                        context.off(events, attachedHandler || handler);
-                    }
-                } else {
-                    console.warn("event context is missing off handler", eventHandler);
+            _eventHandlers.forEach(function (eventHandler) {
+                if (!eventHandler.external && eventHandler.context === target) {
+                    eventHandler.events.split(" ").forEach(function (eventHandlerName) {
+                        // Normalize on:
+                        eventHandlerName = eventHandlerName.indexOf("on:") === 0 ? eventHandlerName.split("on:")[1] : eventHandlerName;
+                        if (eventName === eventHandlerName) {
+                            // Trigger the handler
+                            var returnData = eventHandler.handler(event, data);
+                            if (returnData) {
+                                data = returnData;
+                            } else if (returnData === false) {
+                                isCancelled = true;
+                            }
+                        }
+                    })
                 }
             });
-            _eventHandlers = [];
+
+            return isCancelled || event.cancelBubble || event.defaultPrevented ? false : data;
         }
 
         /**
          * Extracts and normalizes all parts of the events arguments.
          * 
          * @internal
-         * @param {Object} contextRoot - The context for the events
+         * @function
+         * @param {Object} contextTarget - The context for the events
          * @param {Array.<Object>} eventArguments - The function argument list: `[context], events, [selector], handler`
          * @returns {Object}
          * @property {Object} context - The context for the event. Must have an `.on()` function.
@@ -174,56 +182,76 @@
          * @property {function} handler - The handler function
          * @
          */
-        function getEventArguments(contextRoot, eventArguments) {
+        function getEventArguments(contextTarget, eventArguments) {
             var context, events, selector, handler;
 
             var localEvent = typeof eventArguments[1] === "function" && eventArguments[1];
-            var namespace = localEvent ? ".event.weavy" : "";
 
             if (localEvent) {
                 // Local event
                 handler = typeof eventArguments[1] === 'function' ? eventArguments[1] : eventArguments[2];
                 selector = typeof eventArguments[1] === 'function' ? null : eventArguments[1];
                 events = eventArguments[0];
-                context = weavyEvents === contextRoot ? $(root) : $(contextRoot);
+                context = weavyEvents === contextTarget ? rootTarget : contextTarget;
             } else {
-                // Global event
+                // External event
                 handler = typeof eventArguments[2] === 'function' ? eventArguments[2] : eventArguments[3];
                 selector = typeof eventArguments[2] === 'function' ? null : eventArguments[2];
                 events = eventArguments[1];
                 context = eventArguments[0];
+                context = validateContext(context);
             }
 
-            context = validateContext(context);
-
-            // Supports multiple events separated by space
-            events = localEvent ? namespaceEvents(events, namespace) : events;
-
-            return { context: context, events: events, selector: selector, handler: handler };
+            return { context: context, events: events, selector: selector, handler: handler, external: !localEvent };
         }
 
-        /**
-         * Adds an event namespace to all events in a string.
-         * 
-         * @internal
-         * @param {string} events - The string with space separeated events.
-         * @param {string} namespace - The namespace to add.
-         */
-        function namespaceEvents(events, namespace) {
-            return events.split(" ").map(function (eventName) { return eventName.indexOf(namespace) === -1 ? eventName + namespace : eventName; }).join(" ")
-        }
 
         /**
          * Gets an valid context.
          * 
          * @internal
+         * @function
          * @param {any} context The context to validate and return if valid.
-         * @returns {object} if the context has `.on()` return it, otherwise try to return a jQuery context or lastly return a root context or document context.
+         * @returns {object} if the context has `.on()` return it, otherwise try to return a context element or lastly return the root context.
          */
         function validateContext(context) {
-            return context && context.on && context || context && $(context).length && $(context) || (context ? $(root) : $(document))
+            if (context) {
+                if (context.on) {
+                    return context;
+                }
+
+                var contextElement = utils.asElement(context);
+                if (contextElement) {
+                    return contextElement;
+                }
+            }
+
+            return rootTarget;
         }
 
+        /**
+         * Get the event chain for the triggering object. All the objects in the chain except the root must have a link to their parent defined by a .eventParent property.
+         * 
+         * @internal
+         * @param {Object} currentTarget - The triggering target.
+         * @param {Object} rootTarget - The event root target.
+         * @returns {Array.<Object>} All objects in the chain. Starts with the currentTarget and ends with the rootTarget.
+         */
+        function getEventChain(currentTarget, rootTarget) {
+            var eventChain = [];
+            var currentLevel = currentTarget;
+            while (currentLevel !== rootTarget && currentLevel.eventParent) {
+                eventChain.push(currentLevel);
+                currentLevel = currentLevel.eventParent;
+            }
+            if (currentLevel === rootTarget) {
+                eventChain.push(rootTarget);
+                return eventChain;
+            } else {
+                // No complete chain, return currentTarget and rootTarget
+                return [currentTarget, rootTarget];
+            }
+        }
 
         /**
          * Registers one or several event listneres. All event listners are managed and automatically unregistered on destroy.
@@ -245,17 +273,18 @@
          * @example <caption>Button event</caption>
          * weavyEvents.on(myButton, "click", function() { ... })
          *   
-         * @example <caption>Multiple document event listeners using jQuery selector</caption>
-         * weavyEvents.on(document, "show.bs.modal hide.bs.modal", ".modal", function() { ... })
+         * @example <caption>Multiple document event listeners using jQuery context and selector</caption>
+         * weavyEvents.on($(document), "show.bs.modal hide.bs.modal", ".modal", function() { ... })
          * 
          * @category eventhandling
+         * @function
+         * @name WeavyEvents#on
          * @param {Element} [context] - Context Element. If omitted it defaults to the Weavy instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
-         * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
+         * @param {string|Object} [selector] - Only applicable if the context supports selectors, for instance jQuery.on().
          * @param {function} handler - The listener. The first argument is always the event, followed by any data arguments provided by the trigger.
-         * @see The underlying jQuery.on: {@link http://api.jquery.com/on/}
          */
-        weavyEvents.on = function (context, events, selector, handler) {
+        this.on = function (context, events, selector, handler) {
             var argumentsArray = Array.from(arguments || []);
             var args = getEventArguments(this, argumentsArray);
             var once = argumentsArray[4];
@@ -272,23 +301,51 @@
                             console.warn("Could not invoke one handler:", e);
                         }
                     }
-                    unregisterEventHandler(args.events, args.handler, args.context, args.selector);
+                    unregisterEventHandler(args.context, args.events, args.selector, null, args.handler, args.external);
                 };
 
-                registerEventHandler(args.events, args.handler, args.context, args.selector, attachedHandler);
+                registerEventHandler(args.context, args.events, args.selector, attachedHandler, args.handler, args.external);
 
-                if (typeof args.selector === "string" || $.isPlainObject(args.selector)) {
-                    args.context.one(args.events, args.selector, attachedHandler);
-                } else {
-                    args.context.one(args.events, attachedHandler);
+                if (args.external) {
+                    if (typeof args.selector === "string" || utils.isPlainObject(args.selector)) {
+                        if (typeof args.context.one === "function") {
+                            args.context.one(args.events, args.selector, attachedHandler);
+                        } else {
+                            rootTarget.warn("external .one() target does not support selectors")
+                        }
+                    } else {
+                        if (typeof args.context.one === "function") {
+                            args.context.one(args.events, attachedHandler);
+                        } else if (args.context instanceof EventTarget) {
+                            args.events.split(" ").forEach(function (eventName) {
+                                args.context.addEventListener(eventName, attachedHandler, { once: true });
+                            });
+                        } else {
+                            rootTarget.warn("external target does not have valid event listening");
+                        }
+                    }
                 }
             } else {
-                registerEventHandler(args.events, args.handler, args.context, args.selector);
+                registerEventHandler(args.context, args.events, args.selector, args.handler, args.handler, args.external);
 
-                if (typeof args.selector === "string" || $.isPlainObject(args.selector)) {
-                    args.context.on(args.events, args.selector, args.handler);
-                } else {
-                    args.context.on(args.events, args.handler);
+                if (args.external) {
+                    if (typeof args.selector === "string" || utils.isPlainObject(args.selector)) {
+                        if (typeof args.context.one === "function") {
+                            args.context.on(args.events, args.selector, args.handler);
+                        } else {
+                            rootTarget.warn("external .on() target does not support selectors")
+                        }
+                    } else {
+                        if (typeof args.context.on === "function") {
+                            args.context.on(args.events, args.handler);
+                        } else if (args.context instanceof EventTarget) {
+                            args.events.split(" ").forEach(function (eventName) {
+                                args.context.addEventListener(eventName, args.handler);
+                            });
+                        } else {
+                            rootTarget.warn("external target does not have valid event listening");
+                        }
+                    }
                 }
             }
         };
@@ -296,72 +353,102 @@
         /**
          * Registers one or several event listneres that are executed once. All event listners are managed and automatically unregistered on destroy.
          * 
-         * Similar to {@link Weavy#on}.
+         * Similar to {@link WeavyEvents#on}.
          * 
          * @category eventhandling
+         * @function
+         * @name WeavyEvents#one
          * @param {Element} [context] - Context Element. If omitted it defaults to the Weavy instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
-         * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
-         * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
+         * @param {string|Object} [selector] - Only applicable if the context supports selectors, for instance jQuery.on().
+         * @param {Function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
          */
-        weavyEvents.one = function (context, events, selector, handler) {
-            weavyEvents.on.call(this, context, events, selector, handler, true);
+        this.one = function (context, events, selector, handler) {
+            this.on.call(this, context, events, selector, handler, true);
         };
 
         /**
          * Unregisters event listneres. The arguments must match the arguments provided on registration using .on() or .one().
          *
          * @category eventhandling
+         * @function
+         * @name WeavyEvents#off
          * @param {Element} [context] - Context Element. If omitted it defaults to the Weavy instance. weavy.connection and wvy.postal may also be used as contexts.
          * @param {string} events - One or several event names separated by spaces. You may provide any namespaces in the names or use the general namespace parameter instead.
-         * @param {string} [selector] - Only applicable if the context is an Element. Uses the underlying jQuery.on syntax.
+         * @param {string} [selector] - Only applicable if the context supports selectors, for instance jQuery.on().
          * @param {function} handler - The listener. The first argument is always the event, folowed by any data arguments provided by the trigger.
          */
-        weavyEvents.off = function (context, events, selector, handler) {
+        this.off = function (context, events, selector, handler) {
             var args = getEventArguments(this, Array.from(arguments || []));
 
             var offHandler = getEventHandler(args.events, args.handler, args.context, args.selector);
 
-            var handlerRemoved = unregisterEventHandler(args.events, args.handler, args.context, args.selector);
+            var handlerRemoved = unregisterEventHandler(args.context, args.events, args.selector, offHandler, args.handler, args.external);
 
             if (handlerRemoved && offHandler) {
-                if (args.context && typeof args.context.off === "function") {
-                    if (typeof args.selector === "string" || $.isPlainObject(args.selector)) {
-                        args.context.off(args.events, args.selector, offHandler);
+                if (args.external && args.context) {
+
+                    if (typeof args.selector === "string" || utils.isPlainObject(args.selector)) {
+                        if (typeof args.context.off === "function") {
+                            args.context.off(args.events, args.selector, offHandler);
+                        } else {
+                            rootTarget.warn("external target does not have valid event listening");
+                        }
+                            
                     } else {
-                        args.context.off(args.events, offHandler);
+                        if (typeof args.context.off === "function") {
+                            args.context.off(args.events, offHandler);
+                        } else if (args.context instanceof EventTarget) {
+                            args.events.split(" ").forEach(function (eventName) {
+                                args.context.removeEventListener(eventName, offHandler);
+                            });
+                        } else {
+                            rootTarget.warn("external target does not have valid event listening");
+                        }
                     }
-                } else {
-                    console.warn("event context is missing off handler", offHandler);
+
                 }
             } else {
-                console.warn("event off: handler not found", args.events);
+                console.debug("event off: handler not found or already removed;", args.events);
             }
         };
 
         /**
-         * Get the event chain for the triggering object. All the objects in the chain except the root must have a link to their parent defined by a .eventParent property.
+         * Clears all registered eventhandlers
          * 
-         * @internal
-         * @param {Object} currentTarget - The triggering target.
-         * @param {Object} root - The event root.
-         * @returns {Array.<Object>} All objects in the chain. Starts with the currentTarget and ends with the root.
+         * @category eventhandling
+         * @function
+         * @name WeavyEvents#clear
          */
-        function getEventChain(currentTarget, root) {
-            var eventChain = [];
-            var currentLevel = currentTarget;
-            while (currentLevel !== root && currentLevel.eventParent) {
-                eventChain.push(currentLevel);
-                currentLevel = currentLevel.eventParent;
-            }
-            if (currentLevel === root) {
-                eventChain.push(root);
-                return eventChain;
-            } else {
-                // No complete chain, return currentTarget and root
-                return [currentTarget, root];
-            }
+        this.clear = function () {
+            _eventHandlers.forEach(function (eventHandler) {
+                // TODO: Maybe use .off instead?
+                if (eventHandler.external && eventHandler.context) {
+                    if (typeof eventHandler.selector === "string" || utils.isPlainObject(eventHandler.selector)) {
+                        if (typeof eventHandler.context.off === "function") {
+                            eventHandler.context.off(eventHandler.events, eventHandler.selector, eventHandler.handler);
+                        } else {
+                            rootTarget.warn("external target does not have valid event listening");
+                        }
+
+                    } else {
+                        if (typeof eventHandler.context.off === "function") {
+                            eventHandler.context.off(eventHandler.events, eventHandler.handler);
+                        } else if (eventHandler.context instanceof EventTarget) {
+                            eventHandler.events.split(" ").forEach(function (eventName) {
+                                eventHandler.context.removeEventListener(eventName, eventHandler.handler);
+                            });
+                        } else {
+                            rootTarget.warn("external target does not have valid event listening");
+                        }
+                    }
+
+                }
+            });
+
+            _eventHandlers.length = 0; // Empty the array without removing references
         }
+
 
         /**
          * Trigger a custom event. Events are per default triggered on the weavy instance using the weavy namespace.
@@ -428,43 +515,40 @@
          * }
          * 
          * @category eventhandling
+         * @function
+         * @name WeavyEvents#triggerEvent
          * @param {string} name - The name of the event.
-         * @param {(Array/Object/JSON)} [data] - Data may be an array or plain object with data or a JSON encoded string. Unlike jQuery, an array of data will be passed as an array and _not_ as multiple arguments.
-         * @param {Event} [originalEvent] - When relaying another event, you may pass the original Event to access it in handlers.
+         * @param {(Array/Object/JSON)} [data] - Data may be an array or plain object with data or a JSON encoded string.
          * @returns {data} The data passed to the event trigger including any modifications by event handlers. Returns false if the event is cancelled.
          */
-        weavyEvents.triggerEvent = function (name, data, originalEvent) {
+        this.triggerEvent = function (name, data) {
             var hasPrefix = name.indexOf(":") !== -1;
             var prefix = name.split(":")[0];
-            var namespace = ".event.weavy";
-            var eventChain = getEventChain(this, root);
+            var eventChain = getEventChain(this, rootTarget);
             var eventChainReverse = eventChain.slice().reverse();
 
-            name = name.replace("on:", "") + namespace;
-
-            // Triggers additional before:* and after:* events
-            var beforeEvent = $.Event("before:" + name);
-            var event = $.Event(name);
-            var afterEvent = $.Event("after:" + name);
-
-            if (originalEvent) {
-                beforeEvent.originalEvent = originalEvent;
-                event.originalEvent = originalEvent;
-                afterEvent.originalEvent = originalEvent;
+            if (this instanceof HTMLElement && this.isConnected) {
+                console.warn("Triggering event on DOM Node may cause unexpected bubbling:", '"' + name + '"', "<" + this.nodeName.toLowerCase() + (this.id ? ' id="' + this.id + '" />' : ' />'));
             }
 
-            if (data && !$.isArray(data) && !$.isPlainObject(data)) {
+            name = name.replace("on:", "");
+
+            // Triggers additional before:* and after:* events
+            var beforeEventName = "before:" + name;
+            var eventName = name;
+            var afterEventName = "after:" + name;
+
+            if (data && !Array.isArray(data) && !utils.isPlainObject(data)) {
                 try {
                     data = JSON.parse(data);
                 } catch (e) {
-                    root.warn("Could not parse event data");
+                    rootTarget.warn("Could not parse event data");
                 }
             }
 
-            root.debug("trigger", name);
+            rootTarget.debug("trigger", name);
             var result, currentTarget, ct;
 
-            // Wrap arrays in an array to avoid arrays converted to multiple arguments by jQuery
             if (hasPrefix) {
                 // Defined prefix. before: on: after: custom:
                 // select direction of eventChain
@@ -472,39 +556,39 @@
 
                 for (ct = 0; ct < singleEventChain.length; ct++) {
                     currentTarget = singleEventChain[ct];
-                    result = $(currentTarget).triggerHandler(event, $.isArray(data) ? [data] : data);
+                    result = triggerHandler(currentTarget, eventName, data);
                     data = (result || result === false) ? result : data;
-                    if (data === false || event.isPropagationStopped()) { return data; }
+                    if (data === false) { return data; }
                 }
             } else {
                 // Before
                 // eventChain from root
                 for (ct = 0; ct < eventChainReverse.length; ct++) {
                     currentTarget = eventChainReverse[ct];
-                    result = $(currentTarget).triggerHandler(beforeEvent, $.isArray(data) ? [data] : data);
+                    result = triggerHandler(currentTarget, beforeEventName, data);
                     data = (result || result === false) ? result : data;
-                    if (data === false || beforeEvent.isPropagationStopped()) { return data; }
+                    if (data === false) { return data; }
                 }
 
                 // On
                 // eventChain from target
                 for (ct = 0; ct < eventChain.length; ct++) {
                     currentTarget = eventChain[ct];
-                    result = $(currentTarget).triggerHandler(event, $.isArray(data) ? [data] : data);
+                    result = triggerHandler(currentTarget, eventName, data);
                     data = (result || result === false) ? result : data;
-                    if (data === false || event.isPropagationStopped()) { return data; }
+                    if (data === false) { return data; }
                 }
 
                 // After
                 // eventChain from root
                 for (ct = 0; ct < eventChainReverse.length; ct++) {
                     currentTarget = eventChainReverse[ct];
-                    result = $(currentTarget).triggerHandler(afterEvent, $.isArray(data) ? [data] : data);
+                    result = triggerHandler(currentTarget, afterEventName, data);
                     data = (result || result === false) ? result : data;
                 }
             }
 
-            return beforeEvent.isDefaultPrevented() || event.isDefaultPrevented() || afterEvent.isDefaultPrevented() ? false : data;
+            return data;
         };
 
     };

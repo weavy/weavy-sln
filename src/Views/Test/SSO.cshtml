@@ -82,7 +82,7 @@
         $(document).on("click", "#turbolinks-reload", function () {
             console.info("reloading page via Turbolinks");
             $(document).one("turbolinks:load", () => {
-                $("#result").text("Reloaded token: " + token);
+                $("#result").text(token);
             })
             Turbolinks.visit(window.location.toString(), { action: 'replace' });
         });
@@ -97,6 +97,8 @@
         $(document).on("turbolinks:load", () => {
             $(".alerts .alert").alert('close');
             setTokenTimeout();
+
+            $('[data-toggle="tooltip"]').tooltip();
         });
 
     </script>
@@ -108,7 +110,8 @@
     <button type="button" class="btn btn-primary" id="ajax">Sign in with JWT Token AJAX</button>
     <button type="button" class="btn btn-primary" id="authentication">Sign in with JWT Token wvy</button>
     <button type="button" class="btn btn-primary" id="turbolinks-reload">Turbolinks reload</button>
-    <pre class="line-numbers language-js"><code class="language-js" id="result" data-turbolinks-permanent>Token: @token</code></pre>
+    <button class="btn btn-outline-primary border-transparent btn-square float-right" type="button" onclick="window.getSelection().selectAllChildren(document.getElementById('result')); document.execCommand('copy'); window.getSelection().removeAllRanges();" data-toggle="tooltip" data-trigger="click" data-delay="100" data-title="Script Copied">@Svg.Icon("content-copy")</button>
+    <pre class="line-numbers language-js"><code class="language-js" id="result" data-turbolinks-permanent>@token</code></pre>
 </div>
 
 @section footer {

@@ -7,7 +7,6 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'jquery',
             'weavy'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
@@ -15,18 +14,17 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(
-            require('jquery'),
             require('weavy')
         );
     } else {
         // Browser globals (root is window)
-        if (typeof Weavy === 'undefined' || !Weavy.plugins) {
+        if (typeof root.Weavy === 'undefined' || !root.Weavy.plugins) {
             throw new Error("Weavy must be loaded before registering plugin");
         }
 
-        factory(jQuery, Weavy);
+        factory(root.Weavy);
     }
-}(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
+}(typeof self !== 'undefined' ? self : this, function (Weavy) {
 
     /**
      * Displaying content and attachments in the full browser window.
@@ -88,7 +86,7 @@
             }
         }
 
-        $(document).on("keyup", function (e) {
+        weavy.on(document, "keyup", function (e) {
             if (e.which === 27) { // Esc
                 if (weavy.nodes.previewPanel.isOpen) {
                     e.stopImmediatePropagation();
@@ -129,7 +127,7 @@
             if (message.thumb) {
                 previewUrl += "#thumb:" + encodeURIComponent(message.thumb);
             }
-            weavy.nodes.previewPanel.isLoaded = false;
+
             weavy.nodes.previewPanel.open(previewUrl).then(focus);
         });
 
@@ -142,31 +140,30 @@
                 contentUrl += "#thumb:" + encodeURIComponent(message.thumb);
             }
 
-            weavy.nodes.contentPanel.isLoaded = false;
             weavy.nodes.contentPanel.open(contentUrl).then(focus);
         });
 
         weavy.on("build", function (e, build) {
             // Content panel
             if (!weavy.nodes.contentPanel) {
-                weavy.nodes.contentPanel = weavy.nodes.panels.preview.addPanel(options.contentFrameName, "/content/", { controls: { close: true }, persistent: true, preload: true });
-                weavy.nodes.contentPanel.classList.add("weavy-panel-light");
+                weavy.nodes.contentPanel = weavy.nodes.panels.preview.addPanel(options.contentFrameName, "/content/", { controls: { close: true }, persistent: true, preload: "placeholder" });
+                weavy.nodes.contentPanel.node.classList.add("weavy-panel-light");
 
-                weavy.nodes.contentPanel.on("after:panel-close", function (e, closePanel) {
-                    weavy.debug("content panel close");
-                    weavy.nodes.contentPanel.isLoaded = false;
+                weavy.nodes.contentPanel.on("before:panel-open", function (e, openPanel) {
+                    weavy.nodes.contentPanel.loadingStarted(true);
                 });
             }
 
             // Preview panel
             if (!weavy.nodes.previewPanel) {
-                weavy.nodes.previewPanel = weavy.nodes.panels.preview.addPanel(options.previewFrameName, "/attachments/", { controls: { close: true }, persistent: true, preload: true });
-                weavy.nodes.previewPanel.on("after:panel-close", function (e, closePanel) {
-                    weavy.debug("preview panel close");
+                weavy.nodes.previewPanel = weavy.nodes.panels.preview.addPanel(options.previewFrameName, "/attachments/", { controls: { close: true }, persistent: true, preload: "placeholder" });
+                weavy.nodes.previewPanel.on("before:panel-open", function (e, openPanel) {
+                    weavy.nodes.previewPanel.loadingStarted(true);
+                });
+                weavy.nodes.previewPanel.on("before:panel-close", function (e, closePanel) {
                     if (weavy.nodes.contentPanel.isOpen) {
                         focus({ panelId: options.contentFrameName });
                     }
-                    weavy.nodes.previewPanel.isLoaded = false;
                 });
             }
         });
@@ -193,21 +190,26 @@
          * @param {string} url - The url to the preview page to open
          */
         function open(url) {
-            var attachmentUrl = /^(.*)(\/attachments\/[0-9]+\/?)(.+)?$/.exec(url);
-            if (attachmentUrl) {
-                return weavy.nodes.previewPanel.open(url).then(focus)
-            } else {
-                weavy.nodes.previewPanel.close();
-                return weavy.nodes.contentPanel.open(url).then(focus);
-            }
+            return weavy.whenLoaded().then(function () {
+                var attachmentUrl = /^(.*)(\/attachments\/[0-9]+\/?)(.+)?$/.exec(url);
+                if (attachmentUrl) {
+                    return weavy.nodes.previewPanel.open(url).then(focus)
+                } else {
+                    weavy.nodes.previewPanel.close();
+                    return weavy.nodes.contentPanel.open(url).then(focus);
+                }
+            });
         }
 
         /**
          * Closes all open preview panels.
          * @memberof PreviewPlugin#
+         * @param {boolean} noHistory - Set to true if you want no navigation history generated when closing
          **/
-        function closeAll() {
-            return $.when(weavy.nodes.previewPanel.close(), weavy.nodes.contentPanel.close());
+        function closeAll(noHistory) {
+            return weavy.whenLoaded().then(function () {
+                return Promise.all([weavy.nodes.previewPanel.close(noHistory), weavy.nodes.contentPanel.close(noHistory)]);
+            });
         }
 
         // Exports (not required)

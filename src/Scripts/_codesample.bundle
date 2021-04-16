@@ -19,4 +19,4 @@
 ~/scripts/vendor/prismjs/prism-line-numbers.min.js
 
 # component
-~/scripts/src/codesample.js
+~/scripts/src/server/codesample.js

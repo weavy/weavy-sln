@@ -45,7 +45,7 @@ wvy.messenger = (function ($) {
 
     // regular infinite scroll
     var nextObserver = new IntersectionObserver(function (entries, observer) {
-        entries.forEach(entry => {
+        entries.forEach(function (entry) {
             if (entry.isIntersecting) {
                 // start spinner
                 var $target = $(entry.target);
@@ -1337,7 +1337,7 @@ wvy.messenger = (function ($) {
                 if ($c.length) {
 
                     // use age of typing event to animate ellipsis...
-                    var dots = (Math.round((now - Math.max.apply(null, grouped[id].map(x => x.time))) / 1000) % 3) + 1;
+                    var dots = (Math.round((now - Math.max.apply(null, grouped[id].map(function (x) { return x.time;}))) / 1000) % 3) + 1;
                     var ellipsis = (".").repeat(dots) + "<span class=invisible>" + (".").repeat(3 - dots) + "</span>";
 
                     // merge names of people typing
@@ -1599,7 +1599,7 @@ wvy.messenger = (function ($) {
     var showUploadedBlobs = function (blobs) {
         return new Promise(function (resolve, reject) {
             // call server to get partial html for uploaded files
-            var qs = "?" + blobs.map(x => "ids=" + x.id).join("&");
+            var qs = "?" + blobs.map(function (x) { return "ids=" + x.id; }).join("&");
             $.get(wvy.url.resolve("/content/blobs" + qs), function (html) {
                 $(".table-uploads").append(html);
                 saveMessageForm(false);

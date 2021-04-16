@@ -1,13 +1,13 @@
 ﻿# scripts loaded asap
-~/scripts/src/browser.js
+~/scripts/src/server/browser.js
 ~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/vendor/overlayscrollbars/jquery.overlayScrollbars.min.js
-~/scripts/src/when-loaded.js
-~/scripts/src/url.js
+~/scripts/src/server/when-loaded.js
+~/scripts/src/server/url.js
 ~/scripts/src/resources.js
-~/scripts/src/scrollbar.js
+~/scripts/src/server/scrollbar.js
 ~/scripts/src/postal.js
-~/scripts/src/overlay.js
+~/scripts/src/server/overlay.js
 ~/scripts/vendor/turbolinks/turbolinks.js
-~/scripts/src/turbolinks.js
-~/scripts/src/navigation.js
+~/scripts/src/server/turbolinks.js
+~/scripts/src/server/navigation.js

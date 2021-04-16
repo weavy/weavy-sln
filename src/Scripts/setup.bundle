@@ -1,4 +1,4 @@
-﻿~/scripts/src/browser.js
+﻿~/scripts/src/server/browser.js
 ~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/src/resources.js
 ~/scripts/vendor/turbolinks/turbolinks.js
@@ -6,7 +6,7 @@
 ~/scripts/_bootstrap.bundle
 ~/scripts/src/_extensions.js
 ~/scripts/src/postal.js
-~/scripts/src/turbolinks.js 
-~/scripts/src/url.js
-~/scripts/src/alert.js
+~/scripts/src/server/turbolinks.js 
+~/scripts/src/server/url.js
+~/scripts/src/server/alert.js
 ~/scripts/_button.bundle

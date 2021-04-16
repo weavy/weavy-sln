@@ -1,4 +1,6 @@
-﻿~/scripts/vendor/bluebird/bluebird.core.min.js
-~/scripts/vendor/classlist-polyfill/index.js
-~/scripts/vendor/array-from/Array.from.js
+﻿~/scripts/polyfills/bluebird/bluebird.core.min.js
+~/scripts/polyfills/classlist-polyfill/index.js
+~/scripts/polyfills/array-from/Array.from.js
+~/scripts/polyfills/url-search-params-polyfill/index.js
+~/scripts/polyfills/intersection-observer/intersection-observer.js
 ~/scripts/src/_ie.js

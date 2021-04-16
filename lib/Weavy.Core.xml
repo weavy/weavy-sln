@@ -649,6 +649,630 @@
             To override the default url - make sure your implementation of the hook sets this property.
             </summary>
         </member>
+        <member name="T:Weavy.Core.Plugins.ZoomProxyDaemon">
+            <summary>
+            A daemon that checks various license related tasks.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ZoomProxyDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Poll Zoom Proxy server.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ZoomProxyDaemon.GetMeetingStatus(System.Collections.Generic.IEnumerable{Weavy.Core.Models.Meeting})">
+            <summary>
+            Get meeting status from zoom proxy
+            </summary>
+            <param name="ongoing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ZoomProxyDaemon.UpdateEntity(Weavy.Core.Models.IEntity)">
+            <summary>
+            Since the related meeting was updated, trigger an update event on the corresponding entity to force an update in the UI.
+            </summary>
+            <param name="parent"></param>
+        </member>
+        <member name="T:Weavy.Core.Plugins.ClientSecretDaemon">
+            <summary>
+            Periodically update client secrets to support multiple and rotating JWT signing keys.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ClientSecretDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Check open id provider for updated JWKS.
+            </summary>
+            <param name="token"></param>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.UploadHook">
+            <summary>
+            A hook that saves uploaded files to blob storage. Also creates thumbnails and extracts text for fulltext indexing (depending on configuration settings). 
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.UploadHook.Handle(Weavy.Core.Events.AfterInsertBlob)">
+            <summary>
+            Saves blob content to blob storage. Also creates thumbnails and extracts text for fulltext indexing (depending on configuration settings). 
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.PresenceDaemon">
+            <summary>
+            A daemon that keeps track of connections that the <see cref="T:Weavy.Core.Hubs.RealTimeHub"/> has seen. 
+            It uses a time based system to verify if connections are *actually* still online.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Update alive connections and delete zombies.
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Plugins.PresenceHook">
+            <summary>
+            A hook that sends presence updates to connected clients. 
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceHook.#cctor">
+            <summary>
+            Static constructor.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceHook.Handle(Weavy.Core.Events.AfterInsertConnection)">
+            <summary>
+            
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceHook.Handle(Weavy.Core.Events.AfterUpdateConnection)">
+            <summary>
+            
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceHook.Handle(Weavy.Core.Events.AfterDeleteConnection)">
+            <summary>
+            
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceHook.QueuePresence(Weavy.Core.Models.Connection)">
+            <summary>
+            Helper method for queuing presence updates.
+            </summary>
+            <param name="connection"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PresenceHook.SendPresence(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            Periodically check for queued presence updates.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:Weavy.Core.Plugins.BoxScraper">
+            <summary>
+            Scraper for Box.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.BoxScraper.CanScrape(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.BoxScraper.Scrape(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            
+            </summary>
+            <param name="url"></param>
+            <param name="maxwidth"></param>
+            <param name="maxheight"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.GiphyScraper">
+            <summary>
+            Scraper for Giphy.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.GiphyScraper.CanScrape(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.GiphyScraper.Scrape(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            
+            </summary>
+            <param name="url"></param>
+            <param name="maxwidth"></param>
+            <param name="maxheight"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.GiphyScraper.GetId(System.String)">
+            <summary>
+            Extract giphy id from url.
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.ActiveDirectoryDaemon">
+            <summary>
+            Syncs user and roles with Active Directory.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.Domain">
+            <summary>
+            Gets or sets the name of the domain or server.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.Username">
+            <summary>
+            Gets or sets the username to use when authenticating against the directory.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.Password">
+            <summary>
+            Gets or sets the password to use when authenticating against the directory.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.SyncRoles">
+            <summary>
+            Gets or sets a value indicating whether to include roles when syncing.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ActiveDirectoryDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Imports user and role data from Active Directory.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.ActiveDirectoryDaemon.Synchronize(System.DirectoryServices.AccountManagement.PrincipalContext,Weavy.Core.Models.Login)">
+            <summary>
+            Synchronize users and roles with information from Active Directory.
+            </summary>
+            <param name="context"></param>
+            <param name="login"></param>
+            <returns>A <see cref="T:Weavy.Core.Models.User"/> with updated information from the Active directory.</returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.CleanupDaemon">
+            <summary>
+            A daemon that performs cleanup tasks.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Cache">
+            <summary>
+             Gets or sets a value indicating whether old files should be deleted from the /App_Data/Cache/ directory.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Files">
+            <summary>
+             Gets or sets a value indicating whether orphaned blobs should be deleted from the repository.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Notifications">
+            <summary>
+             Gets or sets a value indicating whether old notifications should be deleted.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Temp">
+            <summary>
+             Gets or sets a value indicating whether old files should be deleted from the /App_Data/Temp/ directory.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Trash">
+            <summary>
+             Gets or sets a value indicating whether old stuff should be removed from the recycle bin.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Clears the internal cache.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupCache(System.Threading.CancellationToken)">
+            <summary>
+            Deletes files and folders from the /App_Data/Cache/ directory.
+            </summary>
+            <param name="token"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupFiles(System.Threading.CancellationToken)">
+            <summary>
+            Deletes orphaned blobs from the repository.
+            </summary>
+            <param name="token"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupNotifications(System.Threading.CancellationToken)">
+            <summary>
+            Deletes old notifications from the database.
+            </summary>
+            <param name="token"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupTrash(System.Threading.CancellationToken)">
+            <summary>
+            Permanently delete old stuff from the recycle bin.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupTemp(System.Threading.CancellationToken)">
+            <summary>
+            Deletes files and folders from the /App_Data/Temp/ directory.
+            </summary>
+            <param name="token"></param>
+        </member>
+        <member name="T:Weavy.Core.Plugins.PushNotificationHook">
+            <summary>
+            A hook that sends push notifications to mobile devices for new messages and notifications.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PushNotificationHook.Handle(Weavy.Core.Events.AfterInsertNotification)">
+            <summary>
+            Send push notification.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.PushNotificationHook.Handle(Weavy.Core.Events.AfterInsertMessage)">
+            <summary>
+            Send push notification to people in conversation.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.TestPushNotificationFunction">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.TestPushNotificationFunction.Destination">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.TestPushNotificationFunction.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Sends a test notification to verify configurations settings.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.StatisticsDaemon">
+            <summary>
+            A daemon that creates data points for displaying usage statistics.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.StatisticsDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Sample the system and create an entry in the statistics table.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.NotificationDaemon">
+            <summary>
+            A daemon that sends notification emails.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.NotificationDaemon.EnableEmailNotifications">
+            <summary>
+            Gets or sets a value indicating whether email notifications are enabled.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.NotificationDaemon.EnableDailyDigest">
+            <summary>
+            Gets or sets a value indicating whether the daily digest email is enabled.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.NotificationDaemon.DailyDigestSentAt">
+            <summary>
+            Gets the date and time the daily digest email was last sent.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.NotificationDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Send email notifications
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.NotificationDaemon.GetSmtpClient">
+            <summary>
+            Helper method for re-using a smtp client and sending notification emails in batches.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.LicenseDaemon">
+            <summary>
+            A daemon that checks various license related tasks.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.LicenseDaemon.Schedule">
+            <summary>
+            Hard coded to run every 15 minutes.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.LicenseDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Refresh license information.
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Plugins.IndexDaemon">
+            <summary>
+            A daemon that adds entities to the fulltext index.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.IndexDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Index entities that have changed since the last index operation.
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Plugins.AuditHook">
+            <summary>
+            A hook that logs all events in the system and notifies users about subscribed events.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertSpace)">
+            <summary>
+            Logs the AfterInsertSpace event and subscribes the creator to the space.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteSpace)">
+            <summary>
+            Logs the AfterDeleteSpace event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterAddMember)">
+            <summary>
+            Logs the AfterAddMember event and notifies user that he was added to the space.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterRemoveMember)">
+            <summary>
+            Logs the AfterRemoveMember event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterResetPassword)">
+            <summary>
+            Logs the ResetPassword event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdateProfile)">
+            <summary>
+            Logs the <see cref="T:Weavy.Core.Events.AfterUpdateProfile"/> event and post a message.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertUser)">
+            <summary>
+            Logs the <see cref="T:Weavy.Core.Events.AfterInsertUser"/> event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertVote)">
+            <summary>
+            Handles the AfterInsertVote event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeletePost)">
+            <summary>
+            Logs the AfterDeletePost event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterAddConversationMember)">
+            <summary>
+            Logs the AfterJoinConversation event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertConversation)">
+            <summary>
+            Logs the AfterInsertConversation event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertPost)">
+            <summary>
+            Logs the AfterInsertPost event and creates relevant notifications.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdatePost)">
+            <summary>
+            Logs the AfterUpdatePost event and creates relevant notifications.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterLikeEntity)">
+            <summary>
+            Logs the AfterLikeEntity event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterMoveContent)">
+            <summary>
+            Logs the AfterMoveItem event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdateContent)">
+            <summary>
+            Logs the AfterUpdateContent event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteContent)">
+            <summary>
+            Logs the AfterDeleteContent event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteConversation)">
+            <summary>
+            Logs the AfterDeleteConversation event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertContent)">
+            <summary>
+            Logs the AfterInsertContent event and sends the relevant notification.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterRemoveConversationMember)">
+            <summary>
+            Logs the AfterLeaveConversation event and posts a message in the conversation about the user leaving.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteComment)">
+            <summary>
+            Logs the AfterDeleteComment event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterFollowEntity)">
+            <summary>
+            Handles the AfterFollowEntity event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertComment)">
+            <summary>
+            Logs the AfterInsertComment event and notifies people that follow the commented entity.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdateComment)">
+            <summary>
+            Logs the AfterUpdateComment event and creates relevant notifications.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterSendMail)">
+            <summary>
+            Logs the SendMail event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterSignIn)">
+            <summary>
+            Logs the SignIn event.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterSignOut)">
+            <summary>
+            Logs the SignOut event.
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Notify(Weavy.Core.Models.LogEntry,System.Collections.Generic.IEnumerable{Weavy.Core.Models.Notification},System.Nullable{System.TimeSpan})">
+            <summary>
+            Creates a notification. If rollup is specified, looks for an existing notification to update.
+            </summary>
+            <param name="entry">The associated <see cref="T:Weavy.Core.Models.LogEntry"/>.</param>
+            <param name="notifications">The list of <see cref="T:Weavy.Core.Models.Notification"/> to update/insert.</param>
+            <param name="rollup">The time interval to search when rolling up similar events, <c>null</c> to skip rollup and just insert the notifications.</param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.FindLogEntries(Weavy.Core.Models.LogEntry,System.DateTime)">
+            <summary>
+            Finds similar log entries created after the specified time.
+            </summary>
+            <param name="entry"></param>
+            <param name="createdAfter"></param>
+            <returns>Events that match the search criteria.</returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.RollupActors(Weavy.Core.Models.LogEntry,System.Collections.Generic.IEnumerable{Weavy.Core.Models.User},Weavy.Core.Models.Notification)">
+            <summary>
+            Returns a html string with rolled up actors.
+            </summary>
+            <param name="entry">The current <see cref="T:Weavy.Core.Models.LogEntry"/>.</param>
+            <param name="actors">The persons involved in the rollup.</param>
+            <param name="notification">The current <see cref="T:Weavy.Core.Models.Notification"/>.</param>
+            <returns>The html string.</returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.Scraper">
+            <summary>
+            Default scraper that looks for embed data in the html source.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.CanScrape(System.String)">
+            <summary>
+            Gets a value indicating whether the specified URL is supported by this scraper.
+            </summary>
+            <param name="url">The URL to scrape.</param>
+            <returns>
+              <c>true</c> if the specified URL is supported; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.Scrape(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Returns embed data for the specified url.
+            </summary>
+            <param name="url">The URL to scrape.</param>
+            <param name="maxwidth"></param>
+            <param name="maxheight"></param>
+            <returns>An <see cref="T:Weavy.Core.Models.Embed"/>.</returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.GetOpenGraphProperty(System.Collections.Generic.IEnumerable{HtmlAgilityPack.HtmlNode},System.String)">
+            <summary>
+            
+            </summary>
+            <param name="nodes"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.GetTwitterCardProperty(System.Collections.Generic.IEnumerable{HtmlAgilityPack.HtmlNode},System.String)">
+            <summary>
+            
+            </summary>
+            <param name="nodes"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.GetMetaProperty(System.Collections.Generic.IEnumerable{HtmlAgilityPack.HtmlNode},System.String)">
+            <summary>
+            
+            </summary>
+            <param name="nodes"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.GetMetaContentAttribute(HtmlAgilityPack.HtmlNode)">
+            <summary>
+            
+            </summary>
+            <param name="node"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.Scraper.GetNodeText(HtmlAgilityPack.HtmlNode)">
+            <summary>
+            
+            </summary>
+            <param name="node"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.TestEmailFunction">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.TestEmailFunction.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            Sends a test email to verify email settings.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Weavy.Core.Models.ApiBindAttribute">
             <summary>
             Attribute for controlling if a propery should be bound in Web API or not.
@@ -1725,6 +2349,31 @@
         <member name="P:Weavy.Core.Models.TeamsUser.Email">
             <summary>
             The email of the user
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Models.ZoomNotification">
+            <summary>
+            A model representing a Zoom webhook notification received from the Zoom proxy
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Models.ZoomNotification.MeetingId">
+            <summary>
+            The id of the meeting
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Models.ZoomNotification.UUID">
+            <summary>
+            The UUID of the meeting
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Models.ZoomNotification.EventType">
+            <summary>
+            The type of webhook notification
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Models.ZoomNotification.MetaData">
+            <summary>
+            Additional metadata used for some of the events
             </summary>
         </member>
         <member name="T:Weavy.Core.Models.ZoomMeeting">
@@ -15487,607 +16136,6 @@
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="T:Weavy.Core.Plugins.ClientSecretDaemon">
-            <summary>
-            Periodically update client secrets to support multiple and rotating JWT signing keys.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.ClientSecretDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Check open id provider for updated JWKS.
-            </summary>
-            <param name="token"></param>
-            <param name="args"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.UploadHook">
-            <summary>
-            A hook that saves uploaded files to blob storage. Also creates thumbnails and extracts text for fulltext indexing (depending on configuration settings). 
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.UploadHook.Handle(Weavy.Core.Events.AfterInsertBlob)">
-            <summary>
-            Saves blob content to blob storage. Also creates thumbnails and extracts text for fulltext indexing (depending on configuration settings). 
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.PresenceDaemon">
-            <summary>
-            A daemon that keeps track of connections that the <see cref="T:Weavy.Core.Hubs.RealTimeHub"/> has seen. 
-            It uses a time based system to verify if connections are *actually* still online.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Update alive connections and delete zombies.
-            </summary>
-        </member>
-        <member name="T:Weavy.Core.Plugins.PresenceHook">
-            <summary>
-            A hook that sends presence updates to connected clients. 
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceHook.#cctor">
-            <summary>
-            Static constructor.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceHook.Handle(Weavy.Core.Events.AfterInsertConnection)">
-            <summary>
-            
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceHook.Handle(Weavy.Core.Events.AfterUpdateConnection)">
-            <summary>
-            
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceHook.Handle(Weavy.Core.Events.AfterDeleteConnection)">
-            <summary>
-            
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceHook.QueuePresence(Weavy.Core.Models.Connection)">
-            <summary>
-            Helper method for queuing presence updates.
-            </summary>
-            <param name="connection"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PresenceHook.SendPresence(System.Object,System.Timers.ElapsedEventArgs)">
-            <summary>
-            Periodically check for queued presence updates.
-            </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
-        </member>
-        <member name="T:Weavy.Core.Plugins.BoxScraper">
-            <summary>
-            Scraper for Box.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.BoxScraper.CanScrape(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="url"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.BoxScraper.Scrape(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
-            <summary>
-            
-            </summary>
-            <param name="url"></param>
-            <param name="maxwidth"></param>
-            <param name="maxheight"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.GiphyScraper">
-            <summary>
-            Scraper for Giphy.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.GiphyScraper.CanScrape(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="url"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.GiphyScraper.Scrape(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
-            <summary>
-            
-            </summary>
-            <param name="url"></param>
-            <param name="maxwidth"></param>
-            <param name="maxheight"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.GiphyScraper.GetId(System.String)">
-            <summary>
-            Extract giphy id from url.
-            </summary>
-            <param name="url"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.ActiveDirectoryDaemon">
-            <summary>
-            Syncs user and roles with Active Directory.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.Domain">
-            <summary>
-            Gets or sets the name of the domain or server.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.Username">
-            <summary>
-            Gets or sets the username to use when authenticating against the directory.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.Password">
-            <summary>
-            Gets or sets the password to use when authenticating against the directory.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.ActiveDirectoryDaemon.SyncRoles">
-            <summary>
-            Gets or sets a value indicating whether to include roles when syncing.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.ActiveDirectoryDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Imports user and role data from Active Directory.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.ActiveDirectoryDaemon.Synchronize(System.DirectoryServices.AccountManagement.PrincipalContext,Weavy.Core.Models.Login)">
-            <summary>
-            Synchronize users and roles with information from Active Directory.
-            </summary>
-            <param name="context"></param>
-            <param name="login"></param>
-            <returns>A <see cref="T:Weavy.Core.Models.User"/> with updated information from the Active directory.</returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.CleanupDaemon">
-            <summary>
-            A daemon that performs cleanup tasks.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Cache">
-            <summary>
-             Gets or sets a value indicating whether old files should be deleted from the /App_Data/Cache/ directory.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Files">
-            <summary>
-             Gets or sets a value indicating whether orphaned blobs should be deleted from the repository.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Notifications">
-            <summary>
-             Gets or sets a value indicating whether old notifications should be deleted.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Temp">
-            <summary>
-             Gets or sets a value indicating whether old files should be deleted from the /App_Data/Temp/ directory.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.CleanupDaemon.Trash">
-            <summary>
-             Gets or sets a value indicating whether old stuff should be removed from the recycle bin.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.CleanupDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Clears the internal cache.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupCache(System.Threading.CancellationToken)">
-            <summary>
-            Deletes files and folders from the /App_Data/Cache/ directory.
-            </summary>
-            <param name="token"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupFiles(System.Threading.CancellationToken)">
-            <summary>
-            Deletes orphaned blobs from the repository.
-            </summary>
-            <param name="token"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupNotifications(System.Threading.CancellationToken)">
-            <summary>
-            Deletes old notifications from the database.
-            </summary>
-            <param name="token"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupTrash(System.Threading.CancellationToken)">
-            <summary>
-            Permanently delete old stuff from the recycle bin.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupTemp(System.Threading.CancellationToken)">
-            <summary>
-            Deletes files and folders from the /App_Data/Temp/ directory.
-            </summary>
-            <param name="token"></param>
-        </member>
-        <member name="T:Weavy.Core.Plugins.PushNotificationHook">
-            <summary>
-            A hook that sends push notifications to mobile devices for new messages and notifications.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PushNotificationHook.Handle(Weavy.Core.Events.AfterInsertNotification)">
-            <summary>
-            Send push notification.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.PushNotificationHook.Handle(Weavy.Core.Events.AfterInsertMessage)">
-            <summary>
-            Send push notification to people in conversation.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.TestPushNotificationFunction">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.TestPushNotificationFunction.Destination">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.TestPushNotificationFunction.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Sends a test notification to verify configurations settings.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.StatisticsDaemon">
-            <summary>
-            A daemon that creates data points for displaying usage statistics.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.StatisticsDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Sample the system and create an entry in the statistics table.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.NotificationDaemon">
-            <summary>
-            A daemon that sends notification emails.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.NotificationDaemon.EnableEmailNotifications">
-            <summary>
-            Gets or sets a value indicating whether email notifications are enabled.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.NotificationDaemon.EnableDailyDigest">
-            <summary>
-            Gets or sets a value indicating whether the daily digest email is enabled.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.NotificationDaemon.DailyDigestSentAt">
-            <summary>
-            Gets the date and time the daily digest email was last sent.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.NotificationDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Send email notifications
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.NotificationDaemon.GetSmtpClient">
-            <summary>
-            Helper method for re-using a smtp client and sending notification emails in batches.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.LicenseDaemon">
-            <summary>
-            A daemon that checks various license related tasks.
-            </summary>
-        </member>
-        <member name="P:Weavy.Core.Plugins.LicenseDaemon.Schedule">
-            <summary>
-            Hard coded to run every 15 minutes.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.LicenseDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Refresh license information.
-            </summary>
-        </member>
-        <member name="T:Weavy.Core.Plugins.IndexDaemon">
-            <summary>
-            A daemon that adds entities to the fulltext index.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.IndexDaemon.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Index entities that have changed since the last index operation.
-            </summary>
-        </member>
-        <member name="T:Weavy.Core.Plugins.AuditHook">
-            <summary>
-            A hook that logs all events in the system and notifies users about subscribed events.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertSpace)">
-            <summary>
-            Logs the AfterInsertSpace event and subscribes the creator to the space.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteSpace)">
-            <summary>
-            Logs the AfterDeleteSpace event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterAddMember)">
-            <summary>
-            Logs the AfterAddMember event and notifies user that he was added to the space.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterRemoveMember)">
-            <summary>
-            Logs the AfterRemoveMember event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterResetPassword)">
-            <summary>
-            Logs the ResetPassword event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdateProfile)">
-            <summary>
-            Logs the <see cref="T:Weavy.Core.Events.AfterUpdateProfile"/> event and post a message.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertUser)">
-            <summary>
-            Logs the <see cref="T:Weavy.Core.Events.AfterInsertUser"/> event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertVote)">
-            <summary>
-            Handles the AfterInsertVote event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeletePost)">
-            <summary>
-            Logs the AfterDeletePost event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterAddConversationMember)">
-            <summary>
-            Logs the AfterJoinConversation event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertConversation)">
-            <summary>
-            Logs the AfterInsertConversation event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertPost)">
-            <summary>
-            Logs the AfterInsertPost event and creates relevant notifications.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdatePost)">
-            <summary>
-            Logs the AfterUpdatePost event and creates relevant notifications.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterLikeEntity)">
-            <summary>
-            Logs the AfterLikeEntity event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterMoveContent)">
-            <summary>
-            Logs the AfterMoveItem event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdateContent)">
-            <summary>
-            Logs the AfterUpdateContent event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteContent)">
-            <summary>
-            Logs the AfterDeleteContent event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteConversation)">
-            <summary>
-            Logs the AfterDeleteConversation event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertContent)">
-            <summary>
-            Logs the AfterInsertContent event and sends the relevant notification.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterRemoveConversationMember)">
-            <summary>
-            Logs the AfterLeaveConversation event and posts a message in the conversation about the user leaving.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteComment)">
-            <summary>
-            Logs the AfterDeleteComment event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterFollowEntity)">
-            <summary>
-            Handles the AfterFollowEntity event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterInsertComment)">
-            <summary>
-            Logs the AfterInsertComment event and notifies people that follow the commented entity.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterUpdateComment)">
-            <summary>
-            Logs the AfterUpdateComment event and creates relevant notifications.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterSendMail)">
-            <summary>
-            Logs the SendMail event.
-            </summary>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterSignIn)">
-            <summary>
-            Logs the SignIn event.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterSignOut)">
-            <summary>
-            Logs the SignOut event.
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.Notify(Weavy.Core.Models.LogEntry,System.Collections.Generic.IEnumerable{Weavy.Core.Models.Notification},System.Nullable{System.TimeSpan})">
-            <summary>
-            Creates a notification. If rollup is specified, looks for an existing notification to update.
-            </summary>
-            <param name="entry">The associated <see cref="T:Weavy.Core.Models.LogEntry"/>.</param>
-            <param name="notifications">The list of <see cref="T:Weavy.Core.Models.Notification"/> to update/insert.</param>
-            <param name="rollup">The time interval to search when rolling up similar events, <c>null</c> to skip rollup and just insert the notifications.</param>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.FindLogEntries(Weavy.Core.Models.LogEntry,System.DateTime)">
-            <summary>
-            Finds similar log entries created after the specified time.
-            </summary>
-            <param name="entry"></param>
-            <param name="createdAfter"></param>
-            <returns>Events that match the search criteria.</returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.AuditHook.RollupActors(Weavy.Core.Models.LogEntry,System.Collections.Generic.IEnumerable{Weavy.Core.Models.User},Weavy.Core.Models.Notification)">
-            <summary>
-            Returns a html string with rolled up actors.
-            </summary>
-            <param name="entry">The current <see cref="T:Weavy.Core.Models.LogEntry"/>.</param>
-            <param name="actors">The persons involved in the rollup.</param>
-            <param name="notification">The current <see cref="T:Weavy.Core.Models.Notification"/>.</param>
-            <returns>The html string.</returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.Scraper">
-            <summary>
-            Default scraper that looks for embed data in the html source.
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.CanScrape(System.String)">
-            <summary>
-            Gets a value indicating whether the specified URL is supported by this scraper.
-            </summary>
-            <param name="url">The URL to scrape.</param>
-            <returns>
-              <c>true</c> if the specified URL is supported; otherwise, <c>false</c>.
-            </returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.Scrape(System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
-            <summary>
-            Returns embed data for the specified url.
-            </summary>
-            <param name="url">The URL to scrape.</param>
-            <param name="maxwidth"></param>
-            <param name="maxheight"></param>
-            <returns>An <see cref="T:Weavy.Core.Models.Embed"/>.</returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.GetOpenGraphProperty(System.Collections.Generic.IEnumerable{HtmlAgilityPack.HtmlNode},System.String)">
-            <summary>
-            
-            </summary>
-            <param name="nodes"></param>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.GetTwitterCardProperty(System.Collections.Generic.IEnumerable{HtmlAgilityPack.HtmlNode},System.String)">
-            <summary>
-            
-            </summary>
-            <param name="nodes"></param>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.GetMetaProperty(System.Collections.Generic.IEnumerable{HtmlAgilityPack.HtmlNode},System.String)">
-            <summary>
-            
-            </summary>
-            <param name="nodes"></param>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.GetMetaContentAttribute(HtmlAgilityPack.HtmlNode)">
-            <summary>
-            
-            </summary>
-            <param name="node"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Core.Plugins.Scraper.GetNodeText(HtmlAgilityPack.HtmlNode)">
-            <summary>
-            
-            </summary>
-            <param name="node"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Weavy.Core.Plugins.TestEmailFunction">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Core.Plugins.TestEmailFunction.Run(System.Threading.CancellationToken,System.String[])">
-            <summary>
-            Sends a test email to verify email settings.
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:Weavy.Core.Providers.AzureBlobProvider">
             <summary>
               Azure Blob Storage implementation of the <see cref="T:Weavy.Core.Providers.IBlobProvider"/> interface.
@@ -16732,6 +16780,13 @@
             </summary>
             <param name="provider"></param>
             <param name="uuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Repos.MeetingRepo.GetOngoing(System.String)">
+            <summary>
+            Get ongoing meeting by provider
+            </summary>
+            <param name="provider"></param>        
             <returns></returns>
         </member>
         <member name="M:Weavy.Core.Repos.MeetingRepo.Update(Weavy.Core.Models.Meeting)">
@@ -18960,6 +19015,13 @@
             <param name="entity">The entity for which to get meetings.</param>
             <returns>Returns a list of <see cref="T:Weavy.Core.Models.Meeting"/> object.</returns>
         </member>
+        <member name="M:Weavy.Core.Services.MeetingService.GetOngoing(System.String)">
+            <summary>
+            Get ongoing  <see cref="T:Weavy.Core.Models.Meeting"/>s. Treated as ongoing if EndedAt is null
+            </summary>
+            <param name="provider"></param>
+            <returns>Returns a list of <see cref="T:Weavy.Core.Models.Meeting"/> object.</returns>
+        </member>
         <member name="M:Weavy.Core.Services.MeetingService.Insert(Weavy.Core.Models.Meeting)">
             <summary>
               Inserts an <see cref="T:Weavy.Core.Models.Meeting"/> object into the repository.
@@ -20573,6 +20635,11 @@
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.LicenseUrl">
+            <summary>
+            Gets the url to the licensing server (<code>weavy.license-url</code>).
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.ZoomProxyUrl">
             <summary>
             Gets the url to the licensing server (<code>weavy.license-url</code>).
             </summary>

@@ -1,4 +1,4 @@
-﻿/* global jQueryVersion */
+﻿/* global jQuery, jQueryVersion */
 if (jQuery && jQuery.fn && jQuery.fn.jquery && jQueryVersion) {
     try {
         var $version = jQuery.fn.jquery.split(".");

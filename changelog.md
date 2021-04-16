@@ -1,5 +1,18 @@
 # Changelog for Weavy
 
+## 8.2.0 (2021-04-16)
+
+* Added navigation history states, history event and deep link support in client.
+* Added maximize plugin in client.
+* Changed weavy.timeout() to weavy.whenTimeout() in client.
+* Changed client app/space whenLoaded/whenBuilt promises now resolve app/space for convenience.
+* Improved client destroy.
+* Improved client panels.
+* Improved client logging.
+* Fixed an issue when referencing a HTMLElement as container in the client.
+* Fixed layout when using panel controls in client.
+* Fixed issue with messenger back button.
+
 ## 8.1.0 (2021-03-08)
 
 * Added ability to customize email templates for notifications etc.

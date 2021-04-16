@@ -1,12 +1,12 @@
-﻿~/scripts/src/browser.js
+﻿~/scripts/src/server/browser.js
 ~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/vendor/overlayscrollbars/jquery.overlayScrollbars.min.js
-~/scripts/src/when-loaded.js
-~/scripts/src/url.js
+~/scripts/src/server/when-loaded.js
+~/scripts/src/server/url.js
 ~/scripts/src/resources.js
-~/scripts/src/scrollbar.js
+~/scripts/src/server/scrollbar.js
 ~/scripts/src/postal.js
-~/scripts/src/overlay.js
+~/scripts/src/server/overlay.js
 ~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/vendor/turbolinks/turbolinks.js
 ~/scripts/vendor/popper.js/popper.min.js
@@ -20,17 +20,17 @@
 ~/scripts/vendor/jquery-textcomplete/jquery.textcomplete.min.js
 ~/scripts/vendor/emojione/emojione.js
 ~/scripts/src/emojionearea/emojionearea.js
-~/scripts/src/alert.js
+~/scripts/src/server/alert.js
 ~/scripts/src/_extensions.js
-~/scripts/src/turbolinks.js 
-~/scripts/src/emoji.js
+~/scripts/src/server/turbolinks.js 
+~/scripts/src/server/emoji.js
 ~/scripts/src/authentication.js
 ~/scripts/src/connection.js
-~/scripts/src/presence.js
-~/scripts/src/fileupload.js
-~/scripts/src/drop.js
+~/scripts/src/server/presence.js
+~/scripts/src/server/fileupload.js
+~/scripts/src/server/drop.js
 
 messenger.js
 
 # resolve load promise
-~/scripts/src/when-loaded-resolve.js
+~/scripts/src/server/when-loaded-resolve.js

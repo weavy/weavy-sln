@@ -77,7 +77,7 @@ namespace Weavy.Areas.Apps.Controllers {
             // limit page size to 25
             opts.Top = Math.Min(opts.Top ?? MAX_PAGE_SIZE, MAX_PAGE_SIZE);
 
-            var model = new Messenger { ConversationId = id, IsMessenger = true };
+            var model = new Messenger { ConversationId = id };
 
             if (model.ConversationId != null) {
                 // get selected conversation
@@ -161,7 +161,7 @@ namespace Weavy.Areas.Apps.Controllers {
         [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/conversations/{id:int}")]
         [Route(ControllerUtils.EMBEDDED_PREFIX + MESSENGER_PREFIX + "/conversations/{id:int}", Name = nameof(MessengerController) + nameof(Conversation), Order = 1)]
         public ActionResult Conversation(int id) {
-            var model = new Messenger { IsMessenger = false };
+            var model = new Messenger();
 
             // get conversation
             model.Conversation = ConversationService.Get(id);
@@ -201,12 +201,10 @@ namespace Weavy.Areas.Apps.Controllers {
             cq.OrderBy = "PinnedAt DESC, LastMessageAt DESC";
 
             var model = new Messenger();
-            model.IsMessenger = false;
             model.Conversations = ConversationService.Search(cq);
 
             // search or infinite scroll, return partial view
             if (Request.IsAjaxRequest()) {
-                model.IsMessenger = IsMessenger(Request.Headers["Referer"]);
                 return PartialView("_Conversations", model);
             }
 
@@ -269,7 +267,7 @@ namespace Weavy.Areas.Apps.Controllers {
         [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/m/{id:int}")]
         public PartialViewResult PartialMessage(int id) {
             var model = MessageService.Get(id);
-            ViewBag.Messenger = new Messenger { Conversation = model.Conversation, IsMessenger = IsMessenger(Request.Headers["Referer"]) };
+            ViewBag.Messenger = new Messenger { Conversation = model.Conversation };
             return PartialView("_Message", model);
         }
 
@@ -282,7 +280,7 @@ namespace Weavy.Areas.Apps.Controllers {
         [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/c/{id:int}")]
         public PartialViewResult PartialConversation(int id) {
             var model = ConversationService.Get(id);
-            ViewBag.Messenger = new Messenger { Conversation = model, IsMessenger = IsMessenger(Request.Headers["Referer"]) };
+            ViewBag.Messenger = new Messenger { Conversation = model };
             return PartialView("_Conversation", model);
         }
 
@@ -315,7 +313,6 @@ namespace Weavy.Areas.Apps.Controllers {
             model.Conversation = ConversationService.Get(id);
             model.Messages = ConversationService.GetMessages(model.Conversation.Id, opts);
             model.Messages.Reverse();
-            model.IsMessenger = IsMessenger(Request.Headers["Referer"]);
             return PartialView("_Messages", model);
         }
 
@@ -525,11 +522,7 @@ namespace Weavy.Areas.Apps.Controllers {
         [Route(ControllerUtils.EMBEDDED_PREFIX + MESSENGER_PREFIX + "/c/{id:int}/leave", Name = nameof(MessengerController) + nameof(Leave), Order = 1)]
         public ActionResult Leave(int id) {
             ConversationService.RemoveMember(id);
-            if (IsMessenger(Request.Headers["Referer"])) {
-                return RedirectToAction<MessengerController>(c => c.Index(null));
-            } else {
-                return RedirectToAction<MessengerController>(c => c.Conversations(null));
-            }
+            return RedirectToAction<MessengerController>(c => c.Index(null));
         }
 
         /// <summary>
@@ -613,14 +606,6 @@ namespace Weavy.Areas.Apps.Controllers {
             return msg;
         }
        
-        // helper method that checks if the specified url is for the full messenger or not.
-        private bool IsMessenger(string referer) {
-            // /m, /m/id, /e/m or /e/m/id
-            var pattern = @"^/(" + E_PREFIX + ")?" + MESSENGER_PREFIX + @"(/\d+)?/?$";
-            var url = referer?.RemoveLeading(WeavyContext.Current.ApplicationUrl.RemoveTrailing("/")) ?? "";
-            return Regex.IsMatch(url.LeftBefore("?"), pattern, RegexOptions.IgnoreCase);
-        }
-        
         // callback for processing the queue with SetDelivered updates
         private static void ProcessDelivered(object state) {
             try {

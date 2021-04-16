@@ -7,26 +7,22 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'jquery',
-            './panels',
-            './utils',
-            './promise'
+            '../utils',
+            '../promise'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(
-            require('jquery'),
-            require('./panels'),
-            require('./utils'),
-            require('./promise')
+            require('../utils'),
+            require('../promise')
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyApp = factory(jQuery, root.WeavyPanels, root.WeavyUtils, root.WeavyPromise);
+        root.WeavyApp = factory(root.WeavyUtils, root.WeavyPromise);
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyPanels, utils, WeavyPromise) {
+}(typeof self !== 'undefined' ? self : this, function (utils, WeavyPromise) {
     console.debug("app.js");
 
     /**
@@ -81,7 +77,7 @@
         /** 
          * The Panel displaying the app.
          * @category properties
-         * @type {WeavyPanel}
+         * @type {WeavyPanels~panel}
          */
         app.panel = null;
 
@@ -218,7 +214,7 @@
 
         /** 
          * The parent which the events bubbles to.
-         * @category events
+         * @category eventhandling
          * @type {WeavySpace}
          * @ignore
          */
@@ -227,7 +223,7 @@
         /**
          * Event listener registration for the specific app. Only recieves events that belong to the app.
          * 
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").app("myapp").on("open", function(e) { ... })
@@ -237,7 +233,7 @@
         /**
          * One time event listener registration for the specific app. Is only triggered once and only recieves events that belong to the app.
          *
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").app("myapp").one("open", function(e) { ... })
@@ -247,7 +243,7 @@
         /**
          * Event listener unregistration for the specific app.
          * 
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").app("myapp").off("open", function(e) { ... })
@@ -257,7 +253,7 @@
         /**
          * Triggers events on the specific app. The events will also bubble up to the space and then the weavy instance.
          *
-         * @category events
+         * @category eventhandling
          * @function
          * @example
          * weavy.space("myspace").app("myapp").triggerEvent("myevent", [eventData])
@@ -273,7 +269,6 @@
          */
         Object.defineProperty(this, "isOpen", {
             get: function () {
-                weavy.log("isOpen", app.panel, app.panel && app.panel.isOpen);
                 return app.panel ? app.panel.isOpen : false;
             }
         });
@@ -371,7 +366,7 @@
                 }
 
                 app.isLoaded = true;
-                app.whenLoaded.resolve(app.data);
+                app.whenLoaded.resolve(app);
 
                 if (!app.isBuilt && app.weavy.isLoaded) {
                     app.build();
@@ -468,9 +463,9 @@
                             app.root = root = weavy.createRoot(app.container, "app-" + app.id);
                             root.container.panels = weavy.panels.createContainer("app-container-" + app.id);
                             root.container.panels.eventParent = app;
-                            root.container.appendChild(root.container.panels);
+                            root.container.appendChild(root.container.panels.node);
                         } catch (e) {
-                            weavy.log("could not create app in container");
+                            weavy.warn("could not create app in container", { key: app.key, id: app.id });
                         }
                     }
 
@@ -517,7 +512,7 @@
                          */
                         weavy.on("panel-close", bridgePanelEvent.bind(app, "close", panelId, { space: app.space, app: app }));
 
-                        app.whenBuilt.resolve();
+                        app.whenBuilt.resolve(app);
                     }
                 }
 
@@ -528,16 +523,20 @@
 
         // Opens the app automatically after build
         app.whenBuilt().then(function () {
-            if (app.autoOpen) {
-                app.open();
-            }
+            weavy.whenReady().then(function () {
+                if (app.autoOpen && !app.isOpen) {
+                    app.open(null, true);
+                }
+            });
         });
 
         weavy.on("after:signed-in", function () {
-            if (app.autoOpen) {
-                // Reopen on sign in
-                app.open();
-            }
+            weavy.whenReady().then(function () {
+                if (app.autoOpen && !app.isOpen) {
+                    // Reopen on sign in
+                    app.open(null, true);
+                }
+            });
         });
 
         app.configure();
@@ -547,17 +546,17 @@
      * Opens the app panel and optionally loads a destination url after waiting for {@link WeavyApp#whenBuilt}.
      * If the space is {@link WeavySpace#tabbed} it also closes the other apps in the space.
      * 
-     * @category panels
+     * @category panel
      * @function WeavyApp#open
      * @param {string} [destination] - Destination url to navigate to on open
      * @returns {external:Promise}
      */
-    WeavyApp.prototype.open = function (destination) {
+    WeavyApp.prototype.open = function (destination, noHistory) {
         var app = this;
         var weavy = app.weavy;
-        var whenBuiltAndLoaded = $.when(app.whenBuilt(), weavy.whenLoaded());
+        var whenBuiltAndLoaded = Promise.all([app.whenBuilt(), weavy.whenLoaded()]);
         return whenBuiltAndLoaded.then(function () {
-            var openPromises = [app.panel.open(destination)];
+            var openPromises = [app.panel.open(destination, noHistory)];
 
             // Sibling apps should be closed if the space is a tabbed space
             if (app.space && app.space.tabbed) {
@@ -568,14 +567,18 @@
                 });
             }
 
-            return Promise.all(openPromises);
+            return Promise.all(openPromises).catch(function (reason) {
+                weavy.warn("Could not open app", app.key, reason);
+            });
+        }, function (reason) {
+            weavy.warn("Could not open app", app.key, reason);
         });
     }
 
     /**
      * Closes the app panel.
      * 
-     * @category panels
+     * @category panel
      * @function WeavyApp#close
      * @returns {external:Promise}
      * */
@@ -591,28 +594,30 @@
      * Toggles the app panel open or closed. It optionally loads a destination url on toggle open.
      * If the space is {@link WeavySpace#tabbed} it also closes the other apps in the space.
      * 
-     * @category panels
+     * @category panel
      * @function WeavyApp#toggle
      * @param {string} [destination] - Destination url to navigate to on open
      * @returns {external:Promise}
      */
     WeavyApp.prototype.toggle = function (destination) {
         var app = this;
+        var weavy = app.weavy;
 
         return app.whenBuilt().then(function () {
-            var isOpen = app.panel.isOpen;
             var togglePromises = [app.panel.toggle(destination)];
 
             // Sibling apps should be closed if the space is a tabbed space
-            if (!isOpen && app.space && app.space.tabbed) {
+            if (!app.isOpen && app.space && app.space.tabbed) {
                 Array.from(app.space.apps || []).forEach(function (spaceApp) {
                     if (spaceApp !== app) {
-                        togglePromises.push(spaceApp.panel.close(true));
+                        togglePromises.push(spaceApp.panel.close(true, true));
                     }
                 });
             }
 
-            return Promise.all(togglePromises);
+            return Promise.all(togglePromises).catch(function (reason) {
+                weavy.warn("Could not toggle app", app.key, reason);
+            });
         });
     }
 
@@ -630,12 +635,14 @@
 
         weavy.debug("Removing app", app.id);
 
-        var whenPanelRemoved = app.panel ? app.panel.remove() : Promise.resolve();
+        var whenPanelRemoved = app.panel ? app.panel.remove(null, true) : Promise.resolve();
 
         var whenRemoved = whenPanelRemoved.then(function () {
-            var appRoot = weavy.getRoot("app-" + app.id);
-            if (appRoot) {
-                appRoot.remove();
+            if ('getRoot' in weavy) {
+                var appRoot = weavy.getRoot("app-" + app.id);
+                if (appRoot) {
+                    appRoot.remove();
+                }
             }
         });
 
@@ -661,7 +668,7 @@
             }
 
             if (options.key && this.key) {
-                return utils.ciEq(options.key, this.key);
+                return utils.eqString(options.key, this.key);
             }
         }
 

@@ -7,7 +7,6 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'jquery',
             'weavy'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
@@ -15,18 +14,17 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(
-            require('jquery'),
             require('weavy')
         );
     } else {
         // Browser globals (root is window)
-        if (typeof Weavy === 'undefined' || !Weavy.plugins) {
+        if (typeof root.Weavy === 'undefined' || !root.Weavy.plugins) {
             throw new Error("Weavy must be loaded before registering plugin");
         }
 
-        factory(jQuery, Weavy);
+        factory(root.Weavy);
     }
-}(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
+}(typeof self !== 'undefined' ? self : this, function (Weavy) {
 
     /**
      * Describe your plugin.

@@ -15,6 +15,16 @@
         .weavy-panel {
             background-color: rgba(mix($black, #000), $opacity-panel);
 
+            .weavy-controls {
+                position: absolute;
+                border-bottom: none;
+                flex-direction: row;
+
+                .weavy-icon {
+                    color: $white;
+                }
+            }
+
             &.weavy-open {
                 pointer-events: all;
                 z-index: 5;

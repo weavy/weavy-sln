@@ -88,6 +88,7 @@
             transform: translateX(20rem);
             pointer-events: none;
             border-left: 1px solid #333;
+            background-color: white;
         }
 
             .drawer.open {
@@ -144,7 +145,7 @@
     <script>
         (function ($) {
 
-            var weavy;
+            var weavy, weavy2;
 
             var jwts = ["@ViewBag.Token", "@ViewBag.TokenTest"];
             var currentJwt = 0;
@@ -157,19 +158,29 @@
                 return jwts[currentJwt];
             }
 
+            Weavy.defaults.lang = "@lang";
+            Weavy.defaults.tz = "@tz";
+            //Weavy.defaults.url = "https://weavy.test";
+
+            var pluginConfig = {
+                plugins: {
+                    deeplinks: {
+                        multiple: false
+                    }
+                }
+            };
+
             function init(jwt) {
                 console.log("init()", jwt);
 
-                weavy = window.weavy = new Weavy({
+                weavy = window.weavy = new Weavy(pluginConfig, {
                     id: "ctx",
                     jwt: jwt,
-                    lang: "@lang",
-                    tz: "@tz",
                     spaces: [
                         {
                             key: "client-test-global",
                             name: "Client Test Global",
-                            container: $("#drawer"),
+                            container: "#drawer",
                             tabbed: true,
                             apps: [
                                 { key: "notifications", type: "notifications" },
@@ -191,11 +202,39 @@
                     ]
                 });
 
-                var space = weavy.space({ key: "client-test-demo" });
+                weavy2 = window.weavy2 = new Weavy(pluginConfig, { jwt: jwt });
+
+
+                weavy.on("badge", function (e, badge) {
+                    setBadge("#notifications", badge.notifications);
+                    setBadge("#messenger", badge.conversations);
+                });
+
+                weavy.on("open", function (e, open) {
+                    if (open.space.options.key === "client-test-global") {
+                        weavy.log("on:open (hub)", open);
+                        $("#drawer").addClass("open");
+                    }
+                });
+
+                weavy.on("close", function (e, close) {
+                    if (close.space.options.key === "client-test-global") {
+                        weavy.log("on:close (hub)", close);
+                        $("#drawer").removeClass("open");
+                    }
+
+                });
+
+                weavy.on("user-error", function () {
+                    weavy.alert("User token is invalid. <a href='javascript:window.location.reload();'>Reload</a>", true)
+                });
+
+                var space = weavy2.space({ key: "client-test-demo" });
                 var files = space.app({ key: "files", type: "files", container: "#panel-files" });
                 var posts = space.app({ key: "posts", type: "posts", container: "#panel-posts" });
-                var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments" });
+                var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments", controls: { maximize: true, close: true } });
                 var tasks = space.app({ key: "tasks", type: "tasks", container: "#panel-tasks" });
+                
             }
 
             init("@ViewBag.Token");
@@ -208,6 +247,7 @@
             $("#btn-destroy").on("click", function () {
                 console.log("click destroy");
                 weavy.destroy();
+                weavy2.destroy();
             });
 
 
@@ -243,12 +283,12 @@
 
             $("#btn-jwt-p").on("click", function () {
                 console.log("click jwt promise()");
-                weavy.authentication.signIn(() => new Promise((resolve) => resolve(alternateJwt())));
+                weavy.authentication.signIn(function () { return new Promise(function (resolve) { return resolve(alternateJwt()); }); });
             });
 
             $("#btn-toggle").on("click", function () {
                 console.log("toggle comments");
-                weavy.space("client-test-demo").app("comments").toggle();
+                weavy2.space("client-test-demo").app("comments").toggle();
             });
 
             $("#notifications").on("click", function () {
@@ -259,31 +299,6 @@
             $("#messenger").on("click", function () {
                 console.log("click messenger");
                 weavy.space("client-test-global").app("messenger").toggle();
-            });
-
-
-            weavy.on("badge", function (e, badge) {
-                setBadge("#notifications", badge.notifications);
-                setBadge("#messenger", badge.conversations);
-            });
-
-            weavy.on("open", function (e, open) {
-                if (open.space.options.key === "client-test-global") {
-                    weavy.log("on:open (hub)", open);
-                    $("#drawer").addClass("open");
-                }
-            });
-
-            weavy.on("close", function (e, close) {
-                if (close.space.options.key === "client-test-global") {
-                    weavy.log("on:close (hub)", close);
-                    $("#drawer").removeClass("open");
-                }
-
-            });
-
-            weavy.on("user-error", function () {
-                weavy.alert("User token is invalid. <a href='javascript:window.location.reload();'>Reload</a>", true)
             });
 
             function setBadge(selector, count) {

@@ -1,4 +1,4 @@
-﻿/* eslint-env commonjs, amd */
+﻿/* eslint-env commonjs, amd, jquery */
 
 // UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 // TODO: move to ES6 and transpiler
@@ -19,7 +19,7 @@
     }
 }(typeof self !== 'undefined' ? self : this, function ($) {
 
-    console.debug("postal.js", window.name);
+    //console.debug("postal.js", window.name);
 
     function eqObjects(a, b, skipLength) {
         if (!$.isPlainObject(a) || !$.isPlainObject(b)) {
@@ -178,11 +178,13 @@
                                 var weavyId = contentWindowWeavyIds.get(e.source);
                                 var contentWindowName = contentWindowNames.get(e.source);
 
-                                e.source.postMessage({
-                                    name: "register-window",
-                                    windowName: contentWindowName,
-                                    weavyId: weavyId || true,
-                                }, "*");
+                                if (contentWindowName) {
+                                    e.source.postMessage({
+                                        name: "register-window",
+                                        windowName: contentWindowName,
+                                        weavyId: weavyId || true,
+                                    }, "*");
+                                }
                             } catch (e) {
                                 console.error("wvy.postal: Could not register frame window", weavyId, contentWindowName, e);
                             }
@@ -202,7 +204,7 @@
                         _whenLeader.reject({ parentName: _parentName, parentWeavyId: _parentWeavyId, parentOrigin: _parentOrigin });
 
                         try {
-                            e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId }, e.origin);
+                            e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId, location: window.location.href }, e.origin);
                         } catch (e) {
                             console.error("wvy.postal: register-window could not post back ready-message to source");
                         }
@@ -320,15 +322,29 @@
 
         function unregisterWeavyId(weavyId) {
             if (contentWindowsByWeavyId.has(weavyId)) {
+                contentWindowsByWeavyId.get(weavyId).forEach(function (contentWindow, contentWindowName) {
+                    unregisterContentWindow(contentWindowName, weavyId);
+                });
+                contentWindowsByWeavyId.get(weavyId)
                 contentWindowsByWeavyId.delete(weavyId);
             }
         }
 
         function unregisterContentWindow(windowName, weavyId) {
             if (contentWindowsByWeavyId.has(weavyId)) {
+                if (contentWindowsByWeavyId.get(weavyId).has(windowName)) {
+                    var contentWindow = contentWindowsByWeavyId.get(weavyId).get(windowName);
+                    try {
+                        contentWindows.delete(contentWindow);
+                        contentWindowNames.delete(contentWindow);
+                        contentWindowWeavyIds.delete(contentWindow);
+                    } catch (e) {}
+                }
                 contentWindowsByWeavyId.get(weavyId).delete(windowName);
                 if (contentWindowsByWeavyId.get(weavyId).size === 0) {
-                    contentWindowsByWeavyId.delete(weavyId);
+                    try {
+                        contentWindowsByWeavyId.delete(weavyId);
+                    } catch (e) {}
                 }
             }
         }
@@ -525,7 +541,7 @@
         this.one = one;
         this.off = off;
         this.registerContentWindow = registerContentWindow;
-        this.unregister = unregisterContentWindow;
+        this.unregisterContentWindow = unregisterContentWindow;
         this.unregisterAll = unregisterWeavyId;
         this.postToFrame = postToFrame;
         this.postToParent = postToParent;
@@ -534,6 +550,22 @@
         this.postToChildren = postToChildren;
         this.extractOrigin = extractOrigin;
         this.whenLeader = _whenLeader.promise();
+
+        Object.defineProperty(this, "messageListeners", {
+            get: function () { return messageListeners; }
+        });
+
+        Object.defineProperty(this, "contentWindows", {
+            get: function () {
+                return {
+                    contentWindowsByWeavyId,
+                    contentWindows,
+                    contentWindowNames,
+                    contentWindowWeavyIds
+                };
+            }
+        });
+
 
         Object.defineProperty(this, "isLeader", {
             get: function () { return _isLeader; }

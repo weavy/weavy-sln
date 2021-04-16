@@ -1,4 +1,4 @@
-﻿/* eslint-env commonjs, amd */
+﻿/* eslint-env commonjs, amd, jquery */
 
 // UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 // TODO: move to ES6 and transpiler
@@ -12,9 +12,10 @@
             './panels',
             './space',
             './navigation',
-            './utils',
-            './console',
-            './promise'
+            './history',
+            '../utils',
+            '../console',
+            '../promise'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -26,9 +27,10 @@
             require('./panels'),
             require('./space'),
             require('./navigation'),
-            require('./utils'),
-            require('./console'),
-            require('./promise')
+            require('./history'),
+            require('../utils'),
+            require('../console'),
+            require('../promise')
         );
     } else {
         // Browser globals (root is window)
@@ -38,12 +40,13 @@
             root.WeavyPanels,
             root.WeavySpace,
             root.WeavyNavigation,
+            root.WeavyHistory,
             root.WeavyUtils,
             root.WeavyConsole,
             root.WeavyPromise
         );
     }
-}(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavySpace, WeavyNavigation, utils, WeavyConsole, WeavyPromise) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyEvents, WeavyPanels, WeavySpace, WeavyNavigation, WeavyHistory, utils, WeavyConsole, WeavyPromise) {
     console.debug("weavy.js");
 
     // DEFINE CUSTOM ELEMENTS AND STYLES
@@ -164,8 +167,10 @@
             return id;
         }
 
-        weavy.options.id = generateId(weavy.options.id);
-        _weavyIds.push(weavy.options.id);
+        var _id = generateId(weavy.options.id);
+        Object.defineProperty(weavy, "id", { get: function () { return _id } });
+
+        _weavyIds.push(weavy.id);
 
         // Logging
 
@@ -182,7 +187,7 @@
          * @borrows WeavyConsole#error as Weavy#error
          * @borrows WeavyConsole#info as Weavy#info
          */
-        weavy.console = new WeavyConsole(weavy.options.id, weavy.options.logging && weavy.options.logging.color, weavy.options.logging);
+        weavy.console = new WeavyConsole(weavy.id, weavy.options.logging && weavy.options.logging.color, weavy.options.logging);
 
         weavy.log = weavy.console.log;
         weavy.debug = weavy.console.debug;
@@ -199,7 +204,7 @@
          * @returns {string} Id completed with weavy-id. If no id was provided it returns the weavy-id only.
          */
         weavy.getId = function (id) {
-            return id ? weavy.removeId(id) + "-" + weavy.options.id : weavy.options.id;
+            return id ? weavy.removeId(id) + "__" + weavy.id : weavy.id;
         }
 
         /**
@@ -209,7 +214,7 @@
          * @returns {string} Id without weavy id.
          */
         weavy.removeId = function (id) {
-            return id ? String(id).replace(new RegExp("-" + weavy.getId() + "$"), '') : id;
+            return id ? String(id).replace(new RegExp("__" + weavy.getId() + "$"), '') : id;
         };
 
         /**
@@ -249,6 +254,13 @@
          * @property {string} version - Semver string of the server version. Should match the script {@link Weavy.version}.
          **/
         weavy.data = null;
+
+        /**
+         * True when inatialization has started
+         * 
+         * @type {boolean}
+         */
+        weavy.isInitialized = false;
 
         /**
          * True when frames are blocked by Content Policy or the browser
@@ -341,6 +353,7 @@
 
 
                 if (auth.state === "changed-user") {
+                    // TODO: document these events
                     weavy.triggerEvent("signed-out", { id: -1 });
                     weavy.triggerEvent("signed-in", auth);
                 } else {
@@ -439,8 +452,8 @@
                  * @name Weavy#nodes#panels#drawer
                  **/
                 weavy.nodes.panels.drawer = weavy.panels.createContainer();
-                weavy.nodes.panels.drawer.classList.add("weavy-drawer");
-                weavy.nodes.overlay.appendChild(weavy.nodes.panels.drawer);
+                weavy.nodes.panels.drawer.node.classList.add("weavy-drawer");
+                weavy.nodes.overlay.appendChild(weavy.nodes.panels.drawer.node);
             }
 
             if (!weavy.nodes.panels.preview) {
@@ -452,20 +465,20 @@
                  * @name Weavy#nodes#panels#preview
                  **/
                 weavy.nodes.panels.preview = weavy.panels.createContainer();
-                weavy.nodes.panels.preview.classList.add("weavy-preview");
-                weavy.nodes.overlay.appendChild(weavy.nodes.panels.preview);
+                weavy.nodes.panels.preview.node.classList.add("weavy-preview");
+                weavy.nodes.overlay.appendChild(weavy.nodes.panels.preview.node);
             }
         });
 
         weavy.on("after:panel-open", function (e, open) {
             if (open.panels === weavy.nodes.panels.drawer) {
-                weavy.nodes.panels.drawer.classList.add("weavy-drawer-in");
+                weavy.nodes.panels.drawer.node.classList.add("weavy-drawer-in");
             }
         });
 
         weavy.on("after:panel-close", function (e, close) {
             if (close.panels === weavy.nodes.panels.drawer) {
-                weavy.nodes.panels.drawer.classList.remove("weavy-drawer-in");
+                weavy.nodes.panels.drawer.node.classList.remove("weavy-drawer-in");
             }
         });
 
@@ -506,7 +519,7 @@
 
             var isSpaceId = Number.isInteger(options);
             var isSpaceKey = typeof options === "string";
-            var isSpaceConfig = $.isPlainObject(options);
+            var isSpaceConfig = utils.isPlainObject(options);
             var spaceSelector = isSpaceConfig && options || isSpaceId && { id: options } || isSpaceKey && { key: options };
 
             if (spaceSelector) {
@@ -518,7 +531,7 @@
                     if (isSpaceConfig) {
                         space = new WeavySpace(weavy, options);
                         weavy.spaces.push(space);
-                        $.when(weavy.authentication.whenAuthorized(), weavy.whenLoaded()).then(function () {
+                        Promise.all([weavy.authentication.whenAuthorized(), weavy.whenInitialized()]).then(function () {
                             space.fetchOrCreate();
                         });
                     } else {
@@ -546,7 +559,7 @@
          * Creates a managed timeout promise. Use this instead of window.setTimeout to get a timeout that is automatically managed and unregistered on destroy.
          * 
          * @example
-         * var mytimeout = weavy.timeout(200).then(function() { ... });
+         * var mytimeout = weavy.whenTimeout(200).then(function() { ... });
          * mytimeout.reject(); // Cancel the timeout
          * 
          * @category promises
@@ -554,13 +567,23 @@
          * @param {int} time=0 - Timeout in milliseconds
          * @returns {WeavyPromise}
          */
-        weavy.timeout = function (time) {
+        weavy.whenTimeout = function (time) {
             var timeoutId;
             var whenTimeout = new WeavyPromise();
 
+            var removeIndex = function () {
+                var timeoutIndex = _timeouts.indexOf(timeoutId);
+                if (timeoutIndex >= 0) {
+                    _timeouts.splice(timeoutIndex, 1);
+                }
+            }
+
             _timeouts.push(timeoutId = setTimeout(function () { whenTimeout.resolve(); }, time));
 
+            whenTimeout.then(removeIndex);
+
             whenTimeout.catch(function () {
+                removeIndex();
                 clearTimeout(timeoutId);
             });
 
@@ -583,32 +606,50 @@
          * */
         weavy.whenReady = new WeavyPromise();
 
-        weavy.on("frame-check", function (e, framecheck) {
-            framecheck.blocked ? weavy.whenReady.reject() : weavy.whenReady.resolve();
-        });
-
         /**
-         * Promise that weavy has recieved the after:load event
-         *
-         * @example
-         * weavy.whenLoaded().then(function() { ... })
-         *
+         * Promise that resolves when the initialization has been started
+         * 
          * @category promises
          * @function
          * @returns {WeavyPromise}
-         * @resolved when init is called, the websocket has connected, data is received from the server and weavy is built and the load event has finished.
+         * @resolved when init event has been fully executed
          */
-        weavy.whenLoaded = new WeavyPromise();
+        weavy.whenInitialized = new WeavyPromise();
 
-        weavy.on("processed:load", function () {
-            weavy.whenLoaded.resolve();
+        // Register init before any plugins do
+        weavy.on("init", function () {
+
+            // Prepopulate spaces
+            if (weavy.options.spaces) {
+                var spaces = utils.asArray(weavy.options.spaces);
+
+                spaces.forEach(function (spaceOptions) {
+                    if (weavy.spaces.filter(function (space) { return space.match(spaceOptions); }).length === 0) {
+                        weavy.spaces.push(new WeavySpace(weavy, spaceOptions));
+                    }
+                });
+            }
+
+            loadClientData().then(function () {
+                var wFrameStatusCheck = frameStatusCheck.call(weavy);
+                var wConnectionInit = weavy.connection.init(true, weavy.authentication);
+                Promise.all([wFrameStatusCheck, wConnectionInit]).then(function () {
+                    weavy.whenReady.resolve();
+                });
+            });
+        });
+
+        weavy.on("after:init", function () {
+            weavy.isInitialized = true;
+            weavy.whenInitialized.resolve();
         });
 
         /**
          * Initializes weavy. This is done automatically unless you specify `init: false` in {@link Weavy#options}.
+         * 
          * @param {Weavy#options} [options] Any new or additional options.
          * @emits Weavy#init
-         * @returns {WeavyPromise}
+         * @returns {Weavy#whenInitialized}
          * @resolved When the weavy instance is initialized, ready and loaded.
          */
         weavy.init = function (options) {
@@ -623,8 +664,61 @@
              * @event Weavy#init
              * @returns {external:Promise}
              */
-            return weavy.triggerEvent("init");
+            weavy.triggerEvent("init");
+
+            return weavy.whenInitialized();
+        }        
+
+        /**
+         * Promise that weavy has recieved the after:load event
+         *
+         * @example
+         * weavy.whenLoaded().then(function() { ... })
+         *
+         * @category promises
+         * @function
+         * @returns {WeavyPromise}
+         * @resolved when init is called, the websocket has connected, data is received from the server and weavy is built and the load event has finished.
+         */
+        weavy.whenLoaded = new WeavyPromise();
+
+        function allSpacesAndAppsLoaded() {
+            var spacesLoaded = weavy.spaces.reduce(function (allSpacesLoaded, space) {
+                // Check if space is loaded, then also check if all apps in the space are loaded
+                return allSpacesLoaded && space.isLoaded && space.apps.reduce(function (allSpaceAppsLoaded, app) {
+                    return allSpaceAppsLoaded && app.isLoaded;
+                }, true);
+            }, true);
+
+            return spacesLoaded;
         }
+
+        function whenAllLoaded() {
+            if (allSpacesAndAppsLoaded()) {
+                return WeavyPromise.resolve();
+            } else {
+                var spacesAndAppsLoaded = weavy.spaces.reduce(function (loadPromises, space) {
+                    // Append space load promise
+                    loadPromises.push(space.whenLoaded());
+
+                    return loadPromises.concat(space.apps.map(function (app) {
+                        // Append app load promise
+                        return app.whenLoaded();
+                    }));
+                }, []);
+
+                // Try again when all current promises are fulfilled
+                return Promise.all(spacesAndAppsLoaded).then(whenAllLoaded);
+            }
+        }
+
+        weavy.whenAllLoaded = whenAllLoaded;
+
+        weavy.on("processed:load", function () {
+            whenAllLoaded().then(function () {
+                weavy.whenLoaded.resolve();
+            });
+        });
 
         // INTERNAL FUNCTIONS
 
@@ -647,7 +741,7 @@
  
                 weavy.options.href = window.location.href;
 
-                var authUrl = weavy.httpsUrl("/client/init", weavy.options.url);
+                var initUrl = weavy.httpsUrl("/client/init", weavy.options.url);
 
                 var initData = {
                     spaces: weavy.spaces.map(function (space) {
@@ -664,7 +758,7 @@
                     initData.tz = weavy.options.tz;
                 }
 
-                weavy.ajax(authUrl, initData, "POST", null, true).then(function (clientData) {
+                weavy.ajax(initUrl, initData, "POST", null, true).then(function (clientData) {
 
                     /**
                      * Triggered when init data has been loaded from the server.
@@ -685,7 +779,7 @@
         /**
          * Creates an isolated shadow root in the DOM tree to place nodes in.
          * 
-         * @param {Element|jQuery|string} parentSelector - The node to place the root in.
+         * @param {Element|string} parentSelector - The node to place the root in.
          * @param {string} id - Id of the root.
          * @emits Weavy#create-root
          * @returns {Weavy~root}
@@ -694,8 +788,9 @@
             var supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
 
             var rootId = weavy.getId(id);
+            var parentElement = utils.asElement(parentSelector);
 
-            if (!parentSelector) {
+            if (!parentElement) {
                 weavy.error("No parent container defined for createRoot", rootId);
                 return;
             }
@@ -703,8 +798,6 @@
                 weavy.warn("Root already created", rootId);
                 return _roots.get(rootId);
             }
-
-            var parentElement = $(parentSelector)[0];
 
             var rootSection = document.createElement("weavy");
 
@@ -733,7 +826,7 @@
              * @property {Element} container - The &lt;weavy-container/&gt; where you safely can place elements. Attached to the root.
              * @property {string} id - The id of the root.
              * @property {function} remove() - Function to remove the root from the DOM.
-             * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM
+             * @see {@link https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM}
              **/
             var root = { parent: parentElement, section: rootSection, root: rootDom, container: rootContainer, id: rootId };
 
@@ -751,6 +844,7 @@
             /**
              * Triggered when a shadow root is created
              * 
+             * @category events
              * @event Weavy#create-root
              * @returns {Weavy~root}
              **/
@@ -759,8 +853,8 @@
             root.remove = function () {
                 weavy.triggerEvent("before:remove-root", root);
 
-                $(root.container).remove();
-                $(root.section).remove();
+                root.container.remove();
+                root.section.remove();
 
                 weavy.triggerEvent("on:remove-root", root);
 
@@ -791,6 +885,7 @@
          **/
         function frameStatusCheck() {
             var statusUrl = "/client/ping";
+            var whenFrameStatusCheck = new WeavyPromise();
 
             if (!weavy.nodes.statusFrame) {
                 // frame status checking
@@ -807,16 +902,18 @@
                     /**
                      * Triggered when the frame check is done.
                      * 
+                     * @category events
                      * @event Weavy#frame-check
-                     * @returns {Object}
+                     * @returns {WeavyPromise}
                      * @property {boolean} blocked - Whether iframes communication is blocked or not.
-                     * @resolves {Weavy#whenReady}
+                     * @resolves {WeavyPromise}
                      **/
                     weavy.triggerEvent("frame-check", { blocked: false });
+                    whenFrameStatusCheck.resolve({ blocked: false });
                 });
 
                 weavy.nodes.container.appendChild(weavy.nodes.statusFrame);
-                weavy.timeout(1).then(function () {
+                weavy.whenTimeout(1).then(function () {
                     weavy.nodes.statusFrame.src = weavy.httpsUrl(statusUrl, weavy.options.url);
                     weavy.isBlocked = true;
 
@@ -825,11 +922,12 @@
                     } catch (e) {
                         weavy.warn("Frame postMessage is blocked", e);
                         weavy.triggerEvent("frame-check", { blocked: true });
+                        whenFrameStatusCheck.reject();
                     }
                 });
             }
 
-            return weavy.whenReady();
+            return whenFrameStatusCheck();
         }
 
         /**
@@ -839,7 +937,7 @@
             // add container
             if (!weavy.getRoot()) {
                 // append container to target element || html
-                var rootParent = $(weavy.options.container)[0] || document.documentElement;
+                var rootParent = utils.asElement(weavy.options.container) || document.documentElement;
 
                 var root = weavy.createRoot.call(weavy, rootParent);
                 weavy.nodes.container = root.root;
@@ -881,7 +979,7 @@
         weavy.ajax = function (url, data, method, settings, allowAnonymous) {
             url = weavy.httpsUrl(url, weavy.options.url);
             method = method || "GET";
-            data = data && typeof data === "string" && data || method !== "GET" && data && JSON.stringify(data) || data;
+            data = data && typeof data === "string" && data || method !== "GET" && data && JSON.stringify(data, utils.sanitizeJSON) || data;
 
             settings = weavy.extendDefaults({
                 url: url,
@@ -953,75 +1051,75 @@
                 });
             });
         }
-
+        
         /**
          * Destroys the instance of Weavy. You should also remove any references to weavy after you have destroyed it. The [destroy event]{@link Weavy#event:destroy} will be triggered before anything else is removed so that plugins etc may unregister and clean up, before the instance is gone.
          * @param {boolean} [keepConnection=false] - Set to true if you want the realtime-connection to remain connected.
          * @emits Weavy#destroy
+         * @returns {external:Promise}
          */
         weavy.destroy = function (keepConnection) {
+            var whenDestroyed = new WeavyPromise();
+            var waitFor = [];
+
             /**
              * Event triggered when the Weavy instance is about to be destroyed. Use this event for clean up. 
              * - Any events registered using {@link Weavy#on} and {@link Weavy#one} will be unregistered automatically. 
-             * - Timers using {@link Weavy#timeout} will be cleared automatically.
+             * - Timers using {@link Weavy#whenTimeout} will be cleared automatically.
              * - All elements under the {@link Weavy#nodes#root} will be removed.
              * 
              * @category events
              * @event Weavy#destroy
-             */
-            weavy.triggerEvent("destroy", null);
+             * @returns {Object}
+             * @property {Array} whenAllDestroyed - List of promises to wait for before destroy resolves. Add promises to wait for in your event handler.
+            */
+            var destroyResult = weavy.triggerEvent("destroy", { whenAllDestroyed: [] });
 
-            weavy.events.clear();
-            clearTimeouts();
+            if (destroyResult !== false) {
 
-            _weavyIds.splice(_weavyIds.indexOf(weavy.getId()), 1);
-
-            if (!keepConnection && _weavyIds.length === 0) {
-                disconnect();
-            }
-
-            _roots.forEach(function (root) {
-                root.remove();
-            });
-
-
-            // Unregister all content windows
-            try {
-                wvy.postal.unregisterAll(weavy.getId());
-            } catch (e) {
-                weavy.warn("weavy.destroy: could not unregister postal content windows")
-            }
-
-            // Delete everything in the instance
-            for (var prop in weavy) {
-                if (Object.prototype.hasOwnProperty.call(weavy, prop)) {
-                    delete weavy[prop];
-                }
-            }
-        }
-
-        // EVENTS
-
-        // Register init before any plugins do
-        weavy.on("init", function () {
-
-            // Prepopulate spaces
-            if (weavy.options.spaces) {
-                var spaces = utils.asArray(weavy.options.spaces);
-
-                spaces.forEach(function (spaceOptions) {
-                    if (weavy.spaces.filter(function (space) { return space.match(spaceOptions); }).length === 0) {
-                        weavy.spaces.push(new WeavySpace(weavy, spaceOptions));
-                    }
+                weavy.log("destroy: Removing roots");
+                _roots.forEach(function (root) {
+                    root.remove();
                 });
+
+                Promise.all(destroyResult.whenAllDestroyed || []).then(function () {
+                    weavy.log("destroy: clearing events");
+                    weavy.events.clear();
+
+                    clearTimeouts();
+
+                    // Unregister all content windows
+                    try {
+                        wvy.postal.unregisterAll(weavy.getId());
+                    } catch (e) {
+                        weavy.warn("weavy.destroy: could not unregister postal content windows")
+                    }
+
+                    _weavyIds.splice(_weavyIds.indexOf(weavy.getId()), 1);
+
+                    if (!keepConnection && _weavyIds.length === 0) {
+                        waitFor.push(disconnect(true, true));
+                    }
+
+                    // Delete everything in the instance
+                    for (var prop in weavy) {
+                        if (Object.prototype.hasOwnProperty.call(weavy, prop)) {
+                            delete weavy[prop];
+                        }
+                    }
+
+                    Promise.all(waitFor).then(function () {
+                        whenDestroyed.resolve();
+                    });
+                }).catch(function () {
+                    whenDestroyed.reject();
+                });
+            } else {
+                whenDestroyed.reject();
             }
 
-            return loadClientData().then(function () {
-                var wFrameStatusCheck = frameStatusCheck.call(weavy);
-                var wConnectionInit = weavy.connection.init(true, weavy.authentication);
-                return $.when(wFrameStatusCheck, wConnectionInit);
-            });
-        });
+            return whenDestroyed();
+        }
 
 
         // REALTIME EVENTS
@@ -1140,8 +1238,9 @@
 
         });
 
-        // NAVIGATION
+        // NAVIGATION & HISTORY
         weavy.navigation = new WeavyNavigation(weavy);
+        weavy.history = new WeavyHistory(weavy);
 
         // RUN PLUGINS
 
@@ -1213,7 +1312,7 @@
 
                     // Disable individual plugins by setting plugin options to false
                     if (weavy.options.includePlugins && weavy.options.plugins[plugin] !== false || !weavy.options.includePlugins && weavy.options.plugins[plugin]) {
-                        _unsortedDependencies[plugin] = { name: plugin, dependencies: $.isArray(Weavy.plugins[plugin].dependencies) ? Weavy.plugins[plugin].dependencies : [] };
+                        _unsortedDependencies[plugin] = { name: plugin, dependencies: Array.isArray(Weavy.plugins[plugin].dependencies) ? Weavy.plugins[plugin].dependencies : [] };
                     }
                 }
             }
@@ -1227,7 +1326,7 @@
                 weavy.debug("Running Weavy plugin:", plugin);
 
                 // Extend plugin options
-                weavy.options.plugins[plugin] = weavy.extendDefaults(Weavy.plugins[plugin].defaults, $.isPlainObject(weavy.options.plugins[plugin]) ? weavy.options.plugins[plugin] : {}, true);
+                weavy.options.plugins[plugin] = weavy.extendDefaults(Weavy.plugins[plugin].defaults, utils.isPlainObject(weavy.options.plugins[plugin]) ? weavy.options.plugins[plugin] : {}, true);
 
                 // Run the plugin
                 weavy.plugins[plugin] = Weavy.plugins[plugin].call(weavy, weavy.options.plugins[plugin]) || true;
@@ -1306,6 +1405,9 @@
         https: "adaptive", // force, adaptive or default 
         init: true,
         includePlugins: true,
+        plugins: {
+            deeplinks: false
+        },
         preload: true,
         url: "/"
     };
@@ -1338,6 +1440,7 @@
      * The original options passed are left untouched. {@link Weavy.httpsUrl} settings is applied to all url options.
      * 
      * @name Weavy#extendDefaults
+     * @function
      * @param {Object} source - Original options.
      * @param {Object} properties - Merged options that will replace options from the source.
      * @param {boolean} [recursive=false] True will merge any sub-objects of the options recursively. Otherwise sub-objects are treated as data.
@@ -1361,7 +1464,7 @@
         // Apply properties to copy
         for (property in properties) {
             if (Object.prototype.hasOwnProperty.call(properties, property)) {
-                if (recursive && copy[property] && $.isPlainObject(copy[property]) && $.isPlainObject(properties[property])) {
+                if (recursive && copy[property] && utils.isPlainObject(copy[property]) && utils.isPlainObject(properties[property])) {
                     copy[property] = this.extendDefaults(copy[property], properties[property], recursive);
                 } else {
                     copy[property] = this.httpsUrl(properties[property], null, https);
@@ -1376,6 +1479,7 @@
      * Applies https enforcement to an url. Optionally adds a baseUrl to relative urls.
      * 
      * @name Weavy#httpsUrl
+     * @function
      * @param {string} url - The url to process
      * @param {string} [baseUrl] - Url to preprend to relative urls. Ie. `weavy.options.url`
      * @param {string} [https] - How to treat http enforcement for the url. Default to settings from {@link Weavy#options}. <br> • **enforce** - makes all urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **nochange** - makes no change.

@@ -1,4 +1,4 @@
-/* eslint-env commonjs, amd */
+/* eslint-env commonjs, amd, jquery */
 
 // UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 // TODO: move to ES6 and transpiler
@@ -19,7 +19,7 @@
     }
 }(typeof self !== 'undefined' ? self : this, function ($) {
 
-    console.debug("authentication.js", window.name);
+    //console.debug("authentication.js", window.name);
 
     var userUrl = "/client/user";
     var ssoUrl = "/client/sign-in";

@@ -76,7 +76,12 @@ namespace Weavy.Areas.Apps.Models {
         /// <summary>
         /// Gets or sets a value indicating of we should render full messenger or not.
         /// </summary>
-        public bool IsMessenger { get; set; }
+        public bool IsMessenger {
+            get {
+                // NOTE: for now, only supported mode is full messenger
+                return true;
+            }
+        }
         
         /// <summary>
         /// If Zoom meetings are enabled in app settings

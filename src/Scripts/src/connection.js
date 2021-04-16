@@ -1,4 +1,4 @@
-/* eslint-env commonjs, amd */
+/* eslint-env commonjs, amd, jquery */
 
 // UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 // TODO: move to ES6 and transpiler
@@ -19,7 +19,7 @@
     }
 }(typeof self !== 'undefined' ? self : this, function ($) {
 
-    console.debug("connection.js", window.name);
+    //console.debug("connection.js", window.name);
 
     function sanitizeObject(obj) {
         return JSON.parse(JSON.stringify(obj, function replacer(key, value) {
@@ -471,7 +471,7 @@
                 case "request:connection-start":
                     whenLeaderElected.then(function (leader) {
                         if (leader) {
-                            console.debug("wvy.connection: processing connect request");
+                            //console.debug("wvy.connection: processing connect request");
                             connect().then(function () {
                                 wvy.postal.postToChildren({ name: "connection-started", weavyId: "wvy.connection", connectionUrl: connectionUrl });
                             });
@@ -489,7 +489,7 @@
                 case "connection-started":
                     whenLeaderElected.then(function (leader) {
                         if (!leader) {
-                            console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " distribute received", msg.name, msg.eventName || "");
+                            //console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " distribute received", msg.name, msg.eventName || "");
                             state = states.connected;
                             whenConnected.resolve();
                         }
@@ -512,7 +512,7 @@
                         }
                     }
 
-                    console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " triggering received distribute-event", name);
+                    //console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " triggering received distribute-event", name);
                     $(weavyConnection).triggerHandler(event, msg.data);
                     break;
                 case "alert":

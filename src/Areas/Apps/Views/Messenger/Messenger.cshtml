@@ -19,6 +19,9 @@
     @Html.ThemeHead()
     @Html.ThemeStyle("~/areas/apps/styles/messenger.scss")
     <script data-turbolinks-track="reload">var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    @if (WeavyContext.Browser.Browser == "IE") {
+        @Bundler.Scripts("~/scripts/ie.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
+    }
     @Bundler.Scripts($"~/scripts/resources/resources.{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.js", htmlAttributes: new { data_turbolinks_track = "reload" })
     @Bundler.Scripts("~/areas/apps/scripts/messenger.bundle", htmlAttributes: new { data_turbolinks_track = "reload" })
 </head>

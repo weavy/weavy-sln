@@ -7,26 +7,26 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'jquery',
-            'weavy'
+            'weavy',
+            '../../promise',
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(
-            require('jquery'),
-            require('weavy')
+            require('weavy'),
+            require('../../promise')
         );
     } else {
         // Browser globals (root is window)
-        if (typeof Weavy === 'undefined' || !Weavy.plugins) {
+        if (typeof root.Weavy === 'undefined' || !root.Weavy.plugins) {
             throw new Error("Weavy must be loaded before registering plugin");
         }
 
-        factory(jQuery, Weavy);
+        factory(root.Weavy, root.WeavyPromise);
     }
-}(typeof self !== 'undefined' ? self : this, function ($, Weavy) {
+}(typeof self !== 'undefined' ? self : this, function (Weavy, WeavyPromise) {
 
     /**
      * Plugin for sign-in panel.
@@ -43,7 +43,7 @@
          */
         var weavy = this;
 
-        var whenSignedIn = $.Deferred();
+        var whenSignedIn = new WeavyPromise();
         var isSigningIn = false;
 
         /**
@@ -86,7 +86,7 @@
 
             if (isSigningIn || weavy.authentication.isAuthorized()) {
                 weavy.log("user already " + (isSigningIn ? "signing" : "signed") + " in, moving on");
-                return whenSignedIn.promise();
+                return whenSignedIn();
             }
 
             isSigningIn = true;
@@ -99,7 +99,7 @@
             });
 
             // return promise
-            return whenSignedIn.promise();
+            return whenSignedIn();
         }
 
         weavy.on("user", function (e, auth) {
@@ -135,7 +135,7 @@
              * @returns {Object}
              * @property {boolean} isLocal - Is the origin of the event from this weavy instance
              */
-            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (message.weavyId === true || message.weavyId === weavy.getId()) }));
+            weavy.whenTimeout(0).then(weavy.triggerEvent.bind(weavy, "signing-in", { isLocal: typeof e.source !== "undefined" && (message.weavyId === true || message.weavyId === weavy.getId()) }));
         });
 
 
@@ -150,7 +150,7 @@
              * @category events
              * @event Weavy#authentication-error
              */
-            weavy.timeout(0).then(weavy.triggerEvent.bind(weavy, "authentication-error", { method: "panel", status: 401, message: "Unauthorized" }));
+            weavy.whenTimeout(0).then(weavy.triggerEvent.bind(weavy, "authentication-error", { method: "panel", status: 401, message: "Unauthorized" }));
         });
 
         // EVENT LISTENERS
@@ -188,14 +188,14 @@
         });
 
         weavy.on("signed-out", function (e, auth) {
-            whenSignedIn = $.Deferred();
+            whenSignedIn.reset();
         });
 
         var authenticationExports = {
             signIn: signIn,
             isSigningIn: function () { return isSigningIn },
             whenSignedIn: function () {
-                return whenSignedIn.promise();
+                return whenSignedIn();
             }
         };
 

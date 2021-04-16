@@ -1,7 +1,7 @@
-﻿~/scripts/src/browser.js
+﻿~/scripts/src/server/browser.js
 ~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/vendor/overlayscrollbars/jquery.overlayScrollbars.min.js
-~/scripts/src/scrollbar.js
+~/scripts/src/server/scrollbar.js
 ~/scripts/vendor/turbolinks/turbolinks.js
 ~/scripts/vendor/prismjs/prism-core.min.js
 ~/scripts/vendor/prismjs/prism-clike.min.js
@@ -10,6 +10,6 @@
 ~/scripts/vendor/prismjs/prism-json.min.js
 
 # component
-~/scripts/src/codesample.js
+~/scripts/src/server/codesample.js
 
 

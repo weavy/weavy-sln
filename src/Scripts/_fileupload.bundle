@@ -1,2 +1,2 @@
-﻿~/scripts/src/fileupload.js
-~/scripts/src/drop.js
+﻿~/scripts/src/server/fileupload.js
+~/scripts/src/server/drop.js

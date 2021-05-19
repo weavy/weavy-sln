@@ -290,8 +290,9 @@ body.controller-content {
         display: none;
     }
 
-    &:not(.content-properties) {
+    &:not(.content-properties, .content-generic) {
         h4 {
+            // Seems broken?
             @include divider();
         }
     }

@@ -216,13 +216,17 @@
          */
         function validateContext(context) {
             if (context) {
-                if (context.on) {
+                if (context.on && typeof context.on === "function") {
                     return context;
                 }
 
                 var contextElement = utils.asElement(context);
                 if (contextElement) {
                     return contextElement;
+                }
+
+                if (context instanceof EventTarget) {
+                    return context;
                 }
             }
 

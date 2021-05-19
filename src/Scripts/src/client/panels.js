@@ -718,11 +718,8 @@
                     _isLoaded = false;
                     _isLoading = false;
 
-                    /*
-                    if (panel.frame.dataset.src) {
-                        panel.location = weavy.httpsUrl(newFrame.dataset.src, weavy.options.url);
-                    }
-                    */
+                    panel.whenReady.reset();
+                    panel.whenLoaded.reset();
 
                     var isOpen = panel.isOpen;
 

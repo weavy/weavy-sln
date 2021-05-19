@@ -28,7 +28,7 @@
 
     /**
      * Plugin for enabling maximize button.
-     * Enable the button by setting options { controls: { maximize: true }} on an app or a panel or by manually using the {@link MaximizePlugin#maximize} method.
+     * Enable the button by setting options `{ controls: { maximize: true }}` on an app or a panel or by manually using the {@link MaximizePlugin#maximize} method.
      * @example
      * var weavy = new Weavy();
      * var space = weavy.space({
@@ -86,12 +86,13 @@
      * });
      * 
      * @mixin MaximizePlugin
+     * @typicalname panel
      * @returns {Weavy.plugins.maximize}
      */
     var MaximizePlugin = function (options) {
         /**
          *  Reference to this instance
-         *  @lends Weavy#
+         *  @lends MaximizePlugin#
          */
         var weavy = this;
 
@@ -99,6 +100,8 @@
          * Toggling maximized mode on a panel. This means the panel will try to take up the whole window. 
          * You may add additional styles as properties in a styles object to fine tune the layout/position in your environment.
          * 
+         * @function
+         * @name MaximizePlugin#maximize
          * @param {boolean} [maximize] - Set true to maximize, false to restore, null to toggle (default).
          * @param {Object} [styles] - Object with style properties to override on the panel. The names must be the same as style names used in HTMLElement.styles
          */

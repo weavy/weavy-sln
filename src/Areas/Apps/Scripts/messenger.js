@@ -717,7 +717,7 @@ wvy.messenger = (function ($) {
     });
 
     // update settings
-    $(document).on("change submit", "#settings-form", function (e) {
+    $(document).on("submit", "#settings-form", function (e) {
         e.preventDefault();
         var $form = $(this);
         $.ajax({
@@ -728,6 +728,7 @@ wvy.messenger = (function ($) {
             // update relevant client context settings
             wvy.settings.enter = data.enter_to_send || false;
             wvy.settings.notify = data.desktop_notifications || false;
+            $("#settings-modal").modal("hide");
         });
     });
 
@@ -1029,7 +1030,7 @@ wvy.messenger = (function ($) {
     // update gui because message was delivered
     wvy.connection.default.on("conversation-delivered.weavy", function (event, data) {
         console.debug("conversation " + data.conversation.id + " was delivered to user " + data.user.id);
-
+        
         // update #messages if needed
         if (_id === data.conversation.id && $("#messages .status-sent").length) {
             $.get({ url: wvy.url.resolve(_prefix + "/c/" + data.conversation.id + "/messages"), cache: false }).done(function (data) {
@@ -1037,6 +1038,20 @@ wvy.messenger = (function ($) {
                 $("#messages").html(data);
                 scrollToBottomOfMessages();
             });
+        }
+    });
+
+    // update gui because conversation was deleted
+    wvy.connection.default.on("conversation-deleted.weavy", function (event, data) {
+        console.debug("conversation " + data.id + " was deleted");
+
+        // update or reload if needed
+        if (_id === data.id) {
+            // reload entire view
+            document.location.href = wvy.url.resolve(_prefix);
+        } else {
+            // remove conversation from list
+            $(".conversation[data-id='" + data.id + "']").remove();
         }
     });
 

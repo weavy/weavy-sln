@@ -757,6 +757,9 @@
                 if (weavy.options.tz) {
                     initData.tz = weavy.options.tz;
                 }
+                if (weavy.options.theme) {
+                    initData.theme = weavy.options.theme;
+                }
 
                 weavy.ajax(initUrl, initData, "POST", null, true).then(function (clientData) {
 

@@ -4,6 +4,26 @@
         <name>Weavy.Core</name>
     </assembly>
     <members>
+        <member name="T:Weavy.Core.Events.AfterDeleteMessage">
+            <summary>
+             Runs just after a message was deleted.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.AfterDeleteMessage.Deleted">
+            <summary>
+            Gets the message that was deleted.
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Events.AfterDeleteUser">
+            <summary>
+             Runs just after a user was deleted.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Events.AfterDeleteUser.Deleted">
+            <summary>
+            Gets the user that was deleted.
+            </summary>
+        </member>
         <member name="T:Weavy.Core.Events.AfterRestoreContent">
             <summary>
             Runs just after a content item was restored.
@@ -1018,6 +1038,12 @@
             </summary>
             <param name="e"></param>
         </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteUser)">
+            <summary>
+            Logs the AfterDeleteUser event.
+            </summary>
+            <param name="e"></param>
+        </member>
         <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteSpace)">
             <summary>
             Logs the AfterDeleteSpace event.
@@ -1117,6 +1143,12 @@
         <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteConversation)">
             <summary>
             Logs the AfterDeleteConversation event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AuditHook.Handle(Weavy.Core.Events.AfterDeleteMessage)">
+            <summary>
+            Logs the AfterDeleteMessage event.
             </summary>
             <param name="e"></param>
         </member>
@@ -17723,6 +17755,12 @@
               The object will be updated to reflect any changes made by the repository, i.e. identity or computed columns.
             </remarks>
         </member>
+        <member name="M:Weavy.Core.Repos.LogEntryRepo.Delete(System.Int32)">
+            <summary>
+            Removes all <see cref="T:Weavy.Core.Models.LogEntry"/>s user with the specified actor id.
+            </summary>
+            <param name="actorId">The user id of the actor to remove <see cref="T:Weavy.Core.Models.LogEntry"/>s for.</param>
+        </member>
         <member name="M:Weavy.Core.Repos.LogEntryRepo.Search(Weavy.Core.Models.LogEntryQuery)">
             <summary>
             Performs a search according to the specified <see cref="T:Weavy.Core.Models.LogEntryQuery"/> object.
@@ -18187,6 +18225,12 @@
             <remarks>
               The object will be updated to reflect any changes made by the repository, i.e. identity or computed columns.
             </remarks>
+        </member>
+        <member name="M:Weavy.Core.Repos.MessageRepo.Delete(System.Int32)">
+            <summary>
+            Permanently deletes the <see cref="T:Weavy.Core.Models.Message"/>.
+            </summary>
+            <param name="id">Id of the <see cref="T:Weavy.Core.Models.Message"/> object to delete.</param>
         </member>
         <member name="M:Weavy.Core.Repos.MessageRepo.Update(Weavy.Core.Models.Message)">
             <summary>
@@ -18948,6 +18992,12 @@
               The object will be updated to reflect any changes made by the repository, i.e. computed columns.
             </remarks>
         </member>
+        <member name="M:Weavy.Core.Repos.UserRepo.Delete(System.Int32)">
+            <summary>
+            Permanently deletes a <see cref="T:Weavy.Core.Models.User"/> from the repository.
+            </summary>
+            <param name="id">Id of the <see cref="T:Weavy.Core.Models.User"/> to delete.</param>
+        </member>
         <member name="M:Weavy.Core.Repos.UserRepo.GetPassword(System.Int32)">
             <summary>
             Gets the password hash for the specified user. 
@@ -19188,17 +19238,12 @@
             Generic callback event used in realtime.js to dispatch the actual event to the registered handlers.
             </summary>
         </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_AUTHENTICATE">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="F:Weavy.Core.Services.PushService.EVENT_BADGE">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_POST_INSERTED">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_POST_UPDATED">
             <summary>
             
             </summary>
@@ -19233,37 +19278,7 @@
             
             </summary>
         </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_LIKE">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_UNLIKE">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_STAR">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_UNSTAR">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_MESSAGE_INSERTED">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_MESSAGE_UPDATED">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_MESSAGE_DELIVERED">
+        <member name="F:Weavy.Core.Services.PushService.EVENT_CONVERSATION_DELETED">
             <summary>
             
             </summary>
@@ -19279,6 +19294,26 @@
             </summary>
         </member>
         <member name="F:Weavy.Core.Services.PushService.EVENT_CONVERSATION_PINNED">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_LIKE">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_MESSAGE_INSERTED">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_MESSAGE_UPDATED">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_MESSAGE_DELIVERED">
             <summary>
             
             </summary>
@@ -19303,7 +19338,22 @@
             
             </summary>
         </member>
-        <member name="F:Weavy.Core.Services.PushService.EVENT_AUTHENTICATE">
+        <member name="F:Weavy.Core.Services.PushService.EVENT_POST_INSERTED">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_POST_UPDATED">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_STAR">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_THEME_CHANGED">
             <summary>
             
             </summary>
@@ -19311,6 +19361,16 @@
         <member name="F:Weavy.Core.Services.PushService.EVENT_TYPING">
             <summary>
             Name of event that is sent when a user is typing in a conversation.
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_UNSTAR">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.PushService.EVENT_UNLIKE">
+            <summary>
+            
             </summary>
         </member>
         <member name="M:Weavy.Core.Services.PushService.Push(System.String,System.Object)">
@@ -20699,6 +20759,11 @@
             Gets the email address from which outgoing emails should be sent (<c>weavy.smtp-from</c>).
             </summary>
         </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.Scrape">
+            <summary>
+            Gets a value indicating if link scraping for embeds is enabled. (<c>weavy.scrape</c>).
+            </summary>
+        </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpPassword">
             <summary>
             Gets the password to use for authentication against the SMTP server (<c>weavy.smtp-password</c>).
@@ -21563,6 +21628,12 @@
             <param name="e"><see cref="T:Weavy.Core.Models.LogEntry"/> object to insert.</param>
             <returns>The inserted <see cref="T:Weavy.Core.Models.LogEntry"/>.</returns>
         </member>
+        <member name="M:Weavy.Core.Services.LogEntryService.Delete(System.Int32)">
+            <summary>
+            Removes all <see cref="T:Weavy.Core.Models.LogEntry"/>s user with the specified actor id.
+            </summary>
+            <param name="actorId">The user id of the actor to remove <see cref="T:Weavy.Core.Models.LogEntry"/>s for.</param>
+        </member>
         <member name="M:Weavy.Core.Services.LogEntryService.Search(Weavy.Core.Models.LogEntryQuery)">
             <summary>
               Performs a search according to the specified <see cref="T:Weavy.Core.Models.LogEntryQuery"/> object.
@@ -22217,6 +22288,14 @@
             <param name="meetings"></param>
             <param name="sudo"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
             <returns>The inserted <see cref="T:Weavy.Core.Models.Message"/></returns>
+        </member>
+        <member name="M:Weavy.Core.Services.MessageService.Delete(System.Int32,System.Boolean)">
+            <summary>
+            Deletes a <see cref="T:Weavy.Core.Models.Message" /> from the repository.
+            </summary>
+            <param name="id">The id of the <see cref="T:Weavy.Core.Models.Message"/> to delete.</param>
+            <param name="sudo"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
+            <returns></returns>
         </member>
         <member name="M:Weavy.Core.Services.MessageService.Search(Weavy.Core.Models.MessageQuery)">
             <summary>
@@ -23259,6 +23338,14 @@
             <param name="id">Id of user ro restore.</param>
             <param name="sudo"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
             <returns>The restored user.</returns>
+        </member>
+        <member name="M:Weavy.Core.Services.UserService.Delete(System.Int32,System.Boolean)">
+            <summary>
+            Permanently deletes the <see cref="T:Weavy.Core.Models.User"/> from the repository.
+            </summary>
+            <param name="id">The id of the <see cref="T:Weavy.Core.Models.User"/> to delete.</param>
+            <param name="sudo"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
+            <returns>The deleted <see cref="T:Weavy.Core.Models.User"/> or null if the operation failed.</returns>
         </member>
         <member name="M:Weavy.Core.Services.UserService.Get(System.Int32,System.Boolean,System.Boolean)">
             <summary>

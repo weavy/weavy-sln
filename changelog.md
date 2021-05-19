@@ -1,5 +1,14 @@
 # Changelog for Weavy
 
+## 8.2.2 (2021-05-19)
+
+* Added ability to add cssclass for theming (beta).
+* Embed functions and properties are now public.
+* Added ability to update avatar from messenger settings.
+* Fixes an issue with incorrect FK in conversations.
+* Setting to enable (default) / disable external scraping of urls.
+* Added method for deleting individual messages.
+
 ## 8.2.1 (2021-05-19)
 
 * Fixed issue with promises on panel reset.

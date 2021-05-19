@@ -23,6 +23,7 @@
 ~/scripts/src/server/user.js
 ~/scripts/src/server/space.js
 ~/scripts/src/server/content.js
+~/scripts/src/server/theme.js
 ~/scripts/src/server/star.js
 ~/scripts/src/server/subscribe.js
 ~/scripts/src/server/drag.js

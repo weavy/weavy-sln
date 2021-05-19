@@ -1,8 +1,19 @@
 ﻿@model User
 @if (Model.IsTrashed() && Model.HasPermission(Permission.Delete)) {
-    <form action="@(Url.Action<PeopleController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
-        <button type="submit" class="btn btn-icon" title="@T["Restore user"]">@Svg.Icon("backup-restore", "success")</button>
-    </form>
+    <div class="dropdown" prevent-modal>
+        <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">
+            @Svg.Icon("dots-vertical")
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <form action="@(Url.Action<PeopleController>(c => c.Restore(Model.Id)))" method="post" data-turboform>
+                <button type="submit" class="dropdown-item">@Svg.Icon("backup-restore", "success") @T["Restore"]</button>
+            </form>
+            <form action="@(Url.Action<PeopleController>(c => c.Delete(Model.Id)))" method="post" data-turboform>
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button type="submit" class="dropdown-item">@Svg.Icon("delete", "danger") @T["Delete"]</button>
+            </form>
+        </div>
+    </div>
 } else if (Model.HasPermission(Permission.Edit)) {
     <div class="dropdown" prevent-modal>
         <button type="button" class="btn btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="@T["Toggle Dropdown"]">

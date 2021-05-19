@@ -425,6 +425,25 @@
             <param name="embedded"></param>
             <returns>Returns info about the entity.</returns>
         </member>
+        <member name="M:Weavy.Web.Api.Controllers._ClientController.SetTheme(System.String)">
+            <summary>
+            Saves the name of the new theme in a cookie and triggers realtime message about theme name changing.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._ClientController.ClearTheme">
+            <summary>
+            Clear the theme cookie and triggers realtime message about theme name changing.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Api.Controllers._ClientController.GetTheme">
+            <summary>
+            Gets the current theme (from cookie).
+            </summary>
+            <returns>The name of the current theme or null</returns>
+        </member>
         <member name="T:Weavy.Web.Api.Controllers.JwtModel">
             <summary>
             Class for recieving the jwt token.
@@ -4937,6 +4956,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Weavy.Web.Controllers.PeopleController.Delete(System.Int32)">
+            <summary>
+            Permanently deletes a user account from the repository.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Controllers.PeopleController.Welcome(System.Int32,System.String)">
             <summary>
             Send welcome email with username and password.
@@ -7721,6 +7747,11 @@
             Sets the client timezone.
             </summary>
         </member>
+        <member name="P:Weavy.Web.Models.ClientOptions.Theme">
+            <summary>
+            Sets the CSS theme class.
+            </summary>
+        </member>
         <member name="P:Weavy.Web.Models.ClientOptions.Version">
             <summary>
             Sets the client version (used to display warning if client and server versions are different).
@@ -9474,6 +9505,12 @@
             </summary>
             <param name="e"></param>
             <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterDeleteConversation)">
+            <summary>
+            Push deleted <see cref="T:Weavy.Core.Models.Conversation"/> to all members.
+            </summary>
+            <param name="e"></param>
         </member>
         <member name="M:Weavy.Web.Plugins.RealTimeHook.Handle(Weavy.Core.Events.AfterInsertPost)">
             <summary>

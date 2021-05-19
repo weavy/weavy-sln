@@ -132,12 +132,20 @@ namespace Weavy.Areas.Apps.Models {
         /// </summary>
         public MessengerSettings(User user) {
             var settings = user.GetSettings();
+            Avatar = user.Profile.Avatar;
             EnterToSend = settings.EnterToSend;
             DesktopNotifications = settings.DesktopNotifications;
             EmailNotifications = settings.EmailNotifications;
             MobileNotifications = settings.MobileNotifications;
             Timezone = settings.TimeZone;
         }
+
+        /// <summary>
+        /// Gets or sets the avatar image.
+        /// </summary>
+        [Display(Name = "Profile picture", Description = "Recommended dimensions of at least 256x256 pixels.", Prompt = "Select picture")]
+        [Image(EntityType.User)]
+        public Blob Avatar { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether Enter should send a message or insert a new line.

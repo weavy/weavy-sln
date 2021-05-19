@@ -219,14 +219,16 @@ namespace Weavy.Areas.Apps.Controllers {
         [HttpPost]
         [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/settings")]
         public JsonResult UpdateSettings(MessengerSettings model) {
+            User.Avatar = model.Avatar;
+
             // merge in settings
             User.MergeSettings(new Dictionary<string, object> {
-                { UserUtils.EnterToSendKey, model.EnterToSend},
-                { UserUtils.DesktopNotificationsKey , model.DesktopNotifications},
-                { UserUtils.EmailNotificationsKey,  model.EmailNotifications},
-                { UserUtils.MobileNotificationsKey, model.MobileNotifications},
-                { UserUtils.TimeZoneKey , model.Timezone }
-            });
+                    { UserUtils.EnterToSendKey, model.EnterToSend},
+                    { UserUtils.DesktopNotificationsKey , model.DesktopNotifications},
+                    { UserUtils.EmailNotificationsKey,  model.EmailNotifications},
+                    { UserUtils.MobileNotificationsKey, model.MobileNotifications},
+                    { UserUtils.TimeZoneKey , model.Timezone }
+                });
             var user = UserService.Update(User);
             return Json(new MessengerSettings(user));
         }
@@ -343,7 +345,7 @@ namespace Weavy.Areas.Apps.Controllers {
                 Meeting = MeetingService.CreateMeeting(provider),
                 //ConversationId = id
             };
-                        
+
             return PartialView($"_Meeting{provider}", model);
         }
 

@@ -26,6 +26,7 @@
 ~/scripts/src/server/emoji.js
 ~/scripts/src/authentication.js
 ~/scripts/src/connection.js
+~/scripts/src/server/theme.js
 ~/scripts/src/server/presence.js
 ~/scripts/src/server/fileupload.js
 ~/scripts/src/server/drop.js

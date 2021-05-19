@@ -49,10 +49,10 @@
      * @typicalname weavy.plugins.theme
      */
     var ThemePlugin = function (options) {
-         /** 
-         *  Reference to this instance
-         *  @lends ThemePlugin#
-         */
+        /** 
+        *  Reference to this instance
+        *  @lends ThemePlugin#
+        */
         var weavy = this;
 
         var supportsShadowDOM = !!HTMLElement.prototype.attachShadow;
@@ -99,7 +99,7 @@
          * @param {HTMLElement} root - The root containing the stylesheet
          * @param {string} css - The styles to apply. Full css including selectors etc may be used.
          */
-        function addCss (root, css) {
+        function addCss(root, css) {
             css += "\n";
 
             if (root.weavyStyles) {
@@ -109,6 +109,32 @@
                     root.weavyStyles.appendChild(document.createTextNode(css));
                 }
             }
+        }
+
+        /**
+         * Sets theme cookie and adds class "weavy-theme-{name}" to the body element (via realtime).
+         * @param {any} name - The theme suffix name to set.
+         */
+        function set(name) {
+            weavy.ajax("client/theme/" + name, null, "PUT").then(function () {
+            });
+        }
+
+        /**
+        * Clears theme cookie and removes any theme class added to the body element (via realtime).
+        */
+        function clear() {
+            weavy.ajax("client/theme", null, "DELETE").then(function () {
+            });
+        }
+
+        /**
+         * Get the current theme name.
+         * */
+        function get() {
+            return weavy.ajax("client/theme", null, "GET").then(function (data) {
+                return data.theme;
+            });
         }
 
         weavy.on("create-root", function (e, createRoot) {
@@ -131,7 +157,10 @@
         // Exports
         return {
             addCss: addCss,
-            createStyleSheet: createStyleSheet
+            createStyleSheet: createStyleSheet,
+            set: set,
+            clear: clear,
+            get: get
         };
     };
 

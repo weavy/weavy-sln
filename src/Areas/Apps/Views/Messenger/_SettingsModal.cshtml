@@ -10,6 +10,10 @@
             </div>
             <div class="modal-body">
                 <form id="settings-form" action="@(Url.Action<MessengerController>(x => x.UpdateSettings(null)))" method="post">
+                    <div class="text-center">
+                        @Html.EditorFor(x => Model.Avatar)
+                    </div>
+
                     <fieldset class="my-3">
                         <label>@T["Message settings"]</label>
                         @Html.EditorsForModel(group: "Message", surroundingHtml: false, descriptions: true)
@@ -30,6 +34,7 @@
                         <label>@T["Time zone"]</label>
                         @Html.EditorFor(x => Model.Timezone, additionalViewData: new { __label = false, __desc = false })
                     </fieldset>
+                    <button type="submit" class="btn btn-primary btn-load" title="@T["Save"]">@T["Save"]</button>
                 </form>
             </div>
         </div>

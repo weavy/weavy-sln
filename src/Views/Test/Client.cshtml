@@ -125,9 +125,10 @@
         <a id="btn-sign-out" class="nav-link">Sign out</a>
         <a id="btn-destroy" class="nav-link">Destroy</a>
         <a id="btn-init" class="nav-link">Init</a>
+        <a id="btn-theme" class="nav-link">Toggle Theme</a>
         <a id="btn-toggle" class="nav-link mr-auto">Toggle Comments</a>
         <a id="notifications" class="nav-link p-2">@Svg.Icon("bell")</a>
-        <a id="messenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>
+        <a id="messenger" class="nav-link p-2">@Svg.Icon("weavy-messenger")</a>        
     </nav>
 
     <div class="container-fluid">
@@ -146,6 +147,7 @@
         (function ($) {
 
             var weavy, weavy2;
+            var theme = "";
 
             var jwts = ["@ViewBag.Token", "@ViewBag.TokenTest"];
             var currentJwt = 0;
@@ -176,6 +178,7 @@
                 weavy = window.weavy = new Weavy(pluginConfig, {
                     id: "ctx",
                     jwt: jwt,
+                    theme: theme,
                     spaces: [
                         {
                             key: "client-test-global",
@@ -250,7 +253,6 @@
                 weavy2.destroy();
             });
 
-
             $("#btn-sign-out").on("click", function () {
                 console.log("click signOut");
                 weavy.authentication.signOut();
@@ -284,6 +286,12 @@
             $("#btn-jwt-p").on("click", function () {
                 console.log("click jwt promise()");
                 weavy.authentication.signIn(function () { return new Promise(function (resolve) { return resolve(alternateJwt()); }); });
+            });
+
+            $("#btn-theme").on("click", function () {
+                console.log("toggle theme");
+                theme = "dark";
+                weavy.plugins.theme.set("dark");
             });
 
             $("#btn-toggle").on("click", function () {

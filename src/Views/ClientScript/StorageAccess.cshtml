@@ -1,0 +1,73 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = ViewBag.Title as string ?? "Storage Access";
+    var message = ViewBag.Message as string;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-6">
+            <div class="text-center mb-3">
+                @Html.IconImg(48)
+            </div>
+            <div id="info" class="d-none text-center">
+                <h1 class="display-3 text-center">@(ViewBag.Title as string)</h1>
+                <p>Cookies are required to use collaborative features from @(WeavyContext.Uri.Host).</p>
+                <div>
+                    <button id="saa" class="btn btn-primary">Allow cookie access</button>
+                    <button id="saa_cancel" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    const needsCookie = /cookie/.test(document.location.search);
+
+    function enableCookie() {
+        window.location = "/storage-access-notify";
+    }
+
+    function notify() {
+        wvy.postal.postToParent({ name: "storage-access-granted" }, true);
+        wvy.postal.whenLeader.always(() => window.close());            
+    }
+
+    if ('hasStorageAccess' in document) {
+        document.hasStorageAccess().then(function (hasAccess) {
+            if (hasAccess && !needsCookie) {
+                notify();
+            } else {
+                $(() => {
+                    $("#info").removeClass("d-none");
+
+                    $("#saa").on("click", () => {
+                        if ('requestStorageAccess' in document) {
+                            document.requestStorageAccess().then(
+                                function (hasAccess) {
+                                    console.log("Storage access was granted.", hasAccess);
+                                    enableCookie();
+                                },
+                                function (reason) {
+                                    console.log("Storage access was denied.", reason);
+                                    window.close();
+                                }
+                            );
+                        } else {
+                            notify();
+                        }
+                    });
+
+                    $("#saa_cancel").on("click", function () { window.close(); })
+                });
+            }
+        })
+    } else {
+        notify();
+    }
+
+</script>

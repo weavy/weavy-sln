@@ -43,4 +43,31 @@
             margin-top: rem(1);
         }
     }
+
+    .btn {
+        cursor: pointer;
+        display: inline-flex;
+        flex-shrink: 0;
+        flex-grow: 0;
+
+        > * {
+            display: inline-flex;
+        }
+
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: .3125rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .1875rem;
+        color: $white;
+        background-color: $primary;
+        border-color: $primary;
+        box-shadow: $btn-box-shadow;
+        margin-top: .5rem;
+    }
 }

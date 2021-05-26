@@ -9,6 +9,27 @@
     @Bundler.Scripts("~/scripts/vendor/jquery/jquery.min.js", "~/scripts/src/postal.js")
 </head>
 <body>
+    <script>
+        if ('hasStorageAccess' in document) {
+            var promise = document.hasStorageAccess();
+            promise.then(
+                function (hasAccess) {
+                    // Boolean hasAccess says whether the document has access or not.
+                    console.log("has storage access.", hasAccess);
+                    wvy.postal.postToParent({ name: "storage-access", hasAccess: hasAccess });
+                },
+                function (reason) {
+                    // Promise was rejected for some reason.
+                    console.log("has no storage access.", reason);
+                    wvy.postal.postToParent({ name: "storage-access", hasAccess: false });
+                }
+            );
+        } else {
+            wvy.postal.postToParent({ name: "storage-access", hasAccess: true });
+        }
+
+        wvy.postal.postToParent({ name: "user-status", id: @WeavyContext.Current.User.Id });
+    </script>
     pong
 </body>
 </html>

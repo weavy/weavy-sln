@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 8.3.0 (2021-05-26)
+
+* Added Storage Access API usage flow for third party cookies in client.
+* Improved support for strict tracking protection in browsers.
+
 ## 8.2.2 (2021-05-19)
 
 * Added ability to add cssclass for theming (beta).

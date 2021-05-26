@@ -138,7 +138,7 @@
         }
 
         weavy.on("create-root", function (e, createRoot) {
-            if (weavy.data && weavy.data.plugins.theme) {
+            if (weavy.data && weavy.data.plugins && weavy.data.plugins.theme) {
                 var data = weavy.data.plugins.theme;
 
                 // add styles

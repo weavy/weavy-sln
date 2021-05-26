@@ -4148,6 +4148,18 @@
             </summary>        
             <returns></returns>
         </member>
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.StorageAccess">
+            <summary>
+            A view that notifies the parent window when a user signs in / signs out.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.StorageAccessNotify">
+            <summary>
+            A view that notifies the parent window when a user signs in / signs out.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Weavy.Web.Controllers.ClientScriptController.WeavyClientScript(System.String,System.Boolean)">
             <summary>
             Returns the weavy client script.

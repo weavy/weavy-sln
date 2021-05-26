@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutBasic.cshtml";
+    Title = ViewBag.Title as string ?? "Storage Access";
+    var message = ViewBag.Message as string;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-6">
+            <div class="text-center mb-3">
+                @Html.IconImg(48)
+            </div>
+            <h1 class="display-3 text-center">@(ViewBag.Title as string)</h1>
+            <p>@message</p>
+        </div>
+    </div>
+</div>
+
+@if (Title == "Storage Access") {
+    <script>
+        wvy.postal.postToParent({ name: "storage-access-granted" }, true);
+        wvy.postal.whenLeader.always(() => window.close());
+    </script>
+}

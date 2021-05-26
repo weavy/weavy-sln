@@ -888,19 +888,94 @@
          **/
         function frameStatusCheck() {
             var statusUrl = "/client/ping";
+
+            var whenFrameStorageAccess = new WeavyPromise();
+            var whenFrameCookiesChecked = new WeavyPromise();
+            var whenFrameCookiesEnabled = new WeavyPromise();
+            var whenFrameReady = new WeavyPromise();
+
             var whenFrameStatusCheck = new WeavyPromise();
 
+            var alertCookie, alertStorage;
+
             if (!weavy.nodes.statusFrame) {
+                weavy.log("Starting frame check...");
                 // frame status checking
-                weavy.nodes.statusFrame = document.createElement("iframe");
-                weavy.nodes.statusFrame.className = "weavy-status-check weavy-hidden";
-                weavy.nodes.statusFrame.style.display = "none";
-                weavy.nodes.statusFrame.id = weavy.getId("weavy-status-check");
-                weavy.nodes.statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
+                var statusFrame = weavy.nodes.statusFrame = document.createElement("iframe");
+                statusFrame.className = "weavy-status-check weavy-hidden";
+                statusFrame.style.display = "none";
+                statusFrame.id = weavy.getId("weavy-status-check");
+                statusFrame.setAttribute("name", weavy.getId("weavy-status-check"));
+
+                var requestStorageAccess = function () {
+                    whenFrameCookiesChecked.then(function (isCookieValid) {
+                        var msg = utils.asElement('<span>Third party cookies are required to use this page. </span>')
+                        var msgButton = utils.asElement('<button class="btn" style="pointer-events: auto;">Enable cookies</button>');
+                        var storageAccessWindow;
+
+                        msgButton.onclick = function () {
+                            console.log('Opening storage access request');
+                            storageAccessWindow = window.open(weavy.options.url + '/storage-access' + (isCookieValid ? "" : "?cookie"), weavy.getId("weavy-storage-access"));
+                            wvy.postal.registerContentWindow(storageAccessWindow, weavy.getId("weavy-storage-access"), weavy.id);
+                            storageAccessWindow.onload = function () {
+                                storageAccessWindow.postMessage({ name: "request-something" }, "*")
+                            }
+                        };
+                        msg.appendChild(msgButton);
+
+                        weavy.one(wvy.postal, "storage-access-granted", { weavyId: weavy.id, windowName: weavy.getId("weavy-storage-access") }, function () {
+                            weavy.log("Storage access was granted, authenticating and reloading status check.");
+                            weavy.authentication.signIn();
+                            weavy.authentication.whenAuthenticated().then(function () {
+                                wvy.postal.postToFrame(weavy.getId("weavy-status-check"), weavy.id, { name: "reload" });
+                                whenFrameStorageAccess.resolve();
+                            });
+                        })
+
+                        alertStorage = weavy.alert(msg, true);
+
+                    })
+                };
+
+                weavy.one(wvy.postal, "storage-access", { weavyId: weavy.getId(), windowName: weavy.getId("weavy-status-check") }, function (e, storageAccess) {
+                    if (storageAccess.hasAccess) {
+                        whenFrameStorageAccess.resolve();
+                    } else {
+                        requestStorageAccess();
+                    }
+                });
+
+                weavy.on(wvy.postal, "user-status", { weavyId: weavy.getId(), windowName: weavy.getId("weavy-status-check") }, function (e, userStatus) {
+                    var cookieIsValid = userStatus.id === weavy.authentication.user().id;
+                    whenFrameCookiesChecked.resolve(cookieIsValid);
+
+                    if (!cookieIsValid) {
+                        if (!('hasStorageAccess' in document)) {
+                            alertCookie = weavy.alert('Allow third party cookies to use this page.');
+                        }
+                    } else {
+                        whenFrameCookiesEnabled.resolve();
+                    }
+                });
+
 
                 weavy.one(wvy.postal, "ready", { weavyId: weavy.getId(), windowName: weavy.getId("weavy-status-check") }, function () {
-                    weavy.log("Frame status check", "√")
+                    whenFrameReady.resolve();
+                });
+
+                Promise.all([whenFrameReady, whenFrameCookiesEnabled, whenFrameStorageAccess]).then(function () {
+                    weavy.log("Frame status check", "√");
                     weavy.isBlocked = false;
+
+                    if (alertCookie) {
+                        alertCookie.remove();
+                        alertCookie = null;
+                    }
+
+                    if (alertStorage) {
+                        alertStorage.remove();
+                        alertStorage = null;
+                    }
 
                     /**
                      * Triggered when the frame check is done.
@@ -916,6 +991,7 @@
                 });
 
                 weavy.nodes.container.appendChild(weavy.nodes.statusFrame);
+
                 weavy.whenTimeout(1).then(function () {
                     weavy.nodes.statusFrame.src = weavy.httpsUrl(statusUrl, weavy.options.url);
                     weavy.isBlocked = true;

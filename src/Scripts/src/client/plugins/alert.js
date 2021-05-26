@@ -69,7 +69,11 @@
         weavy.alert = function (message, sticky) {
             var alertMessage = document.createElement("div");
             alertMessage.className = options.className;
-            alertMessage.innerHTML = message;
+            if (message instanceof HTMLElement) {
+                alertMessage.appendChild(message);
+            } else {
+                alertMessage.innerHTML = message;
+            }
 
             if (weavy.nodes.overlay) {
                 displayMessage(alertMessage, sticky);
@@ -77,6 +81,8 @@
                 _addMessages.push([alertMessage, sticky]);
             }
             weavy.log("Alert\n" + alertMessage.innerText);
+
+            return alertMessage;
         }
 
         weavy.on("after:build", function () {

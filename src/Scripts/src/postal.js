@@ -499,7 +499,7 @@
 
             // Find all parent windows
             var nextWindow = window.self;
-            while (nextWindow.top !== nextWindow) {
+            while ((nextWindow.opener || nextWindow.parent) !== nextWindow) {
                 nextWindow = nextWindow.opener || nextWindow.parent;
                 parents.unshift(nextWindow);
             }

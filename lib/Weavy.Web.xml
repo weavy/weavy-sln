@@ -4148,13 +4148,13 @@
             </summary>        
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.ClientScriptController.StorageAccess">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.CookieAccess">
             <summary>
             A view that notifies the parent window when a user signs in / signs out.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.ClientScriptController.StorageAccessNotify">
+        <member name="M:Weavy.Web.Controllers.ClientScriptController.CookieAccessNotify">
             <summary>
             A view that notifies the parent window when a user signs in / signs out.
             </summary>

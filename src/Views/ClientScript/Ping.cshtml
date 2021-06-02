@@ -15,16 +15,15 @@
             promise.then(
                 function (hasAccess) {
                     // Boolean hasAccess says whether the document has access or not.
-                    console.log("has storage access.", hasAccess);
                     wvy.postal.postToParent({ name: "storage-access", hasAccess: hasAccess });
                 },
                 function (reason) {
                     // Promise was rejected for some reason.
-                    console.log("has no storage access.", reason);
                     wvy.postal.postToParent({ name: "storage-access", hasAccess: false });
                 }
             );
         } else {
+            console.debug("storage access api not available");
             wvy.postal.postToParent({ name: "storage-access", hasAccess: true });
         }
 

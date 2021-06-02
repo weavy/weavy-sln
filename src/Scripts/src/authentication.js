@@ -226,7 +226,7 @@
                 if (_jwtProvider !== undefined) {
                     console.log("wvy.authentication: authenticate by jwt")
                     // If JWT is defined, it should always be processed
-                    signIn();
+                    wvy.postal.whenLeader.always(function () { return validateJwt(); })
                 } else if (wvy.context && wvy.context.user) {
                     // If user is defined in wvy.context, user is already signed in
                     setUser({ id: wvy.context.user }, "init/wvy.context.user");
@@ -360,7 +360,16 @@
             if (typeof jwt === "string" || typeof jwt === "function") {
                 setJwt(jwt);
             }
-            return wvy.postal.whenLeader.always(function () { return validateJwt(); });
+
+            if (_whenAuthenticated.state() !== "pending") {
+                _whenAuthenticated = $.Deferred();
+            }
+
+            if (_whenAuthorized.state() !== "pending") {
+                _whenAuthorized = $.Deferred();
+            }
+
+            return wvy.postal.whenLeader.always(function () { return validateJwt(); }).then(function () { return _whenAuthenticated.promise(); })
         }
 
         /**

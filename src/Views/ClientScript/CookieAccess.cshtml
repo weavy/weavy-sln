@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    Title = ViewBag.Title as string ?? "Storage Access";
+    Title = ViewBag.Title as string ?? "Cookie Access";
     var message = ViewBag.Message as string;
 }
 
@@ -26,14 +26,14 @@
 
 
 <script>
-    const needsCookie = /cookie/.test(document.location.search);
+    const needsCookie = /setcookie/.test(document.location.search);
 
     function enableCookie() {
-        window.location = "/storage-access-notify";
+        window.location = "/cookie-access-notify";
     }
 
     function notify() {
-        wvy.postal.postToParent({ name: "storage-access-granted" }, true);
+        wvy.postal.postToParent({ weavyId: true, name: "storage-access-granted", domain: window.location.origin });
         wvy.postal.whenLeader.always(() => window.close());            
     }
 

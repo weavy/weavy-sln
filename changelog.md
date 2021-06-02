@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.3.1 (2021-06-02)
+
+* Fixed an issue with third party cookies in iOS.
+
 ## 8.3.0 (2021-05-26)
 
 * Added Storage Access API usage flow for third party cookies in client.

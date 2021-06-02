@@ -240,7 +240,9 @@
 
                         break;
                     case "reload":
-                        window.location.reload();
+                        console.log("wvy.postal: reload", _parentName, e.data.force);
+                        window.location.reload(e.data.force);
+
                         break;
                     default:
                         if (e.source === window || _parentWindow || contentWindowsByWeavyId.size) {

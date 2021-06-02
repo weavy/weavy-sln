@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    Title = ViewBag.Title as string ?? "Storage Access";
+    Title = ViewBag.Title as string ?? "Cookie Access";
     var message = ViewBag.Message as string;
 }
 
@@ -16,9 +16,9 @@
     </div>
 </div>
 
-@if (Title == "Storage Access") {
+@if (Title == "Cookie Access") {
     <script>
-        wvy.postal.postToParent({ name: "storage-access-granted" }, true);
+        wvy.postal.postToParent({ weavyId: true, name: "storage-access-granted", domain: window.location.origin });
         wvy.postal.whenLeader.always(() => window.close());
     </script>
 }

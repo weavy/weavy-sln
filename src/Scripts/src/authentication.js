@@ -369,7 +369,9 @@
                 _whenAuthorized = $.Deferred();
             }
 
-            return wvy.postal.whenLeader.always(function () { return validateJwt(); }).then(function () { return _whenAuthenticated.promise(); })
+            wvy.postal.whenLeader.always(function () { return validateJwt(); })
+
+            return _whenAuthenticated.promise();
         }
 
         /**

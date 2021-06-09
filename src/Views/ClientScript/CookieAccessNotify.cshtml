@@ -1,7 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    Title = ViewBag.Title as string ?? "Cookie Access";
-    var message = ViewBag.Message as string;
+    Title = T["Cookie Access"].ToString();
 }
 
 <div class="container mt-5">
@@ -10,8 +9,8 @@
             <div class="text-center mb-3">
                 @Html.IconImg(48)
             </div>
-            <h1 class="display-3 text-center">@(ViewBag.Title as string)</h1>
-            <p>@message</p>
+            <h1 class="display-3 text-center">@Title</h1>
+            <p class="text-center">@T["Saving cookie access."]</p>
         </div>
     </div>
 </div>

@@ -219,6 +219,10 @@
                             parentQueue.forEach(function (message) {
                                 console.debug("wvy.postal: sending queued to parent:", message.name);
 
+                                if (message.weavyId === undefined) {
+                                    message.weavyId = _parentWeavyId;
+                                }
+
                                 postToParent(message)
                             });
                             parentQueue = [];
@@ -430,16 +434,16 @@
                 return;
             }
 
-            if (message.weavyId === undefined) {
-                message.weavyId = _parentWeavyId;
-            }
-
             if (transfer === null) {
                 // Chrome does not allow transfer to be null
                 transfer = undefined;
             }
 
             if (_parentWindow) {
+                if (message.weavyId === undefined) {
+                    message.weavyId = _parentWeavyId;
+                }
+
                 try {
                     if (_parentWindow && _parentWindow !== window) {
                         _parentWindow.postMessage(message, _parentOrigin || "*", transfer);

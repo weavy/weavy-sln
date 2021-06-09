@@ -1,7 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_LayoutBasic.cshtml";
-    Title = ViewBag.Title as string ?? "Cookie Access";
-    var message = ViewBag.Message as string;
+    Title = T["Cookie Access"].ToString();
 }
 
 <div class="container mt-5">
@@ -11,23 +10,18 @@
                 @Html.IconImg(48)
             </div>
             <div id="info" class="d-none text-center">
-                <h1 class="display-3 text-center">@(ViewBag.Title as string)</h1>
-                <p>Cookies are required to use collaborative features from @(WeavyContext.Uri.Host).</p>
+                <h1 class="display-3 text-center">@Title</h1>
+                <p>@T["Cookies are required to use collaborative features from {0}.", WeavyContext.Uri.Host]</p>
                 <div>
-                    <button id="saa" class="btn btn-primary">Allow cookie access</button>
-                    <button id="saa_cancel" class="btn btn-secondary">Cancel</button>
+                    <button id="saa" class="btn btn-primary">@T["Allow cookie access"]</button>
+                    <button id="saa_cancel" class="btn btn-secondary">@T["Cancel"]</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
 <script>
-    const needsCookie = /setcookie/.test(document.location.search);
-
     function enableCookie() {
         window.location = "/cookie-access-notify";
     }
@@ -38,36 +32,31 @@
     }
 
     if ('hasStorageAccess' in document) {
-        document.hasStorageAccess().then(function (hasAccess) {
-            if (hasAccess && !needsCookie) {
-                notify();
-            } else {
-                $(() => {
-                    $("#info").removeClass("d-none");
+        // User interaction access
+        // There is no way to determine if user interaction is really needed, so we must presume it's needed
+        $(() => {
+            $("#info").removeClass("d-none");
 
-                    $("#saa").on("click", () => {
-                        if ('requestStorageAccess' in document) {
-                            document.requestStorageAccess().then(
-                                function (hasAccess) {
-                                    console.log("Storage access was granted.", hasAccess);
-                                    enableCookie();
-                                },
-                                function (reason) {
-                                    console.log("Storage access was denied.", reason);
-                                    window.close();
-                                }
-                            );
-                        } else {
-                            notify();
+            $("#saa").on("click", () => {
+                if ('requestStorageAccess' in document) {
+                    document.requestStorageAccess().then(
+                        function (hasAccess) {
+                            console.log("Storage access was granted.", hasAccess);
+                            enableCookie();
+                        },
+                        function (reason) {
+                            console.log("Storage access was denied.", reason);
+                            window.close();
                         }
-                    });
+                    );
+                } else {
+                    enableCookie();
+                }
+            });
 
-                    $("#saa_cancel").on("click", function () { window.close(); })
-                });
-            }
-        })
+            $("#saa_cancel").on("click", function () { window.close(); })
+        });
     } else {
-        notify();
+        enableCookie();
     }
-
 </script>

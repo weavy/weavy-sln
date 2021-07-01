@@ -114,7 +114,7 @@
     };
 
     // Register and return plugin
-    console.debug("Registering Weavy plugin: alert");
+    //console.debug("Registering Weavy plugin: alert");
     return Weavy.plugins.alert = AlertPlugin;
 
 }));

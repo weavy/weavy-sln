@@ -26,9 +26,6 @@
             </p>
         </div>
         <nav class="nav nav-tabs" role="tablist">
-            @if (WeavyContext.Browser.Desktop) {
-                <a class="nav-link nav-icon" href="#tab-messages" data-toggle="tab" role="tab" title="@T["Messages"]">@Svg.Icon("message-text")@Html.ConversationsBadge()</a>
-            }
             <a class="nav-link nav-icon" href="#tab-notifications" data-toggle="tab" role="tab" title="@T["Notifications"]">@Svg.Icon("bell")@Html.NotificationsBadge()</a>
             <a class="nav-link nav-icon" href="#tab-stars" data-toggle="tab" role="tab" title="@T["Stars"]">@Svg.Icon("star")</a>
             <a class="nav-link nav-icon" href="#tab-drafts" data-toggle="tab" role="tab" title="@T["Drafts"]">@Svg.Icon("file")</a>
@@ -36,12 +33,6 @@
         </nav>
     </header>
     <div class="drawer-body scroll-y tab-content">
-        @if (WeavyContext.Browser.Desktop) {
-            <div class="tab-pane" id="tab-messages" role="tabpanel">
-                <div class="tab-loading">@Svg.Spinner()</div>
-                <iframe data-src="@Url.RouteUrl(nameof(Weavy.Areas.Apps.Controllers.MessengerController) + nameof(Weavy.Areas.Apps.Controllers.MessengerController.Index))" name="messenger-global"></iframe>
-            </div>
-        }
         <div class="tab-pane" id="tab-notifications" data-notifications role="tabpanel">
             <header class="navbar navbar-light position-sticky t-0 z-over border-bottom pl-3">
                 <h6 class="navbar-title mr-auto">@T["Notifications"]</h6>

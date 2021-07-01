@@ -4,8 +4,8 @@
 }    
 
 @if (prev != null) {
-    <nav class="content-nav nav-prev"><a class="btn" href="@prev.Url()">@Svg.Icon("arrow-left")@{Html.RenderPartial("_ContentMicroThumb", prev);}</a></nav>
+    <nav class="content-nav nav-prev"><a class="btn" href="@prev.Url()">@Svg.Icon("arrow-left")</a></nav>
 }
 @if (next != null) {
-    <nav class="content-nav nav-next"><a class="btn" href="@next.Url()">@Svg.Icon("arrow-right")@{Html.RenderPartial("_ContentMicroThumb", next);}</a></nav>
+    <nav class="content-nav nav-next"><a class="btn" href="@next.Url()">@Svg.Icon("arrow-right")</a></nav>
 }

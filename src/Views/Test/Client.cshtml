@@ -28,7 +28,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="~/javascript/weavy.js"></script>
+    <script src="~/javascript/weavy.min.js"></script>
 
     <style>
         html, body {
@@ -162,6 +162,7 @@
 
             Weavy.defaults.lang = "@lang";
             Weavy.defaults.tz = "@tz";
+            //Weavy.defaults.shadowMode = "open";
             //Weavy.defaults.url = "https://weavy.test";
 
             var pluginConfig = {
@@ -235,7 +236,7 @@
                 var space = weavy2.space({ key: "client-test-demo" });
                 var files = space.app({ key: "files", type: "files", container: "#panel-files" });
                 var posts = space.app({ key: "posts", type: "posts", container: "#panel-posts" });
-                var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments", controls: { maximize: true, close: true } });
+                var comments = space.app({ key: "comments", type: "comments", container: "#panel-comments", controls: { maximize: { top: "3.5rem" }, close: true } });
                 var tasks = space.app({ key: "tasks", type: "tasks", container: "#panel-tasks" });
                 
             }

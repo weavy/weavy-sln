@@ -277,7 +277,7 @@ wvy.content = (function ($) {
     $(document).on("show.bs.modal", "#view-tags-modal", function (e) {
         var $target = $(e.relatedTarget);
         var $modal = $(this);
-        var tags = $target.data("tags").split(",").filter(function (x) { return x != ""; });
+        var tags = $target.data("tags").split(",").filter(function (x) { return x !== ""; });
         var $modalBody = $modal.find(".modal-body");
         $modalBody.empty();
 

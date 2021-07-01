@@ -6,18 +6,34 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
+        define([
+            './utils',
+            './promise',
+            './console',
+            './postal',
+            './connection',
+            './resources',
+            './wvy'
+        ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('jquery'));
+        module.exports = factory(
+            require('./utils'),
+            require('./promise'),
+            require('./console'),
+            require('./postal'),
+            require('./connection'),
+            require('./resources'),
+            require('./wvy')
+        );
     } else {
         // Browser globals (root is window)
         root.wvy = root.wvy || {};
-        root.wvy.authentication = root.wvy.authentication || new factory(jQuery);
+        root.wvy.authentication = root.wvy.authentication || new factory(root.wvy.utils, root.wvy.promise, root.wvy.console, root.wvy.t, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function ($) {
+}(typeof self !== 'undefined' ? self : this, function (WeavyUtils, WeavyPromise, WeavyConsole, t, wvy) {
 
     //console.debug("authentication.js", window.name);
 
@@ -29,39 +45,7 @@
     var authentications = this;
     var _authentications = new Map();
 
-    // JSON HELPERS
-    var toCamel = function (s) {
-        // from PascalCase
-        s = s[0].toLowerCase() + s.substring(1);
-
-        // from snake_case and spinal-case
-        return s.replace(/([-_][a-z])/ig, function ($1) {
-            return $1.toUpperCase()
-                .replace('-', '')
-                .replace('_', '');
-        });
-    };
-
-    var keysToCamel = function (o) {
-        if ($.isPlainObject(o)) {
-            const n = {};
-
-            Object.keys(o)
-                .forEach(function (k) {
-                    n[toCamel(k)] = keysToCamel(o[k]);
-                });
-
-            return n;
-        } else if ($.isArray(o)) {
-            return o.map(function (i) {
-                return keysToCamel(i);
-            });
-        }
-
-        return o;
-    };
-
-    var WeavyAuthentication = function (baseUrl) {
+    function WeavyAuthentication(baseUrl) {
 
         /**
          *  Reference to this instance
@@ -69,41 +53,15 @@
          */
         var weavyAuthentication = this;
 
-        var initialized = false;
+        var _initialized = false;
 
-        baseUrl = baseUrl || window.location.origin + (wvy.config && wvy.config.applicationPath || "/");
+        var console = new WeavyConsole("WeavyAuthentication");
+
+        baseUrl = baseUrl && String(baseUrl) || window.location.origin + (wvy.config && wvy.config.applicationPath || "/");
 
         if (baseUrl) {
             // Remove trailing slash
             baseUrl = /\/$/.test(baseUrl) ? baseUrl.slice(0, -1) : baseUrl;
-        }
-
-        function resolveUrl(url, resolveBaseUrl) {
-            var https = WeavyAuthentication.defaults.https || "adaptive";
-            resolveBaseUrl = resolveBaseUrl || baseUrl || "";
-
-            if (typeof url === "string" && https !== "nochange") {
-                // Check baseUrl and url protocol
-                if (resolveBaseUrl && !/^[0-9a-zA-Z+\-.]*:/.test(url)) {
-                    // Remove beginning slash
-                    if (url.indexOf("/") === 0) {
-                        url = url.substr(1);
-                    }
-                    // Add trailing slash
-                    if (resolveBaseUrl.lastIndexOf("/") !== resolveBaseUrl.length - 1) {
-                        resolveBaseUrl += "/";
-                    }
-                    url = resolveBaseUrl + url;
-                }
-
-                // Check protocol
-                if (https === "enforce") {
-                    url = url.replace(/^http:/, "https:");
-                } else if (https === "adaptive") {
-                    url = url.replace(/^http:/, window.location.protocol);
-                }
-            }
-            return url;
         }
 
         var _events = [];
@@ -112,13 +70,13 @@
 
         // Is the user established?
         var _isAuthenticated = null;
-        var _whenAuthenticated = $.Deferred();
-        var _whenAuthorized = $.Deferred();
+        var _whenAuthenticated = new WeavyPromise();
+        var _whenAuthorized = new WeavyPromise();
 
         var _isUpdating = false;
         var _isNavigating = false;
 
-        var _whenSignedOut = $.Deferred();
+        var _whenSignedOut = new WeavyPromise();
         var _isSigningOut = false;
 
         window.addEventListener('beforeunload', function () {
@@ -133,7 +91,7 @@
             _isNavigating = false;
 
             // If the user was changed on page load, process the user instantly
-            if (_user && wvy.context && wvy.context.user && _user.id !== wvy.context.user) {
+            if (_user && wvy.context && wvy.context.user && (_user.id !== wvy.context.user)) {
                 processUser({ id: wvy.context.user }, "turbolinks:load/wvy.context.user");
             }
         });
@@ -156,7 +114,7 @@
         var _jwtProvider;
 
         function setJwt(jwt) {
-            console.debug("wvy.authentication: configuring jwt");
+            console.debug("configuring jwt");
             _jwt = null;
             _jwtProvider = jwt;
         }
@@ -211,7 +169,7 @@
         }
 
         function clearJwt() {
-            console.debug("wvy.authentication: clearing jwt");
+            console.debug("clearing jwt");
             _jwt = null;
             _jwtProvider = null;
         }
@@ -224,9 +182,9 @@
 
                 // Authenticate
                 if (_jwtProvider !== undefined) {
-                    console.log("wvy.authentication: authenticate by jwt")
+                    console.log("authenticate by jwt")
                     // If JWT is defined, it should always be processed
-                    wvy.postal.whenLeader.always(function () { return validateJwt(); })
+                    wvy.postal.whenLeader().finally(function () { return validateJwt(); })
                 } else if (wvy.context && wvy.context.user) {
                     // If user is defined in wvy.context, user is already signed in
                     setUser({ id: wvy.context.user }, "init/wvy.context.user");
@@ -236,25 +194,25 @@
                 }
             }
 
-            if (!initialized) {
-                initialized = true;
+            if (!_initialized) {
+                _initialized = true;
 
                 // Listen on messages from parent?
                 wvy.postal.on("message", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onChildMessageReceived);
                 wvy.postal.on("distribute", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onParentMessageReceived);
 
-                console.log("wvy.authentication: init", baseUrl || window.name || "self");
+                console.debug("init", !(baseUrl || window.name) ? "self" : "");
 
                 wvy.connection.get(baseUrl).on("authenticate.weavy.rtmweavy", onConnectionAuthenticate);
             }
 
-            return _whenAuthenticated.promise();
+            return _whenAuthenticated();
         }
 
         function setUser(user, originSource) {
             if (user && user.id) {
                 if (_user && user && _user.id !== user.id) {
-                    console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " setUser", user.id, originSource);
+                    console.debug("setUser", user.id, originSource);
                 }
                 _user = user;
                 if (wvy.context) {
@@ -266,7 +224,7 @@
                 } else {
                     // Authenticated but still awaiting auhorization
                     if (_whenAuthorized.state() !== "pending") {
-                        _whenAuthorized = $.Deferred();
+                        _whenAuthorized.reset();
                     }
                     _isSigningOut = false;
                     _whenSignedOut.resolve();
@@ -281,8 +239,7 @@
                 }
                 _isAuthenticated = false;
 
-                _whenAuthorized.reject();
-                _whenAuthorized = $.Deferred();
+                _whenAuthorized.reset();
             }
         }
 
@@ -320,11 +277,11 @@
             // trigger event (with json object instead of string), handle any number of json objects passed from hub (args)
             var argumentArray = [].slice.call(arguments, 1);
             var data = argumentArray.map(function (a) {
-                if (a && !$.isArray(a) && !$.isPlainObject(a)) {
+                if (a && !Array.isArray(a) && !WeavyUtils.isPlainObject(a)) {
                     try {
                         return JSON.parse(a);
                     } catch (e) {
-                        console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " could not parse event data;", name);
+                        console.warn("could not parse event data.", name);
                     }
                 }
                 return a;
@@ -341,9 +298,9 @@
         // trigger a message distribute
         function triggerToChildren(name, eventName, data) {
             try {
-                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data, weavyId: "wvy.authentication", baseUrl: baseUrl }, null);
+                wvy.postal.postToChildren({ name: name, eventName: eventName, data: data, weavyId: "wvy.authentication", baseUrl: baseUrl });
             } catch (e) {
-                console.error("wvy.authentication:" + (window.name ? " " + window.name : "") + " could not distribute authentication message to children", { name: name, eventName: eventName }, e);
+                console.error("could not distribute authentication message to children.", { name: name, eventName: eventName }, e);
             }
         }
 
@@ -362,16 +319,16 @@
             }
 
             if (_whenAuthenticated.state() !== "pending") {
-                _whenAuthenticated = $.Deferred();
+                _whenAuthenticated.reset();
             }
 
             if (_whenAuthorized.state() !== "pending") {
-                _whenAuthorized = $.Deferred();
+                _whenAuthorized.reset();
             }
 
-            wvy.postal.whenLeader.always(function () { return validateJwt(); })
+            wvy.postal.whenLeader().finally(function () { return validateJwt(); })
 
-            return _whenAuthenticated.promise();
+            return _whenAuthenticated();
         }
 
         /**
@@ -380,7 +337,7 @@
          * @param {boolean} [clear] - Clears JWT provider after signOut
          */
         function signOut(clear) {
-            var authUrl = resolveUrl(signOutUrl);
+            var authUrl = new URL(signOutUrl, baseUrl);
             _isSigningOut = true;
 
             if (clear) {
@@ -389,52 +346,58 @@
 
             triggerEvent("clear-user");
 
-            $.ajax(authUrl, {
-                crossDomain: true,
+            var fetchSettings = {
                 method: "GET",
-                xhrFields: {
-                    withCredentials: true
-                }
-            }).fail(function () {
-                console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " signOut request fail");
-            }).always(function () {
-                console.debug("wvy.authentication: signout ajax -> processing user");
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'reload', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'include', // include, *same-origin, omit
+                headers: {
+                    // https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                redirect: 'manual', // manual, *follow, error
+                referrerPolicy: "no-referrer-when-downgrade", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            };
 
+            fetch(authUrl, fetchSettings).catch(function () {
+                console.warn("signOut request fail");
+            }).finally(function () {
+                console.debug("signout ajax -> processing user");
                 processUser({ id: -1 }, "signOut()");
             });
 
-            return _whenSignedOut.promise();
+            return _whenSignedOut();
         }
 
         function processUser(user, originSource) {
             // Default state when user is unauthenticated or has not changed
             var state = "updated";
 
-            var reloadLink = ' <a href="#" onclick="location.reload(); return false;">' + wvy.t("Reload") + '</a>';
+            var reloadLink = ' <a href="#" onclick="location.reload(); return false;">' + t("Reload") + '</a>';
 
             if (user && user.id) {
                 if (_isAuthenticated) {
                     if (isAuthorized()) {
                         // When signed in
                         if (user && user.id === -1) {
-                            console.log("wvy.authentication: signed-out");
-                            alert(wvy.t("You have been signed out.") + reloadLink);
+                            console.log("signed-out");
+                            alert(t("You have been signed out.") + reloadLink);
                             // User signed out
                             state = "signed-out";
                         } else if (user && user.id !== _user.id) {
-                            console.log("wvy.authentication: changed-user");
-                            alert(wvy.t("The signed in user has changed.") + reloadLink)
+                            console.log("changed-user");
+                            alert(t("The signed in user has changed.") + reloadLink)
                             // User changed
                             state = "changed-user";
                         }
                     } else {
                         // When signed out
                         if (user && user.id !== -1) {
-                            console.log("wvy.authentication: signed-in", originSource);
+                            console.log("signed-in", originSource);
 
                             // Show a message if the user hasn't loaded a new page
-                            if (wvy.context && wvy.context.user && user.id !== wvy.context.user) {
-                                alert(wvy.t("You have signed in.") + reloadLink);
+                            if (wvy && wvy.context && wvy.context.user && (user.id !== wvy.context.user)) {
+                                alert(t("You have signed in.") + reloadLink);
                             }
 
                             // User signed in
@@ -447,15 +410,15 @@
                 triggerEvent("user", { state: state, authorized: isAuthorized(user), user: user });
             } else {
                 // No valid user state
-                console.error("wvy.authentication: user-error", originSource || "");
-
                 setUser(null, originSource || "processUser()");
                 triggerEvent("clear-user");
 
                 var eventResult = triggerEvent("user", { state: "user-error", authorized: false, user: user });
                 if (eventResult !== false) {
-                    wvy.postal.whenLeader.then(function () {
-                        alert(wvy.t("Authentication error.") + reloadLink, "danger");
+                    wvy.postal.whenLeader().then(function (isLeader) {
+                        if (isLeader) {
+                            alert(t("Authentication error.") + reloadLink, "danger");
+                        }
                     });
                 }
             }
@@ -463,114 +426,126 @@
             _isUpdating = false;
         }
 
+
         function updateUserState(originSource) {
             if (!_isUpdating) {
                 _isUpdating = true;
-                wvy.postal.whenLeader.then(function () {
-                    console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " whenLeader => updateUserState");
+                wvy.postal.whenLeader().then(function (isLeader) {
+                    if (isLeader) {
+                        console.debug("whenLeader => updateUserState");
 
-                    if (_whenAuthenticated.state() !== "pending") {
-                        _whenAuthenticated = $.Deferred();
-                    }
-                    if (_whenAuthorized.state() !== "pending") {
-                        _whenAuthorized = $.Deferred();
-                    }
-
-                    var authSettings = {
-                        url: resolveUrl(userUrl),
-                        method: "POST",
-                        contentType: "application/json",
-                        crossDomain: true,
-                        dataType: "json",
-                        data: {},
-                        dataFilter: function (data, dataType) {
-                            return dataType === "json" ? JSON.stringify(keysToCamel(JSON.parse(data))) : data;
-                        },
-                        xhrFields: {
-                            withCredentials: true
-                        },
-                        headers: {
-                            // https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
-                            "X-Requested-With": "XMLHttpRequest"
+                        if (_whenAuthenticated.state() !== "pending") {
+                            _whenAuthenticated.reset();
                         }
-                    };
-
-                    getJwt().then(function (token) {
-                        if (typeof token === "string") {
-                            authSettings.data = JSON.stringify({ jwt: token });
+                        if (_whenAuthorized.state() !== "pending") {
+                            _whenAuthorized.reset();
                         }
 
-                        $.ajax(authSettings).then(null, function (xhr, status, error) {
-                            if (token !== undefined && xhr.status === 401) {
-                                console.warn("wvy.authentication: JWT failed, trying again");
-                                return getJwt(true).then(function (token) {
-                                    authSettings.data.jwt = token;
-                                    return $.ajax(authSettings);
-                                })
+                        var url = new URL(userUrl, baseUrl);
+
+                        var fetchSettings = {
+                            method: "POST",
+                            mode: 'cors', // no-cors, *cors, same-origin
+                            cache: 'reload', // *default, no-cache, reload, force-cache, only-if-cached
+                            credentials: 'include', // include, *same-origin, omit
+                            headers: {
+                                'Content-Type': 'application/json',
+                                // https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
+                                "X-Requested-With": "XMLHttpRequest"
+                            },
+                            redirect: 'manual', // manual, *follow, error
+                            referrerPolicy: "no-referrer-when-downgrade", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        };
+
+                        getJwt().then(function (token) {
+                            if (typeof token !== "string") {
+                                return Promise.reject(new Error("Provided JWT token is invalid."))
                             }
-                        }).then(function (actualUser) {
-                            console.debug("wvy.authentication: updateUserState ajax -> processing user")
-                            processUser(actualUser, "updateUserState," + originSource);
-                        }, function () {
-                            console.warn("wvy.authentication:" + (window.name ? " " + window.name : "") + " updateUserState request fail");
-                            console.debug("wvy.authentication: updateUserState ajax xhr fail -> processing user");
-                            processUser({ id: null }, "updateUserState," + originSource);
+
+                            fetchSettings.body = JSON.stringify({ jwt: token });
+
+                            fetch(url, fetchSettings).then(function (response) {
+                                if (response.status === 401) {
+                                    console.warn("JWT failed, trying again");
+                                    return getJwt(true).then(function (token) {
+                                        fetchSettings.body = JSON.stringify({ jwt: token });
+                                        return fetch(url, fetchSettings);
+                                    })
+                                }
+                                return response;
+                            }).then(WeavyUtils.processJSONResponse).then(function (actualUser) {
+                                console.debug("updateUserState ajax -> processing user")
+                                processUser(actualUser, "updateUserState," + originSource);
+                            }, function () {
+                                console.warn("updateUserState request fail");
+                                console.debug("updateUserState ajax fetch fail -> processing user");
+                                processUser({ id: null }, "updateUserState," + originSource);
+                            });
                         });
-                    });
-                }).catch(function () {
-                    wvy.postal.postToParent({ name: "request:user", weavyId: "wvy.authentication", baseUrl: baseUrl });
+                    } else {
+                        wvy.postal.postToParent({ name: "request:user", weavyId: "wvy.authentication", baseUrl: baseUrl });
+                    }
                 });
             }
 
-            return _whenAuthenticated.promise();
+            return _whenAuthenticated();
         }
 
-        function validateJwt(refresh) {
-            var whenSSO = $.Deferred();
-            var authUrl = resolveUrl(ssoUrl);
+        function validateJwt() {
+            var whenSSO = new WeavyPromise();
+            var authUrl = new URL(ssoUrl, baseUrl);
 
             if (_isSigningOut) {
                 // Wait for signout to complete
-                console.log("wvy.authentication: vaildate jwt awaiting sign-out");
-                return _whenSignedOut.then(function () { return validateJwt(refresh); });
+                console.log("vaildate jwt awaiting sign-out");
+                return _whenSignedOut.then(function () { return validateJwt(); });
             } else if (_whenSignedOut.state() !== "pending") {
                 // Reset signed out promise
-                _whenSignedOut = $.Deferred();
+                _whenSignedOut.reset();
             }
 
-            console.log("wvy.authentication: validating jwt");
+            console.log("validating jwt");
 
-            if (!refresh) {
-                triggerEvent("signing-in");
-            }
+            triggerEvent("signing-in");
 
-            return getJwt(refresh).then(function (jwt) {
-                return $.ajax(authUrl, {
-                    crossDomain: true,
-                    contentType: "application/json",
-                    method: "GET",
-                    xhrFields: {
-                        withCredentials: true
-                    },
+            var fetchSettings = {
+                method: "GET",
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'reload', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'include', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json',
                     // https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
-                    headers: {
-                        "Authorization": "Bearer " + jwt,
-                        "X-Requested-With": "XMLHttpRequest"
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                redirect: 'manual', // manual, *follow, error
+                referrerPolicy: "no-referrer-when-downgrade", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            };
+
+            return getJwt().then(function (token) {
+                if (typeof token !== "string") {
+                    return Promise.reject(new Error("Provided JWT token is invalid."))
+                }
+
+                fetchSettings.headers.Authorization = "Bearer " + token;
+
+                return fetch(authUrl, fetchSettings).then(function (response) {
+                    if (response.status === 401) {
+                        console.warn("JWT failed, trying again");
+                        return getJwt(true).then(function (token) {
+                            fetchSettings.headers.Authorization = "Bearer " + token;
+                            return fetch(authUrl, fetchSettings);
+                        })
                     }
-                }).then(function (ssoUser) {
+                    return response;
+
+                }).then(WeavyUtils.processJSONResponse).then(function (ssoUser) {
                     processUser(ssoUser);
                     return whenSSO.resolve(ssoUser);
-                }, function (xhr, status, error) {
-
-                    if (xhr.status === 401 && !refresh) {
-                        console.warn("wvy.authentication: JWT failed, trying again");
-                        return validateJwt(true);
-                    } else {
-                        triggerEvent("authentication-error", { method: "jwt", status: xhr.status, message: xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : error });
-                        console.error("wvy.authentication:" + (window.name ? " " + window.name : "") + " sign in with JWT token failed", xhr.status, xhr.responseJSON && xhr.responseJSON.message ? "\n" + xhr.responseJSON.message : error);
-                        processUser({ id: null });
-                        return whenSSO.reject({ id: null });
-                    }
+                }).catch(function (error) {
+                    console.error("sign in with JWT token failed.", error.message);
+                    triggerEvent("authentication-error", { method: "jwt", status: 401, message: error.message });
+                    processUser({ id: null });
                 });
             })
         }
@@ -595,7 +570,7 @@
             var msg = e.data;
             switch (msg.name) {
                 case "user":
-                    console.debug("wvy.authentication: parentMessage user -> processing user");
+                    console.debug("parentMessage user -> processing user");
                     processUser(msg.user, "parentMessage:user");
                     break;
                 case "distribute-authentication-event":
@@ -604,15 +579,15 @@
                     var data = msg.data;
 
                     // Extract array with single value
-                    if ($.isArray(data) && data.length === 1) {
+                    if (Array.isArray(data) && data.length === 1) {
                         data = data[0];
                     }
 
                     if (name === "user") {
-                        console.debug("wvy.authentication: parentMessage distribute-authentication-event user -> processing user");
+                        console.debug("parentMessage distribute-authentication-event user -> processing user");
                         processUser(data.user, "distribute-authentication-event:user");
                     } else {
-                        console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " triggering received distribute-event", name);
+                        console.debug("triggering received distribute-event", name);
                         $(weavyAuthentication).triggerHandler(event, msg.data);
                     }
 
@@ -624,7 +599,7 @@
         };
 
         var onConnectionAuthenticate = function (e) {
-            console.debug("wvy.authentication:" + (window.name ? " " + window.name : "") + " authenticate.weavy -> updateUserState");
+            console.debug("authenticate.weavy -> updateUserState");
             updateUserState("authenticate.weavy.rtmweavy");
         };
 
@@ -632,6 +607,8 @@
         function destroy() {
             _isAuthenticated = null;
             _user = null;
+            _jwt = null;
+            _jwtProvider = null;
 
             wvy.postal.off("message", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onChildMessageReceived);
             wvy.postal.off("distribute", { weavyId: "wvy.authentication", baseUrl: baseUrl }, onParentMessageReceived);
@@ -644,15 +621,17 @@
             });
             _events = [];
 
-            initialized = false;
+            _initialized = false;
         }
 
         // Exports 
         this.init = init;
         this.isAuthorized = isAuthorized;
         this.isAuthenticated = function () { return _isAuthenticated === true; };
-        this.whenAuthenticated = function () { return _whenAuthenticated.promise(); };
-        this.whenAuthorized = function () { return _whenAuthorized.promise(); };
+        this.isInitialized = function () { return _initialized === true; }
+        this.isProvided = function () { return !!_jwtProvider; };
+        this.whenAuthenticated = function () { return _whenAuthenticated(); };
+        this.whenAuthorized = function () { return _whenAuthorized(); };
         this.on = on;
         this.off = off;
         this.signIn = signIn;
@@ -664,14 +643,13 @@
         this.user = function () { return _user };
         this.destroy = destroy;
 
-    };
-
-    WeavyAuthentication.defaults = {
-        https: "adaptive"
-    };
+    }
 
     authentications.get = function (url) {
         var sameOrigin = false;
+
+        url = url && String(url);
+
         var urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
         if (urlExtract) {
             sameOrigin = window.location.origin === urlExtract[1];
@@ -688,7 +666,7 @@
     };
 
     authentications.remove = function (url) {
-        url = url || "";
+        url = url && String(url) || "";
         try {
             var authentication = _authentications.get(url);
             if (authentication && authentication.destroy) {
@@ -708,7 +686,7 @@
             } else {
                 var authentication = authentications.get();
 
-                $(function () {
+                WeavyUtils.ready(function () {
                     setTimeout(function () {
                         if (_authentications.size === 1) {
                             authentication.init();
@@ -740,14 +718,4 @@
 /**
  * @external Promise
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
- */
-
-/**
- * @external jqXHR
- * @see http://api.jquery.com/jQuery.ajax/#jqXHR
- */
-
-/**
- * @external jqAjaxSettings
- * @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
  */

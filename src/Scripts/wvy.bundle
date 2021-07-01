@@ -13,11 +13,13 @@
 ~/scripts/vendor/mousetrap/mousetrap.min.js
 ~/scripts/vendor/mousetrap/mousetrap-global-bind.min.js
 ~/scripts/vendor/select2/select2.min.js
+
 ~/scripts/src/_extensions.js
+~/scripts/src/connection.js
+~/scripts/src/authentication.js
+
 ~/scripts/src/server/emoji.js
 ~/scripts/src/server/guid.js
-~/scripts/src/authentication.js
-~/scripts/src/connection.js
 ~/scripts/src/server/presence.js
 ~/scripts/src/server/api.js
 ~/scripts/src/server/user.js

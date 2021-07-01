@@ -12,7 +12,6 @@
     <td>
         <a href="@href" target="@target" data-kind="@Model.Kind()" title="@Model.Name" draggable="false">
             @Model.Name
-            @if (Model.Kind() == "image") { Html.RenderPartial("_ContentMicroThumb", Model); }
         </a>
         @Html.Badge(Model)
         @if (Model is IStarrable starrable) {

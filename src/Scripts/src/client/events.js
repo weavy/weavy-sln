@@ -19,11 +19,11 @@
     } else {
         // Browser globals (root is window)
         root.WeavyEvents = factory(
-            root.WeavyUtils
+            root.wvy.utils
         );
     }
-}(typeof self !== 'undefined' ? self : this, function (utils) {
-    console.debug("events.js");
+}(typeof self !== 'undefined' ? self : this, function (WeavyUtils) {
+    //console.debug("events.js");
 
     /**
      * @class WeavyEvents
@@ -96,7 +96,7 @@
             var getHandler = { context: context, events: events, selector: selector, handler: handler, originalHandler: originalHandler, external: external };
             var eventHandler = _eventHandlers.filter(function (eventHandler) {
                 // Check if all arguments match
-                return utils.eqObjects(getHandler, eventHandler, true);
+                return WeavyUtils.eqObjects(getHandler, eventHandler, true);
             }).pop();
 
             return eventHandler && eventHandler.handler;
@@ -119,7 +119,7 @@
 
             _eventHandlers.forEach(function (eventHandler, eventHandlerIndex) {
                 // Check if all arguments match
-                if (utils.eqObjects(removeHandler, eventHandler, true)) {
+                if (WeavyUtils.eqObjects(removeHandler, eventHandler, true)) {
                     handlerRemoved = true;
                     _eventHandlers.splice(eventHandlerIndex, 1);
                 }
@@ -220,7 +220,7 @@
                     return context;
                 }
 
-                var contextElement = utils.asElement(context);
+                var contextElement = WeavyUtils.asElement(context);
                 if (contextElement) {
                     return contextElement;
                 }
@@ -311,7 +311,7 @@
                 registerEventHandler(args.context, args.events, args.selector, attachedHandler, args.handler, args.external);
 
                 if (args.external) {
-                    if (typeof args.selector === "string" || utils.isPlainObject(args.selector)) {
+                    if (typeof args.selector === "string" || WeavyUtils.isPlainObject(args.selector)) {
                         if (typeof args.context.one === "function") {
                             args.context.one(args.events, args.selector, attachedHandler);
                         } else {
@@ -333,7 +333,7 @@
                 registerEventHandler(args.context, args.events, args.selector, args.handler, args.handler, args.external);
 
                 if (args.external) {
-                    if (typeof args.selector === "string" || utils.isPlainObject(args.selector)) {
+                    if (typeof args.selector === "string" || WeavyUtils.isPlainObject(args.selector)) {
                         if (typeof args.context.one === "function") {
                             args.context.on(args.events, args.selector, args.handler);
                         } else {
@@ -392,7 +392,7 @@
             if (handlerRemoved && offHandler) {
                 if (args.external && args.context) {
 
-                    if (typeof args.selector === "string" || utils.isPlainObject(args.selector)) {
+                    if (typeof args.selector === "string" || WeavyUtils.isPlainObject(args.selector)) {
                         if (typeof args.context.off === "function") {
                             args.context.off(args.events, args.selector, offHandler);
                         } else {
@@ -428,7 +428,7 @@
             _eventHandlers.forEach(function (eventHandler) {
                 // TODO: Maybe use .off instead?
                 if (eventHandler.external && eventHandler.context) {
-                    if (typeof eventHandler.selector === "string" || utils.isPlainObject(eventHandler.selector)) {
+                    if (typeof eventHandler.selector === "string" || WeavyUtils.isPlainObject(eventHandler.selector)) {
                         if (typeof eventHandler.context.off === "function") {
                             eventHandler.context.off(eventHandler.events, eventHandler.selector, eventHandler.handler);
                         } else {
@@ -542,7 +542,7 @@
             var eventName = name;
             var afterEventName = "after:" + name;
 
-            if (data && !Array.isArray(data) && !utils.isPlainObject(data)) {
+            if (data && !Array.isArray(data) && !WeavyUtils.isPlainObject(data)) {
                 try {
                     data = JSON.parse(data);
                 } catch (e) {

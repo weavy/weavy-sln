@@ -20,11 +20,11 @@
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyPanels = factory(root.WeavyPromise, root.WeavyUtils);
+        root.WeavyPanels = factory(root.wvy.promise, root.wvy.utils, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function (WeavyPromise, utils) {
+}(typeof self !== 'undefined' ? self : this, function (WeavyPromise, WeavyUtils, wvy) {
 
-    console.debug("panels.js");
+    //console.debug("panels.js");
 
     var _isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -56,7 +56,7 @@
 
         var panelElementId = weavy.getId("panel-" + panelId);
 
-        if (!utils.isPlainObject(attributes)) {
+        if (!WeavyUtils.isPlainObject(attributes)) {
             attributes = {};
         }
 
@@ -64,8 +64,8 @@
             // frame
             var frame = document.createElement("iframe");
             frame.className = "weavy-panel-frame";
-            frame.id = weavy.getId("panel-frame-" + panelId);
-            frame.name = weavy.getId("panel-frame-" + panelId);
+            frame.id = weavy.getId("panel-" + panelId);
+            frame.name = weavy.getId("panel-" + panelId);
             frame.allowFullscreen = 1;
             frame.dataset.weavyId = weavy.getId();
 
@@ -73,7 +73,7 @@
                 // Stores the provided url as data src for load when requested later.
                 // If the frame src is unset it means that the frame is unloaded
                 // If both data src and src are set it means it's loading
-                frame.dataset.src = weavy.httpsUrl(url, weavy.options.url);
+                frame.dataset.src = new URL(url, weavy.url).href;
             }
 
             return frame;
@@ -130,7 +130,7 @@
         panel.triggerEvent = weavy.events.triggerEvent.bind(panel);
 
         if (panel.frame.dataset.src) {
-            panel.location = weavy.httpsUrl(panel.frame.dataset.src, weavy.options.url);
+            panel.location = new URL(panel.frame.dataset.src, weavy.url).href;
         }
 
         if (attributes.type) {
@@ -169,7 +169,7 @@
         var registerLoading = function (panel) {
             if (!panel.isRegistered) {
                 try {
-                    wvy.postal.registerContentWindow(panel.frame.contentWindow, panel.frame.name, weavy.getId());
+                    wvy.postal.registerContentWindow(panel.frame.contentWindow.self, panel.frame.name, weavy.getId(), weavy.url.origin);
                 } catch (e) {
                     weavy.error("Could not register window id", panel.frame.name, e);
                 }
@@ -192,7 +192,7 @@
                 loadingTimeout[panelId].then(function () { _isLoading = false; updatePanelLoading(panel); });
             } else {
                 if (loadingTimeout[panelId]) {
-                    loadingTimeout[panelId].reject();
+                    loadingTimeout[panelId].cancel();
                     delete loadingTimeout[panelId];
                 }
             }
@@ -307,7 +307,7 @@
         var _onReady = function (e, ready) {
             _isReady = true;
             var previousLocation = panel.location;
-            panel.location = weavy.httpsUrl(ready.location, weavy.options.url);
+            panel.location = new URL(ready.location, weavy.url).href;
 
             panel.loadingFinished();
 
@@ -461,11 +461,8 @@
                 weavy.info("openPanel", panel.panelId + (destination ? " " + destination : ""), noHistory ? "no history" : "with history");
 
                 if (!panel.node.dataset.persistent && !weavy.authentication.isAuthorized()) {
-                    weavy.warn("Unauthorized, can't open panel " + panel.panelId);
-                    return Promise.reject({ panelId: panelId, destination: destination });
+                    return Promise.reject(new Error("Unauthorized, can't open panel " + panel.panelId));
                 }
-
-                panel.node.classList.add("weavy-open");
 
                 /**
                  * Event triggered when a panel is opened.
@@ -480,9 +477,10 @@
                 var openResult = panel.triggerEvent("panel-open", { panelId: panel.panelId, destination: destination, panels: panelsContainer });
 
                 if (openResult !== false && openResult.panelId === panel.panelId) {
+                    panel.node.classList.add("weavy-open");
                     return panel.load(openResult.destination, null, null, null, noHistory);
                 } else {
-                    return Promise.reject({ panelId: panel.panelId, destination: destination, panels: panelsContainer });
+                    return Promise.reject(new Error("Prevented open " + panel.panelId));
                 }
             });
         };
@@ -597,7 +595,7 @@
                 var frameTarget = panel.frame;
 
                 if (url) {
-                    url = weavy.httpsUrl(url, weavy.options.url);
+                    url = new URL(url, weavy.url).href;
 
                     panel.location = url;
 
@@ -682,7 +680,7 @@
             return weavy.whenReady().then(function () {
                 panel.isLoading = true;
 
-                panel.postMessage({ "name": "reload" })
+                panel.postMessage({ name: "reload" })
 
                 /**
                  * Event triggered when a panel is reloading it's content.
@@ -752,7 +750,7 @@
                     return Promise.resolve();
                 } 
 
-                return Promise.reject();
+                return Promise.resolve();
             });
         }
 
@@ -805,14 +803,12 @@
          * @returns {external:Promise}
          */
         panel.postMessage = function (message, transfer) {
-            return weavy.whenReady().then(function () {
+            return panel.whenReady().then(function () {
                 var frameTarget = panel.frame;
-                if (frameTarget) {
-                    try {
-                        wvy.postal.postToFrame(frameTarget.name, weavy.getId(), message, transfer);
-                    } catch (e) {
-                        weavy.error("Could not post panel message", e);
-                    }
+                if (frameTarget && wvy.postal) {
+                    return wvy.postal.postToFrame(frameTarget.name, weavy.getId(), message, transfer);
+                } else {
+                    return Promise.reject();
                 }
             });
         }
@@ -1081,7 +1077,7 @@
          */
         function preloadPanels(force) {
             if (_isMobile) {
-                return Promise.reject();
+                return Promise.resolve();
             }
 
             var preloadRoot = this;
@@ -1124,7 +1120,7 @@
                     return Promise.resolve();
                 });
             } else {
-                return Promise.reject();
+                return Promise.resolve();
             }
 
         }

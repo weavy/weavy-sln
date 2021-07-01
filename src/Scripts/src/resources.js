@@ -1,13 +1,13 @@
-var wvy = wvy || {};
-wvy.resourceManager = (function () {
+let root = typeof self !== 'undefined' ? self : this;
+root.wvy = root.wvy || {};
+root.wvy.t = (function (root) {
 
-    wvy.t = function (key) {
-        return get(key);
-    }
+    // TODO: use scope instead of window
 
     var get = function (key) {
-        var text = wvy.resources != null ? wvy.resources[key] : key;
+        var text = window.wvy && window.wvy.resources != null ? window.wvy.resources[key] : key;
         return text || key;
     }
-    
-})();
+    return get;
+
+})(root);

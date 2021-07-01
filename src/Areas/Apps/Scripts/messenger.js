@@ -263,7 +263,7 @@ wvy.messenger = (function ($) {
         //console.debug(e.type, e.data.url);
 
 
-        if (document.body.classList.contains("sending")) {
+        if (document.documentElement.classList.contains("sending")) {
             clearMessageForm();
         } else {
 
@@ -275,13 +275,13 @@ wvy.messenger = (function ($) {
             _textarea = null;
 
             // display spinner etc.
-            if (wvy.browser.mobile && e.target.location.pathname === _prefix) {
+            if (wvy.browser.platform === "iOS" && wvy.browser.webView && e.target.location.pathname === _prefix) {
                 // REVIEW: det blir fortfarande konstigt när man swipar back....
                 // except when when swiping right to go back in mobile since this gives a blank screen on ios
             } else {
                 // add loading class to show spinner (unless reloading after reconnect)
-                if (!document.body.classList.contains("reloading")) {
-                    document.body.classList.add("loading");
+                if (!document.documentElement.classList.contains("reloading")) {
+                    document.documentElement.classList.add("loading");
                 }
 
                 // disable links, info button and textarea while loading
@@ -294,15 +294,30 @@ wvy.messenger = (function ($) {
         }
 
     });
-    
-    document.addEventListener("turbolinks:render", function (e) {
-        //console.debug(e.type);
 
+    function toggleOSSleep(e) {
+        if (document.documentElement.classList.contains("scrollbars")) {
+            var os = $("#messages-scroll.os-host").overlayScrollbars()
+            if (os) {
+                if (e.matches) {
+                    console.debug("overlayScrollbars wake");
+                    os.update()
+                } else {
+                    console.debug("overlayScrollbars sleep");
+                    os.sleep();
+                }
+            }
+        }
+    }
+
+    window.matchMedia("(min-width: 768px)").onchange = toggleOSSleep;
+
+    document.addEventListener("turbolinks:render", function (e) {
         // restore scroll position
         restoreScroll();
+        scrollToBottomOfMessages("render")
     }, true);
-
-
+    
     document.addEventListener("turbolinks:load", function (e) {
         //if (e.data.timing.visitEnd) {
         //    console.log(e.type, e.data.url, (e.data.timing.visitEnd - e.data.timing.visitStart) + "ms");
@@ -314,16 +329,20 @@ wvy.messenger = (function ($) {
         if ($main.length) {
             // set current conversation
             _id = Number($main.data("id")) || -1;
-            console.debug("conversation " + _id + " was loaded");
+            //console.debug("conversation " + _id + " was loaded");
 
             setTimeout(initTextarea, 0);
         }
+        
+        // scroll to bottom of messages
+        if (document.documentElement.classList.contains("loading")) {
+            queueMicrotask(() => scrollToBottomOfMessages("load"))
+        } else {
+            scrollToBottomOfMessages("loading");
+        }
 
         // remove sending and loading classes
-        document.body.classList.remove("sending", "loading");
-
-        // scroll to bottom of messages
-        scrollToBottomOfMessages();
+        document.documentElement.classList.remove("sending", "loading", "reloading");
 
         // observe intersection, resize etc.
         var el = document.querySelector(".loader[data-next]")
@@ -553,7 +572,7 @@ wvy.messenger = (function ($) {
         document.body.classList.add("one");
 
         // and restore scroll position
-        setTimeout(restoreScroll, 0);
+        restoreScroll()
     });
 
     // let server know that user is typing in conversation
@@ -819,7 +838,7 @@ wvy.messenger = (function ($) {
             $s.find(".text").html(text);
 
             // set sending class on body (which will display #sending)
-            document.body.classList.add("sending");
+            document.documentElement.classList.add("sending");
 
             // scroll to bottom of messages
             scrollToBottomOfMessages();
@@ -989,7 +1008,7 @@ wvy.messenger = (function ($) {
                 // remove temporary sending message
                 if (message.createdBy.id === wvy.context.user) {
                     $("#sending").remove();
-                    document.body.classList.remove("sending");
+                    document.documentElement.classList.remove("sending");
                 }
 
 
@@ -1115,7 +1134,7 @@ wvy.messenger = (function ($) {
         //console.debug("loading conversation " + id);
 
         // save scroll position so that conversation list is scrolled to correct position after turbolinks:render
-        var el = getScrollParent(document.getElementById("conversations"));
+        var el = getScrollParent(document.getElementById("conversations"), true);
         if (el === document.scrollingElement) {
             _b1 = el.scrollTop;
             //console.debug("_b1 = " + _b1);
@@ -1253,7 +1272,11 @@ wvy.messenger = (function ($) {
     }
 
     // get the closest ancestor element that is scrollable (adapted from https://stackoverflow.com/a/42543908/891843)
-    function getScrollParent(element, includeHidden) {
+    function getScrollParent(element) {
+        var isDual = window.matchMedia("(min-width: 768px)").matches;
+        var hasOS = document.documentElement.classList.contains("scrollbars");
+        var includeHidden = !(hasOS && !isDual);
+
         if (element) {
             var style = getComputedStyle(element);
             var excludeStaticParent = style.position === "absolute";
@@ -1279,45 +1302,57 @@ wvy.messenger = (function ($) {
 
     // restore scroll positions after opening/closing panes and/or turbolinks navigation
     function restoreScroll() {
-        var el = getScrollParent(document.getElementById("conversations"));
-        if (el === document.scrollingElement) {
-            if (document.body.classList.contains("one")) {
-                _b1 = _b1 || 0;
-                //console.debug("scrolling document to " + _b1);
-                el.scrollTop = _b1;
-            } else if (document.body.classList.contains("two")) {
-                _b2 = _b2 || document.scrollingElement.scrollHeight;
-                //console.debug("scrolling document to " + _b2);
-                el.scrollTop = _b2;
+        queueMicrotask(() => {
+            var el = getScrollParent(document.getElementById("conversations"));
+            if (el === document.scrollingElement) {
+                if (document.body.classList.contains("one")) {
+                    _b1 = _b1 || 0;
+                    //console.debug("scrolling document (one) to " + _b1);
+                    if (el.scrollTop !== _b1) {
+                        el.scrollTop = _b1;
+                    }
+                } /*else if (document.body.classList.contains("two")) {
+                    _b2 = _b2 || document.scrollingElement.scrollHeight;
+                    console.debug("scrolling document (two) to " + _b2);
+                    if (el.scrollTop !== _b2) {
+                        el.scrollTop = _b2;
+                    }
+                }*/
+            } else if (el) {
+                _p1 = _p1 || 0;
+                if (el.classList.contains("os-viewport")) {
+                    //console.debug("scrolling #conversations (OS) to " + _p1);
+                    var scrollInstance = $(el).closest(".os-host").overlayScrollbars();
+                    scrollInstance.update();
 
+                    // We do a native scroll and then update the scrollbars
+                    if (el.scrollTop !== _p1) {
+                        scrollInstance.scrollStop();
+                        el.scrollTop = _p1;
+                        scrollInstance.update();
+                    }
+                } else {
+                    //console.debug("scrolling #conversations to " + _p1, el.scrollTop);
+                    if (el.scrollTop !== _p1) {
+                        el.scrollTop = _p1;
+                    }
+                }
             }
-        } else if (el) {
-            _p1 = _p1 || 0;
-            //console.debug("scrolling #conversations to " + _p1);
-            if (el.classList.contains("os-viewport")) {
-                $(el).closest(".os-host").overlayScrollbars().scroll({ y: _p1 });
-            } else {
-                el.scrollTop = _p1;
-            }
-        }
+        })
     }
 
     // scroll to bottom of messages
-    function scrollToBottomOfMessages() {
-        var el = getScrollParent(document.getElementById("sending"));
-        if (el === document.scrollingElement) {
-            if (document.body.classList.contains("two")) {
-                //console.debug("scrolling document to " + el.scrollHeight);
-                el.scrollTop = el.scrollHeight;
-            }
-        } else if (el) {
-            //console.debug("scrolling #messages to " + el.scrollHeight, el);
-            if (el.classList.contains("os-viewport")) {
-                $(el).closest(".os-host").overlayScrollbars().scroll({ y: el.scrollHeight });
-            } else {
-                el.scrollTop = el.scrollHeight;
-            }
-            
+    function scrollToBottomOfMessages(origin) {
+        if (document.body.classList.contains("two")) {
+            toggleOSSleep({ matches: true });
+
+            var el = getScrollParent(document.getElementById("sending"));
+            //console.debug("scrolling #messages", origin, el.scrollHeight);
+            el.scrollTop = el.scrollHeight;
+
+            requestAnimationFrame(() => {
+                toggleOSSleep(window.matchMedia("(min-width: 768px)"));
+            })
         }
     }
 
@@ -1607,7 +1642,7 @@ wvy.messenger = (function ($) {
     }
 
     function reload() {
-        document.body.classList.add("reloading");
+        document.documentElement.classList.add("reloading");
         Turbolinks.visit(document.location.href, { action: 'replace' });
     }
 

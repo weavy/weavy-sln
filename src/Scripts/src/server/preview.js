@@ -30,11 +30,13 @@ wvy.preview = (function ($)  {
             id: $(this).data("id") // the entity id
         };
 
-        wvy.postal.whenLeader.then(function () {
-            // open with options from data attributes
-            open(previewOptions);
-        }).catch(function () {
-            openInParent(previewOptions);
+        wvy.postal.whenLeader().then(function (isLeader) {
+            if (isLeader) {
+                // open with options from data attributes
+                open(previewOptions);
+            } else {
+                openInParent(previewOptions);
+            }
         });
     });
 
@@ -80,36 +82,7 @@ wvy.preview = (function ($)  {
         wvy.pdf.pdfjsWebApp.PDFViewerApplication.open(opts.preview);
 
         var $container = $(".preview-container");
-        /*
-        // add navbar
-        $container.find(".navbar-preview").remove();
-        var $navbar = $('<nav class="navbar navbar-preview fixed-top"><div class="navbar-icons"><button type="button" class="btn btn-icon" title="Close" data-preview-close data-weavy-event data-weavy-name="close-preview"><svg class="i i-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path></svg></button></div></nav>');
-        var $middle = $('<div class="navbar-middle" />');
-        $middle.append('<span class="navbar-text">' + opts.name + '</span>');
-        $navbar.append($middle);
 
-        // add star?
-        if (opts.starred !== undefined) {
-            var $star = $('<button type="button" class="btn btn-icon" data-toggle="star" data-type="' + opts.type + '" data-id="' + opts.id + '"><svg class="i i-star-outline d-block" height="24" viewBox="0 0 24 24" width="24"><path d="m12 15.39-3.76 2.27.99-4.28-3.32-2.88 4.38-.37 1.71-4.04 1.71 4.04 4.38.37-3.32 2.88.99 4.28m6.24-8.42-7.19-.61-2.81-6.63-2.81 6.63-7.19.61 5.45 4.73-1.63 7.03 6.18-3.73 6.18 3.73-1.64-7.03z"/></svg><svg class="i i-star d-none" height="24" viewBox="0 0 24 24" width="24"><path d="m12 17.27 6.18 3.73-1.64-7.03 5.46-4.73-7.19-.62-2.81-6.62-2.81 6.62-7.19.62 5.45 4.73-1.63 7.03z"/></svg></button>');
-            if (opts.starred) {
-                $star.addClass("on");
-            } else {
-                $star.addClass("d-none");
-            }
-            $middle.append($star);
-
-        }
-        var $icons = $('<div class="navbar-icons"/>');
-        if (opts.office) {
-            $icons.append('<a href="' + opts.office + '" data-type="' + opts.type + '" data-id="' + opts.id + '" class="btn btn-icon" title="Open in Office"><svg class="i i-office" height="24" viewBox="0 0 24 24" width="24"><path d="m3 18 4-1.25v-9.75l7-2v14.5l-10.5-1.25 10.5 3.75 6-1.25v-17.25l-6.05-1.5-10.95 3.75z" fill="#e64a19"/></svg></a>');
-        }
-        if (opts.download) {
-            $icons.append('<a href="' + opts.download + '" class="btn btn-icon" title="Download"><svg class="i i-download" height="24" viewBox="0 0 24 24" width="24"><path d="m5 20h14v-2h-14m14-9h-4v-6h-6v6h-4l7 7z"/></svg></a>');
-        }
-        $navbar.append($icons);
-        $container.append($navbar);
-
-        */
         // show preview container
         $container.show();
     }

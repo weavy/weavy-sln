@@ -17,5 +17,5 @@
         <pre>@Model.Exception.GetType().FullName: @Model.Exception.Message<br />@Model.Exception.StackTrace</pre>
     }
     <a class="btn btn-icon btn-link px-0 d-standalone" href="@Url.Back(WeavyContext.ApplicationPath)" data-turbolinks="false">@Svg.Icon("arrow-left")<span>@T["Back"]</span></a>
-    <button class="btn btn-icon btn-link px-0 d-framed" onclick="wvy.postal.postToParent({ name: 'reset' }, null, true);">@Svg.Icon("arrow-left")<span>@T["Back"]</span></button>
+    <button class="btn btn-icon btn-link px-0 d-framed" onclick="wvy.postal.postToParent({ name: 'reset' });">@Svg.Icon("arrow-left")<span>@T["Back"]</span></button>
 </div>

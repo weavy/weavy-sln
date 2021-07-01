@@ -22,9 +22,9 @@
             throw new Error("Weavy must be loaded before registering plugin");
         }
 
-        factory(root.Weavy);
+        factory(root.Weavy, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function (Weavy) {
+}(typeof self !== 'undefined' ? self : this, function (Weavy, wvy) {
 
     /**
      * Filepicker plugin for attaching from Google, O365, Dropbox etc.
@@ -69,6 +69,6 @@
     };
 
     // Register and return plugin
-    console.debug("Registering Weavy plugin: filebrowser");
+    //console.debug("Registering Weavy plugin: filebrowser");
     return Weavy.plugins.filebrowser = FileBrowserPlugin;
 }));

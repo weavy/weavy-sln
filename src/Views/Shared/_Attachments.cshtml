@@ -12,7 +12,7 @@
 
     @foreach (var attachment in Model) {
         var attrs = Html.PreviewAttributes(attachment);
-        <a class="list-group-item list-group-item-action" href="@attachment.DownloadUrl()" @Html.Attributes(attrs)>
+        <a class="list-group-item list-group-item-action" href="@(attachment.DownloadUrl() ?? attrs["data-href"])" @Html.Attributes(attrs)>
             <div class="media">
                 @if (attachment.Blob.Link == null && FileUtils.IsWebImage(attachment.Blob.Name)) {
                     <img class="img-48" src="@attachment.ThumbUrl(48, 48, fit: FitMode.Crop)" />

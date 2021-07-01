@@ -217,7 +217,7 @@
 
 
     // Register and return plugin
-    console.debug("Registering Weavy plugin: maximize");
+    //console.debug("Registering Weavy plugin: maximize");
     return Weavy.plugins.maximize = MaximizePlugin;
 
 }));

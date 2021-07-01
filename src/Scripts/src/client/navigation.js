@@ -20,10 +20,10 @@
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyNavigation = factory(root.WeavyPromise, root.WeavyUtils);
+        root.WeavyNavigation = factory(root.wvy.promise, root.wvy.utils, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function (WeavyPromise, utils) {
-    console.debug("navigation.js");
+}(typeof self !== 'undefined' ? self : this, function (WeavyPromise, WeavyUtils, wvy) {
+    //console.debug("navigation.js");
 
     /**
      * @class WeavyNavigation
@@ -105,7 +105,7 @@
          */
         weavyNavigation.open = function (request) {
             var isUrl = typeof request === "string";
-            var isNavigationRequest = utils.isPlainObject(request) && request.url;
+            var isNavigationRequest = WeavyUtils.isPlainObject(request) && request.url;
 
             if (isUrl) {
                 return weavy.ajax("/client/click?url=" + encodeURIComponent(request)).then(openRequest);

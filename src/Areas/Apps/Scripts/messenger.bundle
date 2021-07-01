@@ -1,33 +1,44 @@
-﻿~/scripts/src/server/browser.js
+﻿# scripts loaded asap
+~/scripts/src/server/browser.js
 ~/scripts/vendor/jquery/jquery.min.js
 ~/scripts/vendor/overlayscrollbars/jquery.overlayScrollbars.min.js
 ~/scripts/src/server/when-loaded.js
 ~/scripts/src/server/url.js
 ~/scripts/src/resources.js
 ~/scripts/src/server/scrollbar.js
+~/scripts/src/utils.js
+~/scripts/src/promise.js
+~/scripts/src/console.js
 ~/scripts/src/postal.js
 ~/scripts/src/server/overlay.js
-~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/vendor/turbolinks/turbolinks.js
+~/scripts/src/server/turbolinks.js
+#~/scripts/src/server/navigation.js
+
+# vendor
+~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/vendor/popper.js/popper.min.js
 ~/scripts/vendor/bootstrap/util.js
 ~/scripts/vendor/bootstrap/button.js
 ~/scripts/vendor/bootstrap/dropdown.js
 ~/scripts/vendor/bootstrap/alert.js
-~/scripts/src/bootstrap/modal.js
-~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/vendor/jquery.idle/jquery.idle.min.js
 ~/scripts/vendor/jquery-textcomplete/jquery.textcomplete.min.js
 ~/scripts/vendor/emojione/emojione.js
+
+~/scripts/src/bootstrap/modal.js
+~/scripts/src/signalr/jquery.signalR.js
 ~/scripts/src/emojionearea/emojionearea.js
-~/scripts/src/server/alert.js
+
+# regular scripts
 ~/scripts/src/_extensions.js
-~/scripts/src/server/turbolinks.js 
-~/scripts/src/server/emoji.js
-~/scripts/src/authentication.js
 ~/scripts/src/connection.js
-~/scripts/src/server/theme.js
+~/scripts/src/authentication.js
+
+~/scripts/src/server/emoji.js
 ~/scripts/src/server/presence.js
+~/scripts/src/server/theme.js
+~/scripts/src/server/alert.js
 ~/scripts/src/server/fileupload.js
 ~/scripts/src/server/drop.js
 

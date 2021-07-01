@@ -57,6 +57,7 @@
 @import "../../../styles/components/image-grid";
 @import '../../../styles/components/overlay';
 @import "../../../styles/components/presence";
+@import "../../../styles/components/progress";
 //@import "../../../styles/components/pdf";
 @import "../../../styles/components/spinner";
 @import "../../../styles/components/togglers";
@@ -104,10 +105,6 @@ html.os-html {
         bottom: $navbar-height + .5rem;
     }
 
-}
-
-.turbolinks-progress-bar {
-    display: none;
 }
 
 .pane {
@@ -752,9 +749,12 @@ button.dropdown-item {
     }
 }
 // change some styles when loading
-body.loading {
+html.loading {
+    .turbolinks-progress-bar {
+        display: none;
+    }
 
-    #messages-scroll.os-host  {
+    #messages-scroll.os-host {
         margin-bottom: auto;
 
         > .os-scrollbar {
@@ -764,7 +764,7 @@ body.loading {
         > .os-padding {
             > .os-viewport {
                 overflow: visible;
-            
+
                 > .os-content {
                     position: static;
                 }
@@ -784,7 +784,7 @@ body.loading {
 }
 
 // change some styles while sending
-body.sending {
+html.sending {
     // display #sending
     #sending {
         display: block;

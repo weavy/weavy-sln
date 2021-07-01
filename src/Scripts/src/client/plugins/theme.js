@@ -178,6 +178,6 @@
     ThemePlugin.defaults = {
     };
 
-    console.debug("Registering Weavy plugin: theme");
+    //console.debug("Registering Weavy plugin: theme");
     return Weavy.plugins.theme = ThemePlugin;
 }));

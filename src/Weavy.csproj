@@ -349,17 +349,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.3.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.4.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.3.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.4.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.3.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.4.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.3.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.4.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -3465,18 +3465,20 @@
     <Content Include="Scripts\src\_ie.js" />
     <Content Include="Scripts\src\_jquery-check.js" />
     <Content Include="Scripts\src\_noconflict.js" />
+    <Content Include="Scripts\src\_scope.begin.js" />
+    <Content Include="Scripts\src\_scope.end.js" />
     <Content Include="Scripts\src\authentication.js" />
     <Content Include="Scripts\src\bootstrap\modal.js" />
     <Content Include="Scripts\src\client\app.js" />
     <Content Include="Scripts\src\client\events.js" />
     <Content Include="Scripts\src\client\history.js" />
     <Content Include="Scripts\src\client\navigation.js" />
+    <Content Include="Scripts\src\client\overlay.js" />
     <Content Include="Scripts\src\client\package.json" />
     <Content Include="Scripts\src\client\panels.js" />
     <Content Include="Scripts\src\client\plugins\_weavy-plugin-helloworld.js" />
     <Content Include="Scripts\src\client\plugins\_weavy-plugin-template.js" />
     <Content Include="Scripts\src\client\plugins\alert.js" />
-    <Content Include="Scripts\src\client\plugins\authentication-panel.js" />
     <Content Include="Scripts\src\client\plugins\deeplinks.js" />
     <Content Include="Scripts\src\client\plugins\filebrowser.js" />
     <Content Include="Scripts\src\client\plugins\maximize.js" />
@@ -3548,6 +3550,7 @@
     <Content Include="Scripts\src\tinymce\themes\silver\theme.js" />
     <Content Include="Scripts\src\tinymce\tiny.js" />
     <Content Include="Scripts\src\utils.js" />
+    <Content Include="Scripts\src\wvy.js" />
     <Content Include="Scripts\vendor\bootstrap\alert.js" />
     <Content Include="Scripts\vendor\bootstrap\bootstrap.min.js" />
     <Content Include="Scripts\vendor\bootstrap\button.js" />
@@ -3768,6 +3771,7 @@
     <Content Include="Scripts\vendor\prismjs\prism-ruby.min.js" />
     <Content Include="Scripts\vendor\select2\select2.min.js" />
     <Content Include="Scripts\vendor\tinymce\tinymce.min.js" />
+    <Content Include="Scripts\vendor\tinymce\icons\default\icons.min.js" />
     <Content Include="Scripts\vendor\tinymce\plugins\anchor\plugin.min.js" />
     <Content Include="Scripts\vendor\tinymce\plugins\autolink\plugin.min.js" />
     <Content Include="Scripts\vendor\tinymce\plugins\autoresize\plugin.min.js" />

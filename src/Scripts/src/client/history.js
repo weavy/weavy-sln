@@ -20,10 +20,10 @@
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyHistory = factory(root.WeavyPromise, root.WeavyUtils);
+        root.WeavyHistory = factory(root.wvy.promise, root.wvy.utils);
     }
-}(typeof self !== 'undefined' ? self : this, function (WeavyPromise, utils) {
-    console.debug("history.js");
+}(typeof self !== 'undefined' ? self : this, function (WeavyPromise, WeavyUtils) {
+    //console.debug("history.js");
 
     /**
      * @class WeavyHistory
@@ -43,7 +43,6 @@
          *  @lends WeavyHistory#
          */
         var weavyHistory = this;
-
 
         /**
          * Try to open a weavy uri in the app where it belongs. 
@@ -81,7 +80,7 @@
          * @returns {WeavyHistory~weavyState}
          */
         weavyHistory.getStateFromUri = function(weavyUris) {
-            weavyUris = utils.asArray(weavyUris);
+            weavyUris = WeavyUtils.asArray(weavyUris);
             var panels = [];
             weavyUris.forEach(function (uri) {
                 var isUrl = typeof uri === "string";
@@ -127,7 +126,7 @@
             var weavyId = weavy.options.id && weavy.getId();
             var weavyUriId = (weavy.options.id ? weavy.getId(panelId).replace("__", "@") : panelId);
 
-            var relUrl = panel.location && utils.URL(weavy.httpsUrl(panel.location, weavy.options.url)).pathname;
+            var relUrl = panel.location && new URL(panel.location, weavy.url).pathname;
             var weavyUri = "wvy://" + weavyUriId + (relUrl || "")
 
             return {
@@ -220,7 +219,7 @@
 
                 currentHistoryState.weavy.panels = extendPanelStates(currentHistoryState.weavy.panels || [], state.panels);
 
-                url = url || window.location.href;
+                url = url && String(url) || window.location.href;
 
                 try {
                     if (action === "replace") {
@@ -229,7 +228,7 @@
                         window.history.pushState(currentHistoryState, null, url);
                     }
                 } catch (e) {
-                    weavy.warn("history: Could not push history state.")
+                    weavy.warn("history: Could not push history state.", e);
                 }
             }
         }
@@ -351,7 +350,16 @@
             weavyHistory.setBrowserState(state, "replace");
         }
 
+        window.addEventListener("popstate", function () {
+            weavy.log("POP native");
+            var state = weavyHistory.getBrowserState();
+            if (state) {
+                weavy.debug("history: popstate");
+                weavyHistory.openState(state);
+            }
+        })
         weavy.on(window, "popstate", function (e) {
+            weavy.log("POP");
             var state = weavyHistory.getBrowserState();
             if (state) {
                 weavy.debug("history: popstate");

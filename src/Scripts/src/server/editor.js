@@ -983,16 +983,16 @@ wvy.editor = (function ($) {
 
             switch (e.data.name) {
                 case "zoom-signed-in":
-                    if (e.data.guid != _meetingContainerId) return false;
+                    if (e.data.guid !== _meetingContainerId) return false;
                     recreateMeeting("zoom", e.data.guid);
                     break;
 
                 case "teams-signed-in":
-                    if (e.data.guid != _meetingContainerId) return false;
+                    if (e.data.guid !== _meetingContainerId) return false;
                     recreateMeeting("teams");
                     break;
             }
-        };
+        }
 
         // create new meeting
         function createMeeting(provider) {

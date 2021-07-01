@@ -2,14 +2,13 @@
 @{
     Layout = "~/Views/Content/_Layout.Embedded.cshtml";
     Title = T["Edit"] + " " + Model.MetaData().Name;
-    Back = Url.Back(Model.Url());
     ViewData["turboform"] = true;
     var draftable = Model as IDraftable;
 }
 
 @section navbar_left {
     <div class="navbar-icons">
-        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Svg.Icon("close")</a>
+        @Html.Partial("_NavbarClose")
     </div>
 }
 

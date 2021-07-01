@@ -18,17 +18,37 @@
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyConsole = factory(
-            root.WeavyUtils
+        root.wvy = root.wvy || {};
+        root.wvy.console = root.wvy.console || factory(
+            root.wvy.utils
         );
     }
-}(typeof self !== 'undefined' ? self : this, function (utils) {
-    console.debug("console.js");
+}(typeof self !== 'undefined' ? self : this, function (WeavyUtils) {
+    //console.debug("console.js", self.name);
 
     // LOGGING FUNCTIONS
 
-    /** Checks if the browser is IE */
-    var isIE = /; MSIE|Trident\//.test(navigator.userAgent);
+    // Weavy colors
+    const colors = [
+        "#36ace2", // LightBlue-500
+        "#6599eb", // Blue-400
+        "#646fed", // Indigo-400
+        "#773bde", // DeepPurple-500
+        "#bc4bce", // Purple-500
+        "#d54487", // Pink-500
+        "#de4b3b", // Red-500
+        "#e17637", // DeepOrange-500
+        "#e3a135", // Orange-500
+        "#c9a018", // Amber-600
+        "#a4c51b", // Lime-600
+        "#cbbc15", // Yellow-600
+        "#7cd345", // LightGreen-500
+        "#53c657", // Green-500
+        "#45d391", // Teal-500
+        "#38dde0"  // Cyan-500
+    ];
+
+    const gray = "#8c8c8c";
 
     /**
      * Wrapper for applying colors/styles to the log functions.
@@ -39,26 +59,18 @@
      * @param {string} [color] - The hex color of the prefix
      * @param {Array} logArguments - Any number of log arguments 
      */
-    function colorLog(logMethod, id, color, logArguments) {
+    function colorLog(logMethod, name, color) {
         // Binding needed to get proper line numbers/file reference in console
         // Binding needed for console.log.apply to work in IE
 
-        if (isIE) {
-            if (id) {
-                return Function.prototype.bind.call(logMethod, console, "Weavy " + id);
+        if (name) {
+            if (color) {
+                return Function.prototype.bind.call(logMethod, console, "%c%s", "color: " + color, name);
             } else {
-                return Function.prototype.bind.call(logMethod, console);
+                return Function.prototype.bind.call(logMethod, console, "%c%s", "color: " + gray, name);
             }
         } else {
-            if (id) {
-                if (color) {
-                    return Function.prototype.bind.call(logMethod, console, "%cWeavy %s", "color: " + color, id);
-                } else {
-                    return Function.prototype.bind.call(logMethod, console, "%cWeavy %s", "color: gray", id);
-                }
-            } else {
-                return Function.prototype.bind.call(logMethod, console, "%cWeavy", "color: gray");
-            }
+            return Function.prototype.bind.call(logMethod, console, "%cWeavy", "color: " + gray);
         }
     }
 
@@ -73,16 +85,30 @@
     /**
      * @constructor
      * @hideconstrucor
-     * @param {string} [id] - The unique id displayed by console logging.
-     * @param {string} [color] - A hex color to use for id. A random color will be chosen if omitted.
-     * @param {WeavyConsole#logging} [enableLogging] - Options for which logging to enable/disable
+     * @param {string|Object} [context] - The unique id displayed by console logging.
+     * @param {WeavyConsole#options} [options] - Options for which logging to enable/disable
      */
-    var WeavyConsole = function (id, color, enableLogging) {
+    var WeavyConsole = function (context, options) {
         /** 
          *  Reference to this instance
          *  @lends WeavyConsole#
          */
         var weavyConsole = this;
+
+        var _nameSelf = self.name ? self.name + ":" : "";
+        var _nameType = context.type || context.constructor && context.constructor.name || "";
+        var _nameInstance = context && context.name ? (_nameType ? "." : "") + context.name : (context.id ? "#" + context.id : "");
+        var _name = typeof context === "string" ? _nameSelf + context : _nameSelf + _nameType + _nameInstance;
+
+        var _options = WeavyConsole.defaults;
+
+        // Select a color based on _nameSelf
+        var _selectedColor = Array.from(_nameSelf).reduce(function (sum, ch) { return sum + ch.charCodeAt(0); }, 0) % colors.length;
+        var _uniqueColor = colors[_selectedColor];
+
+        var _color = gray;
+
+        var noop = function () { };
 
         /**
         * Enable logging messages in console. Set the individual logging types to true/false or the entire property to true/false;
@@ -99,118 +125,47 @@
         * @example
         * weavy.console.logging = false;
         *
-        * @name logging
+        * @name options
         * @memberof WeavyConsole#
         * @typedef
         * @type {Object|boolean}
+        * @property {string} color - A hex color to use for id. A random color will be chosen if omitted.
         * @property {boolean} log=true - Enable log messages in console
         * @property {boolean} debug=true - Enable debug messages in console
         * @property {boolean} info=true - Enable info messages in console
         * @property {boolean} warn=true - Enable warn messages in console
         * @property {boolean} error=true - Enable error messages in console
         */
-
-
-        /**
-         * The unique id displayed by console logging.
-         *
-         * @category properties
-         * @type {string}
-         */
-        this.id = id;
-
-        /**
-         * The unique instance color used by console logging.
-         *
-         * @category properties
-         * @type {string}
-         */
-        this.color = color || "#" + (utils.S4() + utils.S4()).substr(-6).replace(/^([8-9a-f].).{2}/, "$100").replace(/^(.{2})[8-9a-f](.).{2}/, "$1a$200").replace(/.{2}([8-9a-f].)$/, "00$1");
-
-        var _logging = enableLogging !== undefined ? enableLogging : WeavyConsole.defaults;
-
-        var _debug = colorLog(console.debug, weavyConsole.id, weavyConsole.color);
-
-
-        Object.defineProperty(weavyConsole, "logging", {
+        Object.defineProperty(this, "options", {
             get: function () {
-                return _logging;
+                return _options;
             },
-            set: function (logging) {
-                _logging = logging;
+            set: function (options) {
+                // Merge default options, current options and new options
+                _options = WeavyUtils.assign(WeavyUtils.assign(WeavyConsole.defaults, _options), options);
 
-                if (logging === true || logging.debug) {
-                    weavyConsole.debug = _debug;
+                // Set color
+                if (_options === true) {
+                    _color = _uniqueColor;
+                } else if (_options.color === false) {
+                    _color = gray;
+                } else if (typeof _options.color === "string") {
+                    _color = _options.color;
                 } else {
-                    weavyConsole.debug = function () { };
+                    _color = _uniqueColor;
                 }
 
+                // Turn on/off logging
+                this.log   = _options === true || _options.log   ? colorLog(window.console.log, _name, _color)   : noop;
+                this.debug = _options === true || _options.debug ? colorLog(window.console.debug, _name, _color) : noop;
+                this.info  = _options === true || _options.info  ? colorLog(window.console.info, _name, _color)  : noop;
+                this.warn  = _options === true || _options.warn  ? colorLog(window.console.warn, _name, _color)  : noop;
+                this.error = _options === true || _options.error ? colorLog(window.console.error, _name, _color) : noop;
             }
         });
 
-        weavyConsole.logging = enableLogging !== undefined ? enableLogging : WeavyConsole.defaults;
-
-
-        /**
-         * Wrapper for `console.debug()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using a unique prefix color. 
-         * @category logging
-         * @function WeavyConsole#debug
-         * @extends {external:console.debug}
-         */
-        /*if (weavyConsole.logging === true || weavyConsole.logging.debug) {
-            this.debug = colorLog(console.debug, weavyConsole.id, weavyConsole.color);
-        } else {
-            this.debug = function () { };
-        }*/
-
-        /**
-         * Wrapper for `console.error()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using a unique prefix color. 
-         * @category logging
-         * @function WeavyConsole#error
-         * @extends {external:console.error}
-         */
-        if (weavyConsole.logging === true || weavyConsole.logging.error) {
-            this.error = colorLog(console.error, weavyConsole.id, weavyConsole.color);
-        } else {
-            this.error = function () { };
-        }
-
-        /**
-         * Wrapper for `console.info()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using a unique prefix color. 
-         * @category logging
-         * @function WeavyConsole#info
-         * @extends {external:console.info}
-         */
-        if (weavyConsole.logging === true || weavyConsole.logging.info) {
-            this.info = colorLog(console.info, weavyConsole.id, weavyConsole.color);
-        } else {
-            this.info = function () {}
-        }
-
-        /**
-         * Wrapper for `console.log()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using a unique prefix color. 
-         * @category logging
-         * @function WeavyConsole#log
-         * @extends {external:console.log}
-         */
-        if (weavyConsole.logging === true || weavyConsole.logging.log) {
-            this.log = colorLog(console.log, weavyConsole.id, weavyConsole.color);
-        } else {
-            this.log = function () {}
-        }
-
-        /**
-         * Wrapper for `console.warn()` that adds the [instance id]{@link Weavy#getId} of weavy as prefix using a unique prefix color. 
-         * @category logging
-         * @function WeavyConsole#warn
-         * @extends {external:console.warn}
-         */
-        if (weavyConsole.logging === true || weavyConsole.logging.warn) {
-            this.warn = colorLog(console.warn, weavyConsole.id, weavyConsole.color);
-        } else {
-            this.warn = function () {}
-        }
-
+        // Set initial logging
+        this.options = options;
     };
 
     /**
@@ -218,6 +173,7 @@
      * 
      * @example
      * Weavy.defaults.console = {
+     *     color: true,
      *     log: true,
      *     debug: true,
      *     info: true,
@@ -229,14 +185,15 @@
      * @memberof WeavyConsole
      * @type {Object}
      * @property {boolean} log=true - Enable log messages in console
-     * @property {boolean} debug=true - Enable debug messages in console
+     * @property {boolean} debug=false - Enable debug messages in console
      * @property {boolean} info=true - Enable info messages in console
      * @property {boolean} warn=true - Enable warn messages in console
      * @property {boolean} error=true - Enable error messages in console
      */
     WeavyConsole.defaults = {
+        color: true,
         log: true,
-        debug: true,
+        debug: false,
         info: true,
         warn: true,
         error: true

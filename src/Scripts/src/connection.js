@@ -6,30 +6,37 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
+        define([
+            'jquery',
+            './utils',
+            './promise',
+            './console',
+            './wvy'
+        ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('jquery'));
+        root.wvy = root.wvy || {};
+        module.exports = factory(
+            require('jquery'),
+            require('./utils'),
+            require('./promise'),
+            require('./console'),
+            require('./wvy')
+        );
     } else {
         // Browser globals (root is window)
-        root.wvy = root.wvy || {};
-        root.wvy.connection = root.wvy.connection || new factory(jQuery);
+        //root.wvy = root.wvy || {};
+        root.wvy.connection = root.wvy.connection || new factory(jQuery, root.wvy.utils, root.wvy.promise, root.wvy.console, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function ($) {
+}(typeof self !== 'undefined' ? self : this, function ($, WeavyUtils, WeavyPromise, WeavyConsole, wvy) {
+
 
     //console.debug("connection.js", window.name);
 
     function sanitizeObject(obj) {
-        return JSON.parse(JSON.stringify(obj, function replacer(key, value) {
-            // Filtering out properties
-            // Remove HTML nodes
-            if (value instanceof HTMLElement) {
-                return value.toString();
-            }
-            return value;
-        }));
+        return JSON.parse(JSON.stringify(obj, WeavyUtils.sanitizeJSON));
     }
 
     var connections = this;
@@ -37,12 +44,14 @@
     // CONNECTION HANDLING
     var _connections = new Map();
 
-    var WeavyConnection = function (url) {
+    function WeavyConnection(url) {
         /**
          *  Reference to this instance
          *  @lends WeavyConnection#
          */
         var weavyConnection = this;
+
+        var console = new WeavyConsole("WeavyConnection");
 
         var initialized = false;
 
@@ -58,6 +67,7 @@
 
         // create a new hub connection
         var connection = $.hubConnection(connectionUrl, { useDefaultPath: false });
+
         var reconnecting = false;
         var hubProxies = { rtm: connection.createHubProxy('rtm'), client: connection.createHubProxy('client') };
         var _events = [];
@@ -67,9 +77,9 @@
         var explicitlyDisconnected = false;
 
         var whenConnectionStart;
-        var whenConnected = $.Deferred();
-        var whenLeaderElected = $.Deferred();
-        var whenAuthenticated = $.Deferred();
+        var whenConnected = new WeavyPromise();
+        var whenLeaderElected = new WeavyPromise();
+        var whenAuthenticated = new WeavyPromise();
 
         var states = $.signalR.connectionState;
 
@@ -96,15 +106,17 @@
         function init(connectAfterInit, authentication) {
             if (!initialized) {
                 initialized = true;
-                console.debug("wvy.connection: init", window.name || "self", "to " + url, connectAfterInit ? "and connect" : "");
+                console.debug("init" + (!window.name ? "self" : "") + " to " + url, connectAfterInit ? "and connect" : "");
 
-                wvy.postal.whenLeader.then(function () {
-                    console.log("wvy.connection: is leader, let's go");
-                    childConnection = false;
-                    whenLeaderElected.resolve(true);
-                }, function () {
-                    childConnection = true;
-                    whenLeaderElected.resolve(false);
+                wvy.postal.whenLeader().then(function (isLeader) {
+                    if (isLeader) {
+                        console.debug("is leader, let's go");
+                        childConnection = false;
+                        whenLeaderElected.resolve(true);
+                    } else {
+                        childConnection = true;
+                        whenLeaderElected.resolve(false);
+                    }
                 });
 
                 authentication = authentication || wvy.authentication.get(url);
@@ -134,35 +146,35 @@
                 // connect to the server?
                 return connect();
             } else {
-                return whenLeaderElected.promise();
+                return whenLeaderElected();
             }
         }
 
         function connect() {
-            return whenLeaderElected.then(function (leader) {
+            return whenLeaderElected().then(function (leader) {
                 if (leader) {
                     connectionStart();
                 } else {
                     wvy.postal.postToParent({ name: "request:connection-start", weavyId: "wvy.connection", connectionUrl: connectionUrl });
                 }
-                return whenConnected.promise();
+                return whenConnected();
             });
         }
 
         // start the connection
         function connectionStart() {
-            return whenAuthenticated.then(function () {
-                 explicitlyDisconnected = false;
+            return whenAuthenticated().then(function () {
+                explicitlyDisconnected = false;
 
                 if (status() === states.disconnected) {
                     state = states.connecting;
                     triggerEvent("state-changed.connection.weavy", { state: state });
 
                     whenConnectionStart = connection.start().always(function () {
-                        console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " connection started")
+                        console.debug((childConnection ? "child " : "") + "connection started")
                         whenConnected.resolve();
                     }).catch(function (error) {
-                        console.error("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " could not start connection")
+                        console.error((childConnection ? "child " : "") + "could not start connection")
                     });
                 }
 
@@ -174,7 +186,7 @@
         function disconnect(async, notify) {
             if (!childConnection && connection.state !== states.disconnected && explicitlyDisconnected === false) {
                 explicitlyDisconnected = true;
-                whenConnected = $.Deferred();
+                whenConnected.reset();
 
                 try {
                     connection.stop(async === true, notify !== false).then(function () {
@@ -246,7 +258,7 @@
                     try {
                         return JSON.parse(a);
                     } catch (e) {
-                        console.warn("wvy.connection" + (childConnection ? " " + (window.name || "[child]") : "") + " could not parse event data;", name);
+                        console.warn((childConnection ? "child " : "") + "could not parse event data;", name);
                     }
                 }
                 return a;
@@ -261,7 +273,7 @@
             try {
                 wvy.postal.postToChildren({ name: name, eventName: eventName, data: data, weavyId: "wvy.connection", connectionUrl: connectionUrl });
             } catch (e) {
-                console.error("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " could not distribute relay realtime message", { name: name, eventName: eventName }, e);
+                console.error((childConnection ? "child " : "") + "could not distribute relay realtime message", { name: name, eventName: eventName }, e);
             }
         }
 
@@ -271,7 +283,7 @@
 
             var whenInvoked = new Promise(function (resolve, reject) {
 
-                whenLeaderElected.then(function (leader) {
+                whenLeaderElected().then(function (leader) {
                     if (leader) {
 
                         console.debug("wvy.connection: invoke as leader", hub, args[0]);
@@ -298,11 +310,11 @@
                     } else {
                         // Invoke via parent
                         var invokeId = "wvy.connection-" + Math.random().toString().substr(2);
-                        console.debug("wvy.connection: invoke via parent", hub, args[0], invokeId);
+                        console.debug("invoke via parent", hub, args[0], invokeId);
 
                         var invokeResult = function (msg) {
                             if (msg.data.name === "invokeResult" && msg.data.invokeId === invokeId) {
-                                console.debug("wvy.connection: parent invokeResult received", invokeId);
+                                console.debug("parent invokeResult received", invokeId);
                                 if (msg.data.error) {
                                     reject(msg.data.error);
                                 } else {
@@ -339,7 +351,7 @@
             var newState = parseInt(connectionState.newState);
 
             if (newState === states.connected) {
-                console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " connected " + connection.id + " (" + connection.transport.name + ")");
+                console.debug((childConnection ? "child " : "") + "connected " + connection.id + " (" + connection.transport.name + ")");
 
                 // clear timeouts
                 window.clearTimeout(_reconnectTimeout);
@@ -374,7 +386,7 @@
 
         connection.reconnecting(function () {
             reconnecting = true;
-            console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " reconnecting...");
+            console.debug((childConnection ? "child " : "") + "reconnecting...");
 
             // wait 2 seconds before showing message
             if (_reconnectTimeout !== null) {
@@ -391,7 +403,7 @@
         });
 
         connection.disconnected(function () {
-            console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " disconnected");
+            console.debug((childConnection ? "child " : "") + "disconnected");
 
             if (!explicitlyDisconnected) {
                 reconnectRetries++;
@@ -432,15 +444,15 @@
             var msg = e.data;
             switch (msg.name) {
                 case "invoke":
-                    whenLeaderElected.then(function (leader) {
+                    whenLeaderElected().then(function (leader) {
                         if (leader) {
                             var proxy = hubProxies[msg.hub];
                             var args = msg.args;
-                            console.debug("wvy.connection: processing invoke request", msg.invokeId, msg.args);
+                            console.debug("processing invoke request", msg.invokeId, msg.args);
                             connect().then(function () {
                                 proxy.invoke.apply(proxy, args)
                                     .then(function (invokeResult) {
-                                        console.debug("wvy.connection: returning invoke request result", msg.args[0], msg.invokeId);
+                                        console.debug("returning invoke request result", msg.args[0], msg.invokeId);
                                         wvy.postal.postToSource(e, {
                                             name: "invokeResult",
                                             hub: msg.hub,
@@ -469,9 +481,9 @@
                     });
                     break;
                 case "request:connection-start":
-                    whenLeaderElected.then(function (leader) {
+                    whenLeaderElected().then(function (leader) {
                         if (leader) {
-                            //console.debug("wvy.connection: processing connect request");
+                            //console.debug("processing connect request");
                             connect().then(function () {
                                 wvy.postal.postToChildren({ name: "connection-started", weavyId: "wvy.connection", connectionUrl: connectionUrl });
                             });
@@ -487,9 +499,9 @@
             var msg = e.data;
             switch (msg.name) {
                 case "connection-started":
-                    whenLeaderElected.then(function (leader) {
+                    whenLeaderElected().then(function (leader) {
                         if (!leader) {
-                            //console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " distribute received", msg.name, msg.eventName || "");
+                            //console.debug((childConnection ? "child " : "") + "distribute received", msg.name, msg.eventName || "");
                             state = states.connected;
                             whenConnected.resolve();
                         }
@@ -501,7 +513,7 @@
                     var data = msg.data;
 
                     // Extract array with single value
-                    if ($.isArray(data) && data.length === 1) {
+                    if (Array.isArray(data) && data.length === 1) {
                         data = data[0];
                     }
 
@@ -512,13 +524,13 @@
                         }
                     }
 
-                    //console.debug("wvy.connection:" + (childConnection ? " " + (window.name || "[child]") : "") + " triggering received distribute-event", name);
+                    //console.debug((childConnection ? "child " : "") + "triggering received distribute-event", name);
                     $(weavyConnection).triggerHandler(event, msg.data);
                     break;
                 case "alert":
                     if (wvy.alert) {
                         if (msg.eventName === "show") {
-                            console.debug("wvy.connection: alert show received", msg.data.title);
+                            console.debug("alert show received", msg.data.title);
                             wvy.alert.alert(msg.data.type, msg.data.title, null, msg.data.id);
                         } else {
                             wvy.alert.close(msg.data);
@@ -555,29 +567,30 @@
             _events = [];
         }
 
-        return {
-            connect: connect,
-            destroy: destroy,
-            disconnect: disconnect,
-            disconnectAndConnect: disconnectAndConnect,
-            init: init,
-            invoke: invoke,
-            on: on,
-            off: off,
-            proxies: hubProxies,
-            states: states,
-            status: status,
-            transport: function () { return connection.transport.name; }
-        };
-    };
+        this.connect = connect;
+        this.destroy = destroy;
+        this.disconnect = disconnect;
+        this.disconnectAndConnect = disconnectAndConnect;
+        this.init = init;
+        this.invoke = invoke;
+        this.on = on;
+        this.off = off;
+        this.proxies = hubProxies;
+        this.states = states;
+        this.status = status;
+        this.transport = function () { return connection.transport.name; };
+    }
 
     connections.get = function (url) {
         var sameOrigin = false;
+
+        url = url && String(url);
+
         var urlExtract;
         try {
             urlExtract = url && /^(https?:\/(\/[^/]+)+)\/?$/.exec(url)
         } catch (e) {
-            console.error("wvy.connection: Unable to parse connection URL, make sure to connect to a valid domain.")
+            console.error("Unable to parse connection URL, make sure to connect to a valid domain.")
         }
         if (urlExtract) {
             sameOrigin = window.location.origin === urlExtract[1]
@@ -594,7 +607,7 @@
     };
 
     connections.remove = function (url) {
-        url = url || "";
+        url = url && String(url) || "";
         try {
             var connection = _connections.get(url);
             if (connection && connection.destroy) {
@@ -602,7 +615,7 @@
             }
             _connections.delete(url);
         } catch (e) {
-            console.error("wvy.connection: Could not remove connection", url, e);
+            console.error("Could not remove connection", url, e);
         }
     };
 
@@ -614,7 +627,7 @@
             } else {
                 var connection = connections.get();
 
-                $(function () {
+                WeavyUtils.ready(function () {
                     setTimeout(function () {
                         if (_connections.size === 1) {
                             connection.init(wvy.authentication.default);

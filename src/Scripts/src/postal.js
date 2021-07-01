@@ -1,4 +1,4 @@
-﻿/* eslint-env commonjs, amd, jquery */
+﻿/* eslint-env commonjs, amd */
 
 // UMD based on https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 // TODO: move to ES6 and transpiler
@@ -6,61 +6,37 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
+        define(['./utils', './promise', './console', './wvy'], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('jquery'));
+        module.exports = factory(require('./utils'), require('./promise'), require('./console'), require('./wvy'));
     } else {
         // Browser globals (root is window)
         root.wvy = root.wvy || {};
-        root.wvy.postal = root.wvy.postal || new factory(jQuery);
+        root.wvy.postal = factory(root.wvy.utils, root.wvy.promise, root.wvy.console, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function ($) {
+}(typeof self !== 'undefined' ? self : this, function (WeavyUtils, WeavyPromise, WeavyConsole, wvy) {
 
-    //console.debug("postal.js", window.name);
+    //console.debug("postal.js", self.name);
 
-    function eqObjects(a, b, skipLength) {
-        if (!$.isPlainObject(a) || !$.isPlainObject(b)) {
-            return false;
-        }
+    function WeavyPostal(options) {
 
-        var aProps = Object.getOwnPropertyNames(a);
-        var bProps = Object.getOwnPropertyNames(b);
+        var console = new WeavyConsole("WeavyPostal");
 
-        if (!skipLength && aProps.length !== bProps.length) {
-            return false;
-        }
-
-        for (var i = 0; i < aProps.length; i++) {
-            var propName = aProps[i];
-
-            if (a[propName] !== b[propName]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    var WeavyPostal = function () {
-        /**
-         *  Reference to this instance
-         *  @lends WeavyPostal#
-         */
-        var postal = this;
+        this.timeout = options && options.timeout || 2000;
 
         var inQueue = [];
-        var parentQueue = [];
         var messageListeners = [];
         var contentWindows = new Set();
         var contentWindowsByWeavyId = new Map();
         var contentWindowOrigins = new WeakMap();
         var contentWindowNames = new WeakMap();
         var contentWindowWeavyIds = new WeakMap();
+        var contentWindowDomain = new WeakMap();
 
-        var _whenLeader = $.Deferred();
+        var _whenLeader = new WeavyPromise();
         var _isLeader = null;
 
         var _parentWeavyId = null;
@@ -74,7 +50,7 @@
             try {
                 extractOrigin = /^((?:https?:\/\/[^/]+)|(?:file:\/\/))\/?/.exec(url)[1]
             } catch (e) {
-                console.error("wvy.postal: Unable to resolve location origin. Make sure you are using http, https or file protocol and have a valid location URL.");
+                console.error("Unable to resolve location origin. Make sure you are using http, https or file protocol and have a valid location URL.");
             }
             return extractOrigin;
         }
@@ -100,13 +76,13 @@
                     e.data.name = e.data.distributeName;
                 }
 
-                //console.debug("wvy.postal:" + (window.name ? " " + window.name : "") + " message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
+                //console.debug("message from", fromSelf && "self" || fromParent && "parent" || fromFrame && "frame " + e.data.windowName, e.data.name);
 
                 messageListeners.forEach(function (listener) {
                     var matchingName = listener.name === messageName || listener.name === "message";
                     var genericListener = listener.selector === null;
                     var matchingWeavyId = listener.selector === e.data.weavyId;
-                    var matchingDataSelector = $.isPlainObject(listener.selector) && eqObjects(listener.selector, e.data, true);
+                    var matchingDataSelector = WeavyUtils.isPlainObject(listener.selector) && WeavyUtils.eqObjects(listener.selector, e.data, true);
 
                     if (matchingName && (genericDistribution || genericListener || matchingWeavyId || matchingDataSelector)) {
 
@@ -122,56 +98,20 @@
 
         window.addEventListener("message", function (e) {
             if (e.data.name && e.data.weavyId !== undefined) {
+                if (e.data.weavyMessageId && e.data.name !== "message-receipt") {
+                    console.debug("sending message receipt", e.data.weavyMessageId, e.data.name)
+                    try {
+                        e.source.postMessage({ name: "message-receipt", weavyId: e.data.weavyId, weavyMessageId: e.data.weavyMessageId }, e.origin);
+                    } catch (e) {
+                        console.error("could not post back message-receipt to source");
+                    }
+                }
+
                 switch (e.data.name) {
                     case "register-child":
                         if (!_parentWindow) {
                             if (!contentWindowWeavyIds.has(e.source)) {
-                                console.debug("wvy.postal: child contentwindow not found, registering frame");
-                                // get the real frame window
-                                var frameWindow = Array.from(window.frames).filter(function (frame) {
-                                    return frame === e.source;
-                                }).pop();
-
-                                if (frameWindow) {
-                                    // get the frame element
-                                    var frameElement, frameName;
-
-                                    try {
-                                        // get iframe by name, name may be blocked by cors
-                                        frameElement = frameWindow.parent.document.getElementsByName(frameWindow.name)[0];
-                                        frameName = frameWindow.name;
-                                    } catch (e) {
-                                        // get iframe by comparison
-                                        frameElement = Array.from(frameWindow.parent.document.getElementsByTagName("iframe")).filter(function (iframe) {
-                                            return iframe.contentWindow === frameWindow;
-                                        }).pop();
-
-                                        if (frameElement) {
-                                            frameWindow = frameElement.contentWindow;
-
-                                            if (frameElement.hasAttribute("name")) {
-                                                frameName = frameElement.getAttribute("name");
-                                            } else {
-                                                frameName = null;
-                                                console.warn("could not get name attribute of the iframe", frameElement)
-                                            }
-                                        }
-                                    }
-
-                                    if (frameElement && frameName) {
-                                        var frameWeavyId = frameElement.dataset.weavyId;
-                                        registerContentWindow(frameWindow, frameName, frameWeavyId);
-                                    } else {
-                                        var msg = "wvy.postal: did not register frame"
-                                        if (!frameName) {
-                                            msg += "; name attribute is missing";
-                                        }
-                                        if (!frameElement) {
-                                            msg += "; frame not accessible";
-                                        }
-                                        console.warn(msg);
-                                    }
-                                }
+                                console.warn("register-child: contentwindow not pre-registered");
                             }
 
                             try {
@@ -183,49 +123,36 @@
                                         name: "register-window",
                                         windowName: contentWindowName,
                                         weavyId: weavyId || true,
-                                    }, "*");
+                                    }, e.origin);
                                 }
                             } catch (e) {
-                                console.error("wvy.postal: Could not register frame window", weavyId, contentWindowName, e);
+                                console.error("could not register frame window", weavyId, contentWindowName, e);
                             }
                         }
                         break;
                     case "register-window":
                         if (!_parentWindow) {
-                            console.debug("wvy.postal: registering frame window", e.data.windowName);
+                            //console.debug("registering frame window");
                             _parentOrigin = e.origin;
                             _parentWindow = e.source;
                             _parentName = e.data.windowName;
                             _parentWeavyId = e.data.weavyId;
                         }
 
-                        console.debug("wvy.postal: is not leader", window.name);
+                        console.debug("is not leader");
                         _isLeader = false;
-                        _whenLeader.reject({ parentName: _parentName, parentWeavyId: _parentWeavyId, parentOrigin: _parentOrigin });
+                        _whenLeader.resolve(false);
 
                         try {
                             e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId, location: window.location.href }, e.origin);
                         } catch (e) {
-                            console.error("wvy.postal: register-window could not post back ready-message to source");
+                            console.error("register-window could not post back ready-message to source");
                         }
 
                         if (wvy.whenLoaded) {
                             wvy.whenLoaded.then(function () {
                                 e.source.postMessage({ name: "load", windowName: e.data.windowName, weavyId: e.data.weavyId }, e.origin);
                             });
-                        }
-
-                        if (parentQueue.length) {
-                            parentQueue.forEach(function (message) {
-                                console.debug("wvy.postal: sending queued to parent:", message.name);
-
-                                if (message.weavyId === undefined) {
-                                    message.weavyId = _parentWeavyId;
-                                }
-
-                                postToParent(message)
-                            });
-                            parentQueue = [];
                         }
 
                         if (inQueue.length) {
@@ -238,13 +165,13 @@
                         break;
                     case "ready":
                         if (contentWindowsByWeavyId.has(e.data.weavyId) && contentWindowNames.has(e.source) && contentWindowsByWeavyId.get(e.data.weavyId).get(contentWindowNames.get(e.source))) {
-                            contentWindowOrigins.set(e.source, e.origin);
+                            contentWindowDomain.set(e.source, e.origin);
                             distributeMessage(e);
                         }
 
                         break;
                     case "reload":
-                        console.log("wvy.postal: reload", _parentName, e.data.force);
+                        console.log("reload", _parentName, e.data.force);
                         window.location.reload(e.data.force);
 
                         break;
@@ -288,7 +215,7 @@
                 var nameMatch = name === listener.name;
                 var handlerMatch = handler === listener.handler;
                 var stringSelectorMatch = typeof selector === "string" && selector === listener.selector;
-                var plainObjectMatch = $.isPlainObject(selector) && eqObjects(selector, listener.selector);
+                var plainObjectMatch = WeavyUtils.isPlainObject(selector) && WeavyUtils.eqObjects(selector, listener.selector);
                 var offMatch = nameMatch && handlerMatch && (stringSelectorMatch || plainObjectMatch);
                 return !(offMatch);
             });
@@ -302,14 +229,14 @@
          * @param {string} weavyId - The id of the group or entity which the contentWindow belongs to.
          * @param {Window} contentWindow - The frame window to send the data to.
          */
-        function registerContentWindow(contentWindow, contentWindowName, weavyId) {
+        function registerContentWindow(contentWindow, contentWindowName, weavyId, contentOrigin) {
             try {
                 if (!contentWindowName) {
-                    console.error("wvy.postal: registerContentWindow() No valid contentWindow to register, must be a window and have a name.");
+                    console.error("registerContentWindow() No valid contentWindow to register, must be a window and have a name.");
                     return;
                 }
             } catch (e) {
-                console.error("wvy.postal: registerContentWindow() cannot access contentWindowName")
+                console.error("registerContentWindow() cannot access contentWindowName")
             }
 
             if (!weavyId || weavyId === "true") {
@@ -324,6 +251,7 @@
             contentWindows.add(contentWindow);
             contentWindowNames.set(contentWindow, contentWindowName);
             contentWindowWeavyIds.set(contentWindow, weavyId);
+            contentWindowOrigins.set(contentWindow, contentOrigin);
         }
 
         function unregisterWeavyId(weavyId) {
@@ -344,6 +272,7 @@
                         contentWindows.delete(contentWindow);
                         contentWindowNames.delete(contentWindow);
                         contentWindowWeavyIds.delete(contentWindow);
+                        contentWindowOrigins.delete(contentWindow);
                     } catch (e) {}
                 }
                 contentWindowsByWeavyId.get(weavyId).delete(windowName);
@@ -355,9 +284,57 @@
             }
         }
 
+        function whenPostMessage(contentWindow, message, transfer) {
+            var whenReceipt = new WeavyPromise();
+
+            if (transfer === null) {
+                // Chrome does not allow transfer to be null
+                transfer = undefined;
+            }
+            
+            var toSelf = contentWindow === window.self;
+            var toParent = _parentWindow && _parentWindow !== window && _parentWindow === contentWindow;
+            var origin = toSelf ? extractOrigin(window.location.href) :
+                         toParent ? _parentOrigin :
+                         contentWindowOrigins.get(contentWindow);
+            var validWindow = toSelf || toParent || contentWindow && origin === contentWindowDomain.get(contentWindow)
+
+            if (validWindow) {
+                if (!message.weavyMessageId) {
+                    message.weavyMessageId = WeavyUtils.S4() + WeavyUtils.S4();
+                }
+
+                queueMicrotask(() => {
+                    console.debug("whenPostMessage", message.name, message.weavyMessageId);
+
+                    var messageWatchdog = setTimeout(function () {
+                        if (whenReceipt.state() === "pending") {
+                            whenReceipt.reject(new Error("postMessage() receipt timed out: " + message.weavyMessageId + ", " + message.name));
+                        }
+                    }, this.timeout || 2000);
+
+                    on("message-receipt", { weavyId: message.weavyId, weavyMessageId: message.weavyMessageId }, function () {
+                        console.debug("message-receipt received", message.weavyMessageId, message.name);
+                        clearTimeout(messageWatchdog);
+                        whenReceipt.resolve();
+                    });
+
+                    try {
+                        contentWindow.postMessage(message, origin, transfer);
+                    } catch (e) {
+                        whenReceipt.reject(e);
+                    }
+                })
+            } else {
+                whenReceipt.reject(new Error("postMessage() Invalid window origin: " + origin + ", " + message.name));
+            }
+
+            return whenReceipt();
+        }
+
         function postToChildren(message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("wvy.postal: postToChildren() Invalid message format", message);
+                console.error("postToChildren() Invalid message format", message);
                 return;
             }
 
@@ -371,10 +348,12 @@
             message.weavyId = message.weavyId || true;
 
             contentWindows.forEach(function (contentWindow) {
-                try {
-                    contentWindow.postMessage(message, "*", transfer);
-                } catch (e) {
-                    console.warn("wvy.postal: postToChildren() could not distribute message to " + contentWindowNames.get(contentWindow))
+                if (contentWindowOrigins.get(contentWindow) === contentWindowDomain.get(contentWindow)) {
+                    try {
+                        contentWindow.postMessage(message, contentWindowOrigins.get(contentWindow), transfer);
+                    } catch (e) {
+                        console.warn("postToChildren() could not distribute message to " + contentWindowNames.get(contentWindow))
+                    }
                 }
             })
 
@@ -382,99 +361,50 @@
 
         function postToFrame(windowName, weavyId, message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("wvy.postal: postToFrame() Invalid message format", message);
+                console.error("postToFrame() Invalid message format", message);
                 return;
-            }
-
-            if (transfer === null) {
-                // Chrome does not allow transfer to be null
-                transfer = undefined;
             }
 
             var contentWindow;
             try {
                 contentWindow = contentWindowsByWeavyId.get(weavyId).get(windowName);
             } catch (e) {
-                console.error("wvy.postal: postToFrame() Window not registered", weavyId, windowName);
+                console.error("postToFrame() Window not registered", weavyId, windowName);
             }
 
-            if (contentWindow) {
-                message.weavyId = weavyId;
-                try {
-                    contentWindow.postMessage(message, "*", transfer);
-                } catch (e) {
-                    console.error("wvy.postal: postToFrame() Could not post message to frame", windowName)
-                }
-            }
+            message.weavyId = weavyId;
+
+            return whenPostMessage(contentWindow, message, transfer);
         }
 
         function postToSelf(message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("wvy.postal: postToSelf() Invalid message format", message);
+                console.error("postToSelf() Invalid message format", message);
                 return;
-            }
-
-            if (transfer === null) {
-                // Chrome does not allow transfer to be null
-                transfer = undefined;
             }
 
             message.weavyId = _parentWeavyId || true;
 
-            try {
-                window.postMessage(message, extractOrigin(window.location.href) || "*", transfer);
-            } catch (e) {
-                console.error("wvy.postal: postToSelf() Could not post message to self");
-            }
+            return whenPostMessage(window.self, message, transfer);
         }
 
-        function postToParent(message, transfer, allowInsecure) {
+        function postToParent(message, transfer) {
             if (typeof message !== "object" || !message.name) {
-                console.error("wvy.postal: postToParent() Invalid message format", message);
+                console.error("postToParent() Invalid message format", message);
                 return;
             }
 
-            if (transfer === null) {
-                // Chrome does not allow transfer to be null
-                transfer = undefined;
-            }
-
-            if (_parentWindow) {
-                if (message.weavyId === undefined) {
-                    message.weavyId = _parentWeavyId;
-                }
-
-                try {
-                    if (_parentWindow && _parentWindow !== window) {
-                        _parentWindow.postMessage(message, _parentOrigin || "*", transfer);
+            return _whenLeader().then(function (isLeader) {
+                if (!isLeader) {
+                    if (message.weavyId === undefined) {
+                        message.weavyId = _parentWeavyId;
                     }
-                } catch (e) {
-                    console.error("wvy.postal: postToParent() Error posting message", message.name, e);
+
+                    return whenPostMessage(_parentWindow, message, transfer);
+                } else {
+                    return WeavyPromise.resolve();
                 }
-            } else if (allowInsecure) {
-                var parents = [];
-
-                // Find all parent windows
-                var nextWindow = window;
-                while (nextWindow.top !== nextWindow) {
-                    nextWindow = nextWindow.opener || nextWindow.parent;
-                    parents.push(nextWindow);
-                }
-
-                parents.forEach(function (parent) {
-                    try {
-                        parent.postMessage(message, "*", transfer);
-                        console.debug("wvy.postal: postToParent() Posted insecure message", message.name)
-                    } catch (e) {
-                        console.error("wvy.postal: postToParent() Error posting insecure message", message.name, e);
-                    }
-                });
-
-            } else {
-                console.debug("wvy.postal: postToParent() queueing to parent", message.name);
-                parentQueue.push(message);
-            }
-
+            });
         }
 
         function postToSource(e, message, transfer) {
@@ -494,54 +424,83 @@
                     try {
                         e.source.postMessage(message, e.origin, transfer);
                     } catch (e) {
-                        console.error("wvy.postal: postToSource() Could not post message back to source");
+                        console.error("postToSource() Could not post message back to source");
                     }
                 }
             }
         }
 
-        function checkForParent() {
-            var parents = [];
-
-            // Find all parent windows
-            var nextWindow = window.self;
-            while ((nextWindow.opener || nextWindow.parent) !== nextWindow) {
-                nextWindow = nextWindow.opener || nextWindow.parent;
-                parents.unshift(nextWindow);
+        function setLeader() {
+            if (_whenLeader.state() === "pending") {
+                console.debug("Is leader");
+                _isLeader = true;
+                _whenLeader.resolve(_isLeader);
             }
+        }
 
-            parents.forEach(function (parent) {
+        function init() {
+
+            // Register in parent or opener
+            var parent = window.self.opener !== window.self && window.self.opener || window.self.parent !== window.self && window.self.parent;
+
+            if (parent) {
+                var parentOrigins;
+
                 try {
-                    parent.postMessage({ name: "register-child", weavyId: true }, "*");
-                    console.debug("wvy.postal: checking for parent")
-                } catch (e) {
-                    console.error("wvy.postal: Error checking for parent", e);
-                }
-            });
-
-            requestAnimationFrame(function () {
-                window.setTimeout(function () {
-                    if (_whenLeader.state() === "pending") {
-                        console.debug("wvy.postal: is leader");
-                        _isLeader = true;
-                        _whenLeader.resolve();
+                    // Server configured cors-origins
+                    // Origins containing wildcards will be treated as generic wildcard origin
+                    if (!parentOrigins) {
+                        let corsOrigins = wvy.config.corsOrigins;
+                        if (corsOrigins && !(corsOrigins.length === 1 && corsOrigins[0] === "*")) {
+                            parentOrigins = corsOrigins;
+                            console.debug("Using CORS origin");
+                        }
                     }
-                }, parents.length ? 2000 : 100);
-            });
+                } catch (e) { }
+
+                try {
+                    // Same-domain origin, only available when samedomain is successfully configured
+                    if (!parentOrigins)  {
+                        parentOrigins = [parent.location.origin];
+                        if (parentOrigins) {
+                            console.debug("Using same-domain origin");
+                        }
+                    }
+                } catch (e) { }
+                
+                // Default if no origin is configured
+                parentOrigins = parentOrigins || ["*"];
+
+                // Filter and sort
+                parentOrigins = Array.from(parentOrigins)
+                    .map(e => e.indexOf("*") !== -1 ? "*" : e) // Uniform wildcards
+                    .filter((e, i, a) => a.indexOf(e) === i) // Unique entries
+                    .sort((a, b) => a.indexOf("*") - b.indexOf("*")); // Sort explicit origins before any wildcards
+
+                if (parent && parentOrigins.length) {
+                    console.debug("Checking for parent");
+
+                    parentOrigins.forEach(function (parentOrigin) {
+                        if (parentOrigin === "*") {
+                            console.warn("Using wildcard origin for registration.")
+                        }
+
+                        try {
+                            parent.postMessage({ name: "register-child", weavyId: true }, parentOrigin);
+                        } catch (e) {
+                            console.error("Error checking for parent", e);
+                        }
+                    })
+                }
+                requestAnimationFrame(function () {
+                    window.setTimeout(setLeader, parent && parentOrigins.length ? 2000 : 100);
+                });
+
+            } else {
+                setLeader();
+            }
+
         }
-
-        $(document).on("click", "[data-weavy-event]", function (e) {
-            e.preventDefault();
-
-            var name = $(this).data("weavy-name");
-
-            postToParent.call(postal, { name: name });
-        });
-
-        $(document).on("submit", "[data-weavy-event-notify]", function (e) {
-            var name = $(this).data("weavyEventNotify");
-            postToParent.call(postal, { name: name });
-        });
 
         this.on = on;
         this.one = one;
@@ -554,24 +513,7 @@
         this.postToSelf = postToSelf;
         this.postToSource = postToSource;
         this.postToChildren = postToChildren;
-        this.extractOrigin = extractOrigin;
-        this.whenLeader = _whenLeader.promise();
-
-        Object.defineProperty(this, "messageListeners", {
-            get: function () { return messageListeners; }
-        });
-
-        Object.defineProperty(this, "contentWindows", {
-            get: function () {
-                return {
-                    contentWindowsByWeavyId,
-                    contentWindows,
-                    contentWindowNames,
-                    contentWindowWeavyIds
-                };
-            }
-        });
-
+        this.whenLeader = function () { return _whenLeader(); };
 
         Object.defineProperty(this, "isLeader", {
             get: function () { return _isLeader; }
@@ -586,8 +528,8 @@
             get: function () { return _parentOrigin; }
         });
 
-        checkForParent();
-    };
+        init();
+    }
 
 
     return new WeavyPostal();

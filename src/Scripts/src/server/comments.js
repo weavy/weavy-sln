@@ -17,7 +17,7 @@ wvy.comments = (function ($) {
         // initializing editor is very slow so we wrap the call in setTimeout to prevent blocking rendering
         wvy.whenLoaded.then(function () {
             setTimeout(function () {
-                console.log("comments.js:init");
+                //console.debug("comments.js:init");
 
                 // any visible comment editors
                 initCommentEditor($("body.controller-posts textarea.comments-form:visible, body:not(.controller-posts) textarea.comments-form"));

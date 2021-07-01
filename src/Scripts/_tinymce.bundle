@@ -26,6 +26,7 @@
 ~/scripts/vendor/tinymce/plugins/table/plugin.min.js       
 ~/scripts/vendor/tinymce/plugins/textcolor/plugin.min.js   
 ~/scripts/vendor/tinymce/plugins/wordcount/plugin.min.js   
+~/scripts/vendor/tinymce/icons/default/icons.min.js   
 
 # custom plugins
 ~/scripts/src/tinymce/plugins/paste/plugin.js                                       

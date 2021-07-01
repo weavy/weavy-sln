@@ -15,6 +15,25 @@ wvy.turbolinks = (function ($) {
     // gets a value indicating whether turbolinks is enabled or not
     var enabled = typeof Turbolinks !== "undefined" && Turbolinks !== undefined && Turbolinks.supported !== undefined && Turbolinks.supported;
 
+    // Show progress when navigating without Turbolinks
+    window.addEventListener("beforeunload", function () {
+        if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
+            try {
+                Turbolinks.controller.adapter.progressBar.setValue(0);
+                Turbolinks.controller.adapter.progressBar.show();
+            } catch (e) { }
+        }
+    });
+
+    window.addEventListener("unload", function () {
+        if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
+            try {
+                Turbolinks.controller.adapter.progressBar.hide();
+                Turbolinks.controller.adapter.progressBar.setValue(100);
+            } catch (e) { }
+        }
+    });
+
     // Opens url in _blank if possible
     function openExternal(url, force) {
         var link = wvy.url.hyperlink(url);
@@ -152,6 +171,14 @@ wvy.turbolinks = (function ($) {
             var t;
             return this.xhr && !this.sent ? (this.notifyApplicationBeforeRequestStart(), this.setProgress(0), this.xhr.send(this.xhr.data), this.sent = !0, "function" === typeof (t = this.delegate).requestStarted ? t.requestStarted() : void 0) : void 0;
         };
+
+        $(document).on("click", "a[href].close-back", function (e) {
+            if (window.opener && window.opener !== window.self) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                window.close();
+            }
+        })
 
         // Catch navigating links before turbolinks:click
         $(document).on("click", "a[href]", function (e) {

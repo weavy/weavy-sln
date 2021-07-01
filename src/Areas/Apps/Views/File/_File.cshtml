@@ -25,8 +25,6 @@
         if (Model.Blob.Width != null && Model.Blob.Height != null) {
             <div class="content-image responsive-image" style="--width: @Model.Blob.Width; --height: @Model.Blob.Height">
                 <img class="loading" src="@attrs["data-src"]" width="@Model.Blob.Width" height="@Model.Blob.Height" decoding="async" />
-                @* TODO: microthumb, find a better transfer *@
-                @*<img id="content-thumb" class="loading responsive-image-thumb" src="@attrs["data-microthumb-src"]" width="@Model.Blob.Width" height="@Model.Blob.Height" loading="eager" decoding="sync" />*@
                 @Svg.Spinner(spin: true)
             </div>
         } else {
@@ -35,19 +33,9 @@
             </div>
         }
 
-        //Html.RenderPartial("_PhotoSwipe");
-<script type="text/javascript">
-            @*
-            // TODO: microthumb, find a better transfer
-            var thumb = /^#?thumb:(.+)/.exec(document.location.hash);
-            if (thumb && thumb.length) {
-                var thumbUrl = decodeURIComponent(thumb[1]);
-                console.log("inserting content thumb");
-                $('<img class="responsive-image-thumb loading loaded" src="' + thumbUrl + '" loading="eager" decoding="sync" />').insertBefore("#content-thumb");
-            }
-            *@
+        <script type="text/javascript">
             wvy.whenLoaded.checkImageLoad();
-</script>
+        </script>
     } else if (fmt == PreviewFormat.Document) {
         Html.RenderPartial("_Pdf");
         <script type="text/javascript" async>

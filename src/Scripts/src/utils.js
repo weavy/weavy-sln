@@ -14,10 +14,11 @@
         module.exports = factory();
     } else {
         // Browser globals (root is window)
-        root.WeavyUtils = factory();
+        root.wvy = root.wvy || {};
+        root.wvy.utils = factory();
     }
 }(typeof self !== 'undefined' ? self : this, function () {
-    console.debug("utils.js");
+    //console.debug("utils.js", window.name);
 
     /**
      * Module for misc utils
@@ -27,6 +28,13 @@
      */
 
     var WeavyUtils = {};
+
+    /**
+     * Generate a S4 alphanumeric 4 character sequence suitable for non-sensitive GUID generation etc.
+     */
+    WeavyUtils.S4 = function () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
 
     /**
      * Parse any HTML string into a HTMLCollection. Use WeavyUtils.parseHTML(html)[0] to get the first HTMLElement.
@@ -102,6 +110,45 @@
     }
 
     /**
+     * Method for extending plainObjects/options, similar to Object.assign() but with deep/recursive merging. If the recursive setting is applied it will merge any plain object children. Note that Arrays are treated as data and not as tree structure when merging. 
+     * 
+     * The original options passed are left untouched.
+     * 
+     * @name WeavyUtils#assign
+     * @function
+     * @param {Object} source - Original options.
+     * @param {Object} properties - Merged options that will replace options from the source.
+     * @param {boolean} [recursive=false] True will merge any sub-objects of the options recursively. Otherwise sub-objects are treated as data.
+     * @returns {Object} A new object containing the merged options.
+     */
+    WeavyUtils.assign = function (source, properties, recursive) {
+        source = source || {};
+        properties = properties || {};
+
+        var property;
+
+        // Make a copy
+        var copy = {};
+        for (property in source) {
+            if (Object.prototype.hasOwnProperty.call(source, property)) {
+                copy[property] = source[property];
+            }
+        }
+
+        // Apply properties to copy
+        for (property in properties) {
+            if (Object.prototype.hasOwnProperty.call(properties, property)) {
+                if (recursive && copy[property] && WeavyUtils.isPlainObject(copy[property]) && WeavyUtils.isPlainObject(properties[property])) {
+                    copy[property] = WeavyUtils.assign(copy[property], properties[property], recursive);
+                } else {
+                    copy[property] = properties[property];
+                }
+            }
+        }
+        return copy;
+    };
+
+    /**
      * Always returns an Array.
      * 
      * @example
@@ -142,22 +189,14 @@
     }
 
     /**
-     * Generate a S4 alphanumeric 4 character sequence suitable for non-sensitive GUID generation etc.
-     */
-    WeavyUtils.S4 = function () {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-
-
-
-    /**
      * Case insensitive string comparison
      * 
      * @param {any} str1 - The first string to compare
      * @param {any} str2 - The second string to compare
+     * @param {boolean} ignoreType - Skipe type check and use any stringified value
      */
-    WeavyUtils.eqString = function (str1, str2) {
-        return typeof str1 === "string" && typeof str2 === "string" && str1.toUpperCase() === str2.toUpperCase();
+    WeavyUtils.eqString = function (str1, str2, ignoreType) {
+        return (ignoreType || typeof str1 === "string" && typeof str2 === "string") && String(str1).toUpperCase() === String(str2).toUpperCase();
     };
 
     /**
@@ -263,6 +302,44 @@
 
         return obj;
     };
+    
+    /**
+     * Processing of JSON in a fetch response
+     * 
+     * @param {external:Response} response - The fetch response to parse
+     * @returns {Object|Response} The data if sucessful parsing, otherwise the response or an rejected error
+     */
+    WeavyUtils.processJSONResponse = function (response) {
+        let contentType = (response.headers.has("content-type") ? response.headers.get("content-type") : "").split(";")[0];
+
+        if (response.ok) {
+            if (contentType === "application/json") {
+                try {
+                    return response.json().then(function (jsonResponse) {
+                        return WeavyUtils.keysToCamel(jsonResponse);
+                    }).catch(function (e) {
+                        return null;
+                    });
+                } catch (e) {
+                    return null;
+                }
+            }
+            return response;
+        } else {
+            if (contentType === "application/json") {
+                try {
+                    return response.json().then(function (responseError) {
+                        return Promise.reject(new Error(responseError.message || response.statusText));
+                    }, function (e) {
+                        return Promise.reject(new Error(response.statusText));
+                    });
+                } catch (e) { }
+            }
+            return Promise.reject(new Error(response.statusText));
+        }
+    };
+
+    // OTHER HELPERS
 
     /**
      * Stores data for the current domain in the weavy namespace.
@@ -292,18 +369,27 @@
         return value;
     };
 
-    WeavyUtils.URL = function (url) {
-        var a;
-        var link = new URL(url) || new window.URL(url) || (a = document.createElement("a")) && (a.href = url) && a;
-        if (link && !link.searchParams) {
-            link.searchParams = new URLSearchParams(link.search);
+    /**
+     * Same as jQuery.ready()
+     * 
+     * @param {Function} fn
+     */
+    WeavyUtils.ready = function(fn) {
+        if (document.readyState !== 'loading') {
+            fn();
+        } else {
+            document.addEventListener('DOMContentLoaded', fn);
         }
-        return link;
-    };
+    }
 
     return WeavyUtils;
 }));
 
+
+/**
+ * @external Response
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Response
+ */
 
 /**
  * @external Promise

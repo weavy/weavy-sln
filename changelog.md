@@ -1,5 +1,29 @@
 # Changelog for Weavy
 
+## 8.4.0 (2021-07-02)
+
+* Added .url property in client.
+* Added Cors/frame issue detection in client.
+* Added message delivery promises to postal.
+* Added option for shadowMode in client.
+* Added scope encapsulation to weavy.js.
+* Changed promises to avoid rejection in client.
+* Changed postal to use proper origins and make use of weavy.cors-origins server configuration.
+* Changed .ajax() method in client to use fetch() instead of $.ajax().
+* Improved client logging.
+* Improved image loading.
+* Updated TinyMCE to version 5.8.1.
+* Fixed an issue with css when accessing server after startup.
+* Fixed an issue with file picker when opening authentication.
+* Fixed an issue with unclickable attachments.
+* Fixed an issue with blocked scrolling in Safari.
+* Fixed issues with scrolling in Messenger on Windows.
+* Removed .httpsUrl() method in client.
+* Removed .extendDefaults() method in client.
+* Removed messenger panel in standalone.
+* Removed preview panel polyfill in standalone.
+* Removed authentication-panel plugin in client.
+
 ## 8.3.2 (2021-06-10)
 
 * Fixed an issue with postal when using multiple Weavy client instances.

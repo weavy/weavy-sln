@@ -2,7 +2,7 @@
 @{
     var attrs = Html.PreviewAttributes(Model);
 }
-<a class="list-group-item list-group-item-action" href="@Model.DownloadUrl()" @Html.Raw(attrs.AsHtmlAttributes())>
+<a class="list-group-item list-group-item-action" href="@(Model.DownloadUrl() ?? attrs["data-href"])" @Html.Raw(attrs.AsHtmlAttributes())>
     <div class="media">
         @if (Model.Link == null && FileUtils.IsWebImage(Model.Name)) {
             <img class="img-48" src="@Model.ThumbUrl(48, 48, fit: FitMode.Crop)" />
@@ -22,7 +22,7 @@
                 }
                 @FileUtils.FileSizeAsString(Model.Size)
                 @if (Model.Provider != null) {
-                    <text>- @FileUtils.GetKind(Model.Name, Model.MediaType) from @Model.Provider</text>
+                    <text>- @FileUtils.GetKind(Model.Name, Model.MediaType) @T["from"] @Model.Provider</text>
                 }
             </small>
         </div>

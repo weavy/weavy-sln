@@ -20,10 +20,10 @@
         );
     } else {
         // Browser globals (root is window)
-        root.WeavyApp = factory(root.WeavyUtils, root.WeavyPromise);
+        root.WeavyApp = factory(root.wvy.utils, root.wvy.promise);
     }
-}(typeof self !== 'undefined' ? self : this, function (utils, WeavyPromise) {
-    console.debug("app.js");
+}(typeof self !== 'undefined' ? self : this, function (WeavyUtils, WeavyPromise) {
+    //console.debug("app.js");
 
     /**
      * @class WeavyApp
@@ -46,7 +46,7 @@
      */
     var WeavyApp = function (weavy, space, options, data) {
 
-        weavy.log("new WeavyApp", options);
+        weavy.debug("new WeavyApp", options);
 
         /** 
          * Reference to this instance
@@ -316,7 +316,7 @@
          */
         app.configure = function (options, data) {
             if (options && typeof options === "object") {
-                app.options = app.weavy.extendDefaults(app.options, options, true);
+                app.options = WeavyUtils.assign(app.options, options, true);
             }
 
             if (data && typeof data === "object") {
@@ -356,7 +356,7 @@
 
                 // Check if app.data needs to be added in space.data.apps
                 if (app.space.data && app.space.data.apps) {
-                    var dataApps = utils.asArray(app.space.data.apps);
+                    var dataApps = WeavyUtils.asArray(app.space.data.apps);
 
                     var foundAppData = dataApps.filter(function (appData) { return app.match(appData) }).pop();
                     if (!foundAppData) {
@@ -393,16 +393,16 @@
 
             if (app.options && typeof app.options === "object") {
 
-                var initAppUrl = weavy.httpsUrl("/client/app", weavy.options.url);
+                var initAppUrl = new URL("/client/app", weavy.url);
 
-                var optionsWithSpace = weavy.extendDefaults({ space: space.id || space.key }, app.options);
+                var optionsWithSpace = WeavyUtils.assign({ space: space.id || space.key }, app.options);
 
                 weavy.ajax(initAppUrl, optionsWithSpace, "POST").then(function (data) {
                         app.data = data;
                         app.configure.call(app);
-                    }).catch(function (xhr, status, error) {
-                        app.weavy.error("WeavyApp.fetchOrCreate()", xhr.responseJSON && xhr.responseJSON.message || xhr);
-                        app.whenLoaded.reject(xhr.responseJSON && xhr.responseJSON.message || xhr);
+                    }).catch(function (error) {
+                        app.weavy.error("WeavyApp.fetchOrCreate()", error.message);
+                        app.whenLoaded.reject(error);
                     });
             } else {
                 app.whenLoaded.reject(new Error("WeavyApp.fetchOrCreate() requires options"));
@@ -668,7 +668,7 @@
             }
 
             if (options.key && this.key) {
-                return utils.eqString(options.key, this.key);
+                return WeavyUtils.eqString(options.key, this.key);
             }
         }
 

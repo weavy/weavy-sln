@@ -6,6 +6,9 @@
 ~/scripts/src/server/url.js
 ~/scripts/src/resources.js
 ~/scripts/src/server/scrollbar.js
+~/scripts/src/utils.js
+~/scripts/src/promise.js
+~/scripts/src/console.js
 ~/scripts/src/postal.js
 ~/scripts/src/server/overlay.js
 ~/scripts/vendor/turbolinks/turbolinks.js

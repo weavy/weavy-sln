@@ -122,7 +122,7 @@
 
 
     // Register and return plugin
-    console.debug("Registering Weavy plugin: deeplinks");
+    //console.debug("Registering Weavy plugin: deeplinks");
     return Weavy.plugins.deeplinks = DeeplinksPlugin;
 
 }));

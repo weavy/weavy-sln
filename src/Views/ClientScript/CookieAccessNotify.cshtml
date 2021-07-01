@@ -15,9 +15,9 @@
     </div>
 </div>
 
-@if (Title == "Cookie Access") {
-    <script>
-        wvy.postal.postToParent({ weavyId: true, name: "storage-access-granted", domain: window.location.origin });
-        wvy.postal.whenLeader.always(() => window.close());
-    </script>
-}
+
+<script>
+    wvy.postal.postToParent({ weavyId: true, name: "storage-access-granted", domain: window.location.origin });
+    wvy.postal.whenLeader().finally(() => window.close());
+</script>
+

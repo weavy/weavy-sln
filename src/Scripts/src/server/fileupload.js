@@ -115,6 +115,9 @@ wvy.fileupload = (function ($) {
         return whenFilebrowserLoaded.promise();
     }
 
+    // Preload filebrowser when opening modal
+    $(document).on("show.bs.modal", "#google-drive-modal, #office-modal", loadFilebrowser);
+
     function init() {
         whenFilebrowserLoaded = $.Deferred();
         whenGoogleInitComplete = $.Deferred();

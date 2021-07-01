@@ -28,7 +28,7 @@
 
     function notify() {
         wvy.postal.postToParent({ weavyId: true, name: "storage-access-granted", domain: window.location.origin });
-        wvy.postal.whenLeader.always(() => window.close());            
+        wvy.postal.whenLeader().finally(() => window.close());            
     }
 
     if ('hasStorageAccess' in document) {

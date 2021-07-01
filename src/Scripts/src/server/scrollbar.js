@@ -42,10 +42,14 @@ wvy.scrollbars = (function ($) {
     }, true);
 
     // Init all scroll-y on load
-    $(document).on("turbolinks:render turbolinks:load", function () {
+    function loadScroll() {
         initScrollbars("body");
         initScrollbars(".scroll-y");
-    });
+    }
+
+    document.addEventListener("turbolinks:render", loadScroll, true);
+    document.addEventListener("turbolinks:load", loadScroll);
+    //$(document).on("turbolinks:render turbolinks:load", loadScroll);
 
 
     // Save scroll positions to turbolinks cache

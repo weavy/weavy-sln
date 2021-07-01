@@ -122,11 +122,11 @@
 // Transitions
 .weavy-panel {
     opacity: 0;
-    transition: opacity .1s $md-animation-duration $md-animation-curve-default;
+    transition: opacity .1s $md-animation-duration $md-animation-curve-default, transform .1s $md-animation-duration step-start;
 
     &.weavy-open {
         opacity: 1;
-        transition: opacity .01s $md-animation-duration $md-animation-curve-default;
+        transition: opacity .01s $md-animation-duration $md-animation-curve-default, transform .01s $md-animation-duration step-end;
     }
 }
 

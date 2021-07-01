@@ -22,9 +22,9 @@
             throw new Error("Weavy must be loaded before registering plugin");
         }
 
-        factory(root.Weavy);
+        factory(root.Weavy, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function (Weavy) {
+}(typeof self !== 'undefined' ? self : this, function (Weavy, wvy) {
 
     /**
      * Displaying content and attachments in the full browser window.
@@ -123,10 +123,7 @@
         // ATTACHMENT PREVIEW
         weavy.on(wvy.postal, "preview-open", weavy.getId(), function (e, message) {
             weavy.log("opening preview");
-            var previewUrl = weavy.httpsUrl(message.url, weavy.options.url);
-            if (message.thumb) {
-                previewUrl += "#thumb:" + encodeURIComponent(message.thumb);
-            }
+            var previewUrl = new URL(message.url, weavy.url).href;
 
             weavy.nodes.previewPanel.open(previewUrl).then(focus);
         });
@@ -135,10 +132,7 @@
         weavy.on(wvy.postal, "content-open", weavy.getId(), function (e, message) {
             weavy.log("opening content");
 
-            var contentUrl = weavy.httpsUrl(message.url, weavy.options.url);
-            if (message.thumb) {
-                contentUrl += "#thumb:" + encodeURIComponent(message.thumb);
-            }
+            var contentUrl = new URL(message.url, weavy.url).href;
 
             weavy.nodes.contentPanel.open(contentUrl).then(focus);
         });
@@ -237,7 +231,6 @@
         contentFrameName: "content"
     };
 
-    console.debug("Registering Weavy plugin: preview");
-
+    //console.debug("Registering Weavy plugin: preview");
     return Weavy.plugins.preview = PreviewPlugin
 }));

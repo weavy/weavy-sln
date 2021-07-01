@@ -2,9 +2,10 @@
 @using System.Collections.Specialized
 
 @{
-    Layout = WeavyContext.Current.IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+    //Layout = WeavyContext.Current.IsEmbedded ? "~/Views/Shared/_Layout.Embedded.cshtml" : "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.Embedded.cshtml";
     Title = Model.GetTitle();
-    Back = Model.Parent?.Url();
+    Back = Url.Back(Model.Parent?.Url());
 
     var (prev, next) = AttachmentService.GetPreviousAndNextSiblings(Model);
     var fmt = Model.Blob == null ? PreviewFormat.None : (Model.Blob.Link != null ? PreviewFormat.Icon : FileUtils.GetPreviewFormat(Model.Blob.Name));
@@ -13,7 +14,7 @@
 
 @section navbar_left {
     <div class="navbar-icons">
-        <a class="btn btn-icon d-standalone" href="@Back" data-link>@Svg.Icon("close")</a>
+        <a class="btn btn-icon d-standalone close-back" href="@Back" data-link>@Svg.Icon("close")</a>
     </div>
 }
 
@@ -40,10 +41,10 @@
 <!-- Attachment -->
 <article class="content-area px-0" data-type="content" data-id="@Model.Id" data-content-id="@Model.Id">
     @if (prev != null) {
-        <nav class="content-nav nav-prev"><a class="btn" href="@prev.Url()">@Svg.Icon("arrow-left")@*@{Html.RenderPartial("_MicroThumb", prev);}*@</a></nav>
+        <nav class="content-nav nav-prev"><a class="btn" href="@prev.Url()">@Svg.Icon("arrow-left")</a></nav>
     }
     @if (next != null) {
-        <nav class="content-nav nav-next"><a class="btn" href="@next.Url()">@Svg.Icon("arrow-right")@*@{Html.RenderPartial("_MicroThumb", next);}*@</a></nav>
+        <nav class="content-nav nav-next"><a class="btn" href="@next.Url()">@Svg.Icon("arrow-right")</a></nav>
     }
 
     <section class="content-section content-viewer">
@@ -64,8 +65,6 @@
                 <div class="content-image responsive-image" style="--width: @Model.Blob.Width; --height: @Model.Blob.Height">
                     <img class="loading" src="@attrs["data-src"]" width="@Model.Blob.Width" height="@Model.Blob.Height" decoding="async" />
                     @Svg.Spinner(spin: true)
-                    @* TODO: microthumb, find a better transfer *@
-                    @*<img id="content-thumb" class="loading responsive-image-thumb" src="@attrs["data-microthumb-src"]" width="@Model.Blob.Width" height="@Model.Blob.Height" loading="eager" decoding="sync" />*@
                 </div>
             } else {
                 <div class="content-image responsive-image intrinsic-image">
@@ -73,18 +72,8 @@
                 </div>
             }
 
-            //Html.RenderPartial("_PhotoSwipe");
             <script type="text/javascript">
-            @*
-            // TODO: microthumb, find a better transfer
-            var thumb = /^#?thumb:(.+)/.exec(document.location.hash);
-            if (thumb && thumb.length) {
-                var thumbUrl = decodeURIComponent(thumb[1]);
-                console.log("inserting content thumb");
-                $('<img class="responsive-image-thumb loading loaded" src="' + thumbUrl + '" loading="eager" decoding="sync" />').insertBefore("#content-thumb");
-            }
-            *@
-            wvy.whenLoaded.checkImageLoad();
+                wvy.whenLoaded.checkImageLoad();
             </script>
 
         } else if (fmt == PreviewFormat.Document) {

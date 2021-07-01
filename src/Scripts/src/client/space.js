@@ -24,12 +24,12 @@
         // Browser globals (root is window)
         root.WeavySpace = factory(
             root.WeavyApp,
-            root.WeavyUtils,
-            root.WeavyPromise
+            root.wvy.utils,
+            root.wvy.promise
         );
     }
-}(typeof self !== 'undefined' ? self : this, function (WeavyApp, utils, WeavyPromise) {
-    console.debug("space.js");
+}(typeof self !== 'undefined' ? self : this, function (WeavyApp, WeavyUtils, WeavyPromise) {
+    //console.debug("space.js");
 
     /**
      * @class WeavySpace
@@ -270,7 +270,7 @@
         space.configure = function (options, data) {
 
             if (options && typeof options === "object") {
-                space.options = space.weavy.extendDefaults(space.options, options, true);
+                space.options = WeavyUtils.assign(space.options, options, true);
             }
 
             if (data && typeof data === "object") {
@@ -293,7 +293,7 @@
                 }
 
                 if (space.options.apps) {
-                    var optionsApps = utils.asArray(space.options.apps);
+                    var optionsApps = WeavyUtils.asArray(space.options.apps);
 
                     optionsApps.forEach(function (appOptions) {
                         var foundApps = space.apps.filter(function (app) { return app.match(appOptions); });
@@ -315,7 +315,7 @@
                 }
 
                 if (space.data.apps) {
-                    var dataApps = utils.asArray(space.data.apps);
+                    var dataApps = WeavyUtils.asArray(space.data.apps);
 
                     space.apps.forEach(function (app) {
                         var foundAppData = dataApps.filter(function (appData) { return app.match(appData) }).pop();
@@ -353,14 +353,14 @@
             }
 
             if (space.options && typeof space.options === "object") {
-                var initSpaceUrl = weavy.httpsUrl("/client/space", weavy.options.url);
+                var initSpaceUrl = new URL("/client/space", weavy.url).href;
 
                 weavy.ajax(initSpaceUrl, space.options, "POST").then(function (data) {
                     space.data = data;
                     space.configure.call(space);
-                }).catch(function (xhr, status, error) {
-                    space.weavy.error("WeavySpace.fetchOrCreate()", xhr.responseJSON && xhr.responseJSON.message || xhr);
-                    space.whenLoaded.reject(xhr.responseJSON && xhr.responseJSON.message || xhr);
+                }).catch(function (error) {
+                    space.weavy.error("WeavySpace.fetchOrCreate()", error);
+                    space.whenLoaded.reject(error);
                 });
             } else {
                 space.whenLoaded.reject(new Error("WeavySpace.fetchOrCreate() requires options"));
@@ -413,7 +413,7 @@
     function getAppSelector(options) {
         var isId = Number.isInteger(options);
         var isKey = typeof options === "string";
-        var isConfig = utils.isPlainObject(options);
+        var isConfig = WeavyUtils.isPlainObject(options);
 
         var selector = isConfig && options || isId && { id: options } || isKey && { key: options };
 
@@ -526,7 +526,7 @@
             }
 
             if (options.key && this.key) {
-                return utils.eqString(options.key, this.key);
+                return WeavyUtils.eqString(options.key, this.key);
             }
         }
 

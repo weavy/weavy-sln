@@ -14,15 +14,16 @@
         module.exports = factory();
     } else {
         // Browser globals (root is window)
-        root.WeavyPromise = factory();
+        root.wvy = root.wvy || {};
+        root.wvy.promise = factory();
     }
 }(typeof self !== 'undefined' ? self : this, function () {
-    console.debug("promise.js");
+    //console.debug("promise.js", window.name);
 
     // This event is handled using same-origin script policy
     window.addEventListener("unhandledrejection", function (e) {
         if (e.promise.weavy) {
-            console.warn("Uncaught (in weavy promise)", e.reason);
+            //console.debug("Uncaught (in weavy promise)", e.reason);
             e.preventDefault();
         }
     });
@@ -31,7 +32,7 @@
      * Unifying wrapper for deferred promises. 
      * Works both as a traditional promise and a deferred promise.
      * Use promise.reset() to replace the promise with a new promise.
-     * Use the promise as a function to 
+     * Use the promise as a function (or via .promise()) to return the actual promise.
      * 
      * @example
      * // Traditional style promise
@@ -45,11 +46,12 @@
      * // jQuery deferred style promise
      * var myPromise = new WeavyPromise();
      * 
+     * // as variable
      * myPromise.then(function() {
      *     console.log("resolved")
      * });
      * 
-     * // or function style
+     * // or as function()
      * myPromise().then(function() {
      *     console.log("resolved")
      * });
@@ -63,7 +65,7 @@
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises}
      **/
     var WeavyPromiseWrapper = function (executor) {
-        var promise;
+        var promise, state = "pending";
         var WeavyPromise = function WeavyPromise() { return promise };
 
         /**
@@ -78,6 +80,19 @@
          * 
          **/
         WeavyPromise.promise = WeavyPromise.bind(WeavyPromise);
+
+        /**
+         * Gets the state of the promise
+         * - "pending"
+         * - "resolved"
+         * - "rejected"
+         * 
+         * @name WeavyPromise#state
+         * @function
+         **/
+        WeavyPromise.state = function () {
+            return state;
+        };
 
         /**
          * Resets the promise so that it can be resolved or rejected again.
@@ -99,9 +114,11 @@
         (WeavyPromise.reset = function () {
             var resolve, reject;
 
+            state = "pending";
+
             promise = new Promise(function (_resolve, _reject) {
-                resolve = _resolve;
-                reject = _reject;
+                resolve = function () { state = "resolved"; _resolve.apply(this, arguments); };
+                reject = function () { state = "rejected"; _reject.apply(this, arguments); };
             });
 
             promise.weavy = true;
@@ -127,6 +144,7 @@
          **/
         WeavyPromise.then = function () {
             promise = promise.then.apply(promise, arguments);
+            promise.weavy = true;
             return WeavyPromise;
         };
 
@@ -135,6 +153,7 @@
          **/
         WeavyPromise.catch = function () {
             promise = promise.catch.apply(promise, arguments);
+            promise.weavy = true;
             return WeavyPromise;
         };
 
@@ -143,6 +162,7 @@
          **/
         WeavyPromise.finally = function () {
             promise = promise.finally.apply(promise, arguments);
+            promise.weavy = true;
             return WeavyPromise;
         };
 

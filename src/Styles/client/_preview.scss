@@ -11,9 +11,15 @@
         right: 0;
         bottom: 0;
         max-width: none;
+        overflow-y: hidden;
 
         .weavy-panel {
             background-color: rgba(mix($black, #000), $opacity-panel);
+
+            &:not(.weavy-open) {
+                // Move panel when not open to avoid mousewheel hi-jacking
+                transform: translateY(100vh) !important;
+            }
 
             .weavy-controls {
                 position: absolute;

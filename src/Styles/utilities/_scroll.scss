@@ -2,6 +2,8 @@
 
 @mixin scroll-y {
     overflow-y: auto;
+    overflow-anchor: auto;
+
     &:not(.scroll-x) {
         overflow-x: hidden;
     }

@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 8.4.1 (2021-07-05)
+
+* Added origin state check for history in client.
+* Reduced cors-origins error messages in client.
+
 ## 8.4.0 (2021-07-02)
 
 * Added .url property in client.

@@ -965,7 +965,7 @@
                     alertStorage = weavy.alert(msg, true);
 
                     weavy.one(WeavyPostal, "storage-access-granted", { weavyId: true, domain: weavy.url.origin }, function () {
-                        weavy.log("Frame Check: Storage access was granted, authenticating and reloading status check.", alertCookie, alertStorage);
+                        weavy.log("Frame Check: Storage access was granted, authenticating and reloading status check.");
 
                         if (alertCookie) {
                             alertCookie.remove();

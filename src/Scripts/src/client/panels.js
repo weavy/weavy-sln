@@ -776,7 +776,12 @@
          **/
         panel.setState = function (state) {
             if (!state || state.panelId !== panelId) {
-                weavy.warn("setState: State not valid " + panelId);
+                weavy.warn("setState: State not valid.", panelId);
+                return;
+            }
+
+            if (new URL(state.location, weavy.url).origin !== weavy.url.origin) {
+                weavy.warn("setState: Invalid url origin.", panelId, new URL(state.location, weavy.url).origin);
                 return;
             }
 

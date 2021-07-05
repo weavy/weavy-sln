@@ -114,6 +114,11 @@
                                 console.warn("register-child: contentwindow not pre-registered");
                             }
 
+                            if (contentWindowOrigins.get(e.source) !== e.origin) {
+                                console.error("register-child: " + contentWindowNames.get(e.source) + " has invalid origin", e.origin);
+                                return;
+                            }
+
                             try {
                                 var weavyId = contentWindowWeavyIds.get(e.source);
                                 var contentWindowName = contentWindowNames.get(e.source);
@@ -151,7 +156,7 @@
 
                         if (wvy.whenLoaded) {
                             wvy.whenLoaded.then(function () {
-                                e.source.postMessage({ name: "load", windowName: e.data.windowName, weavyId: e.data.weavyId }, e.origin);
+                                postToParent({ name: "load" });
                             });
                         }
 
@@ -171,7 +176,7 @@
 
                         break;
                     case "reload":
-                        console.log("reload", _parentName, e.data.force);
+                        console.debug("reload", _parentName, !!e.data.force);
                         window.location.reload(e.data.force);
 
                         break;
@@ -237,6 +242,10 @@
                 }
             } catch (e) {
                 console.error("registerContentWindow() cannot access contentWindowName")
+            }
+
+            if (contentWindow.self) {
+                contentWindow = contentWindow.self;
             }
 
             if (!weavyId || weavyId === "true") {
@@ -400,6 +409,10 @@
                         message.weavyId = _parentWeavyId;
                     }
 
+                    if (message.windowName === undefined) {
+                        message.windowName = _parentName;
+                    }
+
                     return whenPostMessage(_parentWindow, message, transfer);
                 } else {
                     return WeavyPromise.resolve();
@@ -463,11 +476,11 @@
                     if (!parentOrigins)  {
                         parentOrigins = [parent.location.origin];
                         if (parentOrigins) {
-                            console.debug("Using same-domain origin");
+                            console.log("Using same-domain origin");
                         }
                     }
                 } catch (e) { }
-                
+
                 // Default if no origin is configured
                 parentOrigins = parentOrigins || ["*"];
 
@@ -477,7 +490,37 @@
                     .filter((e, i, a) => a.indexOf(e) === i) // Unique entries
                     .sort((a, b) => a.indexOf("*") - b.indexOf("*")); // Sort explicit origins before any wildcards
 
-                if (parent && parentOrigins.length) {
+                // Filter by ancestor to exclude mismatching origins
+                if (parentOrigins.length > 1) {
+                    var parentAncestor;
+
+                    // Try ancestorOrigins
+                    if ('ancestorOrigins' in window.location) {
+                        parentAncestor = window.location.ancestorOrigins[0];
+                    }
+
+                    // Try accessing same-site location
+                    if (!parentAncestor) {
+                        try {
+                            parentAncestor = parent.location.origin;
+                        } catch (e) { }
+                    }
+
+                    // Try using document referrer (FF)
+                    if (!parentAncestor && document.referrer) {
+                        if (new URL(document.referrer).origin !== window.location.origin) {
+                            parentAncestor = new URL(document.referrer).origin;
+                        }
+                    }
+
+                    if (parentAncestor && parentOrigins.indexOf(parentAncestor) >= 0) {
+                        parentOrigins = [parentAncestor];
+                    } else {
+                        console.warn("Frame registration may cause " + (parentOrigins.length - 1) + " origin error messages in the console due to multiple cors-origins configured.");
+                    }
+                }
+
+                if (parentOrigins.length) {
                     console.debug("Checking for parent");
 
                     parentOrigins.forEach(function (parentOrigin) {
@@ -491,9 +534,12 @@
                             console.error("Error checking for parent", e);
                         }
                     })
+                } else {
+                    console.warning("Could not find any parent with valid origin.")
                 }
+
                 requestAnimationFrame(function () {
-                    window.setTimeout(setLeader, parent && parentOrigins.length ? 2000 : 100);
+                    window.setTimeout(setLeader, parentOrigins.length ? 2000 : 1);
                 });
 
             } else {

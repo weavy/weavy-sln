@@ -359,7 +359,7 @@
                 referrerPolicy: "no-referrer-when-downgrade", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
             };
 
-            fetch(authUrl, fetchSettings).catch(function () {
+            window.fetch(authUrl, fetchSettings).catch(function () {
                 console.warn("signOut request fail");
             }).finally(function () {
                 console.debug("signout ajax -> processing user");
@@ -464,12 +464,12 @@
 
                             fetchSettings.body = JSON.stringify({ jwt: token });
 
-                            fetch(url, fetchSettings).then(function (response) {
+                            window.fetch(url, fetchSettings).then(function (response) {
                                 if (response.status === 401) {
                                     console.warn("JWT failed, trying again");
                                     return getJwt(true).then(function (token) {
                                         fetchSettings.body = JSON.stringify({ jwt: token });
-                                        return fetch(url, fetchSettings);
+                                        return window.fetch(url, fetchSettings);
                                     })
                                 }
                                 return response;
@@ -529,12 +529,12 @@
 
                 fetchSettings.headers.Authorization = "Bearer " + token;
 
-                return fetch(authUrl, fetchSettings).then(function (response) {
+                return window.fetch(authUrl, fetchSettings).then(function (response) {
                     if (response.status === 401) {
                         console.warn("JWT failed, trying again");
                         return getJwt(true).then(function (token) {
                             fetchSettings.headers.Authorization = "Bearer " + token;
-                            return fetch(authUrl, fetchSettings);
+                            return window.fetch(authUrl, fetchSettings);
                         })
                     }
                     return response;

@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.4.2 (2021-07-06)
+
+* Fixed an issue with fetch() in client.
+
 ## 8.4.1 (2021-07-05)
 
 * Added origin state check for history in client.

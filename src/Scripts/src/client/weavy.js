@@ -1195,12 +1195,12 @@
                     // JWT configured, use bearer token
                     settings.headers.Authorization = "Bearer " + token;
 
-                    return window.fetch(url, settings).then(function (response) {
+                    return window.fetch(url.toString(), settings).then(function (response) {
                         if (response.status === 401) {
                             weavy.warn("weavy.ajax: JWT failed, trying again");
                             return weavy.authentication.getJwt(true).then(function (token) {
                                 settings.headers.Authorization = "Bearer " + token;
-                                return window.fetch(url, settings);
+                                return window.fetch(url.toString(), settings);
                             })
                         }
                         return response;

@@ -359,7 +359,7 @@
                 referrerPolicy: "no-referrer-when-downgrade", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
             };
 
-            window.fetch(authUrl, fetchSettings).catch(function () {
+            window.fetch(authUrl.toString(), fetchSettings).catch(function () {
                 console.warn("signOut request fail");
             }).finally(function () {
                 console.debug("signout ajax -> processing user");
@@ -464,12 +464,12 @@
 
                             fetchSettings.body = JSON.stringify({ jwt: token });
 
-                            window.fetch(url, fetchSettings).then(function (response) {
+                            window.fetch(url.toString(), fetchSettings).then(function (response) {
                                 if (response.status === 401) {
                                     console.warn("JWT failed, trying again");
                                     return getJwt(true).then(function (token) {
                                         fetchSettings.body = JSON.stringify({ jwt: token });
-                                        return window.fetch(url, fetchSettings);
+                                        return window.fetch(url.toString(), fetchSettings);
                                     })
                                 }
                                 return response;
@@ -529,12 +529,13 @@
 
                 fetchSettings.headers.Authorization = "Bearer " + token;
 
-                return window.fetch(authUrl, fetchSettings).then(function (response) {
+                // Convert url to string to avoid bugs in patched fetch (Dynamics 365)
+                return window.fetch(authUrl.toString(), fetchSettings).then(function (response) {
                     if (response.status === 401) {
                         console.warn("JWT failed, trying again");
                         return getJwt(true).then(function (token) {
                             fetchSettings.headers.Authorization = "Bearer " + token;
-                            return window.fetch(authUrl, fetchSettings);
+                            return window.fetch(authUrl.tostring(), fetchSettings);
                         })
                     }
                     return response;

@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.4.3 (2021-07-07)
+
+* Fixed an issue with fetch() in client when used in Dynamics 365.
+
 ## 8.4.2 (2021-07-06)
 
 * Fixed an issue with fetch() in client.

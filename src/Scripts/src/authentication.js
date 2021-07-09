@@ -432,7 +432,7 @@
                 _isUpdating = true;
                 wvy.postal.whenLeader().then(function (isLeader) {
                     if (isLeader) {
-                        console.debug("whenLeader => updateUserState");
+                        console.debug("whenLeader => updateUserState" + (_jwtProvider !== undefined ? ":jwt" : ":cookie"), originSource);
 
                         if (_whenAuthenticated.state() !== "pending") {
                             _whenAuthenticated.reset();
@@ -458,14 +458,16 @@
                         };
 
                         getJwt().then(function (token) {
-                            if (typeof token !== "string") {
-                                return Promise.reject(new Error("Provided JWT token is invalid."))
+                            if (_jwtProvider !== undefined) {
+                                if (typeof token !== "string") {
+                                    return Promise.reject(new Error("Provided JWT token is invalid."))
+                                }
+
+                                fetchSettings.body = JSON.stringify({ jwt: token });
                             }
 
-                            fetchSettings.body = JSON.stringify({ jwt: token });
-
                             window.fetch(url.toString(), fetchSettings).then(function (response) {
-                                if (response.status === 401) {
+                                if (response.status === 401 && _jwtProvider !== undefined) {
                                     console.warn("JWT failed, trying again");
                                     return getJwt(true).then(function (token) {
                                         fetchSettings.body = JSON.stringify({ jwt: token });

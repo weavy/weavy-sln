@@ -35,11 +35,17 @@ wvy.infinitescroll = (function ($) {
 
     // loads data if $more is visible
     function loadMore(e) {
-        var $more = $('.scroll-more:not([data-mode=prepend])').first();
+        var $more = $('.scroll-more').first();
         var target = e && e.target !== document && e.target || window;
         if ($more.length) {
+            var distance;
+
             // calculate distance until $more scrolls into view
-            var distance = 0 + $more.offset().top - $(target).scrollTop() - $(target).height();
+            if ($more.data("mode") === "prepend") {
+                distance = $(target).scrollTop() + $more.offset().top;
+            } else {
+                distance = 0 + $more.offset().top - $(target).scrollTop() - $(target).height();
+            }
 
             if (distance < buffer) {
                 $more.click();

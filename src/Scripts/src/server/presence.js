@@ -23,8 +23,8 @@ wvy.presence = (function ($) {
             _active = true;
 
             // tell server that connection is active
-            if (wvy.postal.isLeader) {
-                wvy.connection.default.invoke("rtm", "setActive");
+            if (wvy.postal.isLeader && window.navigator.onLine) {
+                wvy.connection.default.invoke("rtm", "setActive").catch(() => { });
             }
         }
     }
@@ -32,8 +32,8 @@ wvy.presence = (function ($) {
     function ping() {
         if (_active) {
             // ping the server to indicate that user is still active on this connection
-            if (wvy.postal.isLeader) {
-                wvy.connection.default.invoke("rtm", "setActive");
+            if (wvy.postal.isLeader && window.navigator.onLine) {
+                wvy.connection.default.invoke("rtm", "setActive").catch(() => { });
             }
         }
     }

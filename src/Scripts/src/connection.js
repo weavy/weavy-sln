@@ -71,8 +71,8 @@
         var reconnecting = false;
         var hubProxies = { rtm: connection.createHubProxy('rtm'), client: connection.createHubProxy('client') };
         var _events = [];
-        var _reconnectTimeout = null;
-        var _connectionTimeout = null;
+        var _reconnectMessageTimeout = null;
+        var _reconnectInterval = null;
         var reconnectRetries = 0;
         var explicitlyDisconnected = false;
 
@@ -174,7 +174,7 @@
                         console.debug((childConnection ? "child " : "") + "connection started")
                         whenConnected.resolve();
                     }).catch(function (error) {
-                        console.error((childConnection ? "child " : "") + "could not start connection")
+                        console.warn((childConnection ? "child " : "") + "could not start connection")
                     });
                 }
 
@@ -273,7 +273,7 @@
             try {
                 wvy.postal.postToChildren({ name: name, eventName: eventName, data: data, weavyId: "wvy.connection", connectionUrl: connectionUrl });
             } catch (e) {
-                console.error((childConnection ? "child " : "") + "could not distribute relay realtime message", { name: name, eventName: eventName }, e);
+                console.warn((childConnection ? "child " : "") + "could not distribute relay realtime message", { name: name, eventName: eventName }, e);
             }
         }
 
@@ -303,7 +303,7 @@
                                     resolve(invokeResult);
                                 })
                                 .catch(function (error) {
-                                    console.error(error, hub, args);
+                                    //console.warn(error, hub, args);
                                     reject(error);
                                 });
                         });
@@ -351,10 +351,15 @@
             var newState = parseInt(connectionState.newState);
 
             if (newState === states.connected) {
-                console.debug((childConnection ? "child " : "") + "connected " + connection.id + " (" + connection.transport.name + ")");
+                if (childConnection) {
+                    console.debug("child connected " + connection.id + " (" + connection.transport.name + ")");
+                } else {
+                    console.log("connected " + connection.id + " (" + connection.transport.name + ")");
+                }
 
                 // clear timeouts
-                window.clearTimeout(_reconnectTimeout);
+                window.clearTimeout(_reconnectMessageTimeout);
+                window.clearInterval(_reconnectInterval);
 
                 // reset retries
                 reconnectRetries = 0;
@@ -386,14 +391,18 @@
 
         connection.reconnecting(function () {
             reconnecting = true;
-            console.debug((childConnection ? "child " : "") + "reconnecting...");
-
-            // wait 2 seconds before showing message
-            if (_reconnectTimeout !== null) {
-                window.clearTimeout(_reconnectTimeout);
+            if (childConnection) {
+                console.debug("child reconnecting...");
+            } else {
+                console.log("reconnecting...");
             }
 
-            _reconnectTimeout = setTimeout(function () {
+            // wait 2 seconds before showing message
+            if (_reconnectMessageTimeout !== null) {
+                window.clearTimeout(_reconnectMessageTimeout);
+            }
+
+            _reconnectMessageTimeout = setTimeout(function () {
                 if (wvy.alert) {
                     wvy.alert.alert("primary", wvy.t("Reconnecting..."), null, "connection-state");
                 } else {
@@ -407,15 +416,26 @@
 
             if (!explicitlyDisconnected) {
                 reconnectRetries++;
-                window.clearTimeout(_connectionTimeout);
+                window.clearInterval(_reconnectInterval);
 
                 if (reconnecting) {
-                    connection.start();
+                    connection.start().catch((reason) => {
+                        console.warn("could not connect", reason)
+
+                    });;
                     reconnecting = false;
                 } else {
                     // connection dropped, try to connect again after 5s
-                    _connectionTimeout = setTimeout(function () {
-                        connection.start();
+                    _reconnectInterval = window.setInterval(function () {
+                        if (window.navigator.onLine) {
+                            connection.start().catch((reason) => {
+                                console.warn("could not reconnect", reason)
+
+                            });
+                            window.clearInterval(_reconnectInterval)
+                        } else {
+                            console.debug("waiting for online")
+                        }
                     }, 5000);
                 }
             }
@@ -464,7 +484,7 @@
                                         });
                                     })
                                     .catch(function (error) {
-                                        console.error(error);
+                                        console.warn(error);
                                         wvy.postal.postToSource(e, {
                                             name: "invokeResult",
                                             hub: msg.hub,
@@ -548,8 +568,8 @@
 
             reconnecting = false;
 
-            window.clearTimeout(_reconnectTimeout);
-            window.clearTimeout(_connectionTimeout);
+            window.clearTimeout(_reconnectMessageTimeout);
+            window.clearTimeout(_reconnectInterval);
 
             try {
                 wvy.postal.off("distribute", { weavyId: "wvy.connection", connectionUrl: connectionUrl }, onParentMessageReceived);
@@ -615,7 +635,7 @@
             }
             _connections.delete(url);
         } catch (e) {
-            console.error("Could not remove connection", url, e);
+            console.warn("Could not remove connection", url, e);
         }
     };
 

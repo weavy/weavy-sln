@@ -1,5 +1,11 @@
 # Changelog for Weavy
 
+## 8.4.4 (2021-07-09)
+
+* Fixed an issue when downloading files in cross-domain environments.
+* Fixed support for reversed infinite scroll.
+* Reduced errors from connection.
+
 ## 8.4.3 (2021-07-07)
 
 * Fixed an issue with fetch() in client when used in Dynamics 365.

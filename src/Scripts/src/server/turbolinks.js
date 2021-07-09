@@ -15,22 +15,45 @@ wvy.turbolinks = (function ($) {
     // gets a value indicating whether turbolinks is enabled or not
     var enabled = typeof Turbolinks !== "undefined" && Turbolinks !== undefined && Turbolinks.supported !== undefined && Turbolinks.supported;
 
-    // Show progress when navigating without Turbolinks
-    window.addEventListener("beforeunload", function () {
-        if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
+    var progressShowTimeout;
+    var progressHideTimeout;
+
+    function showProgress() {
+        window.clearTimeout(progressShowTimeout);
+        window.clearTimeout(progressHideTimeout);
+
+        progressShowTimeout = window.setTimeout(() => {
             try {
                 Turbolinks.controller.adapter.progressBar.setValue(0);
                 Turbolinks.controller.adapter.progressBar.show();
             } catch (e) { }
+        }, 200);
+
+        progressHideTimeout = window.setTimeout(hideProgress, 30000);
+    }
+
+    function hideProgress() {
+        window.clearTimeout(progressShowTimeout);
+        window.clearTimeout(progressHideTimeout);
+
+        try {
+            Turbolinks.controller.adapter.progressBar.hide();
+            Turbolinks.controller.adapter.progressBar.setValue(100);
+        } catch (e) { }
+
+    }
+
+    // Show progress when navigating without Turbolinks
+    window.addEventListener("beforeunload", function (e) {
+        if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
+            console.log("BEFORE UNLOAD", e);
+            showProgress();
         }
     });
 
     window.addEventListener("unload", function () {
         if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
-            try {
-                Turbolinks.controller.adapter.progressBar.hide();
-                Turbolinks.controller.adapter.progressBar.setValue(100);
-            } catch (e) { }
+            hideProgress();
         }
     });
 
@@ -46,18 +69,23 @@ wvy.turbolinks = (function ($) {
         if (force || !(isSameDomain || isJavascript || isHashLink)) {
             console.log("wvy.turbolinks: external navigation");
 
-            if (typeof window.parent.Native !== "undefined") {
-                window.parent.Native('linkCallback', { url: url });
-            } else {
-                if (isHttp) {
-                    // Open http/https links in a new tab
-                    window.open(url, "_blank");
-                } else {
-                    // Open custom protocols in the top browser window
-                    window.open(url, "_top");
-                }
+            setTimeout(hideProgress, 1);
 
+            try {
+                if (typeof window.parent.Native !== "undefined") {
+                    window.parent.Native('linkCallback', { url: url });
+                    return true;
+                }
+            } catch (e) {}
+
+            if (isHttp) {
+                // Open http/https links in a new tab
+                window.open(url, "_blank");
+            } else {
+                // Open custom protocols in the top browser window
+                window.open(url, "_top");
             }
+
             return true;
         }
 
@@ -73,11 +101,16 @@ wvy.turbolinks = (function ($) {
         if (force || isDownload && isHttp) {
             console.log("wvy.turbolinks: download url");
 
+            setTimeout(hideProgress, 1);
+
             // Open download links using system in Android webview
-            if (typeof window.parent.Native !== "undefined" && wvy.browser.platform === "Android") {
-                window.parent.Native('linkCallback', { url: url });
-                return "native";
-            }
+            try {
+                if (typeof window.parent.Native !== "undefined" && wvy.browser.platform === "Android") {
+                    window.parent.Native('linkCallback', { url: url });
+                    return "native";
+                }
+            } catch (e) { }
+
             return true;
         }
 

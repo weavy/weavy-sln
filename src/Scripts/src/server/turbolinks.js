@@ -45,14 +45,14 @@ wvy.turbolinks = (function ($) {
 
     // Show progress when navigating without Turbolinks
     window.addEventListener("beforeunload", function (e) {
-        if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
-            console.log("BEFORE UNLOAD", e);
+        if (enabled && wvy.postal.isLeader && !(wvy.browser.mobile && !wvy.browser.webView)) {
+            console.debug("progress for unload", window.name);
             showProgress();
         }
     });
 
     window.addEventListener("unload", function () {
-        if (enabled && !(wvy.browser.mobile && !wvy.browser.webView)) {
+        if (enabled) {
             hideProgress();
         }
     });
@@ -93,12 +93,13 @@ wvy.turbolinks = (function ($) {
     }
 
     // Open downloads natively in mobile
-    function openDownload(url, force) {
-        var link = wvy.url.hyperlink(url);
-        var isHttp = link.protocol.indexOf("http") === 0;
-        var isDownload = link.searchParams.has("d");
+    function openDownload(url, link) {
+        var downloadUrl = wvy.url.hyperlink(url);
+        var isHttp = downloadUrl.protocol.indexOf("http") === 0;
+        var isDownload = downloadUrl.searchParams.has("d");
+        var linkIsDownload = link && link.hasAttribute("download");
 
-        if (force || isDownload && isHttp) {
+        if (linkIsDownload || isDownload && isHttp) {
             console.log("wvy.turbolinks: download url");
 
             setTimeout(hideProgress, 1);
@@ -110,6 +111,16 @@ wvy.turbolinks = (function ($) {
                     return "native";
                 }
             } catch (e) { }
+
+
+            if (linkIsDownload) {
+                // a[download]
+                link.target = "_top";
+            } else if (!wvy.postal.isLeader) {
+                // ?d url
+                window.open(url, "_top");
+                return "window";
+            }
 
             return true;
         }
@@ -215,31 +226,30 @@ wvy.turbolinks = (function ($) {
 
         // Catch navigating links before turbolinks:click
         $(document).on("click", "a[href]", function (e) {
-            var nearestClickable = $(e.target).closest("A, BUTTON, .btn, input[type='button']").get(0);
+            var nearestClickable = e.target.closest("A, BUTTON, .btn, input[type='button']");
 
             if (!e.isPropagationStopped() && !e.isDefaultPrevented() && (!nearestClickable || nearestClickable === this)) {
-                var href = this.href || $(this).attr("href");
-                var target = this.target || $(this).attr("target");
+                var href = this.href;
+                var target = this.target;
 
                 // Turbolinks listens to a[href]:not([target]):not([download])
                 // Turbolinks filters out extensions ending on other than .htm .html .xhtml
 
                 var targetIsBlank = target === '_blank';
                 var targetIsTop = target === '_top';
-                var targetIsDownload = $(this).is("[download]");
-                var isWebView = $("html").is(".webview");
+                var isWebView = document.documentElement.classList.contains("webview");
 
                 var forceExternal = targetIsBlank || isWebView && targetIsTop;
-                var forceDownload = targetIsDownload;
                 
-                if (openExternal(href, forceExternal)) { // Check if url can open in new window
+                if (openExternal(href, forceExternal)) {
+                    // If url can open in new window
                     e.preventDefault();
                     e.stopPropagation();
                 } else {
-                    // Check if url is a download-url
-                    var hasOpenedDownload = openDownload(href, forceDownload);
+                    // If url is a download-url
+                    var hasOpenedDownload = openDownload(href, this);
                     if (hasOpenedDownload) {
-                        if (hasOpenedDownload === "native") {
+                        if (hasOpenedDownload === "native" || hasOpenedDownload === "window") {
                             e.preventDefault();
                         }
                         e.stopPropagation();

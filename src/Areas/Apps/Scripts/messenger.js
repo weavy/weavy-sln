@@ -1343,11 +1343,11 @@ wvy.messenger = (function ($) {
 
     // scroll to bottom of messages
     function scrollToBottomOfMessages(origin) {
-        if (document.body.classList.contains("two")) {
+        if (document.body.classList.contains("two") || document.body.classList.contains("dual") && window.matchMedia("(min-width: 768px)").matches) {
             toggleOSSleep({ matches: true });
 
             var el = getScrollParent(document.getElementById("sending"));
-            //console.debug("scrolling #messages", origin, el.scrollHeight);
+            //console.log("scrolling #messages", origin, el.scrollHeight, document.body.classList.contains("two"), document.body.classList.contains("dual"), window.matchMedia("(min-width: 768px)"));
             el.scrollTop = el.scrollHeight;
 
             requestAnimationFrame(() => {

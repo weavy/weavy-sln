@@ -34,7 +34,7 @@
             <button type="button" class="btn btn-icon dropdown-toggle top-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Svg.Icon("dots-vertical")</button>
             <div class="dropdown-menu dropdown-menu-right">
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#settings-modal">@T["Settings"]</button>
-                @if (WeavyContext.Browser.Mobile) {
+                @if (!WeavyContext.IsEmbedded && (WeavyContext.Browser.Mobile || WeavyContext.Browser.Tablet)) {
                     <a class="dropdown-item" href="~/sign-out?path=/@Weavy.Areas.Apps.Controllers.MessengerController.MESSENGER_PREFIX" id="signout">@T["Sign out"]</a>
                 }
             </div>

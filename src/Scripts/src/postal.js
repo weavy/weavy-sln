@@ -392,7 +392,7 @@
                 return;
             }
 
-            message.weavyId = _parentWeavyId || true;
+            message.weavyId = message.weavyId || true;
 
             return whenPostMessage(window.self, message, transfer);
         }

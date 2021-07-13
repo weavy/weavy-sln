@@ -797,9 +797,21 @@
             }
         }
 
+
+        /**
+         * Triggered when the app receives a postMessage sent from the panel frame.
+         *
+         * @category events
+         * @event WeavyPanels#message
+         * @returns {Object}
+         * @property {string} panelId - Id of the panel
+         */
+        weavy.on(wvy.postal, "message", { weavyId: weavy.getId(), windowName: panel.frame.name }, (e, message) => panel.triggerEvent("message", WeavyUtils.assign(message, { panelId: panelId })));
+
         /**
          * Sends a postMessage to the panel iframe.
-         * 
+         * Returns a promise that is resolved when the message has been delivered and rejected if the message fails or has timed out.
+         *
          * @function
          * @name WeavyPanels~panel#postMessage
          * @param {object} message - The Message to send

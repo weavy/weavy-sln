@@ -1,5 +1,13 @@
 # Changelog for Weavy
 
+## 8.5.0 (2021-07-13)
+
+* Added "message"-event on apps in client for postMessage from the panel frame.
+* Added .postMessage() on apps in client to send messages to the panel frame.
+* Fixed an issue with sign out in Messenger.
+* Trigger all downloads in top window for easier WebView handling.
+* Fixed an issue with scrolling in Messenger.
+
 ## 8.4.4 (2021-07-09)
 
 * Fixed an issue when downloading files in cross-domain environments.

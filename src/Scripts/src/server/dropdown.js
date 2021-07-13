@@ -14,4 +14,9 @@
         // close all dropdown menus
         $('.dropdown-menu').removeClass("show");
     });
+
+    window.addEventListener("beforeunload", function (e) {
+        // close all dropdown menus
+        $('.dropdown-menu').removeClass("show");
+    });
 })(jQuery);

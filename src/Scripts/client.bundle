@@ -1,4 +1,4 @@
-﻿~/scripts/src/_scope.begin.js
+﻿~/scripts/src/_scope.begin.min.js
 
 ~/scripts/src/wvy.js
 ~/scripts/src/resources.js
@@ -27,4 +27,4 @@
 ~/scripts/src/client/plugins/theme.js
 ~/scripts/src/client/plugins/maximize.js
 
-~/scripts/src/_scope.end.js
+~/scripts/src/_scope.end.min.js

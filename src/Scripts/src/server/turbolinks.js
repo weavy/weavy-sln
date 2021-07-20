@@ -393,9 +393,9 @@ wvy.turbolinks = (function ($) {
             reload();
         });
 
-        $(document).on("turbolinks:load", function (e) {
+        $(document).on("turbolinks:load", function (e, more) {
             if (wvy.postal) {
-                wvy.postal.postToParent({ name: "ready", location: window.location.href });
+                wvy.postal.postToParent({ name: "ready", location: window.location.href, statusCode: wvy.context.statusCode, statusDescription: wvy.context.statusDescription });
             }
             restorationVisit = false;
         });

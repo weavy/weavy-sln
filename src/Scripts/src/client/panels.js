@@ -300,23 +300,43 @@
          * @type {WeavyPromise}
          * @name WeavyPanels~panel#whenReady
          * @property {string} panelId - The id of the panel
-         * @property {string} windowName -  the name of the frame
+         * @property {string} windowName -  The name of the frame
+         * @property {string} location -  The location url of the frame.
+         * @property {int} statusCode -  The http status code of the frame.
+         * @property {string} statusDescription - The description of the http status code.
          **/
         panel.whenReady = new WeavyPromise();
 
         var _onReady = function (e, ready) {
             _isReady = true;
+
             var previousLocation = panel.location;
+            var previousStatusCode = panel.statusCode;
+            var statusOk = !ready.statusCode || ready.statusCode === 200;
+
             panel.location = new URL(ready.location, weavy.url).href;
+            panel.statusCode = ready.statusCode;
 
             panel.loadingFinished();
 
-            if (panel.isOpen && previousLocation && previousLocation !== panel.location) {
-                panel.node.dataset.stateChangedAt = Date.now();
+            if (previousStatusCode !== ready.statusCode && !statusOk) {
+                weavy.warn(ready.location + " " + ready.statusCode + " " + ready.statusDescription);
+            }
+
+            var changedLocation = previousLocation && previousLocation !== panel.location;
+            var changedStatusCode = previousStatusCode !== panel.statusCode;
+            var originalLocation = panel.location === panel.frame.dataset.src && !panel.isOpen;
+
+            if (panel.isOpen && (changedLocation || changedStatusCode)) {
+                if (changedLocation && statusOk && !originalLocation) {
+                    panel.stateChangedAt = Date.now();
+                } else if (!statusOk || originalLocation) {
+                    panel.stateChangedAt = null;
+                }
                 weavy.history.addState("replace");
             }
 
-            panel.whenReady.resolve({ panelId: panelId, windowName: panel.frame.name });
+            panel.whenReady.resolve({ panelId: panelId, windowName: panel.frame.name, location: ready.location, statusCode: ready.statusCode, statusDescription: ready.statusDescription });
         };
 
         weavy.on(wvy.postal, "ready", { weavyId: weavy.getId(), windowName: panel.frame.name }, _onReady);
@@ -555,7 +575,7 @@
                         panel.triggerEvent("panel-close", { panelId: panel.panelId, panels: panelsContainer });
 
                         if (noHistory !== true) {
-                            panel.node.dataset.stateChangedAt = Date.now();
+                            panel.stateChangedAt = Date.now();
                             weavy.history.addState();
                         }
                     }
@@ -626,7 +646,7 @@
 
                 // ADD HISTORY
                 if (noHistory !== true) {
-                    panel.node.dataset.stateChangedAt = Date.now();
+                    panel.stateChangedAt = Date.now();
                     weavy.debug("panels: adding history state", panelId, panel.location);
                     weavy.history.addState();
                 }
@@ -701,7 +721,7 @@
          * @name WeavyPanels~panel#reset
          * @returns {external:Promise}
          **/
-        panel.reset = function (noHistory) {
+        panel.reset = function () {
             return weavy.whenReady().then(function () {
  
                 var oldFrame = panel.frame;
@@ -715,6 +735,9 @@
                     _isReady = false;
                     _isLoaded = false;
                     _isLoading = false;
+
+                    panel.location = null;
+                    panel.statusCode = null;
 
                     panel.whenReady.reset();
                     panel.whenLoaded.reset();
@@ -783,6 +806,17 @@
             if (new URL(state.location, weavy.url).origin !== weavy.url.origin) {
                 weavy.warn("setState: Invalid url origin.", panelId, new URL(state.location, weavy.url).origin);
                 return;
+            }
+
+            var statusOk = (!state.statusCode || state.statusCode === 200);
+
+            if (!statusOk) {
+                weavy.warn("setState: Invalid url http status.", panelId);
+                return;
+            }
+
+            if (state.isOpen !== panel.isOpen || state.location !== panel.location) {
+                panel.stateChangedAt = state.changedAt;
             }
 
             if (state.isOpen) {
@@ -886,6 +920,12 @@
 
 
         // Frame handling
+
+
+        // Close the panel from the inside
+        weavy.on(wvy.postal, "request:reset", { weavyId: weavy.getId(), windowName: panel.frame.name }, function () {
+            panel.reset();
+        });
 
         // Close the panel from the inside
         weavy.on(wvy.postal, "request:close", { weavyId: weavy.getId(), windowName: panel.frame.name }, function () {

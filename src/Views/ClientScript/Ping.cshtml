@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Pong</title>
-    <script>var wvy=wvy||{};@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
+    <script>var wvy=wvy||{};@Html.ContextInfo()@Html.BrowserInfo()@Html.ConfigurationSettings()</script>
     @Bundler.Scripts("~/scripts/src/utils.js", "~/scripts/src/promise.js", "~/scripts/src/console.js", "~/scripts/src/postal.js")
 </head>
 <body>

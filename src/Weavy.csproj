@@ -349,17 +349,17 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.5.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.5.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.5.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.5.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.5.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -3465,8 +3465,8 @@
     <Content Include="Scripts\src\_ie.js" />
     <Content Include="Scripts\src\_jquery-check.js" />
     <Content Include="Scripts\src\_noconflict.js" />
-    <Content Include="Scripts\src\_scope.begin.js" />
-    <Content Include="Scripts\src\_scope.end.js" />
+    <Content Include="Scripts\src\_scope.begin.min.js" />
+    <Content Include="Scripts\src\_scope.end.min.js" />
     <Content Include="Scripts\src\authentication.js" />
     <Content Include="Scripts\src\bootstrap\modal.js" />
     <Content Include="Scripts\src\client\app.js" />

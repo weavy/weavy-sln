@@ -97,6 +97,7 @@
                             panelId: panelId,
                             isOpen: true,
                             location: panelPath,
+                            statusCode: 200,
                             weavyId: weavyId,
                             weavyUri: uri,
                             changedAt: Date.now()
@@ -134,9 +135,10 @@
                 panelId: panelId,
                 isOpen: panel.isOpen,
                 location: panel.location,
+                statusCode: panel.statusCode,
                 weavyId: weavyId,
                 weavyUri: weavyUri,
-                changedAt: panel.node.dataset.stateChangedAt
+                changedAt: panel.stateChangedAt
             };
         }
 
@@ -350,19 +352,10 @@
             weavyHistory.setBrowserState(state, "replace");
         }
 
-        window.addEventListener("popstate", function () {
-            weavy.log("POP native");
-            var state = weavyHistory.getBrowserState();
-            if (state) {
-                weavy.debug("history: popstate");
-                weavyHistory.openState(state);
-            }
-        })
         weavy.on(window, "popstate", function (e) {
-            weavy.log("POP");
             var state = weavyHistory.getBrowserState();
             if (state) {
-                weavy.debug("history: popstate");
+                weavy.log("history: popstate");
                 weavyHistory.openState(state);
             }
         });
@@ -393,6 +386,7 @@
  *   panelId: "app-123",
  *   isOpen: true,
  *   location: "/e/apps/123,
+ *   statusCode: 200,
  *   weavyId: "wy-41d751e8",
  *   weavyUri: "wvy://app-123@wy-41d751e8/e/apps/123",
  *   changedAt: 1614596627434
@@ -404,6 +398,7 @@
  * @property {string} panelId - The internal id of the panel.
  * @property {boolean} isOpen - Indicates whether the panel is open or not.
  * @property {string} location - The relative current location for the panel.
+ * @property {int} statusCode - The http code of the location of the panel.
  * @property {string} weavyId - The explicitly set weavy id. Null if id is not set in options.
  * @property {WeavyHistory~weavyUri} - The Weavy Uri for the panel
  * @property {int} changedAt - Timestamp if the state of the panel was changed since weavy loaded.

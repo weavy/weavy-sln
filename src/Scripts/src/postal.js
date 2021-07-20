@@ -148,10 +148,13 @@
                         _isLeader = false;
                         _whenLeader.resolve(false);
 
+                        var statusCode = wvy.context && wvy.context.statusCode;
+                        var statusDescription = wvy.context && wvy.context.statusDescription;
+
                         try {
-                            e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId, location: window.location.href }, e.origin);
+                            e.source.postMessage({ name: "ready", windowName: e.data.windowName, weavyId: e.data.weavyId, location: window.location.href, statusCode: statusCode, statusDescription: statusDescription }, e.origin);
                         } catch (e) {
-                            console.error("register-window could not post back ready-message to source");
+                            console.error("register-window could not post back ready-message to source", e);
                         }
 
                         if (wvy.whenLoaded) {

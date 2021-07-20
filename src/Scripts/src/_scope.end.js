@@ -1,2 +1,0 @@
-﻿// End scope encapsulation
-})();

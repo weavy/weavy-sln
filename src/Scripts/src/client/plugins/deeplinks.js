@@ -63,7 +63,7 @@
             var options = weavy.options.plugins.deeplinks;
 
             var allOpenPanels = history.globalState.panels.filter(function (panelState) {
-                return panelState.changedAt && panelState.isOpen;
+                return panelState.changedAt && panelState.isOpen && (!panelState.statusCode || panelState.statusCode === 200);
             });
             var lastOpenPanel = allOpenPanels.slice(-1);
             var panelUrls = (options.multiple ? allOpenPanels : lastOpenPanel).map(function (panelState) { return panelState.weavyUri; });

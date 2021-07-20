@@ -4,6 +4,7 @@
     Title = Model.Code + " " + Model.Description;
 }
 
+
 <div class="container my-4">
     @if (Model.Code == 500) {
         <h1 class="display-1">@T["Aw, Snap!"]</h1>
@@ -13,9 +14,14 @@
 
     <p>@Model.Message</p>
 
-    @if (User.IsAdmin && Model.Exception != null && !Model.Exception.StackTrace.IsNullOrEmpty()) {
-        <pre>@Model.Exception.GetType().FullName: @Model.Exception.Message<br />@Model.Exception.StackTrace</pre>
-    }
-    <a class="btn btn-icon btn-link px-0 d-standalone" href="@Url.Back(WeavyContext.ApplicationPath)" data-turbolinks="false">@Svg.Icon("arrow-left")<span>@T["Back"]</span></a>
-    <button class="btn btn-icon btn-link px-0 d-framed" onclick="wvy.postal.postToParent({ name: 'reset' });">@Svg.Icon("arrow-left")<span>@T["Back"]</span></button>
+    <div>
+        <a class="btn btn-icon btn-link px-0 d-standalone" href="@Url.Back(WeavyContext.ApplicationPath)" data-turbolinks="false">@Svg.Icon("arrow-left")<span>@T["Back"]</span></a>
+        <button class="btn btn-icon btn-link px-0 d-framed" onclick="wvy.postal.postToParent({ name: 'request:reset' });">@Svg.Icon("arrow-left")<span>@T["Back"]</span></button>
+    </div>
 </div>
+
+@if (User.IsAdmin && Model.Exception != null && !Model.Exception.StackTrace.IsNullOrEmpty()) {
+    <div class="container my-4">
+        <pre>@Model.Exception.GetType().FullName: @Model.Exception.Message<br />@Model.Exception.StackTrace</pre>
+    </div>
+}

@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 8.5.1 (2021-07-20)
+
+* Fixed issue with resetting panels from error pages.
+* Fixed issue with client scope minification when using weavy.min.js
+
 ## 8.5.0 (2021-07-13)
 
 * Added "message"-event on apps in client for postMessage from the panel frame.

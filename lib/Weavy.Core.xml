@@ -12552,9 +12552,9 @@
             <exception cref="T:System.ArgumentException">When the file in <paramref name="path"/> is not a .gif, .png or .jpg</exception>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.FileConversionUtils.GetSaveFormat(System.String)">
+        <member name="M:Weavy.Core.Utils.FileConversionUtils.GetPsdImageOptions(System.String)">
             <summary>
-            Gets the <see cref="T:Aspose.Words.SaveFormat"/> used by the file in the specified path.
+            Gets the <see cref="T:Aspose.PSD.ImageOptionsBase"/> used by the file in the specified path.
             </summary>
             <param name="path"></param>
             <exception cref="T:System.ArgumentException">When the file in <paramref name="path"/> is not a .gif, .png or .jpg</exception>

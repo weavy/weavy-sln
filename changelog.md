@@ -1,9 +1,16 @@
 # Changelog for Weavy
 
+## 8.6.0 (2021-08-09)
+
+* Added support for previewing macro enabled Microsoft Office files (.docm and .xlsm).
+* Added support for previewing emails (.eml and .msg).
+* Added support for previewing .eps files.
+* Increased maximum length of iss and sub claims to 256 chars.
+
 ## 8.5.1 (2021-07-20)
 
 * Fixed issue with resetting panels from error pages.
-* Fixed issue with client scope minification when using weavy.min.js
+* Fixed issue with client scope minification when using weavy.min.js.
 
 ## 8.5.0 (2021-07-13)
 

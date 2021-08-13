@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.6.1 (2021-08-13)
+
+* Fixed issue with time zone setting (tz) in messenger app. 
+
 ## 8.6.0 (2021-08-09)
 
 * Added support for previewing macro enabled Microsoft Office files (.docm and .xlsm).

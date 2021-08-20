@@ -15,12 +15,12 @@
         <div class="dropdown-divider"></div>
         @if (!details && Model.HasPermission(Permission.Pin)) {
             if (Model.IsPinned()) {
-                <form action="@(Url.Action<PostController>(c => c.Unpin(Model.Id)))" method="post" data-turboform>
+                <form action="@(Url.Action<PostController>(c => c.Unpin(Model.Id)))" method="post" data-turboform data-turbolinks-action="replace">
                     @Html.HttpMethodOverride(HttpVerbs.Delete)
                     <button type="submit" class="dropdown-item">@Svg.Icon("pin-off") @T["Unpin"]</button>
                 </form>
             } else {
-                <form action="@(Url.Action<PostController>(c => c.Pin(Model.Id)))" method="post" data-turboform>
+                <form action="@(Url.Action<PostController>(c => c.Pin(Model.Id)))" method="post" data-turboform data-turbolinks-action="replace">
                     <button type="submit" class="dropdown-item">@Svg.Icon("pin") @T["Pin"]</button>
                 </form>
             }

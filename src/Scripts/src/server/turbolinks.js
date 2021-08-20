@@ -130,6 +130,12 @@ wvy.turbolinks = (function ($) {
 
     function sendData(url, data, method, action) {
         restorationVisit = false;
+        var turbolinksAction;
+
+        if (action) {
+            console.debug("turbolinks: visit using action:", action);
+            turbolinksAction = { action: action };
+        }
 
         if (!method || method === "get") {
             // append data to querystring
@@ -150,13 +156,6 @@ wvy.turbolinks = (function ($) {
                 wvy.navigation.bypassUrl(url);
             }
 
-            var turbolinksAction;
-
-            if (action) {
-                console.debug("turbolinks: visit using action:", action);
-                turbolinksAction = { action: action };
-            }
-
             Turbolinks.visit(url, turbolinksAction);
         } else {
 
@@ -173,7 +172,8 @@ wvy.turbolinks = (function ($) {
             if (wvy.navigation) {
                 wvy.navigation.bypassUrl(url);
             }
-            Turbolinks.visit(url);
+
+            Turbolinks.visit(url, turbolinksAction);
         }
     }
 
@@ -181,6 +181,7 @@ wvy.turbolinks = (function ($) {
     function submitFormWithData($form, data, $submit) {
         var url = $submit && $submit.attr("formaction") || $form.attr("action");
         var method = $submit && $submit.attr("formmethod") || $form.attr("method");
+        var action = $submit && $submit.attr("data-turbolinks-action") || $form.attr("data-turbolinks-action");
 
         if ($form.hasClass("tab-content")) {
             // add active tab to data (so that we can activate the correct tab when the page reloads)
@@ -188,7 +189,7 @@ wvy.turbolinks = (function ($) {
             data = data + "&tab=" + encodeURIComponent($tab.attr('id'));
         }
 
-        sendData(url, data, method);
+        sendData(url, data, method, action);
     }
 
     function reload() {
@@ -369,13 +370,6 @@ wvy.turbolinks = (function ($) {
             } else {
                 submitFormWithData($form, data);
             }
-        });
-
-        // opening link with data-bubble-target
-        $(document).on("click", "a[href][data-target-panel]", function (e) {
-            e.preventDefault();
-            var $link = $(this);
-            sendData($link.attr('href'), null, "get", this.dataset.targetPanel);
         });
 
         wvy.postal.on("turbolinks-visit", function (e) {

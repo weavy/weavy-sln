@@ -233,6 +233,11 @@
                     weavy.alert("User token is invalid. <a href='javascript:window.location.reload();'>Reload</a>", true)
                 });
 
+
+                weavy.on("authentication-error", function () {
+                    weavy.alert("Authentication failed. <a href='javascript:window.location.reload();'>Reload</a>", true)
+                });
+
                 var space = weavy2.space({ key: "client-test-demo" });
                 var files = space.app({ key: "files", type: "files", container: "#panel-files" });
                 var posts = space.app({ key: "posts", type: "posts", container: "#panel-posts" });

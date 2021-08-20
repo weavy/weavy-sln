@@ -59,7 +59,11 @@ wvy.posts = (function ($) {
 
     // destroy editors
     document.addEventListener("turbolinks:before-cache", function () {
+        var $form = $("[data-editor='post']").closest("form");
+        $form.removeClass("sending");
+        $form.find("button[type=submit]").removeProp("disabled");
         $("[data-editor='post']").weavyEditor("destroy");
+
     });
 
     // populate feedback modal with fresh data

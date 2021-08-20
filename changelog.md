@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.6.2 (2021-08-20)
+
+* Fixed an issue with browser history in posts app. 
+
 ## 8.6.1 (2021-08-13)
 
 * Fixed issue with time zone setting (tz) in messenger app. 

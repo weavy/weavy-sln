@@ -9,7 +9,7 @@
 }
 <div class="container my-3">
     @if (Model.App.HasPermission(Permission.Post)) {
-        <form class="card post post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform>
+        <form class="card post post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform data-turbolinks-action="replace">
             <div class="weavy-editor weavy-editor-placeholder minimized">
                 <div class="emojionearea form-control" role="application">
                     <div class="emojionearea-editor" contenteditable="false" placeholder="@T["What's on your mind?"]" tabindex="0" dir="ltr" spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="on"></div>

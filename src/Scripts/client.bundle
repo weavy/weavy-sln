@@ -1,7 +1,6 @@
 ﻿~/scripts/src/_scope.begin.min.js
 
 ~/scripts/src/wvy.js
-~/scripts/src/resources.js
 ~/scripts/src/utils.js
 ~/scripts/src/promise.js
 ~/scripts/src/console.js

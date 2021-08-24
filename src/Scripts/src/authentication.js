@@ -12,7 +12,6 @@
             './console',
             './postal',
             './connection',
-            './resources',
             './wvy'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
@@ -25,15 +24,14 @@
             require('./console'),
             require('./postal'),
             require('./connection'),
-            require('./resources'),
             require('./wvy')
         );
     } else {
         // Browser globals (root is window)
         root.wvy = root.wvy || {};
-        root.wvy.authentication = root.wvy.authentication || new factory(root.wvy.utils, root.wvy.promise, root.wvy.console, root.wvy.t, root.wvy);
+        root.wvy.authentication = root.wvy.authentication || new factory(root.wvy.utils, root.wvy.promise, root.wvy.console, root.wvy);
     }
-}(typeof self !== 'undefined' ? self : this, function (WeavyUtils, WeavyPromise, WeavyConsole, t, wvy) {
+}(typeof self !== 'undefined' ? self : this, function (WeavyUtils, WeavyPromise, WeavyConsole, wvy) {
 
     //console.debug("authentication.js", window.name);
 
@@ -373,7 +371,7 @@
             // Default state when user is unauthenticated or has not changed
             var state = "updated";
 
-            var reloadLink = ' <a href="#" onclick="location.reload(); return false;">' + t("Reload") + '</a>';
+            var reloadLink = ' <a href="#" onclick="location.reload(); return false;">' + wvy.t("Reload") + '</a>';
 
             if (user && user.id) {
                 if (_isAuthenticated) {
@@ -381,12 +379,12 @@
                         // When signed in
                         if (user && user.id === -1) {
                             console.log("signed-out");
-                            alert(t("You have been signed out.") + reloadLink);
+                            alert(wvy.t("You have been signed out.") + reloadLink);
                             // User signed out
                             state = "signed-out";
                         } else if (user && user.id !== _user.id) {
                             console.log("changed-user");
-                            alert(t("The signed in user has changed.") + reloadLink)
+                            alert(wvy.t("The signed in user has changed.") + reloadLink)
                             // User changed
                             state = "changed-user";
                         }
@@ -397,7 +395,7 @@
 
                             // Show a message if the user hasn't loaded a new page
                             if (wvy && wvy.context && wvy.context.user && (user.id !== wvy.context.user)) {
-                                alert(t("You have signed in.") + reloadLink);
+                                alert(wvy.t("You have signed in.") + reloadLink);
                             }
 
                             // User signed in
@@ -417,7 +415,7 @@
                 if (eventResult !== false) {
                     wvy.postal.whenLeader().then(function (isLeader) {
                         if (isLeader) {
-                            alert(t("Authentication error.") + reloadLink, "danger");
+                            alert(wvy.t("Authentication error.") + reloadLink, "danger");
                         }
                     });
                 }

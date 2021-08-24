@@ -23454,6 +23454,16 @@
             <param name="trashed"><c>true</c> to return user even if trashed, otherwise <c>false</c>.</param>
             <returns>Returns an instance of the <see cref="T:Weavy.Core.Models.User"/> class.</returns>
         </member>
+        <member name="M:Weavy.Core.Services.UserService.GetBySub(System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Gets the <see cref="T:Weavy.Core.Models.User"/> with the specified iss and sub claims.
+            </summary>
+            <param name="iss">The "iss" claim from JWT.</param>
+            <param name="sub">The "sub" claim JWT.</param>
+            <param name="sudo"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
+            <param name="trashed"><c>true</c> to return user even if trashed, otherwise <c>false</c>.</param>
+            <returns>A <see cref="T:Weavy.Core.Models.User"/> object.</returns>
+        </member>
         <member name="M:Weavy.Core.Services.UserService.GetByToken(System.String,System.Boolean,System.Boolean,System.Boolean)">
             <summary>
               Gets the <see cref="T:Weavy.Core.Models.User"/> with the specified token.

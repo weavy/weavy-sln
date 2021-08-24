@@ -29,5 +29,18 @@
     let root = self !== undefined ? self : window;
     let wvy = root.wvy || {};
 
+    /**
+     * Translation retriever. 
+     * Gets any translated string or returns the original string if translation is not present.
+     * 
+     * Note: Translations are stored in window.wvy and not in root scope.
+     * 
+     * @param {string} key - The string to translate.
+     */
+    wvy.t = function (key) {
+        var text = window.wvy && window.wvy.resources != null ? window.wvy.resources[key] : key;
+        return text || key;
+    }
+
     return wvy;
 }));

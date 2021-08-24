@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.6.3 (2021-08-24)
+
+* Exposed method UserService.GetBySub() for getting User from JWT claims (`iss` and `sub`).
+
 ## 8.6.2 (2021-08-20)
 
 * Fixed an issue with browser history in posts app. 

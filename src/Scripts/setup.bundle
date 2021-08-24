@@ -1,6 +1,6 @@
 ﻿~/scripts/src/server/browser.js
 ~/scripts/vendor/jquery/jquery.min.js
-~/scripts/src/resources.js
+~/scripts/src/wvy.js
 ~/scripts/vendor/turbolinks/turbolinks.js
 ~/scripts/vendor/underscore/underscore-min.js
 ~/scripts/_bootstrap.bundle

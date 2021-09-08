@@ -1,5 +1,11 @@
 # Changelog for Weavy
 
+## 8.6.4 (2021-09-08)
+
+* Fixed an issue with alerts in Messenger.
+* Changes to license creation. Developers are now referred to weavy.com in order to get a new license key.
+* Changed the schedule for the license update daemon.
+
 ## 8.6.3 (2021-08-24)
 
 * Exposed method UserService.GetBySub() for getting User from JWT claims (`iss` and `sub`).

@@ -1009,7 +1009,7 @@
         </member>
         <member name="P:Weavy.Core.Plugins.LicenseDaemon.Schedule">
             <summary>
-            Hard coded to run every 15 minutes.
+            Hard coded to run at 02:00 every daily.
             </summary>
         </member>
         <member name="M:Weavy.Core.Plugins.LicenseDaemon.Run(System.Threading.CancellationToken,System.String[])">

@@ -5289,19 +5289,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.SetupController.Register">
-            <summary>
-            Display form for requesting a new license.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.SetupController.Register(Weavy.Core.Models.LicenseRequest)">
-            <summary>
-            Submit license request.
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
         <member name="M:Weavy.Web.Controllers.SetupController.License">
             <summary>
             Display form to register/update license.

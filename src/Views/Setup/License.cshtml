@@ -11,14 +11,16 @@
     <p>@T["Invalid license detected. Please enter a valid license key to continue."]</p>
 }
 
+
 @using (Html.BeginForm(null, null, FormMethod.Post, new { autocomplete = "off", novalidate = "", data_turboform = "" })) {
     @Html.EditorsForModel(labels: false)
     <div class="form-buttons">
         @if (Bootstrapper.Status == SystemStatus.Setup) {
-            <a href="@(Url.Action<SetupController>(c => c.Register()))" class="btn btn-outline-secondary">@T["Back"]</a>
+            <a href="@(Url.Action<SetupController>(c => c.Index()))" class="btn btn-outline-secondary">@T["Back"]</a>
             <button type="submit" class="btn btn-primary btn-load">@T["Next"]</button>
         } else {
             <button type="submit" class="btn btn-primary btn-load">@T["Update"]</button>
         }
     </div>
 }
+<div class="alert alert-info">@T["Don't have it? Go to"] <a href='https://weavy.com' target='_blank'>weavy.com</a> @T["and sign up to get your license key."]</div>

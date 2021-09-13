@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.6.5 (2021-09-13)
+
+* Changed the allowed transfer protocol of the integrated OAuth2 server so that it honours the `weavy.https` configuration setting.
+
 ## 8.6.4 (2021-09-08)
 
 * Fixed an issue with alerts in Messenger.

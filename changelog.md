@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.6.6 (2021-09-16)
+
+* Fix for server error when creating space in client using delayed init. 
+
 ## 8.6.5 (2021-09-13)
 
 * Changed the allowed transfer protocol of the integrated OAuth2 server so that it honours the `weavy.https` configuration setting.

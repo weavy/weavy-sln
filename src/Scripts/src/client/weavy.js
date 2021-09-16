@@ -563,7 +563,7 @@
                     if (isSpaceConfig) {
                         space = new WeavySpace(weavy, options);
                         weavy.spaces.push(space);
-                        Promise.all([weavy.authentication.whenAuthorized(), weavy.whenInitialized()]).then(function () {
+                        Promise.all([weavy.authentication.whenAuthorized(), weavy.whenReady()]).then(function () {
                             space.fetchOrCreate();
                         });
                     } else {

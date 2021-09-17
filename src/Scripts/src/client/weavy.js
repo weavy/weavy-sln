@@ -563,7 +563,7 @@
                     if (isSpaceConfig) {
                         space = new WeavySpace(weavy, options);
                         weavy.spaces.push(space);
-                        Promise.all([weavy.authentication.whenAuthorized(), weavy.whenReady()]).then(function () {
+                        Promise.all([weavy.authentication.whenAuthorized(), weavy.whenInitialized()]).then(function () {
                             space.fetchOrCreate();
                         });
                     } else {
@@ -782,8 +782,11 @@
 
                 var initData = {
                     spaces: weavy.spaces.map(function (space) {
-                        return space.options;
-                    }),
+                        if (!space.isLoading) {
+                            space.isLoading = true;
+                            return space.options;
+                        }
+                    }).filter((s) => s), // Remove empty
                     plugins: weavy.options.plugins,
                     version: Weavy.version
                 }

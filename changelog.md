@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 8.6.7 (2021-09-17)
+
+* Fix for server error when creating space in client using delayed init.
+* Fix for regression introduced in v8.6.6.
+
 ## 8.6.6 (2021-09-16)
 
 * Fix for server error when creating space in client using delayed init. 

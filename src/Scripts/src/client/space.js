@@ -216,6 +216,13 @@
         space.triggerEvent = weavy.events.triggerEvent.bind(space);
 
         /**
+         * Is the space currently loading?
+         * @category properties
+         * @type {boolean}
+         */
+        space.isLoading = false;
+
+        /**
          * Has the space loaded?
          * @category properties
          * @type {boolean}
@@ -327,6 +334,7 @@
                     })
                 }
 
+                space.isLoading = false;
                 space.isLoaded = true;
                 space.whenLoaded.resolve(space);
 
@@ -348,24 +356,33 @@
          * @resolves {WeavySpace#whenLoaded}
          */
         space.fetchOrCreate = function (options) {
+            var waitFor = [];
+
             if (options && typeof options === "object") {
                 space.options = options;
+                if (space.isLoading) {
+                    waitFor.push(space.whenLoaded);
+                }
             }
 
-            if (space.options && typeof space.options === "object") {
-                var initSpaceUrl = new URL("/client/space", weavy.url).href;
+            return Promise.all(waitFor).then(() => {
+                if (space.options && typeof space.options === "object") {
+                    space.isLoading = true;
 
-                weavy.ajax(initSpaceUrl, space.options, "POST").then(function (data) {
-                    space.data = data;
-                    space.configure.call(space);
-                }).catch(function (error) {
-                    space.weavy.error("WeavySpace.fetchOrCreate()", error);
-                    space.whenLoaded.reject(error);
-                });
-            } else {
-                space.whenLoaded.reject(new Error("WeavySpace.fetchOrCreate() requires options"));
-            }
-            return space.whenLoaded();
+                    var initSpaceUrl = new URL("/client/space", weavy.url).href;
+
+                    weavy.ajax(initSpaceUrl, space.options, "POST").then(function (data) {
+                        space.data = data;
+                        space.configure.call(space);
+                    }).catch(function (error) {
+                        space.weavy.error("WeavySpace.fetchOrCreate()", error);
+                        space.whenLoaded.reject(error);
+                    });
+                } else {
+                    space.whenLoaded.reject(new Error("WeavySpace.fetchOrCreate() requires options"));
+                }
+                return space.whenLoaded();
+            });
         }
 
         /**

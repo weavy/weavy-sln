@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.6.8 (2021-09-21)
+
+* Fix for server error when fetching spaces.
+
 ## 8.6.7 (2021-09-17)
 
 * Fix for server error when creating space in client using delayed init.

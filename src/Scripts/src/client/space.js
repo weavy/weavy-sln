@@ -360,9 +360,10 @@
 
             if (options && typeof options === "object") {
                 space.options = options;
-                if (space.isLoading) {
-                    waitFor.push(space.whenLoaded);
-                }
+            }
+
+            if (space.isLoading) {
+                waitFor.push(space.whenLoaded);
             }
 
             return Promise.all(waitFor).then(() => {

@@ -40,7 +40,6 @@ namespace Weavy.Areas.Api.Controllers {
         /// <param name="model">The <see cref="App"/> to insert.</param>
         /// <example>
         /// POST /api/spaces/1/apps
-        ///
         /// {
         ///   "name": "Files",
         ///   "guid": "523edd88-4bbf-4547-b60f-2859a6d2ddc1"
@@ -68,7 +67,6 @@ namespace Weavy.Areas.Api.Controllers {
         /// <param name="model">Contains the new properties for the app.</param>
         /// <example>
         /// PATCH /api/spaces/527/apps
-        ///
         /// {
         ///   "name": "Files"
         /// }

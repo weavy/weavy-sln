@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.7.0 (2021-11-02)
+
+*  Added Conversations API with functionality for getting, creating and updating Weavy conversations. For more information, check out the api documentation at https://[weavy_url]/api.
+
 ## 8.6.8 (2021-09-21)
 
 * Fix for server error when fetching spaces.

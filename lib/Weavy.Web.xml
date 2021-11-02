@@ -6040,6 +6040,79 @@
             Performs custom validation. 
             </summary>
         </member>
+        <member name="T:Weavy.Web.Models.ConversationInModel">
+            <summary>
+            Model for creating a conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationInModel.Members">
+            <summary>
+            The members of the conversation.
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.ConversationOutModel">
+            <summary>
+            View model for a conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.Id">
+            <summary>  
+             Gets the id of the conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.Title">
+            <summary>
+             Gets or sets the title of the conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.AvatarUrl">
+            <summary>
+            Gets the avatar url.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.Presence">
+            <summary>
+            Gets a value indicating the presence status of the other user in a one-to-one conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.IsRoom">
+            <summary>
+            Gets a value indicating whether this is a chat room or a conversation between just 2 people.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.IsRead">
+            <summary>
+            Gets a value indicating if the current user has read all messages in the conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.IsPinned">
+            <summary>
+            Gets a value indicating if the current user has pinned the conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.IsStarred">
+            <summary>
+            Gets a value indicating if the current user has starred the conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.Excerpt">
+            Gets a snippet of the most recent message in the conversation.
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.LastMessageAt">
+            <summary>
+            Gets the date and time when the last message in the convesation was recieved or <code>null</code> if no messages exists in the conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.LastMessageAtString">
+            <summary>
+            Gets a string representation of when the created date occured, e.g. "4:38 PM", "Yesterday", "Wednesday", "June 16", "10/06/16" etc
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.ConversationOutModel.Members">
+            <summary>
+            Gets the list of users that are members of the conversation.
+            </summary>
+        </member>
         <member name="T:Weavy.Web.Models.MeetingModel">
             <summary>
             Model for creating new meetings 
@@ -6103,6 +6176,101 @@
         <member name="P:Weavy.Web.Models.PartialMeetingModel.Guid">
             <summary>
             
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.MessageInModel">
+            <summary>
+            Model for inserting a message into a conversation.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageInModel.Text">
+            <summary>
+            The message text.
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.MessageOutModel">
+            <summary>
+            View model for a message.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.Id">
+            <summary>
+             Gets the id of the message.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.CreatedAt">
+            <summary>
+            Gets the date when the message was created
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.CreatedById">
+            <summary>
+            Gets the user's id that created the message
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.CreatedByName">
+            <summary>
+            Gets the user's name that created the message
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.CreatedByThumb">
+            <summary>
+            Gets the user's thumb that created the message
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.Attachments">
+            <summary>
+            Gets the attachments for the message
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.Html">
+            <summary>
+            Gets the html to display
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.MessageOutModel.SeenBy">
+            <summary>
+            A list om conversation members that have seen the message
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.NameInModel">
+            <summary>
+            Model for updating the name of a room.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.NameInModel.Name">
+            <summary>
+            The new room name.
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Models.SettingsModel">
+            <summary>
+            Model for settings.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.SettingsModel.TimeZone">
+            <summary>
+            Gets or sets the user time zone.
+            </summary>                                         
+        </member>
+        <member name="P:Weavy.Web.Models.SettingsModel.EnterToSend">
+            <summary>
+            Gets or sets a value indicating whether Enter should send a message or insert a new line.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.SettingsModel.AvatarId">
+            <summary>
+            The blob id of the avatar to use or null if no avatar is set.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.SettingsModel.ThumbnailUrl">
+            <summary>
+            The avatar thumb.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Models.SettingsModel.TimeZones">
+            <summary>
+            A list with all available time zones.
             </summary>
         </member>
         <member name="T:Weavy.Web.Models.ZoomEvent">

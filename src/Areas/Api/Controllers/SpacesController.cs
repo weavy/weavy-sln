@@ -2,7 +2,6 @@
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Description;
-using Weavy.Areas.Api.Models;
 using Weavy.Core.Models;
 using Weavy.Core.Services;
 using Weavy.Web.Api.Controllers;

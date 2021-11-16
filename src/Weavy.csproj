@@ -1,4 +1,4 @@
-﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="..\packages\JavaScriptEngineSwitcher.V8.Native.win-x64.3.1.5\build\JavaScriptEngineSwitcher.V8.Native.win-x64.props" Condition="Exists('..\packages\JavaScriptEngineSwitcher.V8.Native.win-x64.3.1.5\build\JavaScriptEngineSwitcher.V8.Native.win-x64.props')" />
   <Import Project="..\packages\JavaScriptEngineSwitcher.V8.Native.win-x86.3.1.5\build\JavaScriptEngineSwitcher.V8.Native.win-x86.props" Condition="Exists('..\packages\JavaScriptEngineSwitcher.V8.Native.win-x86.3.1.5\build\JavaScriptEngineSwitcher.V8.Native.win-x86.props')" />
@@ -6,8 +6,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
+    <ProductVersion></ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{70CFFD0F-7B12-43EC-9C57-9080937A6B04}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -23,8 +22,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <NuGetPackageImportStamp></NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -366,17 +364,17 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.7.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.7.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.7.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.7.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.7.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.7.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.7.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.7.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -4363,13 +4361,12 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58586</DevelopmentServerPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>https://localhost:44323/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl />
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -4420,7 +4417,7 @@ using System.Reflection%3B
       <Output TaskParameter="AssignedFilesWithCulture" ItemName="ResourcesWithCulture" />
     </AssignCulture>
     <Message Text="%(Culture) -&gt; @(ResourcesWithCulture)" Importance="High" />
-    <MakeDir Directories="@(ResourcesWithCulture->'bin\%(Culture)\')" />
+    <MakeDir Directories="@(ResourcesWithCulture-&gt;'bin\%(Culture)\')" />
     <AL SdkToolsPath="$(SDK40ToolsPath)" EmbedResources="@(ResourcesWithCulture)" TargetType="library" TemplateFile="bin\Weavy.dll" Culture="%(Culture)" OutputAssembly="bin\%(Culture)\Weavy.resources.dll" />
   </Target>
 </Project>

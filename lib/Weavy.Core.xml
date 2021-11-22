@@ -17021,6 +17021,14 @@
             <param name="query">A <see cref="T:Weavy.Core.Models.AppQuery"/> object containing the search criteria.</param>
             <returns>Returns a paged list of <see cref="T:Weavy.Core.Models.App"/> objects.</returns>
         </member>
+        <member name="M:Weavy.Core.Repos.AttachmentRepo.GetForConversation(System.Int32,Weavy.Core.Models.QueryOptions)">
+            <summary>
+              Get attachments in the conversation.
+            </summary>
+            <param name="id"></param>
+            <param name="opts"><see cref="T:Weavy.Core.Models.QueryOptions"/> for paging etc..</param>
+            <returns>Returns a paged list of <see cref="T:Weavy.Core.Models.Attachment"/> objects.</returns>
+        </member>
         <member name="T:Weavy.Core.Repos.BlobRepo">
             <summary>
               Repo for blobs.
@@ -17593,6 +17601,14 @@
             <remarks>
               The object will be updated to reflect any changes made by the repository, i.e. identity or computed columns.
             </remarks>
+        </member>
+        <member name="M:Weavy.Core.Repos.EmbedRepo.GetForConversation(System.Int32,Weavy.Core.Models.QueryOptions)">
+            <summary>
+              Return embeds for the specified conversation.
+            </summary>
+            <param name="id"></param>
+            <param name="opts"><see cref="T:Weavy.Core.Models.QueryOptions"/> for paging etc..</param>
+            <returns>Returns a paged list of <see cref="T:Weavy.Core.Models.Embed"/> objects.</returns>
         </member>
         <member name="T:Weavy.Core.Repos.EntityRepo">
             <summary>
@@ -22935,6 +22951,24 @@
             <param name="sudo"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
             <param name="trashed"><c>true</c> to return conversation even if trashed, otherwise <c>false</c>.</param>
             <returns>Returns an instance of the <see cref="T:Weavy.Core.Models.Conversation"/> class.</returns>
+        </member>
+        <member name="M:Weavy.Core.Services.ConversationService.GetAttachments(System.Int32,Weavy.Core.Models.QueryOptions,System.Boolean)">
+            <summary>
+              Gets attachments in the <see cref="T:Weavy.Core.Models.Conversation"/>.
+            </summary>
+            <param name="id">Id of the <see cref="T:Weavy.Core.Models.Conversation"/>.</param>
+            <param name="opts"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
+            <param name="sudo"></param>
+            <returns>Returns an list of <see cref="T:Weavy.Core.Models.Attachment"/> objects.</returns>
+        </member>
+        <member name="M:Weavy.Core.Services.ConversationService.GetEmbeds(System.Int32,Weavy.Core.Models.QueryOptions,System.Boolean)">
+            <summary>
+              Get embeds in the <see cref="T:Weavy.Core.Models.Conversation"/>.
+            </summary>
+            <param name="id">Id of the <see cref="T:Weavy.Core.Models.Conversation"/>.</param>
+            <param name="opts"><c>true</c> to perform action as super user, otherwise <c>false</c>.</param>
+            <param name="sudo"></param>
+            <returns>Returns an list of <see cref="T:Weavy.Core.Models.Embed"/> objects.</returns>
         </member>
         <member name="M:Weavy.Core.Services.ConversationService.GetAsMember(System.Int32,System.Int32,System.Boolean,System.Boolean)">
             <summary>

@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.8.0 (2021-11-22)
+
+* Added methods for listing files and embeds posted in a conversation.
+
 ## 8.7.1 (2021-11-16)
 
 * Administrative rights are now required in order to view the generated API documentation available on ~/docs.

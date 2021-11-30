@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.9.0 (2021-11-30)
+
+* Change overlays to open in same window in mobile and messenger.
+
 ## 8.8.0 (2021-11-22)
 
 * Added methods for listing files and embeds posted in a conversation.

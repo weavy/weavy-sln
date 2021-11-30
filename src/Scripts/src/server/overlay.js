@@ -120,17 +120,8 @@ wvy.overlay = (function ($) {
             if (isLeader) {
                 console.log("overlay standalone open");
                 var iOS = wvy.browser.platform === "iOS";
-                if (wvy.browser.mobile || document.body.classList.contains('controller-messenger')) {
-                    var overlayWindow;
-                    if (!iOS) {
-                        try {
-                            overlayWindow = window.open(href, "overlay");
-                        } catch (e) { }
-                    }
-
-                    if (!overlayWindow) {
-                        window.location.href = href;
-                    }
+                if (document.body.classList.contains('controller-messenger')) {
+                    window.location.href = href;
                 } else {
                     wvy.turbolinks.visit(href);
                 }

@@ -191,13 +191,15 @@ wvy.messenger = (function ($) {
                             }
                         }
                     },
-                    // save message form and send typing event on keypress (throttled to avoid sending every keypress)
+                    // save message form
                     keyup: function () {
-                        typing = typing || _.throttle(function () {
-                            $.post({ url: wvy.url.resolve(_prefix + "/c/" + _id + "/typing") });
-                        }, 3000, { trailing: false })
-
-                        typing();
+                        if (wvy.config.typing) {
+                            // send typing event on keypress (throttled to avoid sending every keypress)
+                            typing = typing || _.throttle(function () {
+                                $.post({ url: wvy.url.resolve(_prefix + "/c/" + _id + "/typing") });
+                            }, 3000, { trailing: false })
+                            typing();
+                        }
                         saveMessageForm(false);
                     },
                     // configure autocomplete for @mentions
@@ -214,48 +216,48 @@ wvy.messenger = (function ($) {
                                     callback([]);
                                 });
 
-                                    },
-                                    index: 1,
-                                    template: function (item) {
-                                        var html = '<img class="img-24 avatar mr-1" src="' + wvy.url.thumb(item.thumb, "48") + '" alt="" /><span>' + (item.name || item.username);
-                                        if (item.username) {
-                                            html += ' <small>@' + item.username + '</small>';
-                                        }
-                                        if (item.directory) {
-                                            html += ' <span class="badge badge-success">' + item.directory + '</small>';
-                                        }
-                                        html += "</span>";
-                                        return html;
-                                    },
-                                    replace: function (mention) {
-                                        return '@' + mention.username + " ";
-                                    },
-                                    cache: false
-                                }]);
-                            }
-                        }
-                    });
+                            },
+                            index: 1,
+                            template: function (item) {
+                                var html = '<img class="img-24 avatar mr-1" src="' + wvy.url.thumb(item.thumb, "48") + '" alt="" /><span>' + (item.name || item.username);
+                                if (item.username) {
+                                    html += ' <small>@' + item.username + '</small>';
+                                }
+                                if (item.directory) {
+                                    html += ' <span class="badge badge-success">' + item.directory + '</small>';
+                                }
+                                html += "</span>";
+                                return html;
+                            },
+                            replace: function (mention) {
+                                return '@' + mention.username + " ";
+                            },
+                            cache: false
+                        }]);
+                    }
+                }
+            });
 
             // get the textarea (which is now an emojionearea)
             _textarea = $textarea[0].emojioneArea;
 
-                    // handle pasted image
-                    _textarea.on("pasteImage", function (editor, data, html) {
-                        var file = data.dataURL;
-                        var block = file.split(";");
-                        // get the content type of the image
-                        var contentType = block[0].split(":")[1];// In this case "image/gif"
-                        // get the real base64 content of the file
-                        var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
-                        // convert it to a blob to upload
-                        var blob = b64toBlob(realData, contentType);
-                        var fileOfBlob = new File([blob], data.name, { type: contentType });
-                        wvy.fileupload.uploadBlobs([].concat(fileOfBlob), $(".message-form input[type=file]"));
-                    });
-                    // restore pending message
-                    restoreMessageForm();
-                }
-            }
+            // handle pasted image
+            _textarea.on("pasteImage", function (editor, data, html) {
+                var file = data.dataURL;
+                var block = file.split(";");
+                // get the content type of the image
+                var contentType = block[0].split(":")[1];// In this case "image/gif"
+                // get the real base64 content of the file
+                var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
+                // convert it to a blob to upload
+                var blob = b64toBlob(realData, contentType);
+                var fileOfBlob = new File([blob], data.name, { type: contentType });
+                wvy.fileupload.uploadBlobs([].concat(fileOfBlob), $(".message-form input[type=file]"));
+            });
+            // restore pending message
+            restoreMessageForm();
+        }
+    }
 
     ////////// Document events //////////
 
@@ -317,7 +319,7 @@ wvy.messenger = (function ($) {
         restoreScroll();
         scrollToBottomOfMessages("render")
     }, true);
-    
+
     document.addEventListener("turbolinks:load", function (e) {
         //if (e.data.timing.visitEnd) {
         //    console.log(e.type, e.data.url, (e.data.timing.visitEnd - e.data.timing.visitStart) + "ms");
@@ -333,7 +335,7 @@ wvy.messenger = (function ($) {
 
             setTimeout(initTextarea, 0);
         }
-        
+
         // scroll to bottom of messages
         if (document.documentElement.classList.contains("loading")) {
             queueMicrotask(() => scrollToBottomOfMessages("load"))
@@ -373,16 +375,16 @@ wvy.messenger = (function ($) {
     });
 
     window.addEventListener("message", function (e) {
-        
+
         switch (e.data.name) {
-            case "zoom-signed-in":                                                
+            case "zoom-signed-in":
                 recreateMeeting("zoom");
                 break;
 
-            case "teams-signed-in":                                
+            case "teams-signed-in":
                 recreateMeeting("teams");
                 break;
-        }        
+        }
     })
 
     ////////// DOM events //////////
@@ -391,7 +393,7 @@ wvy.messenger = (function ($) {
     $(document).on("click", ".btn-add-meeting", function () {
         var provider = $(this).data("provider");
         createMeeting(provider);
-        
+
     });
 
     function createMeeting(provider) {
@@ -412,13 +414,13 @@ wvy.messenger = (function ($) {
         removeMeeting($("[data-meeting-provider='" + provider + "']"));
         createMeeting(provider);
     }
-        
+
     // various click actions
     $(document).on("click", ".btnZoomAuthentication", function (e) {
         e.preventDefault();
-        
+
         var zoomAuthUrl = wvy.config.zoomAuthUrl + "&state=" + _id;
-        
+
         if (!wvy.browser.mobile) {
             window.open(zoomAuthUrl,
                 "zoomAuthWin",
@@ -427,14 +429,14 @@ wvy.messenger = (function ($) {
             clearMeetings();
             location.href = zoomAuthUrl;
         }
-        
+
     });
 
     $(document).on("click", ".btnTeamsAuthentication", function (e) {
         e.preventDefault();
 
         var teamsAuthUrl = wvy.config.teamsAuthUrl + "&state=" + _id;
-        
+
         if (!wvy.browser.mobile) {
             window.open(teamsAuthUrl,
                 "teamsAuthWin",
@@ -449,7 +451,7 @@ wvy.messenger = (function ($) {
     $(document).on("click", "[data-meeting-sign-out]", function () {
         var provider = $(this).data("meeting-sign-out");
         var qs = "?provider=" + provider + "&conversationId=" + _id;
-        $.post(wvy.url.resolve("/a/meetings/sign-out" + qs), function (response) {            
+        $.post(wvy.url.resolve("/a/meetings/sign-out" + qs), function (response) {
             clearMeetings(provider);
         });
     });
@@ -575,8 +577,11 @@ wvy.messenger = (function ($) {
         restoreScroll()
     });
 
-    // let server know that user is typing in conversation
-    $(document).on("keydown", ".message-form textarea", _.throttle(function () { wvy.connection.default.invoke("messenger", "typing", _id) }, 3000, { trailing: false }));
+    if (wvy.config.typing) {
+        // REVIEW: we don't have a MessengerHub anymore...
+        // let server know that user is typing in conversation
+        $(document).on("keydown", ".message-form textarea", _.throttle(function () { wvy.connection.default.invoke("messenger", "typing", _id) }, 3000, { trailing: false }));
+    }
 
     // search form
     $(document).on("submit", ".search-form", function (e) {
@@ -800,19 +805,19 @@ wvy.messenger = (function ($) {
         // check that message is not empty
         var $form = $(this);
         var json = $form.serializeObject(false);
-        
+
         if (json.text || json.blobs || json.embeds || json.meetings) {
-            
+
             // check meetings authentication            
-            if (json.meetings) {                
+            if (json.meetings) {
                 var auth = $("a[data-meeting-authenticated='0']");
-                
+
                 if (auth.length) {
                     wvy.alert.info(wvy.t("Please sign in to the meeting provider before you submit the message!"), 3000)
                     return false;
                 }
             }
-            
+
             // disable send button (to avoid double click)
             $form.find("[type=submit]").prop("disabled", true);
 
@@ -846,7 +851,7 @@ wvy.messenger = (function ($) {
             // reset scroll positions so that conversation list is scrolled to top after turbolinks:render
             _b1 = 0;
             _p1 = 0;
-            
+
             // submit form with Turbolinks
             wvy.turbolinks.visit($form.attr("action"), $form.serialize(), $form.attr("method"))
         }
@@ -1033,7 +1038,7 @@ wvy.messenger = (function ($) {
     // update gui because a message was updated
     wvy.connection.default.on("message-updated.weavy", function (event, message) {
         console.debug("received updated message " + message.id + " in conversation " + message.conversation);
-                
+
         // get html for message        
         if (message.conversation === _id && $("#main").is(":visible")) {
             $.get({ url: wvy.url.resolve(_prefix + "/m/" + message.id), cache: false }).then(function (html) {
@@ -1043,13 +1048,13 @@ wvy.messenger = (function ($) {
                     $existing.replaceWith(html)
                 }
             });
-        }   
+        }
     });
 
     // update gui because message was delivered
     wvy.connection.default.on("conversation-delivered.weavy", function (event, data) {
         console.debug("conversation " + data.conversation.id + " was delivered to user " + data.user.id);
-        
+
         // update #messages if needed
         if (_id === data.conversation.id && $("#messages .status-sent").length) {
             $.get({ url: wvy.url.resolve(_prefix + "/c/" + data.conversation.id + "/messages"), cache: false }).done(function (data) {
@@ -1127,7 +1132,7 @@ wvy.messenger = (function ($) {
             load(e.data.id);
         }
     });
-        
+
     ////////// helper functions //////////
 
     function load(id) {
@@ -1387,7 +1392,7 @@ wvy.messenger = (function ($) {
                 if ($c.length) {
 
                     // use age of typing event to animate ellipsis...
-                    var dots = (Math.round((now - Math.max.apply(null, grouped[id].map(function (x) { return x.time;}))) / 1000) % 3) + 1;
+                    var dots = (Math.round((now - Math.max.apply(null, grouped[id].map(function (x) { return x.time; }))) / 1000) % 3) + 1;
                     var ellipsis = (".").repeat(dots) + "<span class=invisible>" + (".").repeat(3 - dots) + "</span>";
 
                     // merge names of people typing
@@ -1433,7 +1438,7 @@ wvy.messenger = (function ($) {
     // hide badge
     function hideBadge() {
         $(".pane-actions .badge").text("");
-    }      
+    }
 
     // convert emoji shortcodes and unicode to images
     function convertEmoji(str) {

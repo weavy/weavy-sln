@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 8.9.1 (2021-12-13)
+
+* Added setting for toggling presence (online/offline) tracking.
+* Added setting for toggling typing indicators.
+* Added database indexes for improved performance.
+* Added setting for manually specifying SignalR transport, e.g websockets.
+
 ## 8.9.0 (2021-11-30)
 
 * Change overlays to open in same window in mobile and messenger.

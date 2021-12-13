@@ -7,8 +7,10 @@ wvy.presence = (function ($) {
     // idle after 1 minute of no activity
     var _timeout = 60 * 1000;
 
-    // ping the server periodically
-    window.setInterval(ping, _timeout);
+    // ping the server periodically but only if presence is enabled
+    if (wvy.config.presence) {
+        window.setInterval(ping, _timeout);
+    }
 
     function idle() {
         if (_active) {
@@ -38,9 +40,9 @@ wvy.presence = (function ($) {
         }
     }
 
-    // returns a value indicating if the current user is active on this connection
+    // returns a value indicating if the current user is active on this connection. Always returns false when presence is not enabled.
     function isActive() {
-        return _active;
+        return wvy.config.presence ? _active : false;
     }
 
     // register callback for server presence event
@@ -56,24 +58,28 @@ wvy.presence = (function ($) {
         }
     });
 
-    // track idleness
-    $(document).idle({
-        onIdle: function () {
-            idle();
-        },
-        onActive: function () {
-            active();
-        },
-        onHide: function () {
-            idle();
-        },
-        onShow: function () {
-            active();
-        },
-        idle: _timeout
-    });
+    if (wvy.config.presence) {
+
+        // track idleness
+        $(document).idle({
+            onIdle: function () {
+                idle();
+            },
+            onActive: function () {
+                active();
+            },
+            onHide: function () {
+                idle();
+            },
+            onShow: function () {
+                active();
+            },
+            idle: _timeout
+        });
+    }
 
     return {
         isActive: isActive
     };
+
 })(jQuery);

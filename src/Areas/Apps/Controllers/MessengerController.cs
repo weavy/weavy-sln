@@ -535,10 +535,13 @@ namespace Weavy.Areas.Apps.Controllers {
         [HttpPost]
         [Route(ControllerUtils.ROOT_PREFIX + MESSENGER_PREFIX + "/c/{id:int}/typing")]
         public HttpStatusCodeResult Typing(int id) {
-            var conversation = ConversationService.Get(id);
-            // push typing event to other conversation members
-            PushService.PushToUsers(PushService.EVENT_TYPING, new TypingModel { Conversation = id, User = WeavyContext.Current.User }, conversation.MemberIds.Where(x => x != WeavyContext.Current.User.Id));
-            return new HttpStatusCodeResult(HttpStatusCode.OK);
+            if (ConfigurationService.Typing) {
+                // push typing event to other conversation members
+                var conversation = ConversationService.Get(id);
+                PushService.PushToUsers(PushService.EVENT_TYPING, new TypingModel { Conversation = id, User = WeavyContext.Current.User }, conversation.MemberIds.Where(x => x != WeavyContext.Current.User.Id));
+                return new HttpStatusCodeResult(HttpStatusCode.OK);
+            }
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
         /// <summary>

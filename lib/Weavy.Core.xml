@@ -20765,6 +20765,11 @@
             Gets names of plugin assemblies (<c>weavy.plugin-assemblies</c>).
             </summary>
         </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.Presence">
+            <summary>
+            Gets a value indicating if presence should be tracked. (<c>weavy.presence</c>).
+            </summary>
+        </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.ProfileProvider">
             <summary>
             Gets the configured profile provider (<c>weavy.profile-provider</c>).
@@ -20778,6 +20783,11 @@
         <member name="P:Weavy.Core.Services.ConfigurationService.Scrape">
             <summary>
             Gets a value indicating if link scraping for embeds is enabled. (<c>weavy.scrape</c>).
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.SignalrTransport">
+            <summary>
+            Gets a value indicating which transport signalr should use. (<c>weavy.signalr-transport</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.SmtpPassword">
@@ -20847,6 +20857,11 @@
         <member name="P:Weavy.Core.Services.ConfigurationService.TeamsAuthenticationUrl">
             <summary>
             Gets a value for the Teams Online default authentication url.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.Typing">
+            <summary>
+            Gets a value indicating if typing indicators are enabled. (<c>weavy.typing</c>).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.Configuration">
@@ -23622,7 +23637,7 @@
         </member>
         <member name="M:Weavy.Core.Hubs.UserIdProvider.GetUserId(Microsoft.AspNet.SignalR.IRequest)">
             <summary>
-            Returns Id or current user (instead of IPrincipal.Identity.Name).
+            Returns Id of current user (instead of IPrincipal.Identity.Name).
             </summary>
             <param name="request"></param>
             <returns></returns>

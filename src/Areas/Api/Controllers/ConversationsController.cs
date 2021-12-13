@@ -128,10 +128,13 @@ namespace Weavy.Areas.Api.Controllers {
         [ResponseType(typeof(Conversation))]
         [Route("conversations/{id:int}/typing")]
         public IHttpActionResult StartTyping(int id) {
-            var conversation = GetConversation(id);
-            // push typing event to other conversation members
-            PushService.PushToUsers(PushService.EVENT_TYPING, new { Conversation = id, User = WeavyContext.Current.User, Name = WeavyContext.Current.User.Profile.Name ?? WeavyContext.Current.User.Username }, conversation.MemberIds.Where(x => x != WeavyContext.Current.User.Id));
-            return Ok(conversation);
+            if (ConfigurationService.Typing) {
+                // push typing event to other conversation members
+                var conversation = GetConversation(id);
+                PushService.PushToUsers(PushService.EVENT_TYPING, new { Conversation = id, User = WeavyContext.Current.User, Name = WeavyContext.Current.User.Profile.Name ?? WeavyContext.Current.User.Username }, conversation.MemberIds.Where(x => x != WeavyContext.Current.User.Id));
+                return Ok(conversation);
+            }
+            return BadRequest();
         }
 
         /// <summary>

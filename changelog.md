@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.9.2 (2021-12-14)
+
+* Added option to disable realtime auto-connect after init in client. Disable using `new Weavy({ connect: false })` and manually connect `weavy.connection.connect()`.
+
 ## 8.9.1 (2021-12-13)
 
 * Added setting for toggling presence (online/offline) tracking.

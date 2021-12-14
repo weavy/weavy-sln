@@ -126,6 +126,7 @@
          * @typedef 
          * @type {Object}
          * @member
+         * @property {boolean} [connect=true] - Enable automatic realtime connect after init. When `false` connection can be started using `weavy.connection.connect()`.
          * @property {Element} [container] - Container where weavy should be placed. If no Element is provided, a &lt;weavy&gt; root is created next to the &lt;body&gt;-element.
          * @property {string} [className] - Additional classNames added to weavy.
          * @property {string} [https=adaptive] - How to enforce https-links. <br> • **force** -  makes urls https.<br> • **adaptive** - enforces https if the calling site uses https.<br> • **default** - makes no change.
@@ -669,7 +670,7 @@
 
             loadClientData().then(function () {
                 var wFrameStatusCheck = frameStatusCheck.call(weavy);
-                var wConnectionInit = weavy.connection.init(true, weavy.authentication);
+                var wConnectionInit = weavy.connection.init(weavy.options.connect, weavy.authentication);
                 Promise.all([wFrameStatusCheck, wConnectionInit]).then(function () {
                     weavy.whenReady.resolve();
                 });
@@ -1548,6 +1549,7 @@
      * @example
      * // Defaults
      * Weavy.defaults = {
+     *     connect: true,
      *     container: null,
      *     className: "",
      *     https: "adaptive",
@@ -1563,6 +1565,7 @@
      *
      * @type {Object}
      * @name Weavy.defaults
+     * @property {boolean} [connect] - Enable automatic realtime connect after init. When `false` connection can be started using `weavy.connection.connect()`.
      * @property {Element} [container] - Container where weavy should be placed. If no Element is provided, a &lt;section&gt; is created next to the &lt;body&gt;-element.
      * @property {string} [className=weavy-default] - Additional classNames added to weavy.
      * @property {string} [https=adaptive] - How to enforce https-links. <br>• **force** -  makes urls https.<br>• **adaptive** -  enforces https if the calling site uses https.<br>• **default** - makes no change.
@@ -1573,6 +1576,7 @@
      * @property {string} url - The URL to the Weavy-installation to connect to.
      */
     Weavy.defaults = {
+        connect: true,
         container: null,
         https: "adaptive", // force, adaptive or default 
         init: true,

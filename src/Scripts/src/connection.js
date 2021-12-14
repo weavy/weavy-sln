@@ -154,8 +154,13 @@
             }
 
             if (connectAfterInit) {
-                // connect to the server?
-                return connect();
+                // Only explicitly connect the leader
+                return whenLeaderElected().then(function (leader) {
+                    if (leader) {
+                        connectionStart();
+                    }
+                    return whenConnected();
+                });
             } else {
                 return whenLeaderElected();
             }
@@ -182,7 +187,8 @@
                     triggerEvent("state-changed.connection.weavy", { state: state });
 
                     whenConnectionStart = connection.start({ transport: transport }).always(function () {
-                        console.debug((childConnection ? "child " : "") + "connection started")
+                        console.debug((childConnection ? "child " : "") + "connection started");
+                        wvy.postal.postToChildren({ name: "connection-started", weavyId: "wvy.connection", connectionUrl: connectionUrl });
                         whenConnected.resolve();
                     }).catch(function (error) {
                         console.warn((childConnection ? "child " : "") + "could not start connection")
@@ -215,10 +221,14 @@
 
         function disconnectAndConnect() {
             return new Promise(function (resolve) {
-                explicitlyDisconnected = false;
-                disconnect(true, false).then(function () {
-                    connect().then(resolve);
-                });
+                if (!childConnection && connection.state !== states.disconnected) {
+                    explicitlyDisconnected = false;
+                    disconnect(true, false).then(function () {
+                        connect().then(resolve);
+                    });
+                } else {
+                    resolve();
+                }
             });
         }
 
@@ -432,7 +442,7 @@
                     connection.start({ transport: transport }).catch((reason) => {
                         console.warn("could not connect", reason)
 
-                    });;
+                    });
                     reconnecting = false;
                 } else {
                     // connection dropped, try to connect again after 5s
@@ -440,7 +450,6 @@
                         if (window.navigator.onLine) {
                             connection.start({ transport: transport }).catch((reason) => {
                                 console.warn("could not reconnect", reason)
-
                             });
                             window.clearInterval(_reconnectInterval)
                         } else {
@@ -657,7 +666,7 @@
                 WeavyUtils.ready(function () {
                     setTimeout(function () {
                         if (_connections.size === 1) {
-                            connection.init(wvy.authentication.default);
+                            connection.init(true, wvy.authentication.default);
                         }
                     }, 1);
                 });

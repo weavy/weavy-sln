@@ -169,11 +169,11 @@
     <Reference Include="Mammoth, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Mammoth.1.4.0.0\lib\net45\Mammoth.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.2\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.NotificationHubs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Azure.NotificationHubs.3.3.0\lib\netstandard2.0\Microsoft.Azure.NotificationHubs.dll</HintPath>
@@ -364,17 +364,17 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.9.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.10.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.9.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.10.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.9.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.10.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.9.2.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.10.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>
@@ -3584,7 +3584,6 @@
     <Content Include="Scripts\vendor\codemirror\htmlmixed.js" />
     <Content Include="Scripts\vendor\codemirror\javascript.js" />
     <Content Include="Scripts\vendor\codemirror\xml.js" />
-    <Content Include="Scripts\vendor\commonmark\commonmark.min.js" />
     <Content Include="Scripts\vendor\corejs-typeahead\typeahead.jquery.min.js" />
     <Content Include="Scripts\vendor\emojione\emojione.js" />
     <Content Include="Scripts\vendor\expanding-textareas\expanding.jquery.js" />
@@ -3592,7 +3591,6 @@
     <Content Include="Scripts\vendor\jquery\jquery.version.js" />
     <Content Include="Scripts\vendor\jquery-textcomplete\jquery.textcomplete.min.js" />
     <Content Include="Scripts\vendor\jquery.idle\jquery.idle.min.js" />
-    <Content Include="Scripts\vendor\jsbridge\mt.js" />
     <Content Include="Scripts\vendor\mousetrap\mousetrap-global-bind.min.js" />
     <Content Include="Scripts\vendor\mousetrap\mousetrap.min.js" />
     <Content Include="Scripts\vendor\overlayscrollbars\jquery.overlayScrollbars.min.js" />

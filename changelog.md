@@ -1,5 +1,23 @@
 # Changelog for Weavy
 
+## 8.10.0 (2022-01-11)
+
+* Updated SignalR to v2.4.2 to improve realtime connection
+* Updated 3rd-party javascript libraries
+  - CodeMirror v5.65.0
+  - jQuery v3.6.0
+  - jQuery-textcomplete v1.8.5
+  - Mousetrap v1.6.5
+  - OverlayScollbars v1.13.1
+  - Popper.js v1.16.1
+  - PrismJS v1.26.0
+  - Select2 v4.0.13
+  - TinyMCE v5.10.2
+  - Twitter-text v2.0.5
+  - Typeahead v1.3.1
+  - Underscore v1.13.2
+* Removed some legacy javascript libraries
+
 ## 8.9.2 (2021-12-14)
 
 * Added option to disable realtime auto-connect after init in client. Disable using `new Weavy({ connect: false })` and manually connect `weavy.connection.connect()`.

@@ -1,5 +1,5 @@
 /*!
- * twitter-text 2.0.4
+ * twitter-text 2.0.5
  *
  * Copyright 2012 Twitter, Inc.
  *

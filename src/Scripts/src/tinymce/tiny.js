@@ -14,6 +14,7 @@ wvy.tiny = (function ($) {
 
             setTimeout(function () {
                 tinymce.init({
+                    deprecation_warnings: false,
                     selector: '.html-editor',
                     skin_url: window.tinymceSkinURL,
                     content_css: window.tinymceContentURL,

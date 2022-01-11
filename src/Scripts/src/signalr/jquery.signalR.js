@@ -1,16 +1,14 @@
-﻿/* jquery.signalR.core.js */
+/* jquery.signalR.core.js */
 /*global window:false */
 /*!
- * ASP.NET SignalR JavaScript Library 2.4.0
+ * ASP.NET SignalR JavaScript Library 2.4.2
  * http://signalr.net/
  *
  * Copyright (c) .NET Foundation. All rights reserved.
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
  *
  * CHANGES BY WEAVY:
- * changed window.jQuery to scoped jQuery 
- * changed window.encodeURIComponent() to encodeURIComponent() (because of issue with Firefox browser extension)
- * adedd local variable asyncLocal to ajaxAbort (as a workaround because our minification fails otherwise)
+ * added local variable asyncLocal to ajaxAbort (as a workaround because our minification fails otherwise)
  * stop early return after subsequent calls to start, we need to do check for crossdomain and set connection.withCredentials
  */
 (function ($, window, undefined) {
@@ -358,7 +356,8 @@
                 lastActiveAt: new Date().getTime(),
                 beatInterval: 5000, // Default value, will only be overridden if keep alive is enabled,
                 beatHandle: null,
-                totalTransportConnectTimeout: 0 // This will be the sum of the TransportConnectTimeout sent in response to negotiate and connection.transportConnectTimeout
+                totalTransportConnectTimeout: 0, // This will be the sum of the TransportConnectTimeout sent in response to negotiate and connection.transportConnectTimeout
+                redirectQs: null
             };
             if (typeof (logging) === "boolean") {
                 this.logging = logging;
@@ -414,12 +413,16 @@
 
         state: signalR.connectionState.disconnected,
 
-        clientProtocol: "2.0",
+        clientProtocol: "2.1",
 
         // We want to support older servers since the 2.0 change is to support redirection results, which isn't
         // really breaking in the protocol. So if a user updates their client to 2.0 protocol version there's
-        // no reason they can't still connect to a 1.5 server.
-        supportedProtocols: ["1.5", "2.0"],
+        // no reason they can't still connect to a 1.5 server. The 2.1 protocol is sent by the client so the SignalR
+        // service knows the client will use they query string returned via the RedirectUrl for subsequent requests.
+        // It doesn't matter whether the server reflects back 2.1 or continues using 2.0 as the protocol version.
+        supportedProtocols: ["1.5", "2.0", "2.1"],
+
+        negotiateRedirectSupportedProtocols: ["2.0", "2.1"],
 
         reconnectDelay: 2000,
 
@@ -446,7 +449,6 @@
                 deferred = connection._deferral || $.Deferred(), // Check to see if there is a pre-existing deferral that's being built on, if so we want to keep using it
                 parser = window.document.createElement("a"),
                 setConnectionUrl = function (connection, url) {
-
                     // NOTE: commented out next three lines - we need to check for cross domain and set withCredentials
                     //if (connection.url === url && connection.baseUrl) {
                     //    // when the url related properties are already set
@@ -565,12 +567,12 @@
 
             connection.withCredentials = config.withCredentials;
 
-            setConnectionUrl(connection, connection.url);
-
             // Save the original url so that we can reset it when we stop and restart the connection
             connection._originalUrl = connection.url;
 
             connection.ajaxDataType = config.jsonp ? "jsonp" : "text";
+
+            setConnectionUrl(connection, connection.url);
 
             $(connection).bind(events.onStart, function (e, data) {
                 if ($.type(callback) === "function") {
@@ -627,7 +629,9 @@
                             signalR.transports._logic.monitorKeepAlive(connection);
                         }
 
-                        signalR.transports._logic.startHeartbeat(connection);
+                        if (connection._.keepAliveData.activated) {
+                            signalR.transports._logic.startHeartbeat(connection);
+                        }
 
                         // Used to ensure low activity clients maintain their authentication.
                         // Must be configured once a transport has been decided to perform valid ping requests.
@@ -742,8 +746,10 @@
                             return;
                         }
 
-                        // Check for a redirect response (which must have a ProtocolVersion of 2.0)
-                        if (res.ProtocolVersion === "2.0") {
+                        // Check for a redirect response (which must have a ProtocolVersion of 2.0 or greater)
+                        // ProtocolVersion 2.1 is the highest supported by the client, so we can just check for 2.0 or 2.1 for now
+                        // instead of trying to do proper version string comparison in JavaScript.
+                        if (connection.negotiateRedirectSupportedProtocols.indexOf(res.ProtocolVersion) !== -1) {
                             if (res.Error) {
                                 protocolError = signalR._.error(signalR._.format(resources.errorFromServer, res.Error));
                                 $(connection).triggerHandler(events.onError, [protocolError]);
@@ -764,7 +770,11 @@
                                 connection.log("Received redirect to: " + res.RedirectUrl);
                                 connection.accessToken = res.AccessToken;
 
-                                setConnectionUrl(connection, res.RedirectUrl);
+                                var splitUrlAndQs = res.RedirectUrl.split("?", 2);
+                                setConnectionUrl(connection, splitUrlAndQs[0]);
+
+                                // Update redirectQs with query string from only the most recent RedirectUrl.
+                                connection._.redirectQs = splitUrlAndQs.length === 2 ? splitUrlAndQs[1] : null;
 
                                 if (connection.ajaxDataType === "jsonp" && connection.accessToken) {
                                     onFailed(signalR._.error(resources.jsonpNotSupportedWithAccessToken), connection);
@@ -1038,7 +1048,13 @@
 
             // Reset the URL and clear the access token
             delete connection.accessToken;
+            delete connection.protocol;
+            delete connection.host;
+            delete connection.baseUrl;
+            delete connection.wsProtocol;
+            delete connection.contentType;
             connection.url = connection._originalUrl;
+            connection._.redirectQs = null;
 
             // Trigger the disconnect event
             changeState(connection, connection.state, signalR.connectionState.disconnected);
@@ -1069,7 +1085,7 @@
 
     $.connection = $.signalR = signalR;
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.transports.common.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -1351,15 +1367,20 @@
             // Use addQs to start since it handles the ?/& prefix for us
             preparedUrl = transportLogic.addQs(url, "clientProtocol=" + connection.clientProtocol);
 
-            // Add the user-specified query string params if any
-            preparedUrl = transportLogic.addQs(preparedUrl, connection.qs);
+            if (typeof (connection._.redirectQs) === "string") {
+                // Add the redirect-specified query string params if any
+                preparedUrl = transportLogic.addQs(preparedUrl, connection._.redirectQs);
+            } else {
+                // Otherwise, add the user-specified query string params if any
+                preparedUrl = transportLogic.addQs(preparedUrl, connection.qs);
+            }
 
             if (connection.token) {
-                preparedUrl += "&connectionToken=" + encodeURIComponent(connection.token);
+                preparedUrl += "&connectionToken=" + window.encodeURIComponent(connection.token);
             }
 
             if (connection.data) {
-                preparedUrl += "&connectionData=" + encodeURIComponent(connection.data);
+                preparedUrl += "&connectionData=" + window.encodeURIComponent(connection.data);
             }
 
             return preparedUrl;
@@ -1398,7 +1419,7 @@
                 qs = "transport=" + transport;
 
             if (!ajaxPost && connection.groupsToken) {
-                qs += "&groupsToken=" + encodeURIComponent(connection.groupsToken);
+                qs += "&groupsToken=" + window.encodeURIComponent(connection.groupsToken);
             }
 
             if (!reconnecting) {
@@ -1412,7 +1433,7 @@
                 }
 
                 if (!ajaxPost && connection.messageId) {
-                    qs += "&messageId=" + encodeURIComponent(connection.messageId);
+                    qs += "&messageId=" + window.encodeURIComponent(connection.messageId);
                 }
             }
             url += "?" + qs;
@@ -1421,7 +1442,7 @@
             // With sse or ws, access_token in request header is not supported
             if (connection.transport && connection.accessToken) {
                 if (connection.transport.name === "serverSentEvents" || connection.transport.name === "webSockets") {
-                    url += "&access_token=" + encodeURIComponent(connection.accessToken);
+                    url += "&access_token=" + window.encodeURIComponent(connection.accessToken);
                 }
             }
 
@@ -1510,31 +1531,45 @@
                 return;
             }
 
+            // NOTE: our minification fails on the next line - introduced local variable (async) as a workaround
             // Async by default unless explicitly overidden
-            //async = typeof async === "undefined" ? true : async;
             var asyncLocal = typeof async === "undefined" ? true : async;
 
             var url = getAjaxUrl(connection, "/abort");
 
-            transportLogic.ajax(connection, {
-                url: url,
-                async: asyncLocal,
-                timeout: 1000,
-                type: "POST",
-                headers: connection.accessToken ? { "Authorization": "Bearer " + connection.accessToken } : {},
-                dataType: "text" // We don't want to use JSONP here even when JSONP is enabled
-            });
+            var requestHeaders = connection.accessToken ? { "Authorization": "Bearer " + connection.accessToken } : {};
+
+            //option #1 - send "fetch" with keepalive
+            if (window.fetch) {
+                // use the fetch API with keepalive
+                window.fetch(url, {
+                    method: "POST",
+                    keepalive: true,
+                    headers: requestHeaders
+                });
+            }
+            else { 
+                // fetch is not available - fallback to $.ajax
+                transportLogic.ajax(connection, {
+                    url: url,
+                    async: asyncLocal,
+                    timeout: 1000,
+                    type: "POST",
+                    headers: requestHeaders,
+                    dataType: "text" // We don't want to use JSONP here even when JSONP is enabled
+                });
+            }
 
             connection.log("Fired ajax abort async = " + async + ".");
         },
 
         ajaxStart: function (connection, onSuccess) {
             var rejectDeferred = function (error) {
-                var deferred = connection._deferral;
-                if (deferred) {
-                    deferred.reject(error);
-                }
-            },
+                    var deferred = connection._deferral;
+                    if (deferred) {
+                        deferred.reject(error);
+                    }
+                },
                 triggerStartError = function (error) {
                     connection.log("The start request failed. Stopping the connection.");
                     $(connection).triggerHandler(events.onError, [error]);
@@ -1608,7 +1643,7 @@
         processMessages: function (connection, minData, onInitialized) {
             var data;
 
-            if (minData && (typeof minData.I !== "undefined")) {
+            if(minData && (typeof minData.I !== "undefined")) {
                 // This is a response to a message the client sent
                 transportLogic.triggerReceived(connection, minData);
                 return;
@@ -1626,6 +1661,7 @@
                     connection.log("Received an error message from the server: " + minData.E);
                     $(connection).triggerHandler(signalR.events.onError, [signalR._.error(minData.E, /* source */ "ServerError")]);
                     connection.stop(/* async */ false, /* notifyServer */ false);
+                    return;
                 }
 
                 transportLogic.updateGroups(connection, data.GroupsToken);
@@ -1692,6 +1728,7 @@
 
         markLastMessage: function (connection) {
             connection._.lastMessageAt = new Date().getTime();
+            connection._.lastActiveAt = connection._.lastMessageAt;
         },
 
         markActive: function (connection) {
@@ -1705,13 +1742,13 @@
 
         isConnectedOrReconnecting: function (connection) {
             return connection.state === signalR.connectionState.connected ||
-                connection.state === signalR.connectionState.reconnecting;
+                   connection.state === signalR.connectionState.reconnecting;
         },
 
         ensureReconnectingState: function (connection) {
             if (changeState(connection,
-                signalR.connectionState.connected,
-                signalR.connectionState.reconnecting) === true) {
+                        signalR.connectionState.connected,
+                        signalR.connectionState.reconnecting) === true) {
                 $(connection).triggerHandler(events.onReconnecting);
             }
             return connection.state === signalR.connectionState.reconnecting;
@@ -1725,15 +1762,19 @@
         },
 
         verifyLastActive: function (connection) {
-            if (new Date().getTime() - connection._.lastActiveAt >= connection.reconnectWindow) {
-                var message = signalR._.format(signalR.resources.reconnectWindowTimeout, new Date(connection._.lastActiveAt), connection.reconnectWindow);
-                connection.log(message);
-                $(connection).triggerHandler(events.onError, [signalR._.error(message, /* source */ "TimeoutException")]);
-                connection.stop(/* async */ false, /* notifyServer */ false);
-                return false;
+            // If there is no keep alive configured, we cannot assume that timer callbacks will
+            // run frequently enough to keep lastActiveAt updated.
+            // https://github.com/SignalR/SignalR/issues/4536
+            if (!connection._.keepAliveData.activated ||
+                new Date().getTime() - connection._.lastActiveAt < connection.reconnectWindow) {
+                return true;
             }
 
-            return true;
+            var message = signalR._.format(signalR.resources.reconnectWindowTimeout, new Date(connection._.lastActiveAt), connection.reconnectWindow);
+            connection.log(message);
+            $(connection).triggerHandler(events.onError, [signalR._.error(message, /* source */ "TimeoutException")]);
+            connection.stop(/* async */ false, /* notifyServer */ false);
+            return false;
         },
 
         reconnect: function (connection, transportName) {
@@ -1788,7 +1829,7 @@
         }
     };
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.transports.webSockets.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -1824,7 +1865,7 @@
                         ex,
                         connection.socket
                     ),
-                        data]);
+                    data]);
             }
         },
 
@@ -1859,8 +1900,8 @@
                     transportLogic.clearReconnectTimeout(connection);
 
                     if (changeState(connection,
-                        signalR.connectionState.reconnecting,
-                        signalR.connectionState.connected) === true) {
+                                    signalR.connectionState.reconnecting,
+                                    signalR.connectionState.connected) === true) {
                         $connection.triggerHandler(events.onReconnect);
                     }
                 };
@@ -1938,7 +1979,7 @@
         }
     };
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.transports.serverSentEvents.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -2019,7 +2060,7 @@
                         }
                     }
                 },
-                    that.timeOut);
+                that.timeOut);
             }
 
             connection.eventSource.addEventListener("open", function (e) {
@@ -2032,8 +2073,8 @@
                     opened = true;
 
                     if (changeState(connection,
-                        signalR.connectionState.reconnecting,
-                        signalR.connectionState.connected) === true) {
+                                         signalR.connectionState.reconnecting,
+                                         signalR.connectionState.connected) === true) {
                         $connection.triggerHandler(events.onReconnect);
                     }
                 }
@@ -2122,7 +2163,7 @@
         }
     };
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.transports.foreverFrame.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -2378,7 +2419,7 @@
         }
     };
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.transports.longPolling.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -2434,8 +2475,8 @@
                     privateData.reconnectTimeoutId = null;
 
                     if (changeState(instance,
-                        signalR.connectionState.reconnecting,
-                        signalR.connectionState.connected) === true) {
+                                    signalR.connectionState.reconnecting,
+                                    signalR.connectionState.connected) === true) {
                         // Successfully reconnected!
                         instance.log("Raising the reconnect event");
                         $(instance).triggerHandler(events.onReconnect);
@@ -2641,7 +2682,7 @@
         }
     };
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.hubs.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -2711,6 +2752,13 @@
         }
     }
 
+    function isCallbackFromGeneratedHubProxy(callback) {
+        // https://github.com/SignalR/SignalR/issues/4310
+        // The stringified callback from the old generated hub proxy is 137 characters in Edge, Firefox and Chrome.
+        // We slice to avoid wasting too many cycles searching through the text of a long large function.
+        return $.isFunction(callback) && callback.toString().slice(0, 256).indexOf("// Call the client hub method") >= 0;
+    }
+
     // hubProxy
     function hubProxy(hubConnection, hubName) {
         /// <summary>
@@ -2742,14 +2790,15 @@
             /// <param name="callback" type="Function">The callback to be invoked.</param>
             /// <param name="callbackIdentity" type="Object">An optional object to use as the "identity" for the callback when checking if the handler has already been registered. Defaults to the value of 'callback' if not provided.</param>
             var that = this,
-                callbackMap = that._.callbackMap;
+                callbackMap = that._.callbackMap,
+                isFromOldGeneratedHubProxy = !callbackIdentity && isCallbackFromGeneratedHubProxy(callback);
 
             // We need the third "identity" argument because the registerHubProxies call made by signalr/js wraps the user-provided callback in a custom wrapper which breaks the identity comparison.
             // callbackIdentity allows the caller of `on` to provide a separate object to use as the "identity". `registerHubProxies` uses the original user callback as this identity object.
             callbackIdentity = callbackIdentity || callback;
 
             // Assign a global ID to the identity object. This tags the object so we can detect the same object when it comes back.
-            if (!callbackIdentity._signalRGuid) {
+            if(!callbackIdentity._signalRGuid) {
                 callbackIdentity._signalRGuid = nextGuid++;
             }
 
@@ -2766,7 +2815,7 @@
             // Check if there's already a registration
             var registration;
             for (var i = 0; i < callbackSpace.length; i++) {
-                if (callbackSpace[i].guid === callbackIdentity._signalRGuid) {
+                if (callbackSpace[i].guid === callbackIdentity._signalRGuid || (isFromOldGeneratedHubProxy && callbackSpace[i].isFromOldGeneratedHubProxy)) {
                     registration = callbackSpace[i];
                 }
             }
@@ -2775,7 +2824,8 @@
             if (!registration) {
                 registration = {
                     guid: callbackIdentity._signalRGuid,
-                    eventHandlers: []
+                    eventHandlers: [],
+                    isFromOldGeneratedHubProxy: isFromOldGeneratedHubProxy
                 };
                 callbackMap[eventName].push(registration);
             }
@@ -2797,7 +2847,8 @@
             /// <param name="callbackIdentity" type="Object">An optional object to use as the "identity" when looking up the callback. Corresponds to the same parameter provided to 'on'. Defaults to the value of 'callback' if not provided.</param>
             var that = this,
                 callbackMap = that._.callbackMap,
-                callbackSpace;
+                callbackSpace,
+                isFromOldGeneratedHubProxy = !callbackIdentity && isCallbackFromGeneratedHubProxy(callback);
 
             callbackIdentity = callbackIdentity || callback;
 
@@ -2814,7 +2865,7 @@
                     var callbackRegistration;
                     var callbackIndex;
                     for (var i = 0; i < callbackSpace.length; i++) {
-                        if (callbackSpace[i].guid === callbackIdentity._signalRGuid) {
+                        if (callbackSpace[i].guid === callbackIdentity._signalRGuid || (isFromOldGeneratedHubProxy && callbackSpace[i].isFromOldGeneratedHubProxy)) {
                             callbackIndex = i;
                             callbackRegistration = callbackSpace[i];
                         }
@@ -3110,7 +3161,7 @@
 
     $.hubConnection = hubConnection;
 
-}(jQuery, window));
+}(window.jQuery, window));
 /* jquery.signalR.version.js */
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
@@ -3120,5 +3171,5 @@
 /// <reference path="jquery.signalR.core.js" />
 (function ($, undefined) {
     // This will be modified by the build script
-    $.signalR.version = "2.4.0";
-}(jQuery));
+    $.signalR.version = "2.4.2";
+}(window.jQuery));

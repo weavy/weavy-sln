@@ -39,7 +39,8 @@ wvy.fileupload = (function ($) {
 
         beforeUpload($input, files).then(
             function () {
-                // show progress
+                // reset and show progress
+                $progressBar.removeClass("bg-danger");
                 $progress.removeClass("d-none");
 
                 // add files to formdata object
@@ -78,6 +79,7 @@ wvy.fileupload = (function ($) {
                         $progressBar.removeClass("progress-bar-striped progress-bar-animated").css("width", "0%");
                     });
                 }).fail(function (xhr, status, error) {
+                    $progressBar.addClass("bg-danger");
                     console.error(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : error);
                 }).always(function () {
                     // activate input

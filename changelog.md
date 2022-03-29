@@ -1,5 +1,10 @@
 # Changelog for Weavy
 
+## 8.11.0 (2022-03-29)
+
+* Added indicator for failed file uploads.
+* Fixed issue where non white-listed files where temporarily saved to disk.
+
 ## 8.10.0 (2022-01-11)
 
 * Updated SignalR to v2.4.2 to improve realtime connection

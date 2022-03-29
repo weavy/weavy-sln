@@ -302,10 +302,10 @@ wvy.messenger = (function ($) {
             var os = $("#messages-scroll.os-host").overlayScrollbars()
             if (os) {
                 if (e.matches) {
-                    console.debug("overlayScrollbars wake");
+                    //console.debug("overlayScrollbars wake");
                     os.update()
                 } else {
-                    console.debug("overlayScrollbars sleep");
+                    //console.debug("overlayScrollbars sleep");
                     os.sleep();
                 }
             }
@@ -920,16 +920,16 @@ wvy.messenger = (function ($) {
 
     // update gui because a message was received
     wvy.connection.default.on("message-inserted.weavy", function (event, message) {
-        console.debug("received message " + message.id + " in conversation " + message.conversation);
+        //console.debug("received message " + message.id + " in conversation " + message.conversation);
 
         if (message.createdBy.id !== wvy.context.user) {
             if (_id === message.conversation && wvy.presence.isActive() && document.hasFocus()) {
                 // mark conversation as read (also tells server that message was delivered)
-                console.debug("marking conversation " + message.conversation + " as read");
+                //console.debug("marking conversation " + message.conversation + " as read");
                 $.post(wvy.url.resolve(_prefix + "/c/" + message.conversation + "/read"));
             } else {
                 // let server know that we received the message
-                console.debug("marking conversation " + message.conversation + " as delivered");
+                //console.debug("marking conversation " + message.conversation + " as delivered");
                 $.post(wvy.url.resolve(_prefix + "/c/" + message.conversation + "/delivered"));
             }
 
@@ -969,7 +969,7 @@ wvy.messenger = (function ($) {
         // wait for all ajax requests to complete
         $.when(d0, d1, d2).then(function (a0, a1, a2) {
             if (a0) {
-                console.debug("updating #conversations (" + event.type + ")");
+                //console.debug("updating #conversations (" + event.type + ")");
                 var $html = $(a0[0]);
                 if (_id === message.conversation) {
                     $html.addClass("active");
@@ -1008,7 +1008,7 @@ wvy.messenger = (function ($) {
             }
 
             if (a1) {
-                console.debug("updating #messages (" + event.type + ")");
+                //console.debug("updating #messages (" + event.type + ")");
 
                 // remove temporary sending message
                 if (message.createdBy.id === wvy.context.user) {
@@ -1023,7 +1023,7 @@ wvy.messenger = (function ($) {
 
 
             if (a2) {
-                console.debug("updating members (" + event.type + ")");
+                //console.debug("updating members (" + event.type + ")");
                 $("#info-modal .modal-body").html($(".modal-body", $(a2[0])).html());
             }
 
@@ -1037,7 +1037,7 @@ wvy.messenger = (function ($) {
 
     // update gui because a message was updated
     wvy.connection.default.on("message-updated.weavy", function (event, message) {
-        console.debug("received updated message " + message.id + " in conversation " + message.conversation);
+        //console.debug("received updated message " + message.id + " in conversation " + message.conversation);
 
         // get html for message        
         if (message.conversation === _id && $("#main").is(":visible")) {
@@ -1053,12 +1053,12 @@ wvy.messenger = (function ($) {
 
     // update gui because message was delivered
     wvy.connection.default.on("conversation-delivered.weavy", function (event, data) {
-        console.debug("conversation " + data.conversation.id + " was delivered to user " + data.user.id);
+        //console.debug("conversation " + data.conversation.id + " was delivered to user " + data.user.id);
 
         // update #messages if needed
         if (_id === data.conversation.id && $("#messages .status-sent").length) {
             $.get({ url: wvy.url.resolve(_prefix + "/c/" + data.conversation.id + "/messages"), cache: false }).done(function (data) {
-                console.debug("updating #messages (" + event.type + ")");
+                //console.debug("updating #messages (" + event.type + ")");
                 $("#messages").html(data);
                 scrollToBottomOfMessages();
             });
@@ -1067,7 +1067,7 @@ wvy.messenger = (function ($) {
 
     // update gui because conversation was deleted
     wvy.connection.default.on("conversation-deleted.weavy", function (event, data) {
-        console.debug("conversation " + data.id + " was deleted");
+        //console.debug("conversation " + data.id + " was deleted");
 
         // update or reload if needed
         if (_id === data.id) {
@@ -1084,7 +1084,7 @@ wvy.messenger = (function ($) {
         var conversation = data.conversation;
         var user = data.user;
 
-        console.debug("conversation " + conversation.id + " was " + (conversation.isRead ? "read" : "unread") + " by " + (user.id === wvy.context.user ? "me" : "user " + user.id));
+        //console.debug("conversation " + conversation.id + " was " + (conversation.isRead ? "read" : "unread") + " by " + (user.id === wvy.context.user ? "me" : "user " + user.id));
 
         if (user.id === wvy.context.user) {
             // update gui (since conversation could have been read/unread in another browser window)
@@ -1094,7 +1094,7 @@ wvy.messenger = (function ($) {
         if (_id === conversation.id && $("#main").is(":visible")) {
             // get html for #messages (to render updated status indicators)
             $.get({ url: wvy.url.resolve(_prefix + "/c/" + conversation.id + "/messages"), cache: false }, function (html) {
-                console.debug("updating #messages (" + event.type + ")");
+                //console.debug("updating #messages (" + event.type + ")");
                 $("#messages").html(html);
                 scrollToBottomOfMessages();
             });
@@ -1653,13 +1653,18 @@ wvy.messenger = (function ($) {
 
     var showUploadedBlobs = function (blobs) {
         return new Promise(function (resolve, reject) {
-            // call server to get partial html for uploaded files
-            var qs = "?" + blobs.map(function (x) { return "ids=" + x.id; }).join("&");
-            $.get(wvy.url.resolve("/content/blobs" + qs), function (html) {
-                $(".table-uploads").append(html);
-                saveMessageForm(false);
+            if (blobs && blobs.length) {
+                // call server to get partial html for uploaded files
+                var qs = "?" + blobs.map(function (x) { return "ids=" + x.id; }).join("&");
+                $.get(wvy.url.resolve("/content/blobs" + qs), function (html) {
+                    $(".table-uploads").append(html);
+                    saveMessageForm(false);
+                    resolve();
+                });
+            } else {
+                console.warn("No blobs were uploaded.")
                 resolve();
-            });
+            }
         });
     }
 

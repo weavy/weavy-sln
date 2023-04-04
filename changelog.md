@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.11.1 (2023-04-04)
+
+* Display the name of the user rather than username when a user is added to or leaves a conversation.
+
 ## 8.11.0 (2022-03-29)
 
 * Added indicator for failed file uploads.

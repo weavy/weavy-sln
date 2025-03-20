@@ -669,6 +669,29 @@
             To override the default url - make sure your implementation of the hook sets this property.
             </summary>
         </member>
+        <member name="T:Weavy.Core.Plugins.AutomaticCheckInDaemon">
+            <summary>
+            A daemon that nudges people to perform their daily and weekly checkins.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.AutomaticCheckInDaemon.DailyId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Plugins.AutomaticCheckInDaemon.WeeklyId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Plugins.AutomaticCheckInDaemon.Run(System.Threading.CancellationToken,System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="token"></param>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
         <member name="T:Weavy.Core.Plugins.ZoomProxyDaemon">
             <summary>
             A daemon that checks various license related tasks.
@@ -3513,6 +3536,16 @@
         <member name="T:Weavy.Core.Models.Posts">
             <summary>
             An app with a message stream.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Models.Posts.Description">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Models.Posts.Prompt">
+            <summary>
+            Prompt to display in the textbox, e.g. "What's on your mind?"
             </summary>
         </member>
         <member name="T:Weavy.Core.Models.IApp">
@@ -12724,6 +12757,20 @@
             <param name="date">The (UTC) date to return as text.</param>        
             <param name="tz"></param>
             <returns>Returns the time from now, e.g. "3 hours ago".</returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.DateUtils.IsWeekday(System.DateTime)">
+            <summary>
+            Returns a value indicating whether <paramref name="date"/> is a weekday (Mon-Fri).
+            </summary>
+            <param name="date"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Utils.DateUtils.IsWeekend(System.DateTime)">
+            <summary>
+            Returns a value indicating whether <paramref name="date"/> is a weekend (Sat-Sun).
+            </summary>
+            <param name="date"></param>
+            <returns></returns>
         </member>
         <member name="M:Weavy.Core.Utils.DateUtils.ToLocal(System.Nullable{System.DateTime},System.TimeZoneInfo)">
             <summary>

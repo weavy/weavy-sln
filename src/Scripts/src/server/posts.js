@@ -15,6 +15,7 @@ wvy.posts = (function ($) {
                 $postEditor.weavyEditor({
                     accept: wvy.config.blobWhitelist,
                     minimized: true,
+                    placeholder: $postEditor.attr('placeholder'),
                     onSubmit: function (e, data) {
                         var $editor = $(this);
                         var $form = $editor.closest("form");

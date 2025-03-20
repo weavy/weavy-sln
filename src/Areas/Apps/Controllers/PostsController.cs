@@ -22,7 +22,7 @@ namespace Weavy.Areas.Apps.Controllers {
             var model = new PostsViewModel();
 
             if (!IsEmbedded) {
-                model.Members = SpaceService.GetMembers(WeavyContext.Current.Space.Id, new MemberQuery { Top = 6, OrderBy = "Random", Count = true });
+                model.Members = SpaceService.GetMembers(WeavyContext.Current.Space.Id, new MemberQuery { Top = PageSizes[0]/2, OrderBy = "Random", Count = true });
             }
 
             query.Top = 10; // NOTE: low number of items/page for better perf.

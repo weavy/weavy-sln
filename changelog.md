@@ -1,5 +1,12 @@
 # Changelog for Weavy
 
+## 8.12.0 (2025-03-20)
+
+* Allow multiple Posts apps in same space.
+* Added description and prompt properties to Posts app.
+* Added AutomaticCheckinDaemon that notifies people to write their daily/weekly check-ins.
+* Updated WebDAV server to fix issue with opening Microsoft Word files on Mac.
+
 ## 8.11.1 (2023-04-04)
 
 * Display the name of the user rather than username when a user is added to or leaves a conversation.

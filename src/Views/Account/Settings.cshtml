@@ -25,10 +25,12 @@
             }
             @Html.EditorsForModel(Model, group: "region")
         </fieldset>
+
         <fieldset>
             <legend>@T["Notification settings"]</legend>
             @Html.EditorsForModel(Model, group: "notifications")
         </fieldset>
+
         <fieldset>
             <legend>@T["Notification delivery"]</legend>
             <div class="notification-alerts">

@@ -1,6 +1,7 @@
 ﻿@model PostsViewModel
 @{
-    Title = Model.App.Name;
+  Title = Model.App.Name;
+  var placeholder = Model.App.Prompt ?? T["What's on your mind?"].ToString();
 }
 @if (ConfigurationService.HtmlPosts || ConfigurationService.HtmlComments) {
     @section scripts{
@@ -12,7 +13,7 @@
         <form class="card post post-form" action="@(Url.Action<PostController>(c => c.Insert(WeavyContext.App.Id, null)))" method="post" data-turboform data-turbolinks-action="replace">
             <div class="weavy-editor weavy-editor-placeholder minimized">
                 <div class="emojionearea form-control" role="application">
-                    <div class="emojionearea-editor" contenteditable="false" placeholder="@T["What's on your mind?"]" tabindex="0" dir="ltr" spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="on"></div>
+                    <div class="emojionearea-editor" contenteditable="false" placeholder="@placeholder" tabindex="0" dir="ltr" spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="on"></div>
                     <div class="emojionearea-picker emojionearea-picker-position-top emojionearea-filters-position-top emojionearea-search-position-top hidden" style="display: none;">
                         <div class="emojionearea-wrapper"></div>
                     </div>
@@ -31,7 +32,7 @@
                 </div>
             </div>
 
-            <textarea id="@(ConfigurationService.HtmlPosts ? "html" : "text")" class="form-control" name="@(ConfigurationService.HtmlPosts ? "html" : "text")" data-editor="post" style="display: none;"></textarea>
+            <textarea id="@(ConfigurationService.HtmlPosts ? "html" : "text")" class="form-control" name="@(ConfigurationService.HtmlPosts ? "html" : "text")" placeholder="@placeholder" data-editor="post" style="display: none;"></textarea>
         </form>
         <div class="card post fake-post">
             <div class="card-header media">

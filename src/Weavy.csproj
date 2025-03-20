@@ -115,11 +115,14 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="ITHit.WebDAV.Server, Version=6.1.4285.0, Culture=neutral, PublicKeyToken=d057f7b1134051b5, processorArchitecture=MSIL">
-      <HintPath>..\packages\ITHit.WebDAV.Server.6.1.4285\lib\net451\ITHit.WebDAV.Server.dll</HintPath>
+    <Reference Include="ITHit.Server, Version=12.1.11824.0, Culture=neutral, PublicKeyToken=d057f7b1134051b5, processorArchitecture=MSIL">
+      <HintPath>..\packages\ITHit.Server.12.1.11824\lib\net451\ITHit.Server.dll</HintPath>
     </Reference>
-    <Reference Include="ITHit.WebDAV.Server.Web, Version=6.1.4285.0, Culture=neutral, PublicKeyToken=d057f7b1134051b5, processorArchitecture=MSIL">
-      <HintPath>..\packages\ITHit.WebDAV.Server.Web.6.1.4285\lib\net451\ITHit.WebDAV.Server.Web.dll</HintPath>
+    <Reference Include="ITHit.WebDAV.Server, Version=12.1.11824.0, Culture=neutral, PublicKeyToken=d057f7b1134051b5, processorArchitecture=MSIL">
+      <HintPath>..\packages\ITHit.WebDAV.Server.12.1.11824\lib\net451\ITHit.WebDAV.Server.dll</HintPath>
+    </Reference>
+    <Reference Include="ITHit.WebDAV.Server.Web, Version=12.1.11824.0, Culture=neutral, PublicKeyToken=d057f7b1134051b5, processorArchitecture=MSIL">
+      <HintPath>..\packages\ITHit.WebDAV.Server.Web.12.1.11824\lib\net451\ITHit.WebDAV.Server.Web.dll</HintPath>
     </Reference>
     <Reference Include="JavaScriptEngineSwitcher.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=c608b2a8cc9e4472, processorArchitecture=MSIL">
       <HintPath>..\packages\JavaScriptEngineSwitcher.Core.3.1.0\lib\net45\JavaScriptEngineSwitcher.Core.dll</HintPath>
@@ -364,17 +367,17 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weavy.Bundler, Version=8.11.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Bundler, Version=8.12.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Bundler.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Core, Version=8.11.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Core, Version=8.12.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Weavy.Web, Version=8.11.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Weavy.Web, Version=8.12.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\Weavy.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="wvy, Version=8.11.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="wvy, Version=8.12.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\lib\wvy.exe</HintPath>
     </Reference>
   </ItemGroup>

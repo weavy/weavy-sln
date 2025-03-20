@@ -9997,7 +9997,7 @@
         </member>
         <member name="T:Weavy.Web.WebDAV.DavContext">
             <summary>
-            Implementation of <see cref="T:ITHit.WebDAV.Server.DavContextBaseAsync"/>
+            WebDAV request context. Is used by WebDAV engine to resolve path into items.
             </summary>
         </member>
         <member name="M:Weavy.Web.WebDAV.DavContext.#ctor(System.Web.HttpContext)">
@@ -10136,7 +10136,7 @@
             <param name="entity"></param>
             <param name="path"></param>
         </member>
-        <member name="M:Weavy.Web.WebDAV.DavFolder.GetChildrenAsync(System.Collections.Generic.IList{ITHit.WebDAV.Server.PropertyName})">
+        <member name="M:Weavy.Web.WebDAV.DavFolder.GetChildrenAsync(System.Collections.Generic.IList{ITHit.WebDAV.Server.PropertyName},System.Nullable{System.Int64},System.Nullable{System.Int64},System.Collections.Generic.IList{ITHit.WebDAV.Server.Paging.OrderProperty})">
             <summary>
             Gets direct children of this folder.
             </summary>
@@ -10149,7 +10149,7 @@
             Creates new WebDAV file with the specified name in this folder.
             </summary>
             <param name="name">Name of the file to create.</param>
-            <remarks>You must create a file in your repository during this call. After calling this method Engine calls <see cref="M:ITHit.WebDAV.Server.IContentAsync.WriteAsync(System.IO.Stream,System.String,System.Int64,System.Int64)"/>.</remarks>
+            <remarks>You must create a file in your repository during this call. After calling this method Engine calls <see cref="M:ITHit.Server.IContentAsync.WriteAsync(System.IO.Stream,System.String,System.Int64,System.Int64)"/>.</remarks>
             <returns>Instance of <see cref="T:ITHit.WebDAV.Server.Class1.IFileAsync"/> referring to newly created file.</returns>
         </member>
         <member name="M:Weavy.Web.WebDAV.DavFolder.CreateFolderAsync(System.String)">
@@ -10212,21 +10212,19 @@
             Gets a value indicating whether the engine shall log request data.
             </summary>
         </member>
-        <member name="M:Weavy.Web.WebDAV.DavGetHandler.ProcessRequestAsync(ITHit.WebDAV.Server.DavContextBaseAsync,ITHit.WebDAV.Server.IHierarchyItemAsync)">
+        <member name="M:Weavy.Web.WebDAV.DavGetHandler.ProcessRequestAsync(ITHit.Server.ContextAsync{ITHit.WebDAV.Server.IHierarchyItemAsync},ITHit.WebDAV.Server.IHierarchyItemAsync)">
             <summary>
             Handles GET and HEAD request.
             </summary>
-            <param name="context">Instace of <see cref="T:ITHit.WebDAV.Server.DavContextBaseAsync"/>.</param>
-            <param name="item">Instance of <see cref="T:ITHit.WebDAV.Server.IHierarchyItemAsync"/> which was returned by
-            <see cref="M:ITHit.WebDAV.Server.DavContextBaseAsync.GetHierarchyItemAsync(System.String)"/> for this request.</param>
+            <param name="context"></param>
+            <param name="item">Instance of <see cref="T:ITHit.WebDAV.Server.IHierarchyItemAsync"/> which was returned by <see cref="M:Weavy.Web.WebDAV.DavContext.GetHierarchyItemAsync(System.String)"/> for this request.</param>
         </member>
         <member name="M:Weavy.Web.WebDAV.DavGetHandler.AppliesTo(ITHit.WebDAV.Server.IHierarchyItemAsync)">
             <summary>
             This handler shall only be invoked for <see cref="T:ITHit.WebDAV.Server.Class1.IFolderAsync"/> items or if original handler (which
             this handler substitutes) shall be called for the item.
             </summary>
-            <param name="item">Instance of <see cref="T:ITHit.WebDAV.Server.IHierarchyItemAsync"/> which was returned by
-            <see cref="M:ITHit.WebDAV.Server.DavContextBaseAsync.GetHierarchyItemAsync(System.String)"/> for this request.</param>
+            <param name="item">Instance of <see cref="T:ITHit.WebDAV.Server.IHierarchyItemAsync"/> which was returned by <see cref="M:Weavy.Web.WebDAV.DavContext.GetHierarchyItemAsync(System.String)"/> for this request.</param>
             <returns>Returns <c>true</c> if this handler can handler this item.</returns>
         </member>
         <member name="T:Weavy.Web.WebDAV.DavHandler">

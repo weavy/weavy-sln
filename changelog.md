@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.12.2 (2025-06-16)
+
+* Even more WebDAV logging
+
 ## 8.12.1 (2025-06-16)
 
 * Additional WebDAV logging

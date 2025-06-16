@@ -10184,49 +10184,6 @@
             <param name="multistatus"></param>
             <returns></returns>
         </member>
-        <member name="T:Weavy.Web.WebDAV.DavGetHandler">
-            <summary>
-            This handler processes GET and HEAD requests to folders returning custom HTML page.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.WebDAV.DavGetHandler.OriginalHandler">
-            <summary>
-            Handler for GET and HEAD request registered with the engine before registering this one.
-            We call this default handler to handle GET and HEAD for files, because this handler
-            only handles GET and HEAD for folders.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.WebDAV.DavGetHandler.EnableOutputBuffering">
-            <summary>
-            Gets a value indicating whether output shall be buffered to calculate content length.
-            Don't buffer output to calculate content length.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.WebDAV.DavGetHandler.EnableOutputDebugLogging">
-            <summary>
-            Gets a value indicating whether engine shall log response data (even if debug logging is on).
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.WebDAV.DavGetHandler.EnableInputDebugLogging">
-            <summary>
-            Gets a value indicating whether the engine shall log request data.
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.WebDAV.DavGetHandler.ProcessRequestAsync(ITHit.Server.ContextAsync{ITHit.WebDAV.Server.IHierarchyItemAsync},ITHit.WebDAV.Server.IHierarchyItemAsync)">
-            <summary>
-            Handles GET and HEAD request.
-            </summary>
-            <param name="context"></param>
-            <param name="item">Instance of <see cref="T:ITHit.WebDAV.Server.IHierarchyItemAsync"/> which was returned by <see cref="M:Weavy.Web.WebDAV.DavContext.GetHierarchyItemAsync(System.String)"/> for this request.</param>
-        </member>
-        <member name="M:Weavy.Web.WebDAV.DavGetHandler.AppliesTo(ITHit.WebDAV.Server.IHierarchyItemAsync)">
-            <summary>
-            This handler shall only be invoked for <see cref="T:ITHit.WebDAV.Server.Class1.IFolderAsync"/> items or if original handler (which
-            this handler substitutes) shall be called for the item.
-            </summary>
-            <param name="item">Instance of <see cref="T:ITHit.WebDAV.Server.IHierarchyItemAsync"/> which was returned by <see cref="M:Weavy.Web.WebDAV.DavContext.GetHierarchyItemAsync(System.String)"/> for this request.</param>
-            <returns>Returns <c>true</c> if this handler can handler this item.</returns>
-        </member>
         <member name="T:Weavy.Web.WebDAV.DavHandler">
             <summary>
             This handler processes WebDAV requests.
@@ -10495,29 +10452,6 @@
             </summary>
             <param name="message"></param>
             <param name="exception"></param>
-        </member>
-        <member name="T:Weavy.Web.WebDAV.DavPage">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.WebDAV.DavPage.#ctor">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.WebDAV.DavPage.Page_Load(System.Object,System.EventArgs)">
-            <summary>
-            
-            </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
-        </member>
-        <member name="M:Weavy.Web.WebDAV.DavPage.GetPageDataAsync">
-            <summary>
-            
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:Weavy.Web.WebDAV.DavRoutingModule">
             <summary>

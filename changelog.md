@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.12.1 (2025-06-16)
+
+* Additional WebDAV logging
+
 ## 8.12.0 (2025-03-20)
 
 * Allow multiple Posts apps in same space.

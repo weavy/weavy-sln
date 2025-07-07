@@ -1,5 +1,9 @@
 # Changelog for Weavy
 
+## 8.12.3 (2025-07-07)
+
+* Prevent writing zero-length files over WebDAV.
+
 ## 8.12.2 (2025-06-16)
 
 * Even more WebDAV logging

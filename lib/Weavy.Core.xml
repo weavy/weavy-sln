@@ -20193,6 +20193,11 @@
             Authentication type for temporary cookie when signing in with open id 
             </summary>
         </member>
+        <member name="F:Weavy.Core.Services.LoginService.HMAC_AUTHENTICATION_TYPE">
+            <summary>
+            Authentication type for HMAC authentication.
+            </summary>
+        </member>
         <member name="F:Weavy.Core.Services.LoginService.WINDOWS_AUTHENTICATION_TYPE">
             <summary>
             Authentication type for Windows authentication and cookie based authentication against Active Directory   
@@ -23362,12 +23367,13 @@
             <param name="newPassword">The new password.</param>
             <returns><c>true</c> if the update was successful; otherwise, <c>false</c>.</returns>
         </member>
-        <member name="M:Weavy.Core.Services.UserService.SetIdentity(Weavy.Core.Models.User,System.Boolean)">
+        <member name="M:Weavy.Core.Services.UserService.SetIdentity(Weavy.Core.Models.User,System.Boolean,System.String)">
             <summary>
             Attach an <see cref="T:System.Security.Claims.ClaimsIdentity"/> to the specified <see cref="T:Weavy.Core.Models.User"/>.
             </summary>
             <param name="user">The user for which to create and attach a <see cref="T:System.Security.Claims.ClaimsIdentity"/> object.</param>
             <param name="authenticated"><c>true</c> to attach an authenticated identity, otherwise <c>false</c>.</param>
+            <param name="authenticationType"></param>
         </member>
         <member name="M:Weavy.Core.Services.UserService.GeneratePassword(System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary>

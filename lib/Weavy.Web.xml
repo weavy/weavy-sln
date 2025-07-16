@@ -7978,6 +7978,68 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions">
+            <summary>
+            Provides options to configure HMAC Authentication Middleware.
+            </summary>
+        </member>
+        <member name="P:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions.RootPath">
+            <summary>
+            Specifies the root path to protect.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions"/> class.
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationExtensions">
+            <summary>
+            Provides extension methods to add HMAC authentication middleware.sing app.UseXXX() pattern.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationExtensions.UseHMACAuthentication(Owin.IAppBuilder,Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions)">
+            <summary>
+            Adds HMAC authentication middleware to the OWIN project (using passed <see cref="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions"/> class).
+            </summary>
+        </member>
+        <member name="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationHandler">
+            <summary>
+            OWIN middleware that implements HMAC authentication.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationHandler.#ctor(Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationHandler"/> class.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationHandler.AuthenticateCoreAsync">
+            <summary>
+            The core authentication logic which must be provided by the handler. Will be invoked at most
+            once per request. Do not call directly, call the wrapping Authenticate method instead.
+            </summary>
+            <returns>
+            The ticket data provided by the authentication logic
+            </returns>
+        </member>
+        <member name="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationMiddleware">
+            <summary>
+            Implements HMAC Authentication. 
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationMiddleware.#ctor(Microsoft.Owin.OwinMiddleware,Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationMiddleware"/> class.
+            </summary>
+            <param name="next">The next.</param>
+            <param name="options">The options.</param>
+        </member>
+        <member name="M:Weavy.Web.Owin.HMACAuthentication.HMACAuthenticationMiddleware.CreateHandler">
+            <summary>
+            Creates the handler for HMAC Authentication.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Weavy.Web.Owin.TokenAuthentication.WeavyIOAuthBearerAuthenticationProvider">
             <summary>
             Specifies callback methods which the Microsoft.Owin.Security.OAuth.OAuthBearerAuthenticationMiddleware invokes to enable developer control over the authentication process.

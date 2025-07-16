@@ -1,4 +1,8 @@
-# Changelog for Weavy
+﻿# Changelog for Weavy
+
+## 8.13.0 (2025-07-16)
+
+* Use HMAC authentication for WebDAV requests.
 
 ## 8.12.3 (2025-07-07)
 

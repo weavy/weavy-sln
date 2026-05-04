@@ -1,5 +1,9 @@
 ﻿# Changelog for Weavy
 
+## 8.13.1 (2026-05-04)
+
+* Prevent PK violation when current version is already in versions table
+
 ## 8.13.0 (2025-07-16)
 
 * Use HMAC authentication for WebDAV requests.

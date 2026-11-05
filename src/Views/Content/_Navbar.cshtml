@@ -14,7 +14,7 @@
             if (Model is IFile file) {
                 if (file.Blob.Link != null) {
                     <a class="btn btn-icon" href="@file.Blob.Link" target="_blank" title="Open in @file.Blob.Provider">@Svg.Icon(file.Blob.Provider.ToKebabCase(), "native")</a>
-                } else if (FileUtils.IsOfficeDocument(file.Name)) {
+                } else if (FileUtils.IsOfficeDocument(file.Name) && DavService.TokensEnabled) {
                     <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="@T["Open in {0}", OfficeUtils.GetProductName(file.Name)]">@Svg.Icon(Model, "native")</a>
                 }
             }

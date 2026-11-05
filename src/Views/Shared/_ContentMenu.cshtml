@@ -16,7 +16,7 @@
             if (file.Blob.Link != null) {
                 <a class="dropdown-item" href="@file.Blob.Link" target="_blank">@Svg.Icon(file.Blob.Provider.ToKebabCase(), "native")<span>@T["Open in {0}", file.Blob.Provider]</span></a>
             } else {
-                if (FileUtils.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit)) {
+                if (FileUtils.IsOfficeDocument(file.Name) && Model.HasPermission(Permission.Edit) && DavService.TokensEnabled) {
                     <a class="dropdown-item" href="@file.OfficeUrl(hmac: true)" target="_top">@Svg.Icon(Model)<span>@T["Open in {0}", OfficeUtils.GetProductName(file.Name)]</span></a>
                 }
                 <a class="dropdown-item" href="@file.DownloadUrl(download: true)">@Svg.Icon("download", "primary")<span>@T["Download"]</span></a>

@@ -6,7 +6,7 @@
 @if (Model is IFile file) {
     if (file.Blob.Link != null) {
         <a class="btn btn-icon" href="@file.Blob.Link" target="_blank" title="@T["Open in {0}", file.Blob.Provider]">@Svg.Icon(Model)</a>
-    } else if (file.Blob.Link == null && FileUtils.IsOfficeDocument(file.Name)) {
+    } else if (file.Blob.Link == null && FileUtils.IsOfficeDocument(file.Name) && DavService.TokensEnabled) {
         <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model)</a>
     } else {
         <a class="btn btn-icon" href="@file.DownloadUrl(download: true)" title="@T["Download"]">@Svg.Icon("download")</a>

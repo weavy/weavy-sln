@@ -1,5 +1,16 @@
 ﻿# Changelog for Weavy
 
+## 8.14.0 (2026-11-05)
+
+* WebDAV links for opening documents in Microsoft Office are now signed with (`weavy.dav-signing-key`) that expire after `weavy.dav-link-lifetime` seconds (default 28800). Rotating the key invalidates all links.
+* Removed unused MS-OFBA sign-in (`/msofba` and `/sign-in-hmac`).
+* Removed `data-guid` attribute from `<body>`.
+
+### Breaking changes
+
+* WebDAV links are disabled until `weavy.dav-signing-key` is configured.
+* Previously issued WebDAV links stop working.
+
 ## 8.13.1 (2026-05-04)
 
 * Prevent PK violation when current version is already in versions table

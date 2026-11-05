@@ -31,7 +31,7 @@
         } else {
             <a class="btn btn-icon" href="@Model.DownloadUrl(download: true)" title="@T["Download"]">@Svg.Icon("download")</a>
         }
-        @if (Model is IFile file && ((IFile)Model).Blob.Link == null && FileUtils.IsOfficeDocument(file.Name)) {
+        @if (Model is IFile file && ((IFile)Model).Blob.Link == null && FileUtils.IsOfficeDocument(file.Name) && DavService.TokensEnabled) {
             <a class="btn btn-icon" href="@file.OfficeUrl(hmac: true)" target="_top" title="Open in @OfficeUtils.GetProductName(file.Name)">@Svg.Icon(Model, "inherit")</a>
         }
     </div>

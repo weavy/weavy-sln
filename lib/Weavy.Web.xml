@@ -1007,17 +1007,17 @@
         </member>
         <member name="M:Weavy.Web.Api.Controllers._ContentController.AttachmentOfficeUrl(System.Int32)">
             <summary>
-            Get a url that will open the attachment in an office app and append a JWT token that facilitates SSO with Weavy. 
+            Gets a URL that opens the attachment in an Office app using an expiring, attachment-scoped WebDAV token for SSO.
             </summary>
             <param name="id">The attachment id.</param>
-            <returns></returns>
+            <returns>The Office URL, or <c>null</c> if one cannot be created.</returns>
         </member>
         <member name="M:Weavy.Web.Api.Controllers._ContentController.ContentOfficeUrl(System.Int32)">
             <summary>
-            Get a url that will open the file in an office app and append a JWT token that facilitates SSO with Weavy. 
+            Gets a URL that opens the file in an Office app using an expiring, file-scoped WebDAV token for SSO.
             </summary>
             <param name="id">The content (IFile) id.</param>
-            <returns></returns>
+            <returns>The Office URL, or <c>null</c> if one cannot be created.</returns>
         </member>
         <member name="T:Weavy.Web.Api.Controllers._EmbedsController">
             <summary>
@@ -3768,14 +3768,6 @@
             <param name="path">The url to redirect to after sign in.</param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.SignInHMAC(Weavy.Web.Models.SignInModel)">
-            <summary>
-            SSO using HMAC token after opening WebDAV url from within Weavy.
-            </summary>
-            <param name="model"></param>
-            <remarks>Signs in the user if the HMAC checks out; otherwise returns the user to the username/password flow.</remarks>
-            <returns></returns>        
-        </member>
         <member name="M:Weavy.Web.Controllers.AccountController.SignInExternal(System.String,System.String)">
             <summary>
             Request a redirect to the external login provider.
@@ -3796,11 +3788,6 @@
             Redirects to this action after provider based sign in from iframe
             </summary>
             <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.MSOFBA">
-            <summary>
-            Page to display after successful authentication with MS-OFBA.
-            </summary>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.RemoveLogin(System.Int32)">
             <summary>
@@ -3908,20 +3895,6 @@
             Returns the current <see cref="T:System.Security.Principal.WindowsIdentity"/> (and also performs a simple check that throws an exception if there is already a login for the Windows identity).
             </summary>
             <exception cref="T:System.InvalidOperationException"></exception>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.GetHMACFromPath(System.String)">
-            <summary>
-            Returns the HMAC from the query string of the path if the request is for msofba.
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Controllers.AccountController.GetSignInViewName(System.String)">
-            <summary>   
-            Helper method for returning correct sign in view.
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
         </member>
         <member name="M:Weavy.Web.Controllers.AccountController.RedirectToLocal(System.String)">
             <summary>
@@ -6533,11 +6506,6 @@
             Gets or sets the path where to redirect after successful sign-in.
             </summary>
         </member>
-        <member name="P:Weavy.Web.Models.SignInModel.HMAC">
-            <summary>
-            Gets or sets the hashed message authentication code (HMAC). Utilized for Single Sign-On in WebDAV requests from Mictrosoft Office.
-            </summary>
-        </member>
         <member name="P:Weavy.Web.Models.SignInModel.AuthenticationTypes">
             <summary>
             Gets the external authentication types.
@@ -8293,142 +8261,6 @@
             The HTTPS port to be added to the redirected URL. The default is 443.
             </summary>
         </member>
-        <member name="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationExtensions">
-            <summary>
-            Provides extension methods to add MS-OFBA Authentication middleware to ASP.NET MVC project
-            using app.UseXXX() patern.
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationExtensions.UseMicrosoftOfficeFormsBasedAuthentication(Owin.IAppBuilder,Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions)">
-            <summary>
-            Adds MS-OFBA authentication middleware to the OWIN project (using passed <see cref="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions"/> class).
-            </summary>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationExtensions.UseMicrosoftOfficeFormsBasedAuthentication(Owin.IAppBuilder)">
-            <summary>
-            Adds MS-OFBA authentication middleware to the OWIN project (using default settings of <see cref="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions"/>).
-            </summary>
-        </member>
-        <member name="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationHandler">
-            <summary>
-            OWIN middleware that implements 'MS-OFBA' authentication protocol.
-            </summary>
-            <remarks>
-            Provides fallback to MS-OFBA authentication if HTTP response code 302 
-            (redirect to log-in page) has been issued after (failed) attempt to 
-            authenticate using other OWIN authentication middleware (i.e. cookie)
-            that isn't supported by host (i.e. Microsoft Office application).
-            </remarks>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationHandler.#ctor(Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationHandler"/> class.
-            </summary>
-            <param name="options">The options.</param>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationHandler.AuthenticateCoreAsync">
-            <summary>
-            The core authentication logic which must be provided by the handler. Will be invoked at most
-            once per request. Do not call directly, call the wrapping Authenticate method instead.
-            </summary>
-            <returns>
-            The ticket data provided by the authentication logic
-            </returns>
-            <remarks>
-            We always return null because goal of this handler is just to tell MS Office to open authentication window.
-            </remarks>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationHandler.ApplyResponseChallengeAsync">
-            <summary>
-            Deal with 401 challenge concerns.
-            </summary>
-            <reremarks>
-            If an authentication scheme in question
-            deals an authentication interaction as part of it's request flow. (like adding a response header, or
-            changing the 401 result to 302 of a log-in page or external sign-in location.)
-            </reremarks>
-        </member>
-        <member name="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationMiddleware">
-            <summary>
-            Implements MS-OFBA Authentication Middleware. 
-            See https://msdn.microsoft.com/en-us/library/cc313069(v=office.12).aspx.
-            </summary>
-            <remarks>
-            MS-OFBA is supported by Microsoft Office 2007 SP1 and later versions.
-            MS-OFBA is not supported by Microsoft Mini-redirector and OS X Finder.
-            </remarks>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationMiddleware.#ctor(Microsoft.Owin.OwinMiddleware,Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationMiddleware"/> class.
-            </summary>
-            <param name="next">The next.</param>
-            <param name="options">The options.</param>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationMiddleware.Invoke(Microsoft.Owin.IOwinContext)">
-            <summary>
-            Handles the request.
-            </summary>
-            <param name="context">The request context.</param>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationMiddleware.CreateHandler">
-            <summary>
-            Creates the handler for MS-OFBA Authentication.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationMiddleware.IsMSOFBAAccepted(Microsoft.Owin.IOwinRequest)">
-            <summary>
-            Analyzes request headers to determine MS-OFBA support.
-            </summary>
-            <remarks>
-            MS-OFBA is supported by Microsoft Office 2007 SP1 and later versions 
-            and any application that provides X-FORMS_BASED_AUTH_ACCEPTED: t header 
-            in OPTIONS request.
-            </remarks>
-        </member>
-        <member name="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions">
-            <summary>
-            Provides options to configure Basic Authentication Middleware.
-            </summary>
-        </member>
-        <member name="P:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions.LoginPath">
-            <summary>
-            Specifies the path to log-in page used by MS-OFBA.
-            </summary>
-            <remarks>
-            This page will be displyed in dialog box presented by Microsoft Office  or other OFBA-enabled application.
-            </remarks>
-        </member>
-        <member name="P:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions.LoginSuccessPath">
-            <summary>
-            Specifies the path to log-in redirect URL which is used to indicate successful login.
-            </summary>
-            <remarks>
-            On seeing the redirect, the client determines that this URI matches that returned in response to the 
-            Protocol Discovery request. In case the URIs match, the client assumes success, follows the 
-            redirect, and closes the form.
-            </remarks>
-        </member>
-        <member name="P:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions.DialogSize">
-            <summary>
-            Gets or sets the size of the OFBA log-in dialog.
-            </summary>
-            <value>
-            The size of the dialog.
-            </value>
-        </member>
-        <member name="P:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions.ReturnUrlParameter">
-            <summary>
-            The parameter name used to pass the return URL.
-            </summary>
-            <value>String that represents return URL parameter name.</value>
-        </member>
-        <member name="M:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Weavy.Web.Owin.MSOFBAuthentication.MSOFBAuthenticationOptions"/> class.
-            </summary>
-        </member>
         <member name="T:Weavy.Web.Owin.Turbolinks.TurbolinksMiddleware">
             <summary>
             Set Turbolinks response headers.
@@ -10079,6 +9911,16 @@
             <returns>
             Hierarchy item object referenced by the specified path or <c>null</c> if hierarchy item not found.
             </returns>
+        </member>
+        <member name="P:Weavy.Web.WebDAV.DavContext.IsTokenRequest">
+            <summary>
+            Gets a value indicating whether the current request was authenticated with a signed WebDAV token.
+            </summary>
+        </member>
+        <member name="M:Weavy.Web.WebDAV.DavContext.GetTokenScope">
+            <summary>
+            Returns the entity the signed WebDAV token of the current request is scoped to, or <c>null</c> if the request was not authenticated with a signed token.
+            </summary>
         </member>
         <member name="T:Weavy.Web.WebDAV.DavFile">
             <summary>

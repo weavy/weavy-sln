@@ -15297,16 +15297,16 @@
             Returns an url that can be used to open an Office document in Microsoft Word, Excel or Powerpoint using the Office URI Schemes.
             </summary>
             <param name="attachment">The attachment to open</param>
-            <param name="hmac"><c>true</c> to include a hash-based message authentication code (HMAC) in the path (for SSO when opening a document in Microsoft Office).</param>
-            <returns></returns>
+            <param name="hmac"><c>true</c> to include a signed token in the path (for SSO when opening a document in Microsoft Office).</param>
+            <returns>The url, or <c>null</c> if the document cannot be opened in Office.</returns>
         </member>
         <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.IFile,System.Boolean)">
             <summary>
             Returns an url that can be used to open an Office document in Microsoft Word, Excel or Powerpoint using the Office URI Schemes.
             </summary>
             <param name="file">The file to open</param>
-            <param name="hmac"><c>true</c> to include a hash-based message authentication code (HMAC) in the path (for SSO when opening a document in Microsoft Office).</param>
-            <returns></returns>
+            <param name="hmac"><c>true</c> to include a signed token in the path (for SSO when opening a document in Microsoft Office).</param>
+            <returns>The url, or <c>null</c> if the document cannot be opened in Office.</returns>
         </member>
         <member name="M:Weavy.Core.Utils.UrlUtils.DavUrl(Weavy.Core.Models.IEntity,System.Boolean,System.Boolean)">
             <summary>
@@ -15314,8 +15314,8 @@
             </summary>
             <param name="entity">The entity</param>
             <param name="absolute"><c>false</c> to return a relative url or <c>true</c> to return an absolute url.</param>
-            <param name="hmac"><c>true</c> to include a hash-based message authentication code (HMAC) in the path (for SSO when opening a document in Microsoft Office).</param>
-            <returns></returns>
+            <param name="hmac"><c>true</c> to include a signed token, scoped to <paramref name="entity"/>, in the path (for SSO when opening a document in Microsoft Office).</param>
+            <returns>The url, or <c>null</c> if no url could be created (e.g. when <paramref name="hmac"/> is <c>true</c> and no signing key is configured).</returns>
         </member>
         <member name="M:Weavy.Core.Utils.UrlUtils.IconUrl(System.Nullable{System.Int32},System.Boolean,System.Boolean)">
             <summary>
@@ -20727,6 +20727,17 @@
             Gets the configured cache provider (<c>weavy.cache-provider</c>).
             </summary>
         </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.DavSigningKey">
+            <summary>
+            Gets the secret key used to sign WebDAV links for opening documents in Microsoft Office (<c>weavy.dav-signing-key</c>).
+            When not configured, no such links are issued.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.DavLinkLifetime">
+            <summary>
+            Gets the number of seconds a signed WebDAV link is valid (<c>weavy.dav-link-lifetime</c>). Default is 28800 (8 hours).
+            </summary>
+        </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.AuthenticationEndpoint">
             <summary>
             Gets the full url to an external authentication endpoint. Must start with https:// (<c>weavy.authentication-endpoint</c>).
@@ -21666,6 +21677,55 @@
             <summary>
             Name of root dav folder.
             </summary>
+        </member>
+        <member name="F:Weavy.Core.Services.DavService.TOKEN_SCOPE_CLAIM">
+            <summary>
+            Name of the claim that holds the identifier of the entity a signed WebDAV token is scoped to.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.DavService.TokensEnabled">
+            <summary>
+            Gets a value indicating whether signed WebDAV links (for opening documents in Microsoft Office) can be created, i.e. if a signing key is configured.
+            </summary>
+        </member>
+        <member name="M:Weavy.Core.Services.DavService.CreateToken(Weavy.Core.Models.User,Weavy.Core.Models.IEntity)">
+            <summary>
+            Creates a signed token that grants <paramref name="user"/> access to <paramref name="entity"/> (and only that entity) over WebDAV.
+            </summary>
+            <remarks>
+            Token format is <c>{userIdentifier}.{entityIdentifier}.{expiresAtUnixSeconds}.{sig}</c> where <c>sig</c> is the base64url encoded HMAC-SHA256 of
+            <c>{userIdentifier}.{entityIdentifier}.{expiresAtUnixSeconds}</c> using the key configured in <c>weavy.dav-signing-key</c>.
+            </remarks>
+            <param name="user">The user.</param>
+            <param name="entity">The entity.</param>
+            <returns>A token, or <c>null</c> if no signing key is configured.</returns>
+        </member>
+        <member name="M:Weavy.Core.Services.DavService.TryValidateToken(System.String,Weavy.Core.Models.User@,Weavy.Core.Models.IEntity@)">
+            <summary>
+            Validates a token created with <see cref="M:Weavy.Core.Services.DavService.CreateToken(Weavy.Core.Models.User,Weavy.Core.Models.IEntity)"/>.
+            </summary>
+            <param name="token">The token to validate.</param>
+            <param name="user">When this method returns <c>true</c>, contains the (active) user the token was issued for.</param>
+            <param name="entity">When this method returns <c>true</c>, contains the entity the token is scoped to.</param>
+            <returns><c>true</c> if the token has a valid signature, has not expired and belongs to an active user; otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Weavy.Core.Services.DavService.IsInTokenScope(Weavy.Core.Models.IEntity,System.String,System.String,System.String)">
+            <summary>
+            Checks if a WebDAV request is allowed for a token scoped to <paramref name="scope"/>.
+            </summary>
+            <param name="scope">The entity the token is scoped to.</param>
+            <param name="path">The WebDAV path of the request, e.g. DAV/{token}/s3/a21/file.txt</param>
+            <param name="method">The HTTP method of the request.</param>
+            <param name="depth">The value of the Depth header (if any).</param>
+            <returns><c>true</c> if the request targets the scoped entity (or is a read-only, non-recursive probe of one of its ancestors); otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Weavy.Core.Services.DavService.IsScopeOrAncestor(Weavy.Core.Models.IEntity,Weavy.Core.Models.IEntity)">
+            <summary>
+            Checks if an entity is the specified scope or one of its ancestors.
+            </summary>
+            <param name="scope">The entity a token is scoped to.</param>
+            <param name="entity">The entity to check.</param>
+            <returns></returns>
         </member>
         <member name="M:Weavy.Core.Services.DavService.GetFromPath(System.String,System.Boolean,System.Boolean)">
             <summary>

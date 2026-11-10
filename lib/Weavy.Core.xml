@@ -925,6 +925,55 @@
             </summary>
             <param name="token"></param>
         </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanCacheDirectory(System.IO.DirectoryInfo,System.TimeSpan,System.Nullable{System.Int64},System.DateTime,System.Threading.CancellationToken)">
+            <summary>
+            Deletes files and empty folders from a cache directory.
+            </summary>
+            <remarks>
+            Files that have not been used within <paramref name="retention"/> are always removed.
+            If <paramref name="maxSize"/> is specified and the directory is still too big, the least recently used files are removed until the size is below 90% of <paramref name="maxSize"/>.
+            </remarks>
+            <param name="dir">The cache directory.</param>
+            <param name="retention">How long to keep files.</param>
+            <param name="maxSize">Optional max size (in bytes) of the directory.</param>
+            <param name="now">The current time (UTC).</param>
+            <param name="token"></param>
+            <returns>The result of the cleanup.</returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.EnumerateFiles(System.IO.DirectoryInfo,System.Threading.CancellationToken)">
+            <summary>
+            Enumerates all files in the specified directory and its subdirectories.
+            Directories that cannot be read (e.g. because they were removed while enumerating) are logged and skipped.
+            </summary>
+            <param name="dir"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.RemoveEmptyDirectories(System.IO.DirectoryInfo,System.DateTime,System.Threading.CancellationToken)">
+            <summary>
+            Removes empty subdirectories of the specified directory, deepest first so that parents that become empty are also removed.
+            </summary>
+            <param name="dir"></param>
+            <param name="now">The current time (UTC).</param>
+            <param name="token"></param>
+        </member>
+        <member name="M:Weavy.Core.Plugins.CleanupDaemon.TryDelete(System.IO.FileInfo)">
+            <summary>
+            Deletes the specified file.
+            </summary>
+            <param name="file"></param>
+            <returns><c>true</c> if the file was deleted; otherwise <c>false</c>.</returns>
+        </member>
+        <member name="T:Weavy.Core.Plugins.CleanupDaemon.CacheCleanupResult">
+            <summary>
+            Result of a cache cleanup.
+            </summary>
+        </member>
+        <member name="T:Weavy.Core.Plugins.CleanupDaemon.CachedFile">
+            <summary>
+            Info about a file in the cache.
+            </summary>
+        </member>
         <member name="M:Weavy.Core.Plugins.CleanupDaemon.CleanupFiles(System.Threading.CancellationToken)">
             <summary>
             Deletes orphaned blobs from the repository.
@@ -20746,6 +20795,17 @@
         <member name="P:Weavy.Core.Services.ConfigurationService.Daemons">
             <summary>
             Gets a value indicating if daemons are enabled <c>weavy.daemons</c>.
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.FileCacheMaxSize">
+            <summary>
+            Gets the maximum size (in bytes) of the file cache in App_Data/Cache (<c>weavy.file-cache-max-size</c>, configured in GB).
+            When the cache is larger than this, the least recently used files are removed by the cleanup daemon. Default is <c>null</c> (no limit).
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.FileCacheRetention">
+            <summary>
+            Gets the number of hours that files are kept in the file cache in App_Data/Cache (<c>weavy.file-cache-retention</c>). Default is 168 (7 days).
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.FormsAuthentication">

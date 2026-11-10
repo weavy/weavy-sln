@@ -1,5 +1,10 @@
 ﻿# Changelog for Weavy
 
+## 8.15.0 (2026-11-10)
+
+* Cache retention is now configurable with `weavy.file-cache-retention` (hours, default 168).
+* Added `weavy.file-cache-max-size` (GB) to cap the size of the file cache in `App_Data/Cache`. 
+
 ## 8.14.0 (2026-11-05)
 
 * WebDAV links for opening documents in Microsoft Office are now signed with (`weavy.dav-signing-key`) that expire after `weavy.dav-link-lifetime` seconds (default 28800). Rotating the key invalidates all links.

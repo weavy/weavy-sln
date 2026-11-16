@@ -1,5 +1,11 @@
 ﻿# Changelog for Weavy
 
+## 8.16.0 (2026-11-16)
+
+* Added `weavy.dav-legacy-links` (default `false`) to accept WebDAV links issued before 8.14.0 during a transition period. Legacy links never expire, are not affected by `weavy.dav-signing-key`, but are now limited to the document they were created for.
+* Added an optional `lifetime` parameter in minutes to `GET /a/content/{id}/officeurl` and `GET /a/attachments/{id}/officeurl`. It defaults to `weavy.dav-link-lifetime`; `lifetime=0` creates a non-expiring link. Rotating the signing key invalidates all signed links, including non-expiring links.
+* Changed `weavy.dav-link-lifetime` to minutes instead of seconds, with a default of 525600 minutes (1 year). 
+
 ## 8.15.0 (2026-11-10)
 
 * Cache retention is now configurable with `weavy.file-cache-retention` (hours, default 168).

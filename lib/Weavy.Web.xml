@@ -1005,18 +1005,20 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._ContentController.AttachmentOfficeUrl(System.Int32)">
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.AttachmentOfficeUrl(System.Int32,System.Nullable{System.Int32})">
             <summary>
-            Gets a URL that opens the attachment in an Office app using an expiring, attachment-scoped WebDAV token for SSO.
+            Gets a URL that opens the attachment in an Office app using an attachment-scoped WebDAV token for SSO.
             </summary>
             <param name="id">The attachment id.</param>
+            <param name="lifetime">Number of minutes the url should be valid, or <c>0</c> to never expire. When omitted, the configured default (<c>weavy.dav-link-lifetime</c>) is used. Negative values are not allowed.</param>
             <returns>The Office URL, or <c>null</c> if one cannot be created.</returns>
         </member>
-        <member name="M:Weavy.Web.Api.Controllers._ContentController.ContentOfficeUrl(System.Int32)">
+        <member name="M:Weavy.Web.Api.Controllers._ContentController.ContentOfficeUrl(System.Int32,System.Nullable{System.Int32})">
             <summary>
-            Gets a URL that opens the file in an Office app using an expiring, file-scoped WebDAV token for SSO.
+            Gets a URL that opens the file in an Office app using a file-scoped WebDAV token for SSO.
             </summary>
             <param name="id">The content (IFile) id.</param>
+            <param name="lifetime">Number of minutes the url should be valid, or <c>0</c> to never expire. When omitted, the configured default (<c>weavy.dav-link-lifetime</c>) is used. Negative values are not allowed.</param>
             <returns>The Office URL, or <c>null</c> if one cannot be created.</returns>
         </member>
         <member name="T:Weavy.Web.Api.Controllers._EmbedsController">

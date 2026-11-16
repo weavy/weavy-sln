@@ -15341,29 +15341,32 @@
             <param name="download"></param>
             <returns></returns>
         </member>
-        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.Attachment,System.Boolean)">
+        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.Attachment,System.Boolean,System.Nullable{System.DateTime})">
             <summary>
             Returns an url that can be used to open an Office document in Microsoft Word, Excel or Powerpoint using the Office URI Schemes.
             </summary>
             <param name="attachment">The attachment to open</param>
             <param name="hmac"><c>true</c> to include a signed token in the path (for SSO when opening a document in Microsoft Office).</param>
+            <param name="expires">When the signed token expires (UTC), <see cref="F:System.DateTime.MaxValue"/> to never expire, or <c>null</c> to use the configured default lifetime. Only used when <paramref name="hmac"/> is <c>true</c>.</param>
             <returns>The url, or <c>null</c> if the document cannot be opened in Office.</returns>
         </member>
-        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.IFile,System.Boolean)">
+        <member name="M:Weavy.Core.Utils.UrlUtils.OfficeUrl(Weavy.Core.Models.IFile,System.Boolean,System.Nullable{System.DateTime})">
             <summary>
             Returns an url that can be used to open an Office document in Microsoft Word, Excel or Powerpoint using the Office URI Schemes.
             </summary>
             <param name="file">The file to open</param>
             <param name="hmac"><c>true</c> to include a signed token in the path (for SSO when opening a document in Microsoft Office).</param>
+            <param name="expires">When the signed token expires (UTC), <see cref="F:System.DateTime.MaxValue"/> to never expire, or <c>null</c> to use the configured default lifetime. Only used when <paramref name="hmac"/> is <c>true</c>.</param>
             <returns>The url, or <c>null</c> if the document cannot be opened in Office.</returns>
         </member>
-        <member name="M:Weavy.Core.Utils.UrlUtils.DavUrl(Weavy.Core.Models.IEntity,System.Boolean,System.Boolean)">
+        <member name="M:Weavy.Core.Utils.UrlUtils.DavUrl(Weavy.Core.Models.IEntity,System.Boolean,System.Boolean,System.Nullable{System.DateTime})">
             <summary>
             Returns an url that can be used by WebDAV clients.
             </summary>
             <param name="entity">The entity</param>
             <param name="absolute"><c>false</c> to return a relative url or <c>true</c> to return an absolute url.</param>
             <param name="hmac"><c>true</c> to include a signed token, scoped to <paramref name="entity"/>, in the path (for SSO when opening a document in Microsoft Office).</param>
+            <param name="expires">When the signed token expires (UTC), <see cref="F:System.DateTime.MaxValue"/> to never expire, or <c>null</c> to use the configured default lifetime. Only used when <paramref name="hmac"/> is <c>true</c>.</param>
             <returns>The url, or <c>null</c> if no url could be created (e.g. when <paramref name="hmac"/> is <c>true</c> and no signing key is configured).</returns>
         </member>
         <member name="M:Weavy.Core.Utils.UrlUtils.IconUrl(System.Nullable{System.Int32},System.Boolean,System.Boolean)">
@@ -20784,7 +20787,13 @@
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.DavLinkLifetime">
             <summary>
-            Gets the number of seconds a signed WebDAV link is valid (<c>weavy.dav-link-lifetime</c>). Default is 28800 (8 hours).
+            Gets the number of minutes a signed WebDAV link is valid (<c>weavy.dav-link-lifetime</c>). Default is 525600 (1 year).
+            </summary>
+        </member>
+        <member name="P:Weavy.Core.Services.ConfigurationService.DavLegacyLinks">
+            <summary>
+            Gets a value indicating whether legacy (unsigned, non-expiring) WebDAV links issued before signed links were introduced are still accepted (<c>weavy.dav-legacy-links</c>).
+            Intended for a transition period only. Default is <c>false</c>.
             </summary>
         </member>
         <member name="P:Weavy.Core.Services.ConfigurationService.AuthenticationEndpoint">
@@ -21748,22 +21757,28 @@
             Gets a value indicating whether signed WebDAV links (for opening documents in Microsoft Office) can be created, i.e. if a signing key is configured.
             </summary>
         </member>
-        <member name="M:Weavy.Core.Services.DavService.CreateToken(Weavy.Core.Models.User,Weavy.Core.Models.IEntity)">
+        <member name="M:Weavy.Core.Services.DavService.CreateToken(Weavy.Core.Models.User,Weavy.Core.Models.IEntity,System.Nullable{System.DateTime})">
             <summary>
             Creates a signed token that grants <paramref name="user"/> access to <paramref name="entity"/> (and only that entity) over WebDAV.
             </summary>
             <remarks>
             Token format is <c>{userIdentifier}.{entityIdentifier}.{expiresAtUnixSeconds}.{sig}</c> where <c>sig</c> is the base64url encoded HMAC-SHA256 of
             <c>{userIdentifier}.{entityIdentifier}.{expiresAtUnixSeconds}</c> using the key configured in <c>weavy.dav-signing-key</c>.
+            An expiration of <c>0</c> means the token never expires.
             </remarks>
             <param name="user">The user.</param>
             <param name="entity">The entity.</param>
+            <param name="expires">When the token expires (UTC), <see cref="F:System.DateTime.MaxValue"/> to never expire, or <c>null</c> to expire after the configured <see cref="P:Weavy.Core.Services.ConfigurationService.DavLinkLifetime"/>.</param>
             <returns>A token, or <c>null</c> if no signing key is configured.</returns>
         </member>
         <member name="M:Weavy.Core.Services.DavService.TryValidateToken(System.String,Weavy.Core.Models.User@,Weavy.Core.Models.IEntity@)">
             <summary>
-            Validates a token created with <see cref="M:Weavy.Core.Services.DavService.CreateToken(Weavy.Core.Models.User,Weavy.Core.Models.IEntity)"/>.
+            Validates a token created with <see cref="M:Weavy.Core.Services.DavService.CreateToken(Weavy.Core.Models.User,Weavy.Core.Models.IEntity,System.Nullable{System.DateTime})"/>.
             </summary>
+            <remarks>
+            When <see cref="P:Weavy.Core.Services.ConfigurationService.DavLegacyLinks"/> is enabled, legacy tokens in the format <c>{userIdentifier}.{entityIdentifier}.{sha1}</c>
+            (issued before signed links were introduced) are also accepted. They do not expire and do not depend on the signing key.
+            </remarks>
             <param name="token">The token to validate.</param>
             <param name="user">When this method returns <c>true</c>, contains the (active) user the token was issued for.</param>
             <param name="entity">When this method returns <c>true</c>, contains the entity the token is scoped to.</param>
